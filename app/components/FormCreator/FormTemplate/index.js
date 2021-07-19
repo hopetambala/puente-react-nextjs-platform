@@ -4,7 +4,10 @@ import styles from './index.module.scss';
 import InputPicker from './InputPicker';
 
 const FormTemplate = (props) => {
-  const { formItems, setFormItems, removeValue } = props;
+  const {
+    formItems, setFormItems, removeValue,
+    disabledTotal, setDisabledTotal,
+  } = props;
   return (
     <Droppable droppableId="DROP-AREA" className={styles.formTemplate}>
       {(providedDrop) => (
@@ -19,6 +22,8 @@ const FormTemplate = (props) => {
                   removeValue={removeValue}
                   provided={providedDrag}
                   innerRef={providedDrag.innerRef}
+                  disabledTotal={disabledTotal}
+                  setDisabledTotal={setDisabledTotal}
                 />
               )}
             </Draggable>

@@ -9,7 +9,8 @@ const PaperInputPicker = (props) => {
     provided, innerRef,
     item,
     formItems, setFormItems,
-    removeValue,
+    removeValue, disabledTotal,
+    setDisabledTotal,
   } = props;
 
   return (
@@ -24,24 +25,32 @@ const PaperInputPicker = (props) => {
         formItems={formItems}
         setFormItems={setFormItems}
         removeValue={removeValue}
+        disabledTotal={disabledTotal}
+        setDisabledTotal={setDisabledTotal}
       />
       <Select
         item={item}
         formItems={formItems}
         setFormItems={setFormItems}
         removeValue={removeValue}
+        disabledTotal={disabledTotal}
+        setDisabledTotal={setDisabledTotal}
       />
       <Header
         item={item}
         formItems={formItems}
         setFormItems={setFormItems}
         removeValue={removeValue}
+        disabledTotal={disabledTotal}
+        setDisabledTotal={setDisabledTotal}
       />
       <Geolocation
         item={item}
         formItems={formItems}
         setFormItems={setFormItems}
         removeValue={removeValue}
+        disabledTotal={disabledTotal}
+        setDisabledTotal={setDisabledTotal}
       />
     </div>
   );
