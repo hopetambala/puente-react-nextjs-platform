@@ -1,6 +1,6 @@
 import FormMarketplace from 'app/components/epics/FormMarketplace';
 import Page from 'app/components/templates/dashboard-layout';
-import { useGlobalState } from 'app/store';
+import { useGlobalState } from 'app/store/global.context';
 import { useRouter } from 'next/router';
 
 import styles from './index.module.scss';

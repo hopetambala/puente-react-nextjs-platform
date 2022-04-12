@@ -1,17 +1,19 @@
+import { List, ListItem } from '@material-ui/core';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
 import IconButton from '@material-ui/core/IconButton';
-import List from '@material-ui/core/List';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import CreateIcon from '@material-ui/icons/Create';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import FormatListBulletedIcon from '@material-ui/icons/FormatListBulleted';
 import GetAppIcon from '@material-ui/icons/GetApp';
-import PieChartIcon from '@material-ui/icons/PieChart';
 import StoreIcon from '@material-ui/icons/Store';
+import theme from 'app/modules/theme';
 import { retrieveSignOutFunction } from 'app/modules/user';
 import clsx from 'clsx';
+import { useRouter } from 'next/router';
 import React from 'react';
 
 import HeaderItem from './HeaderItem';
@@ -20,6 +22,9 @@ import useStyles from './index.style';
 export default function Header({ children }) {
   const classes = useStyles();
   const [open, setDrawerOpen] = React.useState(false);
+  const router = useRouter();
+
+  const logout = () => retrieveSignOutFunction().then(() => router.push('/'));
 
   return (
     <div className={classes.root}>
@@ -57,6 +62,13 @@ export default function Header({ children }) {
           <HeaderItem link="/data/data-exporter" text="Exporter">
             <GetAppIcon />
           </HeaderItem>
+        </List>
+        <List>
+          <ListItem>
+            <IconButton onClick={logout} style={{ color: theme.palette.error.main }}>
+              {open ? <ExitToAppIcon /> : <ExitToAppIcon />}
+            </IconButton>
+          </ListItem>
         </List>
       </Drawer>
       <main className={classes.content}>

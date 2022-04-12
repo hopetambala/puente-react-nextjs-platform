@@ -6,8 +6,9 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { Link } from 'app/components/elements';
 import FormInput from 'app/components/molecules/dashboard/form-controls/input';
 import Page from 'app/components/templates/dashboard-layout';
-import { retrieveSignInFunction } from 'app/modules/user';
+import { UserContext } from 'app/store/auth.context';
 import { useRouter } from 'next/router';
+import { useContext } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 // import { alertService, userService } from 'services';
 import * as yup from 'yup';
@@ -23,15 +24,21 @@ const Login = () => {
     resolver: yupResolver(validationSchema),
   });
 
+  const {
+    login, error: userError,
+  } = useContext(UserContext);
+
   const { handleSubmit, errors } = methods;
 
   const onSubmit = (data) => {
     const { usernameV, passwordV } = data;
-    return retrieveSignInFunction(usernameV, passwordV)
-      .then((result) => {
+    return login({ usernameV, passwordV })
+      .then(() => {
         // get return url from query parameters or default to '/'
         const returnUrl = router.query.returnUrl || '/quick-start';
         router.push(returnUrl);
+      }).catch(() => {
+        console.log(userError); //eslint-disable-line
       });
   };
 

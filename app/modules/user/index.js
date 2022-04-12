@@ -45,6 +45,10 @@ const retrieveForgotPasswordFunction = (params) => new Promise((resolve, reject)
   });
 });
 
+/**
+ * DEPRECATED
+ * @returns
+ */
 const retrieveCurrentUserAsyncFunction = () => Parse.User.current().then((u) => {
   const user = {};
   user.id = u.id;

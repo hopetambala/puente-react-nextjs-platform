@@ -1,11 +1,11 @@
 import {
-  Button, Chip, CircularProgress,
+  Button, Chip,
   Grid, Input, MenuItem, NoSsr,
   Select, Snackbar,
   TextField,
 } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
-import { postObjectsToClass, retrieveUniqueListOfOrganizations, updateObject } from 'app/modules/cloud-code';
+import { postObjectsToClass, updateObject } from 'app/modules/cloud-code';
 import { useEffect, useState } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { v4 as uuid } from 'uuid';
@@ -33,15 +33,18 @@ const formTypes = [
   'Custom',
 ];
 
-function FormCreator({ context }) {
+function FormCreator({ context, user }) {
   const [formName, setFormName] = useState('');
   const [formDescription, setFormDescription] = useState('');
   const [formItems, setFormItems] = useState([]);
   const [formTypeNames, setFormTypeNames] = useState([]);
   const [formId, setFormId] = useState();
 
-  const [organizationNames, setOrganizationNames] = useState([]);
-  const [organizations, setOrganizations] = useState([]);
+  /**
+   * ADMIN WORKFLOW
+   */
+  // const [organizationNames, setOrganizationNames] = useState([]);
+  // const [organizations, setOrganizations] = useState([]);
 
   const [workflowTypes] = useState(['Puente', 'Assets', 'Marketplace']);
   const [workflowNames, setWorkflowNames] = useState([]);
@@ -53,9 +56,12 @@ function FormCreator({ context }) {
   const [submission, setSubmission] = useState(false);
 
   useEffect(() => {
-    retrieveUniqueListOfOrganizations().then((results) => {
-      setOrganizations(results);
-    });
+    /**
+     * ADMIN WORKFLOW
+     */
+    // retrieveUniqueListOfOrganizations().then((results) => {
+    //   setOrganizations(results);
+    // });
 
     if (context.store['/forms/form-creator']) {
       const { data, action } = context.store['/forms/form-creator'];
@@ -70,14 +76,19 @@ function FormCreator({ context }) {
       setFormName(name);
       setFormDescription(description);
       setFormTypeNames(typeOfForm || []);
-      setOrganizationNames(orgs || []);
+      // setOrganizationNames(orgs || []); //ADMIN WORKFLOW
+      console.log('Orgs Authorized', orgs) //eslint-disable-line
       setFormItems(fields);
     }
   }, []);
 
-  const handleOrganizationChange = (event) => {
-    setOrganizationNames(event.target.value);
-  };
+  /**
+   * ADMIN WORKFLOW
+   * @param {} event
+   */
+  // const handleOrganizationChange = (event) => {
+  //   setOrganizationNames(event.target.value);
+  // };
 
   const handleFormTypesChange = (event) => {
     setFormTypeNames(event.target.value);
@@ -96,14 +107,14 @@ function FormCreator({ context }) {
     setFormName('');
     setFormDescription('');
     setFormTypeNames([]);
-    setOrganizationNames([]);
     setFormItems([]);
   };
 
   const submitCustomForm = () => {
     const formObject = {};
     formObject.fields = formItems;
-    formObject.organizations = organizationNames;
+    // formObject.organizations = organizationNames;
+    formObject.organizations = [user.organization];
     formObject.typeOfForm = formTypeNames;
     let newWorkflowsToAdd;
     if (newWorkflowValue !== '') {
@@ -220,7 +231,10 @@ function FormCreator({ context }) {
               <div>
                 <p className={styles.formBlob}>{submissionType}</p>
               </div>
-              <div id="organization">
+              {/**
+               * PUT BACK IN FOR ADMIN
+               */}
+              {/* <div id="organization">
                 <h2>Organization(s)</h2>
                 {organizations.length < 1
                   && <CircularProgress />}
@@ -245,7 +259,7 @@ function FormCreator({ context }) {
                     </MenuItem>
                   ))}
                 </Select>
-              </div>
+              </div> */}
               <div id="formType">
                 <h2>Type of Form</h2>
                 <Select

@@ -1,13 +1,11 @@
 import {
-  CircularProgress, Grid,
-  MenuItem,
+  Grid,
   Modal,
-  Select,
 } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import AppsIcon from '@material-ui/icons/Apps';
 import MenuIcon from '@material-ui/icons/Menu';
-import { retrieveCustomData, retrievePuenteFormModifications, retrieveUniqueListOfOrganizations } from 'app/modules/cloud-code';
+import { retrieveCustomData, retrievePuenteFormModifications } from 'app/modules/cloud-code';
 import React, { useEffect, useState } from 'react';
 import { isArray } from 'underscore';
 
@@ -15,9 +13,11 @@ import GridTable from './Grid';
 import styles from './index.module.scss';
 import Table from './Table';
 
-const FormManager = ({ context, router }) => {
+const FormManager = ({ context, router, user }) => {
+  /* Admin Workflow
   const [organization, setOrganization] = useState('Puente');
   const [organizationList, setOrganizationList] = useState([]);
+  */
 
   const [workflowData, setWorkflowData] = useState({});
   const [puenteData, setPuenteData] = useState([]);
@@ -31,6 +31,8 @@ const FormManager = ({ context, router }) => {
     Vitals: null,
     MedicalEvaluation: null,
   });
+
+  const { organization } = user;
 
   useEffect(() => {
     retrieveCustomData(organization).then((records) => {
@@ -60,9 +62,14 @@ const FormManager = ({ context, router }) => {
       delete tableDataByCategory.Puente;
       setWorkflowData(tableDataByCategory);
     });
-    retrieveUniqueListOfOrganizations().then((results) => {
-      setOrganizationList(results);
-    });
+
+    /**
+     * ADMIN WORKFLOW
+     */
+    // retrieveUniqueListOfOrganizations().then((results) => {
+    //   setOrganizationList(results);
+    // });
+    // setOrganizationList([organization]);
   }, [organization]);
 
   const updatePuenteForms = (record) => {
@@ -85,7 +92,8 @@ const FormManager = ({ context, router }) => {
   };
 
   useEffect(() => {
-    retrieveCustomData('Shared').then((records) => {
+    // retrieveCustomData('Shared').then((records) => {
+    retrieveCustomData(organization).then((records) => {
       records.forEach((record) => {
         if (isArray(record.workflows)) {
           record.workflows.forEach((workflow) => {
@@ -115,9 +123,14 @@ const FormManager = ({ context, router }) => {
     setPuenteData(combinedPuenteForms);
   }, [puenteForms]);
 
-  const handleOrganization = (event) => {
-    setOrganization(event.target.value);
-  };
+  /**
+   * ADMIN WORKFLOW
+   * @param {*} action
+   * @param {*} data
+   */
+  // const handleOrganization = (event) => {
+  //   setOrganization(event.target.value);
+  // };
 
   const passDataToFormCreator = (action, data) => {
     const href = '/forms/form-creator';
@@ -172,7 +185,10 @@ const FormManager = ({ context, router }) => {
             </IconButton>
           </div>
         )}
-        <Grid item xs={12}>
+        {/**
+         * ADMIN WORKFLOW
+         */}
+        {/* <Grid item xs={12}>
           <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
@@ -184,7 +200,7 @@ const FormManager = ({ context, router }) => {
             {organization.length > 1
             && organizationList.map((value) => <MenuItem value={value}>{value}</MenuItem>)}
           </Select>
-        </Grid>
+        </Grid> */}
         {listView === true ? (
           <Table
             data={puenteData}

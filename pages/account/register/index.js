@@ -6,8 +6,9 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { Link } from 'app/components/elements';
 import FormInput from 'app/components/molecules/dashboard/form-controls/input';
 import Page from 'app/components/templates/dashboard-layout';
-import { retrieveSignUpFunction } from 'app/modules/user';
+import { UserContext } from 'app/store/auth.context';
 import { useRouter } from 'next/router';
+import { useContext } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 // import { alertService, userService } from 'services';
 import * as yup from 'yup';
@@ -30,14 +31,15 @@ const Register = () => {
   const methods = useForm({
     resolver: yupResolver(validationSchema),
   });
+  const {
+    register, error: userError,
+  } = useContext(UserContext);
 
   const { handleSubmit, errors } = methods;
 
-  const onSubmit = (user) => retrieveSignUpFunction(user)
-    .then((result) => {
-      console.log(result);
-      router.push('/quick-start');
-    });
+  const onSubmit = (user) => register(user)
+    .then(() => router.push('/quick-start'))
+    .catch(() => console.log(userError)); //eslint-disable-line
 
   const paperStyle = {
     padding: 20, height: '70vh', width: '50vw', margin: '20px auto',

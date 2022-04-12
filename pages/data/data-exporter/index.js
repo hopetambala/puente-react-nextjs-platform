@@ -1,7 +1,12 @@
 import DataExporter from 'app/components/epics/DataExporter';
 import Page from 'app/components/templates/dashboard-layout';
+import { UserContext } from 'app/store/auth.context';
+import { useContext } from 'react';
 
 export default function Forms() {
+  const {
+    user, isLoading: isUserLoading, error: userError,
+  } = useContext(UserContext);
   return (
     <Page
       header
@@ -12,7 +17,11 @@ export default function Forms() {
           <h1 className="title">
             Data Exporter
             {' '}
-            <DataExporter />
+            <DataExporter
+              user={user}
+              isUserLoading={isUserLoading}
+              userError={userError}
+            />
           </h1>
         </main>
 

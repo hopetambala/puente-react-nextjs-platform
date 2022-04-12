@@ -11,7 +11,8 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider } from '@material-ui/core/styles';
 import theme from 'app/modules/theme';
 import { parseUserValue } from 'app/modules/user';
-import { AppWrapper } from 'app/store'; // import based on where you put it
+import { UserContextProvider } from 'app/store/auth.context';
+import { AppWrapper } from 'app/store/global.context'; // import based on where you put it
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { appWithTranslation } from 'next-i18next';
@@ -72,12 +73,14 @@ const App = (props) => {
         <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
       </Head>
       <AppWrapper>
-        <ThemeProvider theme={theme}>
-          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-          <CssBaseline />
-          {authorized
+        <UserContextProvider>
+          <ThemeProvider theme={theme}>
+            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+            <CssBaseline />
+            {authorized
             && <Component {...pageProps} />}
-        </ThemeProvider>
+          </ThemeProvider>
+        </UserContextProvider>
       </AppWrapper>
 
     </>

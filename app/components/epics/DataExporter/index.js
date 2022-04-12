@@ -15,7 +15,7 @@ import DataExporterTableRow from './DataExporterTableRow';
 import FormMenu from './FormMenu';
 import SubmitButton from './SubmitButton';
 
-const DataExporter = () => {
+const DataExporter = ({ user }) => {
   const classes = useStyles();
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('surveyingOrganization');
@@ -27,11 +27,12 @@ const DataExporter = () => {
   const [cellLabels, setCellLabels] = useState([]);
   const [formType, setFormType] = useState('SurveyData');
   const [formValue, setFormValue] = useState('Survey Data');
-  const [organization] = useState('Puente');
-  const [params, setParams] = useState({ surveyingOrganization: organization });
+  const [params, setParams] = useState({ surveyingOrganization: user.organization });
   const [selectedCellLabels, setSelectedCellLabels] = useState([]);
   const [cellLabelMax, setCellLabelMax] = useState(10);
   const [csvData, setCsvData] = useState([]);
+
+  const { organization } = user;
 
   const refreshDataExporter = () => {
     retrieveAllFormResults(formType, params).then((records) => {
@@ -48,13 +49,13 @@ const DataExporter = () => {
     });
   };
 
-  const handleSubmit = () => {
-    refreshDataExporter();
-  };
-
   useEffect(() => {
     refreshDataExporter();
   }, []);
+
+  const handleSubmit = () => {
+    refreshDataExporter();
+  };
 
   const handleClick = (event, name) => {
     const selectedIndex = selected.indexOf(name);

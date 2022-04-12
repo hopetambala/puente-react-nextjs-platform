@@ -1,11 +1,16 @@
 import FormManager from 'app/components/epics/FormManager';
 import Page from 'app/components/templates/dashboard-layout';
-import { useGlobalState } from 'app/store';
+import { UserContext } from 'app/store/auth.context';
+import { useGlobalState } from 'app/store/global.context';
 import { useRouter } from 'next/router';
+import { useContext } from 'react';
 
 export default function Manager() {
   const { contextManagment } = useGlobalState();
   const router = useRouter();
+  const {
+    user, isLoading: isUserLoading, error: userError,
+  } = useContext(UserContext);
 
   return (
     <Page
@@ -17,6 +22,9 @@ export default function Manager() {
         <FormManager
           router={router}
           context={contextManagment}
+          user={user}
+          isUserLoading={isUserLoading}
+          userError={userError}
         />
         <style jsx>
           {`
