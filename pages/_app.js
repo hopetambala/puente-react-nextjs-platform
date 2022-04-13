@@ -9,8 +9,9 @@ import 'styles/landing-page/slick/slick-theme.css';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider } from '@material-ui/core/styles';
+import { initializeParse } from '@parse/react-ssr';
 import theme from 'app/modules/theme';
-import { parseUserValue } from 'app/modules/user';
+import { retrieveCurrentUserAsyncFunction } from 'app/modules/user';
 import { UserContextProvider } from 'app/store/auth.context';
 import { AppWrapper } from 'app/store/global.context'; // import based on where you put it
 import Head from 'next/head';
@@ -21,14 +22,21 @@ import { useEffect, useState } from 'react';
 
 import nextI18NextConfig from '../next-i18next.config.js';
 
+initializeParse(
+  process.env.NEXT_PUBLIC_parseServerUrl,
+  process.env.NEXT_PUBLIC_parseAppId,
+  process.env.NEXT_PUBLIC_parseJavascriptKey,
+);
+
 const App = (props) => {
   const { Component, pageProps } = props;
   const router = useRouter();
   const [authorized, setAuthorized] = useState(false);
 
-  const authCheck = (url) => {
+  const authCheck = async (url) => {
     // redirect to login page if accessing a private page and not logged in
-    const parseUser = parseUserValue();
+    const parseUser = await retrieveCurrentUserAsyncFunction();
+    console.log(parseUser);
     const publicPaths = ['/account/login', '/account/register', '/'];
     const path = url.split('?')[0];
     if (!parseUser && !publicPaths.includes(path)) {
@@ -73,14 +81,16 @@ const App = (props) => {
         <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
       </Head>
       <AppWrapper>
-        <UserContextProvider>
-          <ThemeProvider theme={theme}>
-            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-            <CssBaseline />
-            {authorized
-            && <Component {...pageProps} />}
-          </ThemeProvider>
-        </UserContextProvider>
+        <ThemeProvider theme={theme}>
+          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+          <CssBaseline />
+          {authorized
+            && (
+            <UserContextProvider>
+              <Component {...pageProps} />
+            </UserContextProvider>
+            )}
+        </ThemeProvider>
       </AppWrapper>
 
     </>

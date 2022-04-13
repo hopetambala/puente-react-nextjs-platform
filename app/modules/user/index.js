@@ -1,25 +1,28 @@
 import { Parse } from 'parse';
-import { BehaviorSubject } from 'rxjs';
+// import { BehaviorSubject } from 'rxjs';
 
-const userSubject = new BehaviorSubject(process.browser && JSON.parse(localStorage.getItem('user')));
+// const userSubject = new BehaviorSubject(process.browser && JSON.parse(localStorage.getItem('currentUser')));
 
 const retrieveSignUpFunction = (params) => new Promise((resolve, reject) => {
   Parse.Cloud.run('signup', params).then((user) => {
+    console.log('signup', user);
     console.log(`User registered successful ${user}`); // eslint-disable-line
-    userSubject.next(user);
-    localStorage.setItem('user', JSON.stringify(user));
+    // userSubject.next(user);
+    localStorage.setItem('currentUser', JSON.stringify(user));
     resolve(user);
   }, (error) => {
     reject(error);
   });
 });
 
-const retrieveSignInFunction = (username, password) => new Promise((resolve, reject) => {
+const retrieveSignInFunction = (params) => new Promise((resolve, reject) => {
   // sign in with either phonenumber (username) or email handled with logIn
-  Parse.User.logIn(String(username), String(password)).then((user) => {
+  Parse.User.logIn(String(params?.username), String(params?.password)).then((user) => {
+  // Parse.Cloud.run('signin', params).then((user) => {
+    console.log('signin', user);
     console.log(`User logged in successful with username: ${user.get('username')}`); // eslint-disable-line
-    userSubject.next(user);
-    localStorage.setItem('user', JSON.stringify(user));
+    // userSubject.next(user);
+    localStorage.setItem('currentUser', JSON.stringify(user));
     resolve(user);
   }, (error) => {
       console.log(`Error: ${error.code} ${error.message}`); // eslint-disable-line
@@ -29,8 +32,8 @@ const retrieveSignInFunction = (username, password) => new Promise((resolve, rej
 
 const retrieveSignOutFunction = () => new Promise((resolve, reject) => {
   Parse.User.logOut().then((result) => {
-    localStorage.removeItem('user');
-    userSubject.next(null);
+    localStorage.removeItem('currentUser');
+    // userSubject.next(null);
     resolve(result);
   }, (error) => {
     reject(error);
@@ -49,29 +52,19 @@ const retrieveForgotPasswordFunction = (params) => new Promise((resolve, reject)
  * DEPRECATED
  * @returns
  */
-const retrieveCurrentUserAsyncFunction = () => Parse.User.current().then((u) => {
-  const user = {};
-  user.id = u.id;
-  user.username = u.get('username');
-  user.firstname = u.get('firstname');
-  user.lastname = u.get('lastname');
-  user.email = u.get('email');
-  user.organization = u.get('organization');
-  user.role = u.get('role');
-  return user;
-});
+const retrieveCurrentUserAsyncFunction = () => Parse.User.currentAsync();
 
 const retrieveDeleteUserFunction = (params) => {
   Parse.Cloud.run('deleteUser', params).then((result) => result);
 };
 
-const parseUser = () => userSubject.asObservable();
+// const parseUser = () => userSubject.asObservable();
 
-const parseUserValue = () => userSubject.value;
+// const parseUserValue = () => userSubject.value;
 
 export {
-  parseUser,
-  parseUserValue,
+  // parseUser,
+  // parseUserValue,
   retrieveCurrentUserAsyncFunction,
   retrieveDeleteUserFunction,
   retrieveForgotPasswordFunction,

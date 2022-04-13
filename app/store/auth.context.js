@@ -1,11 +1,16 @@
 import { deleteData, storeData } from 'app/modules/async-storage';
 import {
-  parseUserValue,
+  // parseUserValue,
+  // retrieveCurrentUserAsyncFunction,
   retrieveSignInFunction,
   retrieveSignOutFunction,
   retrieveSignUpFunction,
 } from 'app/modules/user';
-import React, { createContext, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  // useEffect,
+  useState,
+} from 'react';
 
 export const UserContext = createContext();
 
@@ -14,35 +19,36 @@ export const UserContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    setIsLoading(true);
-    const currentParseUser = parseUserValue();
-    if (currentParseUser) {
-      setUser(currentParseUser);
-      storeData(currentParseUser, 'currentUser');
-      setIsLoading(false);
-    }
-  }, []);
+  // useEffect(() => {
+  //   setIsLoading(true);
+  //   async function checkUser() {
+  //     const currentParseUser = await retrieveCurrentUserAsyncFunction();
+  //     console.log(currentParseUser);
+  //     if (!currentParseUser) {
+  //       return;
+  //     }
+  //     setUser(currentParseUser);
+  //     storeData(currentParseUser, 'currentUser');
+  //     setIsLoading(false);
+  //   }
+
+  //   checkUser();
+  // }, []);
 
   const login = async (enteredCredentials) => {
-    const { username, password } = enteredCredentials;
     setIsLoading(true);
-    return retrieveSignInFunction(username, password)
-      .then((currentParseUser) => {
-        const usr = currentParseUser;
-        usr.isOnline = true;
-        setUser(usr);
-        storeData(usr, 'currentUser');
-        storeData(password, 'password');
-        setError(null);
-        setIsLoading(false);
-        return true;
-      })
-      .catch(async (e) => {
-        setError(e.toString());
-        setIsLoading(false);
-        return false;
-      });
+    try {
+      const u = await retrieveSignInFunction(enteredCredentials);
+      setUser(u);
+      storeData(u, 'currentUser');
+      setError(null);
+      setIsLoading(false);
+      return u;
+    } catch (e) {
+      setError(e.toString());
+      setIsLoading(false);
+      return null;
+    }
   };
 
   /**

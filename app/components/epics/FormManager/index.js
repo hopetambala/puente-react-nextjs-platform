@@ -32,7 +32,7 @@ const FormManager = ({ context, router, user }) => {
     MedicalEvaluation: null,
   });
 
-  const { organization } = user;
+  const organization = user?.organization || ''; // testing
 
   useEffect(() => {
     retrieveCustomData(organization).then((records) => {

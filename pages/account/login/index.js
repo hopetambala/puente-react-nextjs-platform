@@ -30,7 +30,7 @@ const Login = () => {
 
   const { handleSubmit, errors } = methods;
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     const { usernameV, passwordV } = data;
     return login({ usernameV, passwordV })
       .then(() => {
