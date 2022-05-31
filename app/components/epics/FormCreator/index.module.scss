@@ -1,21 +1,14 @@
 .formCreator{
   width: inherit;
-  .formButtons{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content:flex-start;
-  }
-
   .formBlob {
-    text-transform:uppercase
+    text-transform: uppercase
   }
 
   .formBlock{
     position: fixed;
     top: 0;
     right: 0vw;
-    // width: 100% !important;
+    width: 100% !important;
   }
 
   

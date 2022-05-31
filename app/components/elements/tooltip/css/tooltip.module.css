@@ -1,0 +1,34 @@
+.tooltipWrapper {
+  margin: 0 !important;
+  pointer-events: none;
+  z-index: var(--z-tooltip);
+}
+
+.tooltip {
+  background: var(--color-tooltip-bg);
+  border-radius: var(--border-radius-s);
+  box-shadow: var(--shadow-lv1);
+  color: var(--color-text);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+  max-width: 360px;
+  padding: var(--spacer-xs) var(--spacer-s);
+  text-align: center;
+}
+
+.tooltipTriggerWrapper {
+  display: inline-flex;
+}
+
+.tooltip[data-popper-reference-hidden] {
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.ellipsis {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  white-space: nowrap;
+}
