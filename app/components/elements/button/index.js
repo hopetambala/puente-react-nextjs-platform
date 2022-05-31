@@ -58,7 +58,6 @@ const Button = ({
       href={href}
       className={classname}
       id={id}
-      data-test="button"
       shouldOpenHrefInNewTab={shouldOpenHrefInNewTab}
     >
       {contents}
@@ -91,7 +90,7 @@ Button.defaultProps = {
   shouldOpenHrefInNewTab: false,
   icon: null,
   id: null,
-  intent: 'primary',
+  intent: null,
   isDisabled: false,
   isDropdown: false,
   isFullWidth: false,

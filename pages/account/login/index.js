@@ -3,7 +3,7 @@ import {
   Avatar, Grid, Paper,
 } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import { Button } from 'app/components/elements';
+import { Button, Stack } from 'app/components/elements';
 import FormInput from 'app/components/molecules/dashboard/form-controls/input';
 import Page from 'app/components/templates/dashboard-layout';
 import { retrieveSignInFunction } from 'app/modules/user';
@@ -67,16 +67,19 @@ const Login = () => {
               </Grid>
             </form>
           </FormProvider>
-          <Button
-            text="Login"
-            intent="primary"
-            onClick={handleSubmit(onSubmit)}
-          />
-          <Button
-            text="Register"
-            intent="primary"
-            href="/account/register"
-          />
+          <Stack isVertical spacing="mediumLarge">
+            <Button
+              text="Continue"
+              onClick={handleSubmit(onSubmit)}
+              isFullWidth
+            />
+            <Button
+              text="Create account"
+              intent="primary"
+              href="/account/register"
+              isFullWidth
+            />
+          </Stack>
         </Paper>
       </Grid>
     </Page>
