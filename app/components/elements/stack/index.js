@@ -11,6 +11,7 @@ const Stack = ({
   isVertical,
   isWrapDisabled,
   spacing,
+  className,
 }) => {
   const classname = classNames(
     styles.stack,
@@ -20,6 +21,7 @@ const Stack = ({
       [styles.fillModifier]: fill,
       [styles.nowrapModifier]: isWrapDisabled,
     },
+    className,
   );
 
   const items = React.Children.map(children, (child) => {

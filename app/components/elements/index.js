@@ -1,4 +1,6 @@
 import Button from './button';
+import Card from './card';
+import CardGroup from './card-group';
 import Icon from './icon';
 import Link from './Link';
 import Spinner from './spinner';
@@ -8,6 +10,8 @@ import Tooltip from './tooltip';
 
 export {
   Button,
+  Card,
+  CardGroup,
   Icon,
   Link,
   Spinner,

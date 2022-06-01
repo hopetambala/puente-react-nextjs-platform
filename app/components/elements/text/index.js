@@ -10,6 +10,7 @@ const Color = ['gray', 'white', 'red', 'green', 'blue', 'orange', 'yellow', 'lig
 const Text = ({
   className,
   color,
+  bold,
   element,
   shouldTruncate,
   text,
@@ -29,6 +30,7 @@ const Text = ({
       [styles.blue]: color && color === 'blue',
       [styles.orange]: color && color === 'orange',
       [styles.yellow]: color && color === 'yellow',
+      [styles.bold]: bold,
       [styles.truncate]: shouldTruncate,
     },
     className,
