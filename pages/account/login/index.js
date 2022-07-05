@@ -1,16 +1,15 @@
 import { yupResolver } from '@hookform/resolvers';
 import {
-  Avatar, Button, Grid, Paper,
-} from '@material-ui/core';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import { Link } from 'app/components/elements';
+  Button, Card, Stack, Text,
+} from 'app/components/elements';
 import FormInput from 'app/components/molecules/dashboard/form-controls/input';
 import Page from 'app/components/templates/dashboard-layout';
 import { retrieveSignInFunction } from 'app/modules/user';
 import { useRouter } from 'next/router';
 import { FormProvider, useForm } from 'react-hook-form';
-// import { alertService, userService } from 'services';
 import * as yup from 'yup';
+
+import styles from './index.module.scss';
 
 const validationSchema = yup.object().shape({
   usernameV: yup.string().required('Username or Phone Number is Required'),
@@ -35,56 +34,55 @@ const Login = () => {
       });
   };
 
-  const paperStyle = {
-    padding: 20, height: '70vh', width: '50vw', margin: '20px auto',
-  };
-
-  const avatarStyle = { backgroundColor: 'black' };
   return (
     <Page>
-      <Grid>
-        <Paper elevation={10} style={paperStyle}>
-          <Grid align="center">
-            <Avatar style={avatarStyle}><LockOutlinedIcon /></Avatar>
-            <h2>Login</h2>
-          </Grid>
+      <div className={styles.paper}>
+        <Card padding="extraLarge">
+          <Text text="PUENTE" element="h1" className={styles.stack} />
+          <Stack isVertical className={styles.stack}>
+            <Text text="Sign in to Manage" element="h2" />
+          </Stack>
           <FormProvider {...methods}>
-            <form>
-              <Grid>
-                <Grid item>
-                  <FormInput
-                    name="usernameV"
-                    label="Phone Number or Email Address"
-                    required
-                    errorobj={errors}
-                  />
-                  <FormInput
-                    name="passwordV"
-                    label="Password"
-                    required
-                    errorobj={errors}
-                  />
-                </Grid>
-              </Grid>
-            </form>
-          </FormProvider>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSubmit(onSubmit)}
-          >
-            Login
-          </Button>
-          <Link href="/account/register">
-            <Button
-              variant="contained"
-              color="primary"
+            <Stack
+              isVertical
+              spacing="large"
+              className={styles.stack}
             >
-              Register
-            </Button>
-          </Link>
-        </Paper>
-      </Grid>
+              <FormInput
+                name="usernameV"
+                label="Phone Number or Email Address"
+                required
+                errorobj={errors}
+                InputProps={{
+                  startAdornment: <span position="start" />,
+                }}
+              />
+              <FormInput
+                name="passwordV"
+                label="Password"
+                required
+                errorobj={errors}
+                InputProps={{
+                  startAdornment: <span position="start" />,
+                }}
+              />
+            </Stack>
+          </FormProvider>
+          <Stack isVertical spacing="large">
+            <Button
+              text="Continue"
+              onClick={handleSubmit(onSubmit)}
+              isFullWidth
+            />
+            <Button
+              text="Create account"
+              intent="primary"
+              href="/account/register"
+              isFullWidth
+            />
+          </Stack>
+        </Card>
+      </div>
     </Page>
   );
 };
