@@ -6,6 +6,7 @@ import 'styles/landing-page/top-loading-bar.css';
 import 'styles/landing-page/page-transition.css';
 import 'styles/landing-page/slick/slick.css';
 import 'styles/landing-page/slick/slick-theme.css';
+import 'app/components/elements/_css/root.css';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider } from '@material-ui/core/styles';
