@@ -35,12 +35,13 @@ const Verify = () => {
       <div className={styles.paper}>
         <Card padding="extraLarge">
           <Text text={status} element="h1" className={styles.stack} />
-          {status ==='Verified'}
+          {status ==='Verified' &&
             <Button
               text="Continue"
               onClick={returnHome}
               isFullWidth
             />
+          }
         </Card>
       </div>
     </Page>
