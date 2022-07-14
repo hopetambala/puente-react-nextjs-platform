@@ -38,6 +38,7 @@ const Reset = () => {
   }
 
   useEffect(() => {
+    // http://localhost:3000/account/reset?objectId=AyplFWVebA
     const retrieveAccountDetails = async () => {
       const user = await retrieveUserByObjectId(userId);
 
