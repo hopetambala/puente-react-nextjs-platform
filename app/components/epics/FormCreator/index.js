@@ -1,11 +1,10 @@
 import {
-  Chip,
+  Button, Chip,
   Grid, Input, MenuItem, NoSsr,
   Select, Snackbar,
   TextField,
 } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
-import { Button, Text } from 'app/components/elements';
 import { postObjectsToClass, updateObject } from 'app/modules/cloud-code';
 import { useEffect, useState } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
@@ -114,7 +113,7 @@ function FormCreator({ context, user }) {
   const submitCustomForm = () => {
     const formObject = {};
     formObject.fields = formItems;
-    // formObject.organizations = organizationNames; //ADMIN WORKFLOW
+    // formObject.organizations = organizationNames;
     formObject.organizations = [user.organization];
     formObject.typeOfForm = formTypeNames;
     let newWorkflowsToAdd;
@@ -220,10 +219,18 @@ function FormCreator({ context, user }) {
         <DragDropContext onDragEnd={onDragEnd}>
           <Grid container>
             <Grid item xs={9}>
-              <Text element="h1" text="Form Creator" />
-              <Button text="Reset Form" onClick={clearForm} />
-              <Button text="Submit" onClick={submitCustomForm} />
-              <p className={styles.formBlob}>{submissionType}</p>
+              <div className={styles.formButtons}>
+                <h1>Form Creator</h1>
+                <Button variant="outlined" color="primary" onClick={() => clearForm()}>
+                  Reset Form
+                </Button>
+                <Button variant="contained" color="primary" onClick={submitCustomForm}>
+                  Submit
+                </Button>
+              </div>
+              <div>
+                <p className={styles.formBlob}>{submissionType}</p>
+              </div>
               {/**
                * PUT BACK IN FOR ADMIN
                */}
@@ -253,8 +260,8 @@ function FormCreator({ context, user }) {
                   ))}
                 </Select>
               </div> */}
-              <div id="form-type">
-                <Text element="h2" text="Type of Form" />
+              <div id="formType">
+                <h2>Type of Form</h2>
                 <Select
                   labelId="mutiple-chip-organization"
                   id="mutiple-chip"
@@ -278,43 +285,46 @@ function FormCreator({ context, user }) {
                 </Select>
               </div>
               <div id="workflow">
-                <Text element="h2" text="Workflows" />
-                <div id="your-workflows">
-                  <Text element="h3" text="Your Workflows" />
-                  <Select
-                    labelId="mutiple-chip-organization"
-                    id="mutiple-chip"
-                    multiple
-                    value={workflowNames}
-                    onChange={handleWorkflowChange}
-                    input={<Input id="select-multiple-chip" />}
-                    renderValue={(selected) => (
-                      <div>
-                        {selected.map((value) => (
-                          <Chip key={value} label={value} />
-                        ))}
-                      </div>
-                    )}
-                  >
-                    {workflowTypes.map((workflowType) => (
-                      <MenuItem key={workflowType} value={workflowType}>
-                        {workflowType}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </div>
-                <div id="add-new-workflow">
-                  <Text element="h3" text="Add New Workflow" />
-                  <TextField id="new-workflow" label="New Workflow" onChange={(event) => handleTextChange(event)} />
+                <h2>Workflow</h2>
+                <div style={{ flexDirection: 'row' }}>
+                  <div style={{ flexDirection: 'column' }}>
+                    <Select
+                      labelId="mutiple-chip-organization"
+                      id="mutiple-chip"
+                      multiple
+                      value={workflowNames}
+                      onChange={handleWorkflowChange}
+                      input={<Input id="select-multiple-chip" />}
+                      renderValue={(selected) => (
+                        <div>
+                          {selected.map((value) => (
+                            <Chip key={value} label={value} />
+                          ))}
+                        </div>
+                      )}
+                    >
+                      {workflowTypes.map((workflowType) => (
+                        <MenuItem key={workflowType} value={workflowType}>
+                          {workflowType}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </div>
+                  <div style={{ flexDirection: 'column' }}>
+                    <h3>Add New Workflow</h3>
+                    <TextField id="new-workflow" label="New Workflow" onChange={(event) => handleTextChange(event)} />
+                  </div>
                 </div>
               </div>
-              <div id="form-input">
+              <div>
                 <input
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   type="text"
                   placeholder="Form Name"
                 />
+              </div>
+              <div>
                 <input
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
@@ -329,7 +339,7 @@ function FormCreator({ context, user }) {
               />
             </Grid>
             <Grid item xs={3} className={styles.formBlock}>
-              <Text element="h2" text="Building Blocks" />
+              <h2>Building Blocks</h2>
               <FormBlocks items={COLLECTION} />
             </Grid>
           </Grid>
