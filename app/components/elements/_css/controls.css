@@ -1,0 +1,165 @@
+.control {
+  --checkbox-size: 24px;
+
+  display: inline-block;
+  position: relative;
+  padding-left: var(--checkbox-size);
+  cursor: pointer;
+
+  /* Prevent from overflowing flex parent */
+  min-width: 0;
+  max-width: 100%;
+  min-height: var(--checkbox-size);
+}
+
+/* Hide default checkbox and radio button using opacity
+/* to restyle while allowing screen reader access */
+.hidden {
+  opacity: 0;
+}
+
+.label:not(:empty) {
+  min-height: var(--checkbox-size);
+  margin-left: var(--spacer-s);
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacer-xxs) 0;
+  overflow-wrap: break-word;
+}
+
+.hidden,
+.indicator,
+.indicator::before,
+.indicator::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: var(--checkbox-size);
+  width: var(--checkbox-size);
+}
+
+.indicator::before {
+  background: var(--color-checkbox-bg);
+  border: 1px solid var(--color-checkbox-border);
+}
+
+/* Check and Radio Dot */
+.indicator::before,
+.indicator::after {
+  content: '';
+}
+
+.buttonModifier {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-m);
+  padding-top: var(--spacer-s);
+  padding-bottom: var(--spacer-s);
+  padding-right: var(--spacer-m);
+  padding-left: calc(var(--checkbox-size) + var(--spacer-s) + var(--spacer-s));
+}
+
+.buttonModifier .indicator {
+  top: var(--spacer-s);
+  left: var(--spacer-s);
+}
+
+.control .hidden:checked ~ .indicator::before,
+.checkboxModifier .hidden:indeterminate ~ .indicator::before {
+  background: var(--color-button-primary);
+  border: none;
+  transition: background-color 0.2s ease-out;
+}
+
+.control .hidden:checked ~ .indicator::after,
+.checkboxModifier .hidden:indeterminate ~ .indicator::after {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+  transition: transform 0.15s ease-out, opacity 0.1s ease-out;
+}
+
+.control .hidden:not(:checked) ~ .indicator::before {
+  transition: background-color 0.2s ease-out;
+}
+
+.control .hidden:not(:checked) ~ .indicator::after {
+  transition: transform 0s ease-out 0.15s, opacity 0.1s ease-out;
+}
+
+.control .hidden:focus ~ .indicator::before,
+.control .hidden:active ~ .indicator::before {
+  border-color: var(--color-checkbox-border-focus);
+  box-shadow: var(--focus-glow);
+}
+
+.control .hidden:checked:active ~ .indicator::before,
+.checkboxModifier .hidden:indeterminate:active ~ .indicator::before {
+  background: var(--color-button-primary-active);
+}
+
+.control .hidden:checked:active ~ .indicator::after {
+  opacity: 0.6;
+}
+
+.control .hidden:not(:checked):active ~ .indicator::before {
+  background: var(--color-blue-bg);
+  transition: 0s;
+}
+
+.checkboxModifier .hidden:indeterminate ~ .indicator::after {
+  content: url("data:image/svg+xml; utf8, <svg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'><rect x='6' y='10' width='12' height='4' rx='1' fill='white'/></svg>");
+  opacity: 1;
+}
+
+.disabledModifier {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.disabledModifier .indicator::before {
+  background: var(--color-neutral-400);
+  border: none;
+}
+
+.checkboxModifier .indicator::before {
+  border-radius: var(--border-radius-s);
+}
+
+.checkboxModifier .indicator::after {
+  content: url("data:image/svg+xml; utf8, <svg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'><path fill-rule='evenodd' clip-rule='evenodd' d='M4.29993 12.9079C3.87976 13.3198 3.90438 14.0038 4.35309 14.3845L9.72367 18.9409C10.1676 19.3175 10.8381 19.2368 11.18 18.7656L20.0265 6.57288C20.34 6.14084 20.2556 5.53824 19.8356 5.20888V5.20888C19.4341 4.8941 18.8594 4.93494 18.5064 5.30332L9.54222 14.6599L6.21075 12.2101C5.81573 11.9196 5.26836 11.9584 4.91824 12.3016L4.29993 12.9079Z' fill='white'/></svg>");
+  opacity: 0;
+  transform: rotate(-30deg) scale(0.6);
+}
+
+.radioModifier .indicator::before {
+  border-radius: var(--border-radius-full);
+}
+
+.radioModifier .indicator::after {
+  content: '';
+  opacity: 0;
+  background: var(--color-button-primary-text);
+  border-radius: var(--border-radius-full);
+  width: 50%;
+  height: 50%;
+  position: absolute;
+  left: 25%;
+  top: 25%;
+  transform: scale(2);
+}
+
+.labelWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.conditional {
+  margin-left: var(--spacer-xl);
+  margin-top: var(--spacer-s);
+}
+
+.checkboxWarnText {
+  margin: var(--spacer-xxs) 0 calc(var(--spacer-s) * -1) 0;
+}
