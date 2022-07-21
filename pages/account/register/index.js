@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers';
 import {
-  Button, Card, Stack, Text,
+  Button, Card, Stack, Text, Toast,
 } from 'app/components/elements';
 import FormInput from 'app/components/molecules/dashboard/form-controls/input';
 import Page from 'app/components/templates/dashboard-layout';
@@ -8,6 +8,7 @@ import { retrieveSignUpFunction } from 'app/modules/user';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
 import * as yup from 'yup';
 
 import styles from './index.module.scss';
@@ -37,7 +38,9 @@ const Register = () => {
   const onSubmit = async (user) => {
     await retrieveSignUpFunction(user, notificationType).then(() => {
       router.push('/quick-start');
-    });
+    }).catch((e) => toast(
+      <Toast text={`${e.message}`} isError />,
+    ));
   };
 
   return (
