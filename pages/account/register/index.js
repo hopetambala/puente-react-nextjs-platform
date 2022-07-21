@@ -1,13 +1,17 @@
 import { yupResolver } from '@hookform/resolvers';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import { Card, Link, Stack, Text, Button } from 'app/components/elements';
+import {
+  Button, Card, Stack, Text, Toast,
+} from 'app/components/elements';
 import FormInput from 'app/components/molecules/dashboard/form-controls/input';
 import Page from 'app/components/templates/dashboard-layout';
 import { retrieveSignUpFunction } from 'app/modules/user';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import styles from './index.module.scss';
+import { toast } from 'react-toastify';
 import * as yup from 'yup';
+
+import styles from './index.module.scss';
 
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
@@ -27,13 +31,17 @@ const Register = () => {
   const methods = useForm({
     resolver: yupResolver(validationSchema),
   });
+  const [notificationType, setNotificationType] = useState('email');
 
   const { handleSubmit, errors } = methods;
 
-  const onSubmit = (user) => retrieveSignUpFunction(user)
-    .then(() => {
+  const onSubmit = async (user) => {
+    await retrieveSignUpFunction(user, notificationType).then(() => {
       router.push('/quick-start');
-    });
+    }).catch((e) => toast(
+      <Toast text={`${e.message}`} isError />,
+    ));
+  };
 
   return (
     <Page>
@@ -89,7 +97,22 @@ const Register = () => {
               />
             </Stack>
           </FormProvider>
-          <Stack isVertical spacing='medium'>
+          <Stack spacing="medium" fill>
+            <Button
+              intent={notificationType === 'email' ? 'primary' : ''}
+              onClick={() => setNotificationType('email')}
+              text="Send confirmation via email?"
+              isFullWidth
+            />
+            <Button
+              intent={notificationType === 'text' ? 'primary' : ''}
+              onClick={() => setNotificationType('text')}
+              text="Send confirmation via text?"
+              isFullWidth
+            />
+
+          </Stack>
+          <Stack isVertical spacing="medium">
             <Button
               intent="primary"
               onClick={handleSubmit(onSubmit)}
