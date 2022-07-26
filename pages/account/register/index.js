@@ -1,13 +1,16 @@
 import { yupResolver } from '@hookform/resolvers';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import { Card, Link, Stack, Text, Button } from 'app/components/elements';
+import {
+  Button, Card, Link, Stack, Text,
+} from 'app/components/elements';
 import FormInput from 'app/components/molecules/dashboard/form-controls/input';
 import Page from 'app/components/templates/dashboard-layout';
 import { retrieveSignUpFunction } from 'app/modules/user';
 import { useRouter } from 'next/router';
 import { FormProvider, useForm } from 'react-hook-form';
-import styles from './index.module.scss';
 import * as yup from 'yup';
+
+import styles from './index.module.scss';
 
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
@@ -89,7 +92,7 @@ const Register = () => {
               />
             </Stack>
           </FormProvider>
-          <Stack isVertical spacing='medium'>
+          <Stack isVertical spacing="medium">
             <Button
               intent="primary"
               onClick={handleSubmit(onSubmit)}

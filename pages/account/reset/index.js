@@ -4,10 +4,11 @@ import {
 } from 'app/components/elements';
 import FormInput from 'app/components/molecules/dashboard/form-controls/input';
 import Page from 'app/components/templates/dashboard-layout';
-import { retrieveSignInFunction, retrieveUserByObjectId } from 'app/modules/user';
+import { retrieveSignInFunction, retrieveUserByObjectId, updateUser } from 'app/modules/user';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { v4 as uuid } from 'uuid';
 import * as yup from 'yup';
 
 import styles from './index.module.scss';
@@ -21,48 +22,36 @@ const validationSchema = yup.object().shape({
   password: yup.string().required('Password is Required'),
 });
 
-const Reset = () => {
-  const router =  useRouter()
-  const methods =  useForm({
+const Reset = (props) => {
+  const { user, userId, router } = props;
+  const methods = useForm({
+    defaultValues: useMemo(() => user, [props]),
     resolver: yupResolver(validationSchema),
   });
 
-  const { objectId:userId } = router.query;
-
-  const { handleSubmit, errors } = methods
-
-  const [user, setUser] = useState()
-
-  const returnHome = () => {
-    router.push('/')
-  }
+  const {
+    register, reset, handleSubmit, errors,
+  } = methods;
 
   useEffect(() => {
-    // http://localhost:3000/account/reset?objectId=AyplFWVebA
-    const retrieveAccountDetails = async () => {
-      const user = await retrieveUserByObjectId(userId);
+    reset(user);
+  }, [user]);
 
-      setUser({
-        "First Name": user.attributes.firstname,
-        "Last Name":user. attributes.lastname, 
-        "Username": user.attributes.username,
-        "Organization": user.attributes.organization,
-        "Phone Number": user.attributes.phonenumber,
-        "Email Address": "",
-        'Password': "",
-      })
-    }  
-    if (!userId) return
-    retrieveAccountDetails()
-  },[userId])
-
-  const onSubmit = (data) => {
-    const { username, password } = data;
-    return retrieveSignInFunction(username, password)
-      .then(() => {
-        const returnUrl = router.query.returnUrl || '/quick-start';
-        router.push(returnUrl);
-      });
+  const onSubmit = async (data) => {
+    const updatedUser = {
+      firstname: data['First Name'],
+      lastname: data['Last Name'],
+      organization: data.Organization,
+      phonenumber: data['Phone Number'],
+      email: data['Email Address'],
+      password: data.Password,
+    };
+    await updateUser(userId, updatedUser).then(async (userResp) => {
+      const { username, password } = userResp;
+      await retrieveSignInFunction(username, password);
+      const returnUrl = '/quick-start';
+      router.push(returnUrl);
+    });
   };
 
   return (
@@ -79,50 +68,53 @@ const Reset = () => {
               spacing="large"
               className={styles.stack}
             >
-              {user && Object.keys(user).map(attr =>
-                <FormInput
-                defaultValue={user[attr]}
-                name={attr}
-                label={attr}
-                required
-                errorobj={errors}
-                InputProps={{
-                  startAdornment: <span position="start" />,
-                }}
+              {user && Object.keys(user).map((attr) => (
+                <div>
+                  <label htmlFor={attr}>{attr}</label>
+                  <input name={attr} ref={register} />
+                </div>
+              ))}
+            </Stack>
+            <Stack isVertical spacing="large">
+              <Button
+                text="Continue"
+                onClick={handleSubmit(onSubmit)}
+                isFullWidth
+                type="submit"
               />
-              )}
-              {/* <FormInput
-                name="username"
-                label="Phone Number or Email Address"
-                required
-                errorobj={errors}
-                InputProps={{
-                  startAdornment: <span position="start" />,
-                }}
-              />
-              <FormInput
-                name="password"
-                label="Password"
-                required
-                errorobj={errors}
-                InputProps={{
-                  startAdornment: <span position="start" />,
-                }}
-              />  */}
             </Stack>
           </FormProvider>
-          <Stack isVertical spacing="large">
-            <Button
-              text="Continue"
-              onClick={handleSubmit(onSubmit)}
-              isFullWidth
-            />
-          </Stack>
         </Card>
       </div>
     </Page>
   );
 };
 
-export default Reset;
+const ResetWrapper = () => {
+  const router = useRouter();
+  const { objectId: userId } = router.query;
+  const [user, setUser] = useState();
+  window.localStorage.clear();
+  useEffect(() => {
+    // http://localhost:3000/account/reset?objectId=AyplFWVebA
+    const retrieveAccountDetails = async () => {
+      const { attributes: retrievedUser } = await retrieveUserByObjectId(userId);
+      setUser(retrievedUser);
+      setUser({
+        'First Name': retrievedUser.firstname,
+        'Last Name': retrievedUser.lastname,
+        Username: retrievedUser.username,
+        Organization: retrievedUser.organization,
+        'Phone Number': retrievedUser.phonenumber,
+        'Email Address': retrievedUser.email,
+        Password: '',
+      });
+    };
+    if (!userId) return;
+    retrieveAccountDetails();
+  }, [userId]);
 
+  return <Reset user={user} userId={userId} router={router} />;
+};
+
+export default ResetWrapper;
