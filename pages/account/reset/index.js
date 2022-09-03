@@ -2,32 +2,30 @@ import { yupResolver } from '@hookform/resolvers';
 import {
   Button, Card, Stack, Text,
 } from 'app/components/elements';
-import FormInput from 'app/components/molecules/form-controls/input';
 import Page from 'app/components/templates/dashboard-layout';
 import { retrieveSignInFunction, retrieveUserByObjectId, updateUser } from 'app/modules/user';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { v4 as uuid } from 'uuid';
 import * as yup from 'yup';
 
 import styles from './index.module.scss';
 
 const validationSchema = yup.object().shape({
-  firstname: yup.string().required('First Name is Required'),
-  lastname: yup.string().required('Last Name is Required'),
-  username: yup.string().required('Username or Phone Number is Required'),
-  email: yup.string().required('Email is Required'),
-  organization: yup.string().required('Username or Phone Number is Required'),
-  password: yup.string().required('Password is Required'),
-});
+  "First Name": yup.string().required('First Name is Required'),
+  "Last Name": yup.string().required('Last Name is Required'),
+  "Email Address": yup.string().required('Email is Required'),
+  "Organization": yup.string().required('Username or Phone Number is Required'),
+  "Password": yup.string().required('Password is Required'),
+}).required();
 
 const Reset = (props) => {
   const { user, userId, router } = props;
   const methods = useForm({
-    defaultValues: useMemo(() => user, [props]),
-    resolver: yupResolver(validationSchema),
-  });
+    resolver: yupResolver(validationSchema)
+  })
+
 
   const {
     register, reset, handleSubmit, errors,
@@ -63,16 +61,23 @@ const Reset = (props) => {
             <Text text="Account Details" element="h2" />
           </Stack>
           <FormProvider {...methods}>
+          <form>
             <Stack
               isVertical
               spacing="large"
               className={styles.stack}
+              fill
             >
               {user && Object.keys(user).map((attr) => (
-                <div>
+                <Stack
+                isVertical
+                fill
+               >
                   <label htmlFor={attr}>{attr}</label>
                   <input name={attr} ref={register} />
-                </div>
+                  {console.log(errors)}
+                  {errors[`${attr}`]?.message && <p className={styles.errorText}>{errors[`${attr}`]?.message}</p>}
+                </Stack>
               ))}
             </Stack>
             <Stack isVertical spacing="large">
@@ -80,9 +85,9 @@ const Reset = (props) => {
                 text="Continue"
                 onClick={handleSubmit(onSubmit)}
                 isFullWidth
-                type="submit"
               />
             </Stack>
+            </form>
           </FormProvider>
         </Card>
       </div>
@@ -103,7 +108,7 @@ const ResetWrapper = () => {
       setUser({
         'First Name': retrievedUser.firstname,
         'Last Name': retrievedUser.lastname,
-        Username: retrievedUser.username,
+        // Username: retrievedUser.username,
         Organization: retrievedUser.organization,
         'Phone Number': retrievedUser.phonenumber,
         'Email Address': retrievedUser.email,
