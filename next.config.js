@@ -8,3 +8,15 @@ module.exports = withImages({
   },
   i18n,
 });
+
+module.exports = {
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/account/login',
+        permanent: true,
+      },
+    ];
+  },
+};

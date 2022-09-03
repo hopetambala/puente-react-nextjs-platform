@@ -2,7 +2,7 @@ import { yupResolver } from '@hookform/resolvers';
 import {
   Button, Card, Stack, Text,
 } from 'app/components/elements';
-import FormInput from 'app/components/molecules/dashboard/form-controls/input';
+import FormInput from 'app/components/molecules/form-controls/input';
 import Page from 'app/components/templates/dashboard-layout';
 import { retrieveSignInFunction, retrieveUserByObjectId, updateUser } from 'app/modules/user';
 import { useRouter } from 'next/router';

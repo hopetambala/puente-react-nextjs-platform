@@ -5,7 +5,7 @@ import {
   TextField,
 } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
-import { Button, Text } from 'app/components/elements';
+import { Button, Stack, Text } from 'app/components/elements';
 import { postObjectsToClass, updateObject } from 'app/modules/cloud-code';
 import { useEffect, useState } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
@@ -207,7 +207,7 @@ function FormCreator({ context, user }) {
   );
 
   return (
-    <div className={styles.formCreator}>
+    <div>
       <NoSsr>
         <Snackbar open={submission} autoHideDuration={6000}>
           <Alert variant="filled" severity="success">
@@ -219,74 +219,29 @@ function FormCreator({ context, user }) {
         />
         <DragDropContext onDragEnd={onDragEnd}>
           <Grid container>
-            <Grid item xs={9}>
-              <Text element="h1" text="Form Creator" />
-              <Button text="Reset Form" onClick={clearForm} />
-              <Button text="Submit" onClick={submitCustomForm} />
-              <p className={styles.formBlob}>{submissionType}</p>
-              {/**
-               * PUT BACK IN FOR ADMIN
-               */}
-              {/* <div id="organization">
-                <h2>Organization(s)</h2>
-                {organizations.length < 1
-                  && <CircularProgress />}
-                <Select
-                  labelId="mutiple-chip-organization"
-                  id="mutiple-chip"
-                  multiple
-                  value={organizationNames}
-                  onChange={handleOrganizationChange}
-                  input={<Input id="select-multiple-chip" />}
-                  renderValue={(selected) => (
-                    <div>
-                      {selected.map((value) => (
-                        <Chip key={value} label={value} />
-                      ))}
-                    </div>
-                  )}
-                >
-                  {organizations.length > 1 && organizations.map((organization) => (
-                    <MenuItem key={organization} value={organization}>
-                      {organization}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </div> */}
-              <div id="form-type">
-                <Text element="h2" text="Type of Form" />
-                <Select
-                  labelId="mutiple-chip-organization"
-                  id="mutiple-chip"
-                  multiple
-                  value={formTypeNames}
-                  onChange={handleFormTypesChange}
-                  input={<Input id="select-multiple-chip" />}
-                  renderValue={(selected) => (
-                    <div>
-                      {selected.map((value) => (
-                        <Chip key={value} label={value} />
-                      ))}
-                    </div>
-                  )}
-                >
-                  {formTypes.map((formType) => (
-                    <MenuItem key={formType} value={formType}>
-                      {formType}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </div>
-              <div id="workflow">
-                <Text element="h2" text="Workflows" />
-                <div id="your-workflows">
-                  <Text element="h3" text="Your Workflows" />
+            <Grid item xs={8}>
+              <Stack isVertical spacing="medium">
+                <Text element="h1" text="Form Creator" />
+                <div>
+                  <Button text="Reset Form" onClick={clearForm} />
+                  <Button text="Submit" onClick={submitCustomForm} />
+                </div>
+                <div>
+                  <p>{submissionType}</p>
+                </div>
+                {/**
+                 * PUT BACK IN FOR ADMIN
+                 */}
+                {/* <div id="organization">
+                  <h2>Organization(s)</h2>
+                  {organizations.length < 1
+                    && <CircularProgress />}
                   <Select
                     labelId="mutiple-chip-organization"
                     id="mutiple-chip"
                     multiple
-                    value={workflowNames}
-                    onChange={handleWorkflowChange}
+                    value={organizationNames}
+                    onChange={handleOrganizationChange}
                     input={<Input id="select-multiple-chip" />}
                     renderValue={(selected) => (
                       <div>
@@ -296,19 +251,60 @@ function FormCreator({ context, user }) {
                       </div>
                     )}
                   >
-                    {workflowTypes.map((workflowType) => (
-                      <MenuItem key={workflowType} value={workflowType}>
-                        {workflowType}
+                    {organizations.length > 1 && organizations.map((organization) => (
+                      <MenuItem key={organization} value={organization}>
+                        {organization}
                       </MenuItem>
                     ))}
                   </Select>
-                </div>
-                <div id="add-new-workflow">
+                </div> */}
+                  <Text element="h2" text="Type of Form" />
+                  <Select
+                    labelId="mutiple-chip-organization"
+                    id="mutiple-chip"
+                    multiple
+                    value={formTypeNames}
+                    onChange={handleFormTypesChange}
+                    input={<Input id="select-multiple-chip" />}
+                    renderValue={(selected) => (
+                      <span>
+                        {selected.map((value) => (
+                          <Chip key={value} label={value} />
+                        ))}
+                      </span>
+                    )}
+                  >
+                    {formTypes.map((formType) => (
+                      <MenuItem key={formType} value={formType}>
+                        {formType}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                <Text element="h2" text="Workflows" />
+                <Text element="h3" text="Your Workflows" />
+                <Select
+                  labelId="mutiple-chip-organization"
+                  id="mutiple-chip"
+                  multiple
+                  value={workflowNames}
+                  onChange={handleWorkflowChange}
+                  input={<Input id="select-multiple-chip" />}
+                  renderValue={(selected) => (
+                    <div>
+                      {selected.map((value) => (
+                        <Chip key={value} label={value} />
+                      ))}
+                    </div>
+                  )}
+                >
+                  {workflowTypes.map((workflowType) => (
+                    <MenuItem key={workflowType} value={workflowType}>
+                      {workflowType}
+                    </MenuItem>
+                  ))}
+                </Select>
                   <Text element="h3" text="Add New Workflow" />
                   <TextField id="new-workflow" label="New Workflow" onChange={(event) => handleTextChange(event)} />
-                </div>
-              </div>
-              <div id="form-input">
                 <input
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
@@ -321,33 +317,20 @@ function FormCreator({ context, user }) {
                   type="text"
                   placeholder="Form Description"
                 />
-              </div>
-              <FormTemplate
-                formItems={formItems}
-                setFormItems={setFormItems}
-                removeValue={removeValue}
-              />
+                <FormTemplate
+                  formItems={formItems}
+                  setFormItems={setFormItems}
+                  removeValue={removeValue}
+                />
+              </Stack>
             </Grid>
-            <Grid item xs={3} className={styles.formBlock}>
+            <Grid item xs={4} className={styles['form-block']}>
               <Text element="h2" text="Building Blocks" />
               <FormBlocks items={COLLECTION} />
             </Grid>
           </Grid>
         </DragDropContext>
       </NoSsr>
-      <style jsx>
-        {`
-        .conatiner {
-          flexDirection: 'row'
-        }
-
-        .contentSplit {
-          flexDirection: 'column'
-        }
-        
-        `}
-
-      </style>
     </div>
   );
 }

@@ -3,7 +3,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import {
   Button, Card, Link, Stack, Text,
 } from 'app/components/elements';
-import FormInput from 'app/components/molecules/dashboard/form-controls/input';
+import FormInput from 'app/components/molecules/form-controls/input';
 import Page from 'app/components/templates/dashboard-layout';
 import { retrieveSignUpFunction } from 'app/modules/user';
 import { useRouter } from 'next/router';

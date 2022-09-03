@@ -1,4 +1,4 @@
-import { Card } from 'app/components/molecules/dashboard';
+import { Card } from 'app/components/molecules';
 import React, { useEffect, useState } from 'react';
 
 import retrieveAllFormSpecs from './_data';

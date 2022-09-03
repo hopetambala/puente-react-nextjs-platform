@@ -30,7 +30,7 @@ const Copyable = (props) => {
                         {...provideded.dragHandleProps}
                         className={snapshoted.isDragging ? styles.dragging : styles.noDragging}
                       >
-                        {item.text}
+                        <p>{item.text}</p>
                       </div>
                     )}
                   </Draggable>
