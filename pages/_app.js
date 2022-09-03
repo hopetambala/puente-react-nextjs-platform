@@ -16,12 +16,9 @@ import { parseUserValue } from 'app/modules/user';
 import { AppWrapper } from 'app/store'; // import based on where you put it
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { appWithTranslation } from 'next-i18next';
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
-
-import nextI18NextConfig from '../next-i18next.config.js';
 
 const App = (props) => {
   const { Component, pageProps } = props;
@@ -101,7 +98,7 @@ const App = (props) => {
   );
 };
 
-export default appWithTranslation(App, nextI18NextConfig);
+export default App
 
 App.propTypes = {
   Component: PropTypes.elementType.isRequired,
