@@ -1,4 +1,4 @@
-# Puente - Manage
+# Puente - Manage 
 
 [![Build Status](https://travis-ci.com/hopetambala/puente-react-nextjs-platform.svg?branch=master)](https://travis-ci.com/hopetambala/puente-react-nextjs-platform)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/490748505d184028b66bbdaf9c83f887)](https://app.codacy.com/manual/hopetambala/puente-reactnative-collect?utm_source=github.com&utm_medium=referral&utm_content=hopetambala/puente-reactnative-collect&utm_campaign=Badge_Grade_Dashboard)

@@ -7,6 +7,7 @@ import 'styles/landing-page/page-transition.css';
 import 'styles/landing-page/slick/slick.css';
 import 'styles/landing-page/slick/slick-theme.css';
 import 'app/components/elements/_css/root.css';
+import 'react-toastify/dist/ReactToastify.css';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider } from '@material-ui/core/styles';
@@ -18,6 +19,7 @@ import { useRouter } from 'next/router';
 import { appWithTranslation } from 'next-i18next';
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
+import { ToastContainer } from 'react-toastify';
 
 import nextI18NextConfig from '../next-i18next.config.js';
 
@@ -77,7 +79,21 @@ const App = (props) => {
           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
           {authorized
-            && <Component {...pageProps} />}
+            && (
+            <>
+              <Component {...pageProps} />
+              <ToastContainer
+                autoClose={8000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                draggable={false}
+                pauseOnVisibilityChange
+                closeOnClick
+                pauseOnHover
+                closeButton={false}
+              />
+            </>
+            )}
         </ThemeProvider>
       </AppWrapper>
 

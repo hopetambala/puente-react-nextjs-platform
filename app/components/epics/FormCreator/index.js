@@ -1,5 +1,5 @@
 import {
-  Chip,
+  Button, Chip,
   Grid, Input, MenuItem, NoSsr,
   Select, Snackbar,
   TextField,
@@ -114,7 +114,7 @@ function FormCreator({ context, user }) {
   const submitCustomForm = () => {
     const formObject = {};
     formObject.fields = formItems;
-    // formObject.organizations = organizationNames; //ADMIN WORKFLOW
+    // formObject.organizations = organizationNames;
     formObject.organizations = [user.organization];
     formObject.typeOfForm = formTypeNames;
     let newWorkflowsToAdd;
@@ -311,6 +311,8 @@ function FormCreator({ context, user }) {
                   type="text"
                   placeholder="Form Name"
                 />
+              </div>
+              <div>
                 <input
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
