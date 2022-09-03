@@ -5,7 +5,9 @@ import {
   TextField,
 } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
-import { Button, Stack, Text, Card } from 'app/components/elements';
+import {
+  Button, Card, Stack, Text,
+} from 'app/components/elements';
 import { postObjectsToClass, updateObject } from 'app/modules/cloud-code';
 import { useEffect, useState } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
@@ -325,7 +327,7 @@ function FormCreator({ context, user }) {
               </Stack>
             </Grid>
             <Grid item xs={4} className={styles['form-block']}>
-              <Card >
+              <Card>
                 <Text element="h2" text="Building Blocks" />
                 <FormBlocks items={COLLECTION} />
               </Card>

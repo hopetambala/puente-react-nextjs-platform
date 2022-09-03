@@ -1,6 +1,6 @@
-import { Button } from '@material-ui/core';
 import { useEffect, useState } from 'react';
 
+import { Button } from '../../../../../elements';
 import ActiveInput from '../Utils';
 import styles from './index.module.scss';
 
@@ -35,7 +35,7 @@ const Input = (props) => {
       {item.fieldType === 'geolocation' && (
         <div key={item.id}>
           <h3>Geolocation</h3>
-          <Button variant="contained" className={styles.remove} onClick={() => removeValue(item.id)}>Remove Question</Button>
+          <Button text="REMOVE QUESTION" intent="danger" className={styles.remove} onClick={() => removeValue(item.id)} />
           <ActiveInput
             activeInput={activeInput}
             setActiveInput={setActiveInput}

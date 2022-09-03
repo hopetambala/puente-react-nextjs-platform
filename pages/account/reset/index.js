@@ -6,26 +6,24 @@ import Page from 'app/components/templates/dashboard-layout';
 import { retrieveSignInFunction, retrieveUserByObjectId, updateUser } from 'app/modules/user';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
-import { FormProvider, useForm, useFormContext } from 'react-hook-form';
-import { v4 as uuid } from 'uuid';
+import { FormProvider, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import styles from './index.module.scss';
 
 const validationSchema = yup.object().shape({
-  "First Name": yup.string().required('First Name is Required'),
-  "Last Name": yup.string().required('Last Name is Required'),
-  "Email Address": yup.string().required('Email is Required'),
-  "Organization": yup.string().required('Username or Phone Number is Required'),
-  "Password": yup.string().required('Password is Required'),
+  'First Name': yup.string().required('First Name is Required'),
+  'Last Name': yup.string().required('Last Name is Required'),
+  'Email Address': yup.string().required('Email is Required'),
+  Organization: yup.string().required('Username or Phone Number is Required'),
+  Password: yup.string().required('Password is Required'),
 }).required();
 
 const Reset = (props) => {
   const { user, userId, router } = props;
   const methods = useForm({
-    resolver: yupResolver(validationSchema)
-  })
-
+    resolver: yupResolver(validationSchema),
+  });
 
   const {
     register, reset, handleSubmit, errors,
@@ -61,32 +59,32 @@ const Reset = (props) => {
             <Text text="Account Details" element="h2" />
           </Stack>
           <FormProvider {...methods}>
-          <form>
-            <Stack
-              isVertical
-              spacing="large"
-              className={styles.stack}
-              fill
-            >
-              {user && Object.keys(user).map((attr) => (
-                <Stack
+            <form>
+              <Stack
                 isVertical
+                spacing="large"
+                className={styles.stack}
                 fill
-               >
-                  <label htmlFor={attr}>{attr}</label>
-                  <input name={attr} ref={register} />
-                  {console.log(errors)}
-                  {errors[`${attr}`]?.message && <p className={styles.errorText}>{errors[`${attr}`]?.message}</p>}
-                </Stack>
-              ))}
-            </Stack>
-            <Stack isVertical spacing="large">
-              <Button
-                text="Continue"
-                onClick={handleSubmit(onSubmit)}
-                isFullWidth
-              />
-            </Stack>
+              >
+                {user && Object.keys(user).map((attr) => (
+                  <Stack
+                    isVertical
+                    fill
+                  >
+                    <label htmlFor={attr}>{attr}</label>
+                    <input name={attr} ref={register} />
+                    {console.log(errors)}
+                    {errors[`${attr}`]?.message && <p className={styles.errorText}>{errors[`${attr}`]?.message}</p>}
+                  </Stack>
+                ))}
+              </Stack>
+              <Stack isVertical spacing="large">
+                <Button
+                  text="Continue"
+                  onClick={handleSubmit(onSubmit)}
+                  isFullWidth
+                />
+              </Stack>
             </form>
           </FormProvider>
         </Card>

@@ -1,6 +1,6 @@
-import { Button } from '@material-ui/core';
 import { useEffect, useState } from 'react';
 
+import { Button } from '../../../../../elements';
 import ActiveInput from '../Utils';
 import styles from './index.module.scss';
 
@@ -43,7 +43,7 @@ const Header = (props) => {
         <div key={item.id}>
           <h3>Header</h3>
           <input className={styles.input} type="text" value={item.label || ''} id={item.id} onChange={setValue} placeholder="Untitled Header" />
-          <Button variant="contained" className={styles.remove} onClick={() => removeValue(item.id)}>Remove Header</Button>
+          <Button text="REMOVE HEADER" intent="danger" className={styles.remove} onClick={() => removeValue(item.id)} />
           <ActiveInput
             activeInput={activeInput}
             setActiveInput={setActiveInput}

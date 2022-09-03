@@ -1,7 +1,7 @@
-import { Button } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
+import { Button, Stack } from '../../../../../elements';
 import ActiveInput from '../Utils';
 import styles from './index.module.scss';
 
@@ -140,26 +140,29 @@ const Select = (props) => {
                 <h3>
                   {`Option ${index + 1}`}
                 </h3>
-                <input type="text" value={option.value} id={option.id} onChange={(e) => editOption(e, item.id, 'optionValue')} />
-                <Button style={{ color: 'green' }} onClick={addOption}>Add option</Button>
-                <Button onClick={() => removeOption(option.id)}>Remove</Button>
-                {option.text === false && (
-                  <Button style={{ color: 'blue' }} onClick={() => editTextOption(option.id, true)}>Add Text Question When Selected</Button>
-                )}
-                {option.text === true && (
+                <Stack spacing="small">
+                  <input type="text" value={option.value} id={option.id} onChange={(e) => editOption(e, item.id, 'optionValue')} />
+                  <Button isSmall onClick={addOption} text="Add option" />
+                  <Button isSmall onClick={() => removeOption(option.id)} text="Remove" />
+                  {option.text === false && (
+                  <Button isSmall onClick={() => editTextOption(option.id, true)} text="Add Text Question When Selected" />
+                  )}
+                  {option.text === true && (
                   <div>
                     <h4>
                       {`Question to ask when Option ${index + 1} selected`}
                     </h4>
                     <input type="text" value={option.textQuestion} id={option.id} onChange={(e) => editOption(e, item.id, 'textQuestion')} />
-                    <Button style={{ color: 'red' }} onClick={() => editTextOption(option.id, false)}>Remove Text Question When Selected</Button>
+                    <Button isSmall onClick={() => editTextOption(option.id, false)} text="Remove Text Question When Selected" />
                   </div>
-                )}
+                  )}
+                </Stack>
               </div>
             ))}
 
           </div>
-          <Button variant="contained" className={styles.remove} onClick={() => removeValue(item.id)}>Remove Question</Button>
+          <Button text="REMOVE QUESTION" intent="danger" className={styles.remove} onClick={() => removeValue(item.id)} />
+
           <ActiveInput
             activeInput={activeInput}
             setActiveInput={setActiveInput}
@@ -176,25 +179,29 @@ const Select = (props) => {
                 <h3>
                   {`Option ${index + 1}`}
                 </h3>
-                <input type="text" value={option.value} id={option.id} onChange={(e) => editOption(e, item.id, 'optionValue')} />
-                <Button style={{ color: 'green' }} onClick={addOption}>Add option</Button>
-                <Button onClick={() => removeOption(option.id)}>Remove</Button>
-                {option.text === false && (
-                  <Button style={{ color: 'blue' }} onClick={() => editTextOption(option.id, true)}>Add Text Question When Selected</Button>
-                )}
-                {option.text === true && (
+                <Stack spacing="small">
+                  <input type="text" value={option.value} id={option.id} onChange={(e) => editOption(e, item.id, 'optionValue')} />
+                  <Button isSmall onClick={addOption} text="Add option" />
+
+                  <Button isSmall onClick={() => removeOption(option.id)} text="Remove" />
+                  {option.text === false && (
+                  <Button style={{ color: 'blue' }} onClick={() => editTextOption(option.id, true)} text="Add Text Question When Selected" />
+                  )}
+                  {option.text === true && (
                   <div>
                     <h4>
                       {`Question to ask when Option ${index + 1} selected`}
                     </h4>
                     <input type="text" value={option.textQuestion} id={option.id} onChange={(e) => editOption(e, item.id, 'textQuestion')} />
-                    <Button style={{ color: 'red' }} onClick={() => editTextOption(option.id, false)}>Remove Text Question When Selected</Button>
+                    <Button style={{ color: 'red' }} onClick={() => editTextOption(option.id, false)} text="Remove Text Question When Selected" />
                   </div>
-                )}
+                  )}
+                </Stack>
               </div>
             ))}
           </div>
-          <Button variant="contained" className={styles.remove} onClick={() => removeValue(item.id)}>Remove Question</Button>
+          <Button text="REMOVE QUESTION" intent="danger" className={styles.remove} onClick={() => removeValue(item.id)} />
+
           <ActiveInput
             activeInput={activeInput}
             setActiveInput={setActiveInput}

@@ -1,7 +1,3 @@
-import {
-  Grid,
-  Modal,
-} from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import AppsIcon from '@material-ui/icons/Apps';
 import MenuIcon from '@material-ui/icons/Menu';
@@ -23,7 +19,7 @@ const FormManager = ({ context, router, user }) => {
   const [workflowData, setWorkflowData] = useState({});
   const [puenteData, setPuenteData] = useState([]);
   const [noWorkflowData, setNoWorkflowData] = useState([]);
-  const [workflowModal, setWorkflowModal] = useState(false);
+  const [, setWorkflowModal] = useState(false);
   const [listView, setListView] = useState(true);
   const [workflows, setWorkflows] = useState(null);
   const [puenteForms, setPuenteForms] = useState({
@@ -142,10 +138,6 @@ const FormManager = ({ context, router, user }) => {
 
     context.addPropToStore(href, storedData); // contextManagement.removeFromGlobalStoreData(key);
     router.push(href);
-  };
-
-  const closeWorkflowModal = () => {
-    setWorkflowModal(false);
   };
 
   return (
