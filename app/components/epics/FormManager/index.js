@@ -5,6 +5,7 @@ import {
 import IconButton from '@material-ui/core/IconButton';
 import AppsIcon from '@material-ui/icons/Apps';
 import MenuIcon from '@material-ui/icons/Menu';
+import { Stack, Text } from 'app/components/elements';
 import { retrieveCustomData, retrievePuenteFormModifications } from 'app/modules/cloud-code';
 import React, { useEffect, useState } from 'react';
 import { isArray } from 'underscore';
@@ -149,8 +150,8 @@ const FormManager = ({ context, router, user }) => {
 
   return (
     <div className={styles.formCreator}>
-      <Grid container>
-        <h2>Puente Forms</h2>
+      <Stack isVertical spacing="medium">
+        <Text element="h2" text="Puente Forms" />
         {listView === true ? (
           <div>
             <IconButton
@@ -217,24 +218,17 @@ const FormManager = ({ context, router, user }) => {
             workflows={workflows}
           />
         )}
-      </Grid>
-      <h2>Custom Forms</h2>
-      {/* {workflowModal && ( */}
-      <Modal
-        open={workflowModal}
-        onClose={closeWorkflowModal}
-        aria-labelledby="simple-modal-title"
-        aria-describedby="simple-modal-description"
-      >
-        <div style={styles.modalContainer}>
-          <h2 id="simple-modal-title">Hi</h2>
-          <p id="simple-modal-description">you</p>
-        </div>
-      </Modal>
-      {/* )} */}
-      {
+      </Stack>
+      <Stack isVertical spacing="medium">
+
+        <Text element="h2" text="Custom Forms" />
+
+        {/* {workflowModal && ( */}
+
+        {/* )} */}
+        {
         Object.keys(workflowData).map((key) => (
-          <Grid>
+          <div isVertical spacing="medium">
             <h3>{key}</h3>
             {listView === true ? (
               <Table
@@ -252,10 +246,12 @@ const FormManager = ({ context, router, user }) => {
                 workflows={workflows}
               />
             )}
-          </Grid>
+          </div>
         ))
       }
-      <Grid>
+      </Stack>
+
+      <Stack isVertical spacing="medium">
         <h3>No Workflow Assigned</h3>
         {listView === true ? (
           <Table
@@ -273,7 +269,7 @@ const FormManager = ({ context, router, user }) => {
             workflows={workflows}
           />
         )}
-      </Grid>
+      </Stack>
     </div>
   );
 };

@@ -98,7 +98,7 @@ const App = (props) => {
   );
 };
 
-export default App
+export default App;
 
 App.propTypes = {
   Component: PropTypes.elementType.isRequired,
