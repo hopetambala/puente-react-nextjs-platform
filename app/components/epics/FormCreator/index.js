@@ -258,28 +258,28 @@ function FormCreator({ context, user }) {
                     ))}
                   </Select>
                 </div> */}
-                  <Text element="h2" text="Type of Form" />
-                  <Select
-                    labelId="mutiple-chip-organization"
-                    id="mutiple-chip"
-                    multiple
-                    value={formTypeNames}
-                    onChange={handleFormTypesChange}
-                    input={<Input id="select-multiple-chip" />}
-                    renderValue={(selected) => (
-                      <span>
-                        {selected.map((value) => (
-                          <Chip key={value} label={value} />
-                        ))}
-                      </span>
-                    )}
-                  >
-                    {formTypes.map((formType) => (
-                      <MenuItem key={formType} value={formType}>
-                        {formType}
-                      </MenuItem>
-                    ))}
-                  </Select>
+                <Text element="h2" text="Type of Form" />
+                <Select
+                  labelId="mutiple-chip-organization"
+                  id="mutiple-chip"
+                  multiple
+                  value={formTypeNames}
+                  onChange={handleFormTypesChange}
+                  input={<Input id="select-multiple-chip" />}
+                  renderValue={(selected) => (
+                    <span>
+                      {selected.map((value) => (
+                        <Chip key={value} label={value} />
+                      ))}
+                    </span>
+                  )}
+                >
+                  {formTypes.map((formType) => (
+                    <MenuItem key={formType} value={formType}>
+                      {formType}
+                    </MenuItem>
+                  ))}
+                </Select>
                 <Text element="h2" text="Workflows" />
                 <Text element="h3" text="Your Workflows" />
                 <Select
@@ -303,8 +303,8 @@ function FormCreator({ context, user }) {
                     </MenuItem>
                   ))}
                 </Select>
-                  <Text element="h3" text="Add New Workflow" />
-                  <TextField id="new-workflow" label="New Workflow" onChange={(event) => handleTextChange(event)} />
+                <Text element="h3" text="Add New Workflow" />
+                <TextField id="new-workflow" label="New Workflow" onChange={(event) => handleTextChange(event)} />
                 <input
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
