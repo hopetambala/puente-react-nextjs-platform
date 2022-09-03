@@ -47,7 +47,7 @@ const Copyable = (props) => {
 
 const FormBlocks = (props) => {
   const { items } = props;
-  return <Copyable droppableId="BLOCK" className={styles['block-area']} items={items} />;
+  return <Copyable droppableId="BLOCK" items={items} />;
 };
 
 export default FormBlocks;

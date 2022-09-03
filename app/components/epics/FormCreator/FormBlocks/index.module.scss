@@ -1,15 +1,8 @@
-.block-area {
-  background-color: #F3EFEC;
-  box-shadow: 0 9px 18px 0 rgba(0,0,0,0.18), 0 5.5px 5px 0 rgba(0,0,0,0.24);
-  width: 100%;
-}
 
 .copy ~ div {
   transform: none !important;
 }
 .noDragging {
-  color: #464646;
-  font-family: "Roboto";
   font-size: 16px;
   letter-spacing: 0.29px;
   line-height: 40px;
