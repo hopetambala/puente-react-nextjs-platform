@@ -1,6 +1,4 @@
-const { NEXT_PUBLIC_PUENTE_SMS_EMAIL_API_URL } = process.env;
-
-const fetchData = (path, payload) => fetch(`${NEXT_PUBLIC_PUENTE_SMS_EMAIL_API_URL}${path}`, {
+const fetchData = (path, payload) => fetch(`${process.env.NEXT_PUBLIC_PUENTE_SMS_EMAIL_API_URL}${path}`, {
   method: 'POST',
   headers: {
     Accept: 'application/json',
