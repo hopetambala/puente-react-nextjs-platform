@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers';
 import {
-  Button, Card, Stack, Text, Toast
+  Button, Card, Stack, Text, Toast,
 } from 'app/components/elements';
 import FormInput from 'app/components/molecules/form-controls/input';
 import Page from 'app/components/templates/dashboard-layout';
@@ -110,7 +110,6 @@ const Register = () => {
               text="Send confirmation via text?"
               isFullWidth
             />
-
           </Stack>
           <Stack isVertical spacing="medium">
             <Button

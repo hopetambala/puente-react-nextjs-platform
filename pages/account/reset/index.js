@@ -5,7 +5,7 @@ import {
 import Page from 'app/components/templates/dashboard-layout';
 import { retrieveSignInFunction, retrieveUserByObjectId, updateUser } from 'app/modules/user';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -73,7 +73,6 @@ const Reset = (props) => {
                   >
                     <label htmlFor={attr}>{attr}</label>
                     <input name={attr} ref={register} />
-                    {console.log(errors)}
                     {errors[`${attr}`]?.message && <p className={styles.errorText}>{errors[`${attr}`]?.message}</p>}
                   </Stack>
                 ))}

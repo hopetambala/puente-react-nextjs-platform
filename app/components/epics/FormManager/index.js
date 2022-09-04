@@ -19,7 +19,6 @@ const FormManager = ({ context, router, user }) => {
   const [workflowData, setWorkflowData] = useState({});
   const [puenteData, setPuenteData] = useState([]);
   const [noWorkflowData, setNoWorkflowData] = useState([]);
-  const [, setWorkflowModal] = useState(false);
   const [listView, setListView] = useState(true);
   const [workflows, setWorkflows] = useState(null);
   const [puenteForms, setPuenteForms] = useState({
