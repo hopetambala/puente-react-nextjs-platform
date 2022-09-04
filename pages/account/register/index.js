@@ -1,7 +1,6 @@
 import { yupResolver } from '@hookform/resolvers';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import {
-  Button, Card, Link, Stack, Text,
+  Button, Card, Stack, Text, Toast
 } from 'app/components/elements';
 import FormInput from 'app/components/molecules/form-controls/input';
 import Page from 'app/components/templates/dashboard-layout';
