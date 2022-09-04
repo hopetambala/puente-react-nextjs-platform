@@ -1,4 +1,4 @@
-import { Card } from 'app/components/molecules/dashboard';
+import { Card } from 'app/components/molecules';
 
 import styles from './index.module.scss';
 

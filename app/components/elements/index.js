@@ -6,7 +6,7 @@ import Link from './Link';
 import Spinner from './spinner';
 import Stack from './stack';
 import Text from './text';
-import { Toast } from './toast';
+import Toast from './toast';
 import Tooltip from './tooltip';
 
 export {

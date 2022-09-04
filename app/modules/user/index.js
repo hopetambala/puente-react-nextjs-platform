@@ -66,6 +66,30 @@ const retrieveDeleteUserFunction = (params) => {
   Parse.Cloud.run('deleteUser', params).then((result) => result);
 };
 
+const retrieveUserByObjectId = async (objectId) => new Promise((resolve, reject) => {
+  Parse.Cloud.run('retrieveUserByObjectId', { objectId }).then((user) => {
+    resolve(user);
+  }, (error) => {
+    reject(error);
+  });
+});
+
+const updateUser = async (objectId, userObject) => new Promise((resolve, reject) => {
+  Parse.Cloud.run('updateUser', { objectId, userObject }).then((user) => {
+    resolve(user);
+  }, (error) => {
+    reject(error);
+  });
+});
+
+const queryUser = async (username) => new Promise((resolve, reject) => {
+  Parse.Cloud.run('queryUser', { username }).then((user) => {
+    resolve(user);
+  }, (error) => {
+    reject(error);
+  });
+});
+
 const parseUser = () => userSubject.asObservable();
 
 const parseUserValue = () => userSubject.value;
@@ -73,9 +97,12 @@ const parseUserValue = () => userSubject.value;
 export {
   parseUser,
   parseUserValue,
+  queryUser,
   retrieveCurrentUserAsyncFunction,
   retrieveDeleteUserFunction,
   retrieveForgotPasswordFunction,
   retrieveSignInFunction, retrieveSignOutFunction,
   retrieveSignUpFunction,
+  retrieveUserByObjectId,
+  updateUser,
 };

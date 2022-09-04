@@ -13,7 +13,7 @@ Here are some quick npm commands to get started:
 
 ## Structure
 
-- Elements --> Molecules --> Charts/Templates --> Epics
+- Elements --> Molecules --> Charts/Templates --> Epics 
 
 ## Resources
 
