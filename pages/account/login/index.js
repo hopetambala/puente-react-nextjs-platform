@@ -21,7 +21,6 @@ const Login = () => {
   const methods = useForm({
     resolver: yupResolver(validationSchema),
   });
-
   const { handleSubmit, errors } = methods;
 
   const onSubmit = (data) => {
@@ -78,6 +77,12 @@ const Login = () => {
               text="Create account"
               intent="primary"
               href="/account/register"
+              isFullWidth
+            />
+            <Button
+              text="Reset password"
+              intent="danger"
+              href="/account/login/reset-login"
               isFullWidth
             />
           </Stack>

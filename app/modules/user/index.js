@@ -82,6 +82,14 @@ const updateUser = async (objectId, userObject) => new Promise((resolve, reject)
   });
 });
 
+const queryUser = async (username) => new Promise((resolve, reject) => {
+  Parse.Cloud.run('queryUser', { username }).then((user) => {
+    resolve(user);
+  }, (error) => {
+    reject(error);
+  });
+});
+
 const parseUser = () => userSubject.asObservable();
 
 const parseUserValue = () => userSubject.value;
@@ -89,6 +97,7 @@ const parseUserValue = () => userSubject.value;
 export {
   parseUser,
   parseUserValue,
+  queryUser,
   retrieveCurrentUserAsyncFunction,
   retrieveDeleteUserFunction,
   retrieveForgotPasswordFunction,
