@@ -4,7 +4,7 @@ import {
 } from 'app/components/elements';
 import FormInput from 'app/components/molecules/form-controls/input';
 import Page from 'app/components/templates/dashboard-layout';
-import { queryUser } from 'app/modules/user';
+import { queryUser, retrieveSignOutFunction } from 'app/modules/user';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -55,9 +55,12 @@ const ResetLogin = () => {
     const { usernameV } = data;
     return retrieveUser(usernameV).then(() => toast(
       <Toast text="Request Sent!" />,
-    )).catch((e) => toast(
-      <Toast text={`${e.message}`} isError />,
-    ));
+    )).catch(async (e) => {
+      await retrieveSignOutFunction();
+      return toast(
+        <Toast text={`${e.message}`} isError />,
+      );
+    });
   };
 
   return (
