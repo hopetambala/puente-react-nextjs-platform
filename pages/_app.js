@@ -28,7 +28,14 @@ const App = (props) => {
   const authCheck = (url) => {
     // redirect to login page if accessing a private page and not logged in
     const parseUser = parseUserValue();
-    const publicPaths = ['/account/login', '/account/login/reset-login', '/account/register', '/', '/account/reset'];
+    const publicPaths = [
+      '/',
+      '/account/login',
+      '/account/login/reset-login',
+      '/account/verify',
+      '/account/verify/redirect',
+      '/account/register',
+      '/account/reset'];
     const path = url.split('?')[0];
     if (!parseUser && !publicPaths.includes(path)) {
       setAuthorized(false);

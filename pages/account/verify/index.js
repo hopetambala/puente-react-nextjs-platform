@@ -15,7 +15,7 @@ const Verify = () => {
   const [status, setStatus] = useState();
 
   const returnHome = () => {
-    router.push('/');
+    router.push('/account/login');
   };
 
   useEffect(() => {
