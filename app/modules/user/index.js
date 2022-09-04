@@ -1,10 +1,15 @@
 import { Parse } from 'parse';
 import { BehaviorSubject } from 'rxjs';
 
+import notificationTypeRestParams from './_signupHelper';
+
 const userSubject = new BehaviorSubject(process.browser && JSON.parse(localStorage.getItem('user')));
 
-const retrieveSignUpFunction = (params) => new Promise((resolve, reject) => {
-  Parse.Cloud.run('signup', params).then((user) => {
+const retrieveSignUpFunction = (params, type) => new Promise((resolve, reject) => {
+  const signupParams = params;
+  const restParamsData = notificationTypeRestParams(type, signupParams);
+  if (restParamsData) signupParams.restParams = restParamsData;
+  Parse.Cloud.run('signup', signupParams).then((user) => {
     console.log(`User registered successful ${user}`); // eslint-disable-line
     userSubject.next(user);
     localStorage.setItem('user', JSON.stringify(user));
