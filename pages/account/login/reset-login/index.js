@@ -4,39 +4,18 @@ import {
 } from 'app/components/elements';
 import FormInput from 'app/components/molecules/form-controls/input';
 import Page from 'app/components/templates/dashboard-layout';
+import { sendMessage } from 'app/modules/cloud-code';
 import { queryUser, retrieveSignOutFunction } from 'app/modules/user';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import * as yup from 'yup';
 
-import MessagingModule from '../../../../app/modules/messaging';
 import styles from './index.module.scss';
 
 const validationSchema = yup.object().shape({
   usernameV: yup.string().required('Username or Phone Number is Required'),
 });
-
-const restParams = (type) => {
-  if (type === 'email') {
-    return {
-      path: 'email',
-      data: {
-        emailSubject: 'Account Reset',
-        type: 'passwordReset',
-      },
-    };
-  }
-  if (type === 'text') {
-    return {
-      path: 'text',
-      data: {
-        type: 'accountReset',
-      },
-    };
-  }
-  return null;
-};
 
 const ResetLogin = () => {
   const [notificationType, setNotificationType] = useState('email');
@@ -46,10 +25,7 @@ const ResetLogin = () => {
   const { handleSubmit, errors } = methods;
 
   const retrieveUser = (username) => queryUser(username)
-    .then((user) => {
-      const data = restParams(notificationType);
-      return MessagingModule(data, user);
-    });
+    .then((user) => sendMessage(user, notificationType));
 
   const onSubmit = (data) => {
     const { usernameV } = data;
