@@ -14,6 +14,7 @@ import {
   retrievePuenteFormModifications,
   retrieveUniqueListOfOrganizations,
 } from './custom-data-retrieval';
+import sendMessage from './messaging';
 
 export {
   countObject,
@@ -27,5 +28,6 @@ export {
   retrieveCustomData,
   retrievePuenteFormModifications,
   retrieveUniqueListOfOrganizations,
+  sendMessage,
   updateObject,
 };
