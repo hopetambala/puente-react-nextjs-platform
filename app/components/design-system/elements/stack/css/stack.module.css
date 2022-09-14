@@ -1,107 +1,107 @@
 .stack {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
 }
 
 .stack:empty {
-  margin: 0;
+    margin: 0;
 }
 
 .item {
-  max-width: 100%;
+    max-width: 100%;
 }
 
 .item:empty {
-  margin: 0 !important;
+    margin: 0 !important;
 }
 
 .verticalModifier {
-  flex-direction: column;
-  align-items: flex-start;
-  width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
 }
 
 .nowrapModifier {
-  flex-wrap: nowrap;
+    flex-wrap: nowrap;
 }
 
 .verticalModifier > .item {
-  width: 100%;
+    width: 100%;
 }
 
 .fillModifier > .item {
-  flex: 1;
+    flex: 1;
 }
 
 .fillModifier > .item > * {
-  width: 100%;
+    width: 100%;
 }
 
 .spacing-extraSmallModifier {
-  margin: calc(var(--spacer-xxs) * -1);
+    margin: calc(var(--spacer-xxs) * -1);
 }
 
 .spacing-extraSmallModifier > .item {
-  margin: var(--spacer-xxs);
+    margin: var(--spacer-xxs);
 }
 
 .spacing-smallModifier {
-  margin: calc(var(--spacer-xs) * -1);
+    margin: calc(var(--spacer-xs) * -1);
 }
 
 .spacing-smallModifier > .item {
-  margin: var(--spacer-xs);
+    margin: var(--spacer-xs);
 }
 
 .spacing-mediumModifier {
-  margin: calc(var(--spacer-s) * -1);
+    margin: calc(var(--spacer-s) * -1);
 }
 
 .spacing-mediumModifier > .item {
-  margin: var(--spacer-s);
+    margin: var(--spacer-s);
 }
 
 .spacing-mediumLargeModifier {
-  margin: calc(var(--spacer-sm) * -1);
+    margin: calc(var(--spacer-sm) * -1);
 }
 
 .spacing-mediumLargeModifier > .item {
-  margin: var(--spacer-sm);
+    margin: var(--spacer-sm);
 }
 
 .spacing-largeModifier {
-  margin: calc(var(--spacer-m) * -1);
+    margin: calc(var(--spacer-m) * -1);
 }
 
 .spacing-largeModifier > .item {
-  margin: var(--spacer-m);
+    margin: var(--spacer-m);
 }
 
 .spacing-extraLargeModifier {
-  margin: calc(var(--spacer-l) * -1);
+    margin: calc(var(--spacer-l) * -1);
 }
 
 .spacing-extraLargeModifier > .item {
-  margin: var(--spacer-l);
+    margin: var(--spacer-l);
 }
 
 .spacing-noneModifier,
 .spacing-noneModifier > .item {
-  margin: 0;
+    margin: 0;
 }
 
 .spacing-spaceBetweenModifier {
-  justify-content: space-between;
+    justify-content: space-between;
 }
 
 .centerModifier {
-  align-items: center;
+    align-items: center;
 }
 
 .fillItemModifier {
-  flex: 1;
+    flex: 1;
 
-  /* Prevent lengthy unbroken text from overflowing parent */
-  min-width: 0;
+    /* Prevent lengthy unbroken text from overflowing parent */
+    min-width: 0;
 }

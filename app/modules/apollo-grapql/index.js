@@ -1,14 +1,14 @@
-import { gql } from '@apollo/client';
-import client from 'app/services/apollo-grapql';
+import { gql } from '@apollo/client'
+import client from 'app/services/apollo-grapql'
 
 const dataQueryer = async (grapqlquery) => {
-  const { data } = await client.query({
-    query: gql`
-          ${grapqlquery}
+    const { data } = await client.query({
+        query: gql`
+            ${grapqlquery}
         `,
-  });
+    })
 
-  return data;
-};
+    return data
+}
 
-export default dataQueryer;
+export default dataQueryer

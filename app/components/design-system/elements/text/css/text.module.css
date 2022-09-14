@@ -1,41 +1,41 @@
 .text {
-  display: inline-block;
+    display: inline-block;
 }
 
 .gray {
-  color: var(--color-text-light);
+    color: var(--color-text-light);
 }
 
 .lightGray {
-  color: var(--color-text-placeholder);
+    color: var(--color-text-placeholder);
 }
 
 .white {
-  color: var(--hex-white);
+    color: var(--hex-white);
 }
 
 .red {
-  color: var(--color-red);
+    color: var(--color-red);
 }
 
 .green {
-  color: var(--color-green);
+    color: var(--color-green);
 }
 
 .blue {
-  color: var(--color-blue);
+    color: var(--color-blue);
 }
 
 .orange {
-  color: var(--color-orange);
+    color: var(--color-orange);
 }
 
 .yellow {
-  color: var(--color-yellow);
+    color: var(--color-yellow);
 }
 
 .truncate {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

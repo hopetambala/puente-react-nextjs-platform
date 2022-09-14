@@ -1,99 +1,99 @@
 .card {
-  background-color: var(--color-bg-light);
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-l);
-  padding: var(--spacer-l);
-  display: block;
+    background-color: var(--color-bg-light);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-l);
+    padding: var(--spacer-l);
+    display: block;
 }
 
 .card + .card,
 .cardGroup + .cardGroup {
-  margin-top: var(--spacer-m);
+    margin-top: var(--spacer-m);
 }
 
 .cardSection:not(:first-child) {
-  border-top: 1px solid var(--color-border);
+    border-top: 1px solid var(--color-border);
 }
 
 .smallPadding,
 .smallPadding .cardSection {
-  padding: var(--spacer-s);
+    padding: var(--spacer-s);
 }
 
 .smallPadding .header:not(:last-child) {
-  margin-bottom: var(--spacer-s);
+    margin-bottom: var(--spacer-s);
 }
 
 .smallPadding > .cardSection {
-  margin: 0 calc(var(--spacer-s) * -1);
+    margin: 0 calc(var(--spacer-s) * -1);
 }
 
 .smallPadding > .cardSection:first-child {
-  margin-top: calc(var(--spacer-s) * -1);
+    margin-top: calc(var(--spacer-s) * -1);
 }
 
 .smallPadding > .cardSection:last-child {
-  margin-bottom: calc(var(--spacer-s) * -1);
+    margin-bottom: calc(var(--spacer-s) * -1);
 }
 
 .mediumPadding,
 .mediumPadding > .cardSection {
-  padding: var(--spacer-m);
+    padding: var(--spacer-m);
 }
 
 .mediumPadding > .cardSection:first-child {
-  margin-top: calc(var(--spacer-m) * -1);
+    margin-top: calc(var(--spacer-m) * -1);
 }
 
 .mediumPadding > .cardSection:last-child {
-  margin-bottom: calc(var(--spacer-m) * -1);
+    margin-bottom: calc(var(--spacer-m) * -1);
 }
 
 .mediumPadding .header:not(:last-child) {
-  margin-bottom: var(--spacer-m);
+    margin-bottom: var(--spacer-m);
 }
 
 .largePadding,
 .largePadding > .cardSection {
-  padding: var(--spacer-l);
+    padding: var(--spacer-l);
 }
 
 .largePadding > .cardSection {
-  margin: 0 calc(var(--spacer-l) * -1);
+    margin: 0 calc(var(--spacer-l) * -1);
 }
 
 .largePadding > .cardSection:first-child {
-  margin-top: calc(var(--spacer-l) * -1);
+    margin-top: calc(var(--spacer-l) * -1);
 }
 
 .largePadding > .cardSection:last-child {
-  margin-bottom: calc(var(--spacer-l) * -1);
+    margin-bottom: calc(var(--spacer-l) * -1);
 }
 
 .extraLargePadding,
 .extraLargePadding > .cardSection {
-  padding: var(--spacer-xl);
+    padding: var(--spacer-xl);
 }
 
 .extraLargePadding > .cardSection {
-  margin: 0 calc(var(--spacer-xl) * -1);
+    margin: 0 calc(var(--spacer-xl) * -1);
 }
 
 .extraLargePadding > .cardSection:first-child {
-  margin-bottom: calc(var(--spacer-xl) * -1);
+    margin-bottom: calc(var(--spacer-xl) * -1);
 }
 
 .extraLargePadding > .cardSection:last-child {
-  margin-bottom: calc(var(--spacer-xl) * -1);
+    margin-bottom: calc(var(--spacer-xl) * -1);
 }
 
 a.card,
 a.card:hover {
-  color: var(--color-text);
+    color: var(--color-text);
 }
 
 .noPadding {
-  padding: 0;
+    padding: 0;
 }
 
 .elevated,
@@ -101,149 +101,149 @@ a.card:hover {
 .clickable:active,
 .clickable:focus,
 .clickable.subtle:hover {
-  box-shadow: var(--shadow-lv1);
+    box-shadow: var(--shadow-lv1);
 }
 
 .clickable.elevated:hover,
 .clickable.elevated:active,
 .clickable.elevated:focus {
-  box-shadow: var(--shadow-lv1-hover);
+    box-shadow: var(--shadow-lv1-hover);
 }
 
 .subtle,
 .subtle.clickable {
-  background-color: transparent;
-  border: 1px solid var(--color-border);
+    background-color: transparent;
+    border: 1px solid var(--color-border);
 }
 
 .header {
-  display: flex;
+    display: flex;
 }
 
 .header:not(:last-child) {
-  margin-bottom: var(--spacer-l);
+    margin-bottom: var(--spacer-l);
 }
 
 .headerText {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  flex: 1;
-  margin-right: var(--spacer-m);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+    margin-right: var(--spacer-m);
 }
 
 .headerText:not(:first-child) {
-  margin-left: var(--spacer-m);
+    margin-left: var(--spacer-m);
 }
 
 .title {
-  color: var(--color-text);
+    color: var(--color-text);
 }
 
 .subtitle {
-  color: var(--color-text-light);
+    color: var(--color-text-light);
 }
 
 .clickable {
-  cursor: pointer;
-  text-align: unset;
-  width: 100%;
-  transition: 0.2s ease-out box-shadow;
+    cursor: pointer;
+    text-align: unset;
+    width: 100%;
+    transition: 0.2s ease-out box-shadow;
 }
 
 .clickable:hover {
-  background-color: var(--color-bg-light);
+    background-color: var(--color-bg-light);
 }
 
 .clickable:hover,
 .clickable:active,
 .clickable:focus {
-  outline: none;
-  z-index: var(--z-focused);
+    outline: none;
+    z-index: var(--z-focused);
 }
 
 /* Card Groups */
 .cardGroup {
-  display: flex;
+    display: flex;
 }
 
 .cardGroup.column {
-  flex-direction: column;
+    flex-direction: column;
 }
 
 .cardGroup.row {
-  flex-direction: row;
+    flex-direction: row;
 }
 
 .cardGroup.column.noSpacing > .card + .card {
-  margin-top: -1px;
+    margin-top: -1px;
 }
 
 .cardGroup.row.noSpacing > .card + .card {
-  margin-left: -1px;
+    margin-left: -1px;
 }
 
 .column.smallSpacing > .card + .card {
-  margin-top: var(--spacer-s);
+    margin-top: var(--spacer-s);
 }
 
 .column.mediumSpacing > .card + .card {
-  margin-top: var(--spacer-m);
+    margin-top: var(--spacer-m);
 }
 
 .column.largeSpacing > .card + .card {
-  margin-top: var(--spacer-l);
+    margin-top: var(--spacer-l);
 }
 
 .column.extraLargeSpacing > .card + .card {
-  margin-top: var(--spacer-xl);
+    margin-top: var(--spacer-xl);
 }
 
 .column.noSpacing > .card + .card {
-  margin-top: 0;
+    margin-top: 0;
 }
 
 .column.noSpacing > .card:not(:first-child) {
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }
 
 .column.noSpacing > .card:not(:last-child) {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 .row.smallSpacing > .card + .card {
-  margin-top: 0;
-  margin-left: var(--spacer-s);
+    margin-top: 0;
+    margin-left: var(--spacer-s);
 }
 
 .row.mediumSpacing > .card + .card {
-  margin-top: 0;
-  margin-left: var(--spacer-m);
+    margin-top: 0;
+    margin-left: var(--spacer-m);
 }
 
 .row.largeSpacing > .card + .card {
-  margin-top: 0;
-  margin-left: var(--spacer-l);
+    margin-top: 0;
+    margin-left: var(--spacer-l);
 }
 
 .row.extraLargeSpacing > .card + .card {
-  margin-top: 0;
-  margin-left: var(--spacer-xl);
+    margin-top: 0;
+    margin-left: var(--spacer-xl);
 }
 
 .row.noSpacing > .card + .card {
-  margin-top: 0;
-  margin-left: 0;
+    margin-top: 0;
+    margin-left: 0;
 }
 
 .row.noSpacing > .card:not(:first-child) {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 }
 
 .row.noSpacing > .card:not(:last-child) {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }

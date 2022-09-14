@@ -1,4 +1,4 @@
-import styles from './index.module.scss';
+import styles from './index.module.scss'
 /**
  * Card Component that has
  *  title
@@ -21,20 +21,20 @@ import styles from './index.module.scss';
  * @returns Card Component
  */
 
-const Card = ({
-  title, description, nextLink, actions,
-}) => (
-  <a href={nextLink || null} className={styles.card}>
-    <h3>{title}</h3>
-    <p>{description}</p>
-    {actions
-    && (
-    <div>
-      {actions.map((action) => <button type="button" onClick={action.action}>{action.text}</button>)}
-    </div>
-    )}
-  </a>
+const Card = ({ title, description, nextLink, actions }) => (
+    <a href={nextLink || null} className={styles.card}>
+        <h3>{title}</h3>
+        <p>{description}</p>
+        {actions && (
+            <div>
+                {actions.map((action) => (
+                    <button type="button" onClick={action.action}>
+                        {action.text}
+                    </button>
+                ))}
+            </div>
+        )}
+    </a>
+)
 
-);
-
-export default Card;
+export default Card

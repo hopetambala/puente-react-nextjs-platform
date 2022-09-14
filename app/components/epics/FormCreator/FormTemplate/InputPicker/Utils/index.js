@@ -1,3 +1,3 @@
-import ActiveInput from './ActiveInput';
+import ActiveInput from './ActiveInput'
 
-export default ActiveInput;
+export default ActiveInput

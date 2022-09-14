@@ -1,7 +1,7 @@
 # Contributing to Puente Analytics
 
 Do you want to help us make awesome open-source software for humanitarian work?
- 
+
 Awesome! Here are instructions to get you started.
 
 ## Contribution guidelines
@@ -65,17 +65,16 @@ Short answer: with pull requests to the Puente Analytics repository.
 
 All decisions affecting Puente Analytics follow the same 3 steps:
 
-* Step 1: Open a pull request. Anyone can do this.
+-   Step 1: Open a pull request. Anyone can do this.
 
-* Step 2: Discuss the pull request. Anyone can do this.
+-   Step 2: Discuss the pull request. Anyone can do this.
 
-* Step 3: Accept or refuse a pull request. A maintainer does this.
-
+-   Step 3: Accept or refuse a pull request. A maintainer does this.
 
 ### How can I become a maintainer?
 
-* Step 1: learn the code inside out
-* Step 2: make yourself useful by contributing code, bugfixes, support etc.
+-   Step 1: learn the code inside out
+-   Step 2: make yourself useful by contributing code, bugfixes, support etc.
 
 Don't forget: being a maintainer is a time investment. Make sure you will have time to make yourself available.
 You don't have to be a maintainer to make a difference on our project!
@@ -84,10 +83,9 @@ You don't have to be a maintainer to make a difference on our project!
 
 It is every maintainer's responsibility to:
 
-* 1) Deliver prompt feedback and decisions on pull requests.
-* 2) Be available to anyone with questions, bug reports, criticism etc. on Puente's Analytics dashboard.
+-   1. Deliver prompt feedback and decisions on pull requests.
+-   2. Be available to anyone with questions, bug reports, criticism etc. on Puente's Analytics dashboard.
 
 ### How is this process changed?
 
 Just like everything else: by making a pull request :D
-
