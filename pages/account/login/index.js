@@ -1,8 +1,8 @@
 import { yupResolver } from '@hookform/resolvers';
 import {
   Button, Card, Stack, Text,
-} from 'app/components/elements';
-import FormInput from 'app/components/molecules/form-controls/input';
+} from 'app/components/design-system/elements';
+import FormInput from 'app/components/design-system/molecules/form-controls/input';
 import Page from 'app/components/templates/dashboard-layout';
 import { retrieveSignInFunction } from 'app/modules/user';
 import { useRouter } from 'next/router';

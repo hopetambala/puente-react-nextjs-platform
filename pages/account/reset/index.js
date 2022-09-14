@@ -1,7 +1,7 @@
 import { yupResolver } from '@hookform/resolvers';
 import {
   Button, Card, Stack, Text,
-} from 'app/components/elements';
+} from 'app/components/design-system/elements';
 import Page from 'app/components/templates/dashboard-layout';
 import { retrieveSignInFunction, retrieveUserByObjectId, updateUser } from 'app/modules/user';
 import { useRouter } from 'next/router';

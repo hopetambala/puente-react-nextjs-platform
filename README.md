@@ -11,9 +11,9 @@ Here are some quick npm commands to get started:
 - `npm run start`: Starts a Node.js server that supports hybrid pages, serving both statically generated and server-side rendered pages
 - `npm lint-fix`: Run the ESLinter. Fixes issues that are solvable
 
-## Structure
+## Component Structure
 
-- Elements --> Molecules --> Charts/Templates --> Epics 
+- Elements --> Molecules --> Organisms --> Charts/Templates --> Epics 
 
 ## Resources
 

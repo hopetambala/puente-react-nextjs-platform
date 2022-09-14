@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { Button } from '../../../../../elements';
+import { Button } from 'app/components/design-system/elements';
 import ActiveInput from '../Utils';
 import styles from './index.module.scss';
 

@@ -1,6 +1,6 @@
 import {
   Button, Card, Text,
-} from 'app/components/elements';
+} from 'app/components/design-system/elements';
 import Page from 'app/components/templates/dashboard-layout';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';

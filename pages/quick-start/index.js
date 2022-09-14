@@ -1,4 +1,4 @@
-import { Card } from 'app/components/molecules';
+import { Card } from 'app/components/design-system/molecules';
 
 import styles from './index.module.scss';
 

@@ -7,7 +7,7 @@ import {
 import { Alert } from '@material-ui/lab';
 import {
   Button, Card, Stack, Text,
-} from 'app/components/elements';
+} from 'app/components/design-system/elements';
 import { postObjectsToClass, updateObject } from 'app/modules/cloud-code';
 import { useEffect, useState } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';

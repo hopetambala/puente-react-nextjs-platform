@@ -1,7 +1,7 @@
 import IconButton from '@material-ui/core/IconButton';
 import AppsIcon from '@material-ui/icons/Apps';
 import MenuIcon from '@material-ui/icons/Menu';
-import { Stack, Text } from 'app/components/elements';
+import { Stack, Text } from 'app/components/design-system/elements';
 import { retrieveCustomData, retrievePuenteFormModifications } from 'app/modules/cloud-code';
 import React, { useEffect, useState } from 'react';
 import { isArray } from 'underscore';

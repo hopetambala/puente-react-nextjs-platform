@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
-import { Button, Stack } from '../../../../../elements';
+import { Button, Stack } from 'app/components/design-system/elements';
 import ActiveInput from '../Utils';
 import styles from './index.module.scss';
 

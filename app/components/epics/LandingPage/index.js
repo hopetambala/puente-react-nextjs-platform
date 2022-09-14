@@ -14,7 +14,7 @@ import {
   // PageNav,
   PricingPlan,
   // Testimonials,
-} from 'app/components/molecules/website';
+} from 'app/components/design-system/molecules/website';
 // import clsx from 'clsx';
 import Head from 'next/head';
 import React from 'react';

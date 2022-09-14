@@ -1,6 +1,6 @@
 import {
   Card, Text,
-} from 'app/components/elements';
+} from 'app/components/design-system/elements';
 import Page from 'app/components/templates/dashboard-layout';
 import { updateUser } from 'app/modules/user';
 import { useRouter } from 'next/router';
