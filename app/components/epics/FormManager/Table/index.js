@@ -1,5 +1,7 @@
-import Button from '@material-ui/core/Button';
+// import Button from '@material-ui/core/Button';
+import { Button  } from 'app/components/design-system/elements'
 import Paper from '@material-ui/core/Paper';
+import { getCustomById } from 'app/modules/exporter/custom-forms'
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -66,6 +68,16 @@ const FormManagerTable = ({
     setOpen(!open);
   };
 
+  /**
+   * PLACEHOLDER FOR BETTER LOGIC
+   * @param {*} form 
+   */
+  const handleDownload = async (form) => {
+    const { objectId } = form;
+    const data = await getCustomById(objectId)
+    console.log(data);
+  }
+
   return (
     <TableContainer component={Paper}>
       <Modal
@@ -100,18 +112,10 @@ const FormManagerTable = ({
                 <TableCell align="right">{row.createdAt}</TableCell>
                 <TableCell align="right">{row.updatedAt}</TableCell>
                 <TableCell align="right">
-                  <Button
-                    aria-label="duplicate"
-                    onClick={() => handleDuplicate(row)}
-                  >
-                    Duplicate
-                  </Button>
-                  <Button aria-label="edit" onClick={() => handleEdit(row)}>
-                    Edit
-                  </Button>
-                  <Button aria-label="remove" onClick={() => handleModal(row)}>
-                    Remove
-                  </Button>
+                  <Button text="Duplicate" onClick={() => handleDuplicate(row)} />
+                  <Button text="Edit" onClick={() => handleEdit(row)} />
+                  <Button text="Remove" onClick={() => handleModal(row)} />
+                  <Button text="Download Data" onClick={() => handleDownload(row)} intent='primary' />
                 </TableCell>
               </TableRow>
             ))}
