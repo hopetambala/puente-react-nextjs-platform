@@ -1,27 +1,27 @@
 .formCreator {
-    h2 {
-        color: rgba(0, 0, 0, 0.88);
-        font-size: 24px;
-        font-weight: 700;
-    }
+  h2 {
+    color: rgba(0, 0, 0, 0.88);
+    font-size: 24px;
+    font-weight: 700;
+  }
 }
 
 .formButtons {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    & * {
-        margin: 10;
-    }
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  & * {
+    margin: 10;
+  }
 
-    .modalContainer {
-        // color: white;
-        margin-left: 'auto';
-        margin-right: 'auto';
-        margin-top: 'auto';
-        margin-bottom: 'auto';
-        // width: 10;
-        // height: 10;
-    }
+  .modalContainer {
+    // color: white;
+    margin-left: 'auto';
+    margin-right: 'auto';
+    margin-top: 'auto';
+    margin-bottom: 'auto';
+    // width: 10;
+    // height: 10;
+  }
 }

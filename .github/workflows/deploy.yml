@@ -2,7 +2,7 @@ name: CD
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:
@@ -20,4 +20,3 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
       - run: aws s3 sync ./out s3://dashboard-react-next-serverside-dev
-

@@ -3,89 +3,89 @@
 @import './fonts.css';
 
 html {
-    margin: 0;
-    box-sizing: border-box;
-    -webkit-text-size-adjust: 100%;
-    -ms-text-size-adjust: 100%;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  width: 100%;
 }
 
 *,
 *::before,
 *::after {
-    box-sizing: inherit;
+  box-sizing: inherit;
 }
 
 html,
 body {
-    padding: 0;
-    letter-spacing: 0;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
-    font-family: var(--font-family);
-    font-weight: var(--font-weight-regular);
-    font-size: var(--font-size-body);
-    line-height: var(--line-height-body);
-    background-color: var(--color-bg);
-    color: var(--color-text);
-    margin: 0;
-    height: 100%;
-    min-height: 100%;
+  padding: 0;
+  letter-spacing: 0;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  margin: 0;
+  height: 100%;
+  min-height: 100%;
 }
 
 body {
-    width: 100vw;
-    height: 100vh;
-    margin: 0;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
 }
 
 h1 {
-    font-weight: var(--font-weight-emphasis);
-    font-size: var(--font-size-h1);
-    line-height: var(--line-height-h1);
+  font-weight: var(--font-weight-emphasis);
+  font-size: var(--font-size-h1);
+  line-height: var(--line-height-h1);
 }
 
 h2 {
-    font-weight: var(--font-weight-emphasis);
-    font-size: var(--font-size-h2);
-    line-height: var(--line-height-h2);
+  font-weight: var(--font-weight-emphasis);
+  font-size: var(--font-size-h2);
+  line-height: var(--line-height-h2);
 }
 
 h3 {
-    font-weight: var(--font-weight-emphasis);
-    font-size: var(--font-size-h3);
-    line-height: var(--line-height-h3);
+  font-weight: var(--font-weight-emphasis);
+  font-size: var(--font-size-h3);
+  line-height: var(--line-height-h3);
 }
 
 h4 {
-    font-weight: var(--font-weight-emphasis);
-    font-size: var(--font-size-h4);
-    line-height: var(--line-height-h4);
+  font-weight: var(--font-weight-emphasis);
+  font-size: var(--font-size-h4);
+  line-height: var(--line-height-h4);
 }
 
 h5 {
-    font-weight: var(--font-weight-emphasis);
-    font-size: var(--font-size-h5);
-    line-height: var(--line-height-h5);
+  font-weight: var(--font-weight-emphasis);
+  font-size: var(--font-size-h5);
+  line-height: var(--line-height-h5);
 }
 
 h6 {
-    font-weight: var(--font-weight-emphasis);
-    font-size: var(--font-size-h6);
-    line-height: var(--line-height-h6);
+  font-weight: var(--font-weight-emphasis);
+  font-size: var(--font-size-h6);
+  line-height: var(--line-height-h6);
 }
 
 strong {
-    font-weight: var(--font-weight-emphasis);
+  font-weight: var(--font-weight-emphasis);
 }
 
 small {
-    font-size: var(--font-size-small);
-    line-height: var(--line-height-small);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
 }
 
 button,
@@ -93,62 +93,62 @@ input,
 textarea,
 select,
 dialog {
-    color: var(--color-text);
-    font-weight: var(--font-weight-regular);
-    font-size: var(--font-size-body);
-    font-family: var(--font-family);
-    line-height: var(--line-height-body);
-    margin: 0;
+  color: var(--color-text);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--font-size-body);
+  font-family: var(--font-family);
+  line-height: var(--line-height-body);
+  margin: 0;
 }
 
 select {
-    background: var(--color-input-bg);
-    border-radius: var(--border-radius-m);
-    height: var(--input-height);
-    border: 1px solid var(--color-border);
+  background: var(--color-input-bg);
+  border-radius: var(--border-radius-m);
+  height: var(--input-height);
+  border: 1px solid var(--color-border);
 }
 
 input::placeholder,
 input::-webkit-input-placeholder,
 textarea::placeholder,
 textarea::-webkit-input-placeholder {
-    font-weight: var(--font-weight-regular);
-    font-size: var(--font-size-body);
-    font-family: var(--font-family);
-    line-height: var(--line-height-body);
-    color: var(--color-text-placeholder);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--font-size-body);
+  font-family: var(--font-family);
+  line-height: var(--line-height-body);
+  color: var(--color-text-placeholder);
 }
 
 a {
-    color: var(--color-link);
-    cursor: pointer;
-    text-decoration: none;
+  color: var(--color-link);
+  cursor: pointer;
+  text-decoration: none;
 }
 
 a:hover {
-    color: var(--color-link-hover);
-    transition: color 0.3s;
-    text-decoration: none;
+  color: var(--color-link-hover);
+  transition: color 0.3s;
+  text-decoration: none;
 }
 
 img {
-    max-width: 100%;
+  max-width: 100%;
 }
 
 em {
-    font-style: italic;
+  font-style: italic;
 }
 
 pre {
-    white-space: pre-wrap;
+  white-space: pre-wrap;
 }
 
 /* stylelint-disable selector-pseudo-class-no-unknown */
 :global(.x-hellosign-embedded) {
-    z-index: 99;
+  z-index: 99;
 }
 
 :global([class*='public-DraftStyleDefault-']) {
-    margin: 0;
+  margin: 0;
 }
 /* stylelint-enable selector-pseudo-class-no-unknown */

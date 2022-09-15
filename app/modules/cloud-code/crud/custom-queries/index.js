@@ -1,4 +1,4 @@
-import { Parse } from 'parse'
+import { Parse } from 'parse';
 
 /**
   * Performs a query based on the parameter defined in a column
@@ -15,30 +15,28 @@ import { Parse } from 'parse'
   * @returns Results of Query
   */
 function customMultiParamQueryService(limit = 5000, parseModel, parseParams) {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const Model = Parse.Object.extend(parseModel)
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const Model = Parse.Object.extend(parseModel);
 
-            const query = new Parse.Query(Model)
+      const query = new Parse.Query(Model);
 
-            query.limit(limit)
+      query.limit(limit);
 
-            query.descending('createdAt')
+      query.descending('createdAt');
 
-            Object.entries(parseParams).forEach((e) =>
-                query.equalTo(e[0], e[1])
-            )
+      Object.entries(parseParams).forEach((e) => query.equalTo(e[0], e[1]));
 
-            query.find().then(
-                (records) => {
-                    resolve(records)
-                },
-                (error) => {
-                    reject(error)
-                }
-            )
-        }, 1500)
-    })
+      query.find().then(
+        (records) => {
+          resolve(records);
+        },
+        (error) => {
+          reject(error);
+        }
+      );
+    }, 1500);
+  });
 }
 
 /**
@@ -55,55 +53,55 @@ function customMultiParamQueryService(limit = 5000, parseModel, parseParams) {
  * @returns Results of Query
  */
 function customQueryService(
-    offset,
-    limit,
-    parseModel,
-    parseColumn,
-    parseParam
+  offset,
+  limit,
+  parseModel,
+  parseColumn,
+  parseParam
 ) {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const Model = Parse.Object.extend(parseModel)
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const Model = Parse.Object.extend(parseModel);
 
-            const query = new Parse.Query(Model)
+      const query = new Parse.Query(Model);
 
-            query.skip(offset)
+      query.skip(offset);
 
-            query.limit(limit || 5000)
+      query.limit(limit || 5000);
 
-            query.descending('createdAt')
+      query.descending('createdAt');
 
-            query.equalTo(parseColumn, parseParam)
+      query.equalTo(parseColumn, parseParam);
 
-            query.find().then(
-                (records) => {
-                    resolve(records)
-                },
-                (error) => {
-                    reject(error)
-                }
-            )
-        }, 1500)
-    })
+      query.find().then(
+        (records) => {
+          resolve(records);
+        },
+        (error) => {
+          reject(error);
+        }
+      );
+    }, 1500);
+  });
 }
 
 function removeQueryService(parseModel, objectId) {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const Model = Parse.Object.extend(parseModel)
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const Model = Parse.Object.extend(parseModel);
 
-            const query = new Parse.Query(Model)
+      const query = new Parse.Query(Model);
 
-            query.get(objectId).then(
-                (obj) => {
-                    resolve(obj.destroy())
-                },
-                (error) => {
-                    reject(error)
-                }
-            )
-        }, 1500)
-    })
+      query.get(objectId).then(
+        (obj) => {
+          resolve(obj.destroy());
+        },
+        (error) => {
+          reject(error);
+        }
+      );
+    }, 1500);
+  });
 }
 
-export { customMultiParamQueryService, customQueryService, removeQueryService }
+export { customMultiParamQueryService, customQueryService, removeQueryService };

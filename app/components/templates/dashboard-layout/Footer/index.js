@@ -1,22 +1,18 @@
-import styles from './index.module.scss'
+import styles from './index.module.scss';
 
 const Footer = () => (
-    <div className={styles.footer}>
-        <footer>
-            <a
-                href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                Powered by{' '}
-                <img
-                    src="/vercel.svg"
-                    alt="Vercel Logo"
-                    className={styles.logo}
-                />
-            </a>
-        </footer>
-    </div>
-)
+  <div className={styles.footer}>
+    <footer>
+      <a
+        href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Powered by{' '}
+        <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
+      </a>
+    </footer>
+  </div>
+);
 
-export default Footer
+export default Footer;

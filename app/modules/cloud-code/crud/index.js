@@ -1,74 +1,74 @@
-import { Parse } from 'parse'
+import { Parse } from 'parse';
 
 import {
-    customMultiParamQueryService,
-    customQueryService,
-    removeQueryService,
-} from './custom-queries'
+  customMultiParamQueryService,
+  customQueryService,
+  removeQueryService,
+} from './custom-queries';
 
 function residentIDQuery(params) {
-    return new Promise((resolve, reject) => {
-        Parse.Cloud.run('basicQuery', params).then(
-            (result) => {
-                resolve(result)
-            },
-            (error) => {
-                reject(error)
-            }
-        )
-    })
+  return new Promise((resolve, reject) => {
+    Parse.Cloud.run('basicQuery', params).then(
+      (result) => {
+        resolve(result);
+      },
+      (error) => {
+        reject(error);
+      }
+    );
+  });
 }
 
 function postObjectsToClass(params) {
-    return new Promise((resolve, reject) => {
-        Parse.Cloud.run('postObjectsToClass', params).then(
-            (result) => {
-                resolve(result)
-            },
-            (error) => {
-                reject(error)
-            }
-        )
-    })
+  return new Promise((resolve, reject) => {
+    Parse.Cloud.run('postObjectsToClass', params).then(
+      (result) => {
+        resolve(result);
+      },
+      (error) => {
+        reject(error);
+      }
+    );
+  });
 }
 
 function postObjectsToClassWithRelation(params) {
-    return new Promise((resolve, reject) => {
-        Parse.Cloud.run('postObjectsToClassWithRelation', params).then(
-            (result) => {
-                resolve(result)
-            },
-            (error) => {
-                reject(error)
-            }
-        )
-    })
+  return new Promise((resolve, reject) => {
+    Parse.Cloud.run('postObjectsToClassWithRelation', params).then(
+      (result) => {
+        resolve(result);
+      },
+      (error) => {
+        reject(error);
+      }
+    );
+  });
 }
 
 function getObjectsByGeolocation(params) {
-    return new Promise((resolve, reject) => {
-        Parse.Cloud.run('geoQuery', params).then(
-            (result) => {
-                resolve(result)
-            },
-            (error) => {
-                reject(error)
-            }
-        )
-    })
+  return new Promise((resolve, reject) => {
+    Parse.Cloud.run('geoQuery', params).then(
+      (result) => {
+        resolve(result);
+      },
+      (error) => {
+        reject(error);
+      }
+    );
+  });
 }
 
 function updateObject(params) {
-    return new Promise((resolve, reject) => {
-        Parse.Cloud.run('updateObject', params).then(
-            (result) => {
-                resolve(result)
-            },
-            (error) => {
-                reject(error)
-            }
-        )
-    })
+  return new Promise((resolve, reject) => {
+    Parse.Cloud.run('updateObject', params).then(
+      (result) => {
+        resolve(result);
+      },
+      (error) => {
+        reject(error);
+      }
+    );
+  });
 }
 
 /**
@@ -83,34 +83,34 @@ function updateObject(params) {
  * @returns Count of Query
  */
 function countObject(parseModel, parseColumn, parseParam) {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const Model = Parse.Object.extend(parseModel)
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const Model = Parse.Object.extend(parseModel);
 
-            const query = new Parse.Query(Model)
+      const query = new Parse.Query(Model);
 
-            query.equalTo(parseColumn, parseParam)
+      query.equalTo(parseColumn, parseParam);
 
-            query.count().then(
-                (count) => {
-                    resolve(count)
-                },
-                (error) => {
-                    reject(error)
-                }
-            )
-        }, 1500)
-    })
+      query.count().then(
+        (count) => {
+          resolve(count);
+        },
+        (error) => {
+          reject(error);
+        }
+      );
+    }, 1500);
+  });
 }
 
 export {
-    countObject,
-    customMultiParamQueryService,
-    customQueryService,
-    getObjectsByGeolocation,
-    postObjectsToClass,
-    postObjectsToClassWithRelation,
-    removeQueryService,
-    residentIDQuery,
-    updateObject,
-}
+  countObject,
+  customMultiParamQueryService,
+  customQueryService,
+  getObjectsByGeolocation,
+  postObjectsToClass,
+  postObjectsToClassWithRelation,
+  removeQueryService,
+  residentIDQuery,
+  updateObject,
+};

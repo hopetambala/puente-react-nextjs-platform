@@ -1,29 +1,29 @@
-import { FormControl, InputLabel } from '@material-ui/core'
-import styled from 'styled-components'
+import { FormControl, InputLabel } from '@material-ui/core';
+import styled from 'styled-components';
 
 export const StyledInputLabel = styled(InputLabel)`
-    && {
-        .req-label {
-            color: #f44336;
-        }
+  && {
+    .req-label {
+      color: #f44336;
     }
-`
+  }
+`;
 
 export const StyledFormControl = styled(FormControl)`
-    && {
-        width: 100%;
-        display: block;
-        position: relative;
-    }
-`
+  && {
+    width: 100%;
+    display: block;
+    position: relative;
+  }
+`;
 
 export const StyledAutoSelectInputLabel = styled(InputLabel)`
-    && {
-        position: relative;
-        .req-label {
-            color: #f44336;
-        }
-        transform: translate(0, 1.5px) scale(0.75);
-        transform-origin: top left;
+  && {
+    position: relative;
+    .req-label {
+      color: #f44336;
     }
-`
+    transform: translate(0, 1.5px) scale(0.75);
+    transform-origin: top left;
+  }
+`;

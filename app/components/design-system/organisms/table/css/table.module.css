@@ -1,12 +1,12 @@
 .table {
-    position: relative;
-    background-color: var(--hex-blue-100);
-    border-radius: var(--border-radius-m);
-    width: inherit;
-    transition: background-color 0.1s ease-out, box-shadow 0.1s ease-out;
-    padding: 0 var(--spacer-m);
+  position: relative;
+  background-color: var(--hex-blue-100);
+  border-radius: var(--border-radius-m);
+  width: inherit;
+  transition: background-color 0.1s ease-out, box-shadow 0.1s ease-out;
+  padding: 0 var(--spacer-m);
 }
 
 .table thead {
-    background-color: var(--hex-blue-400);
+  background-color: var(--hex-blue-400);
 }

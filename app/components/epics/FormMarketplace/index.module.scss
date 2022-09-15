@@ -1,29 +1,29 @@
 .formMarketplace {
-    h1 {
-        text-align: center;
-    }
+  h1 {
+    text-align: center;
+  }
 
-    .carousel {
-        flex: 1;
-        display: flex;
-        overflow: auto;
-        .box {
-            display: flex;
-            min-height: min-content; /* needs vendor prefixes */
-        }
+  .carousel {
+    flex: 1;
+    display: flex;
+    overflow: auto;
+    .box {
+      display: flex;
+      min-height: min-content; /* needs vendor prefixes */
     }
+  }
 
-    .searchbar {
-        align-items: center;
-        display: flex;
-        justify-content: center;
-    }
+  .searchbar {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+  }
 
-    .cards {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-wrap: wrap;
-        margin-top: 3rem;
-    }
+  .cards {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 3rem;
+  }
 }
