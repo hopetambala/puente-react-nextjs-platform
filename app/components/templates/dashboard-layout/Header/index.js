@@ -5,6 +5,7 @@ import Drawer from '@material-ui/core/Drawer';
 import IconButton from '@material-ui/core/IconButton';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import PersonOutline from '@material-ui/icons/PersonOutline';
 import CreateIcon from '@material-ui/icons/Create';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import FormatListBulletedIcon from '@material-ui/icons/FormatListBulleted';
@@ -24,7 +25,7 @@ export default function Header({ children }) {
   const [open, setDrawerOpen] = React.useState(false);
   const router = useRouter();
 
-  const logout = () => retrieveSignOutFunction().then(() => router.push('/'));
+  const logout = () => retrieveSignOutFunction().then(() => router.push('/account/login'));
 
   return (
     <div className={classes.root}>
@@ -50,23 +51,36 @@ export default function Header({ children }) {
         </div>
         <Divider />
         <List>
-          <HeaderItem link="/forms/form-marketplace" text="Marketplace">
-            <StoreIcon />
-          </HeaderItem>
-          <HeaderItem link="/forms/form-manager" text="Manager">
-            <FormatListBulletedIcon />
-          </HeaderItem>
-          <HeaderItem link="/forms/form-creator" text="Creator">
-            <CreateIcon />
-          </HeaderItem>
-          <HeaderItem link="/data/data-exporter" text="Exporter">
-            <GetAppIcon />
-          </HeaderItem>
+          <ListItem>
+            <IconButton onClick={() => router.push("/forms/form-marketplace")}>
+              <StoreIcon />
+            </IconButton>
+          </ListItem>
+          <ListItem>
+            <IconButton onClick={() => router.push("/forms/form-manager")}>
+              <FormatListBulletedIcon />
+            </IconButton>
+          </ListItem>
+          <ListItem>
+            <IconButton onClick={() => router.push("/forms/form-creator")}>
+              <CreateIcon />
+            </IconButton>
+          </ListItem>
+          <ListItem>
+            <IconButton onClick={() => router.push("/data/data-exporter")}>
+              <GetAppIcon />
+            </IconButton>
+          </ListItem>
         </List>
         <List>
           <ListItem>
+            <IconButton onClick={() => router.push("/account/management")}>
+              <PersonOutline />
+            </IconButton>
+          </ListItem>
+          <ListItem>
             <IconButton onClick={logout} style={{ color: theme.palette.error.main }}>
-              {open ? <ExitToAppIcon /> : <ExitToAppIcon />}
+                {open ? <ExitToAppIcon /> : <ExitToAppIcon />}
             </IconButton>
           </ListItem>
         </List>
