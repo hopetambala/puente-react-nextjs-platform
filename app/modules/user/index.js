@@ -50,17 +50,7 @@ const retrieveForgotPasswordFunction = (params) => new Promise((resolve, reject)
   });
 });
 
-const retrieveCurrentUserAsyncFunction = () => Parse.User.current().then((u) => {
-  const user = {};
-  user.id = u.id;
-  user.username = u.get('username');
-  user.firstname = u.get('firstname');
-  user.lastname = u.get('lastname');
-  user.email = u.get('email');
-  user.organization = u.get('organization');
-  user.role = u.get('role');
-  return user;
-});
+const retrieveCurrentUserAsyncFunction = () => Parse.User.current();
 
 const retrieveDeleteUserFunction = (params) => {
   Parse.Cloud.run('deleteUser', params).then((result) => result);
