@@ -35,7 +35,9 @@ const App = (props) => {
       '/account/verify',
       '/account/verify/redirect',
       '/account/register',
-      '/account/reset'];
+      '/account/reset',
+      '/account/management',
+    ];
     const path = url.split('?')[0];
     if (!parseUser && !publicPaths.includes(path)) {
       setAuthorized(false);
