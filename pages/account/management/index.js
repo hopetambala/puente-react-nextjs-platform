@@ -3,7 +3,7 @@ import {
   Button, Card, Stack, Text,
 } from 'app/components/elements';
 import Page from 'app/components/templates/dashboard-layout';
-import { retrieveSignInFunction,retrieveCurrentUserAsyncFunction, updateUser } from 'app/modules/user';
+import { retrieveSignInFunction, retrieveUserByObjectId, updateUser } from 'app/modules/user';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -60,7 +60,7 @@ const Management = (props) => {
       phonenumber: data['Phone Number'],
       email: data['Email Address'],
       password: data.Password,
-      active:false
+      active: false,
     };
 
     return updateUser(userId, updatedUser).then(() => router.push('/account/login'));
@@ -96,13 +96,13 @@ const Management = (props) => {
               </Stack>
               <Stack isVertical spacing="large">
                 <Button
-                  intent='primary'
+                  intent="primary"
                   text="Update user"
                   onClick={handleSubmit(onSubmit)}
                   isFullWidth
                 />
                 <Button
-                  intent='danger'
+                  intent="danger"
                   text="Delete user"
                   onClick={handleSubmit(onDelete)}
                   isFullWidth
@@ -119,24 +119,30 @@ const Management = (props) => {
 const ManagementWrapper = () => {
   const router = useRouter();
   const [user, setUser] = useState();
-  const [userId, setUserID] = useState()
+  const [userId, setUserID] = useState();
+  const { objectId } = router.query;
+
+  const retrieveUser = async () => {
+    const { attributes: retrievedUser } = await retrieveUserByObjectId(objectId);
+    return retrievedUser;
+  };
+
   useEffect(() => {
     const retrieveAccountDetails = async () => {
-      const { attributes: retrievedUser, id } = await retrieveCurrentUserAsyncFunction();
-      setUserID(id)
-      setUser(retrievedUser);
+      const retrievedUser = await retrieveUser();
+      setUserID(objectId);
       setUser({
         'First Name': retrievedUser.firstname,
         'Last Name': retrievedUser.lastname,
-        // Username: retrievedUser.username,
         Organization: retrievedUser.organization,
         'Phone Number': retrievedUser.phonenumber,
         'Email Address': retrievedUser.email,
         Password: '',
       });
     };
+    if (!objectId) return;
     retrieveAccountDetails();
-  }, []);
+  }, [objectId]);
 
   return <Management user={user} userId={userId} router={router} />;
 };
