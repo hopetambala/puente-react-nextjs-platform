@@ -1,3 +1,5 @@
+import { Parse } from 'parse';
+
 const text = (data) => {
   const { phonenumber } = data;
   return {
@@ -27,10 +29,16 @@ const email = (data) => {
   };
 };
 
-const notificationTypeRestParams = (type, data) => {
+export const notificationTypeRestParams = (type, data) => {
   if (type === 'text') return text(data);
   if (type === 'email') return email(data);
   return null;
 };
 
-export default notificationTypeRestParams;
+export const refreshSessionToken = async () => {
+  const currentUser = Parse.User.current();
+  if (currentUser) {
+    return Parse.User.logOut();
+  }
+  return null;
+};
