@@ -47,7 +47,7 @@
     "react-anchor-link-smooth-scroll": "^1.0.12",
     "react-beautiful-dnd": "^13.0.0",
     "react-countup": "^6.1.0",
-    "react-csv": "^2.2.1",
+    "react-csv": "^2.2.2",
     "react-dom": "^16.8.0",
     "react-hook-form": "^6.6.0",
     "react-image-lightbox": "^5.1.4",

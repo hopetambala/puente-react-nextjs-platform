@@ -1,3 +1,4 @@
+import customMultiParamCountService from './aggregate';
 import {
   countObject,
   customMultiParamQueryService,
@@ -18,6 +19,7 @@ import sendMessage from './messaging';
 
 export {
   countObject,
+  customMultiParamCountService,
   customMultiParamQueryService,
   customQueryService,
   getObjectsByGeolocation,
