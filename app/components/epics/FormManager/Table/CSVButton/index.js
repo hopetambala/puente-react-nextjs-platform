@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import { CSVLink } from 'react-csv';
 
 import fetchFlaskData from '../../../../../services/flask-api';
+import flatten from './_utils';
 
 const CSVButton = React.forwardRef(({
   fetchData, data, loading,
@@ -35,8 +36,11 @@ export default function CSVButtonWrapper({ form }) {
   const fetchData = async () => {
     setLoading(true);
     const { records } = await fetchFlaskData(`/records-custom-forms/ids/${objectId}`);
+    flatten(records);
     setData(records);
-    csvLink.current.link.click();
+    setTimeout(() => {
+      csvLink.current.link.click();
+    });
     setLoading(false);
   };
 
