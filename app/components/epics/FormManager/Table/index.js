@@ -99,6 +99,7 @@ const FormManagerTable = ({
               <ExpandableTableRow
                 row={row}
                 key={row.name}
+                surveyingOrganization={organization}
                 expandComponent={<TableCell colSpan="5" />}
               >
                 <TableCell>{row.name}</TableCell>
