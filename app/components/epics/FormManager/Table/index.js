@@ -22,7 +22,8 @@ const useStyles = makeStyles({
 
 const FormManagerTable = ({
   data,
-  retrieveCustomData, passDataToFormCreator,
+  retrieveCustomData,
+  passDataToFormCreator,
   organization,
 }) => {
   const [open, setOpen] = useState(false);
@@ -39,7 +40,10 @@ const FormManagerTable = ({
   };
 
   const handleEdit = (object) => {
-    if (compareOrganizations(object.organizations) || object.class === 'PuenteFormModifications') {
+    if (
+      compareOrganizations(object.organizations)
+      || object.class === 'PuenteFormModifications'
+    ) {
       object.organizations = [organization]; //eslint-disable-line
       passDataToFormCreator('edit puente form', object);
     } else {
@@ -74,7 +78,7 @@ const FormManagerTable = ({
         action={handleRemove}
         actionText="Remove"
       />
-      { data !== undefined ? (
+      {data !== undefined ? (
         <Table className={classes.table} aria-label="simple table">
           <TableHead>
             <TableRow>
@@ -97,17 +101,27 @@ const FormManagerTable = ({
                 key={row.name}
                 expandComponent={<TableCell colSpan="5" />}
               >
-                <TableCell>
-                  {row.name}
-                </TableCell>
+                <TableCell>{row.name}</TableCell>
                 <TableCell>{row.description}</TableCell>
                 <TableCell>{row.createdAt}</TableCell>
                 <TableCell>{row.updatedAt}</TableCell>
                 <TableCell>
-                  <Button aria-label="remove" text="Delete Form" onClick={() => handleModal(row)} />
-                  <Button aria-label="duplicate" text="Duplicate Form" onClick={() => handleDuplicate(row)} />
-                  <Button aria-label="edit" text="Edit Form" onClick={() => handleEdit(row)} />
-                  <CSVButton form={row} />
+                  <Button
+                    aria-label="remove"
+                    text="Delete Form"
+                    onClick={() => handleModal(row)}
+                  />
+                  <Button
+                    aria-label="duplicate"
+                    text="Duplicate Form"
+                    onClick={() => handleDuplicate(row)}
+                  />
+                  <Button
+                    aria-label="edit"
+                    text="Edit Form"
+                    onClick={() => handleEdit(row)}
+                  />
+                  <CSVButton form={row} surveyingOrganization={organization} />
                 </TableCell>
               </ExpandableTableRow>
             ))}
