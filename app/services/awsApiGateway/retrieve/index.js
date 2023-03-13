@@ -9,10 +9,11 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 function concatParameters(parameters) {
   let path = '?';
 
-  for (const [key, value] of Object.entries(parameters)) {
-    const keyValue = `${key}=${value}&`;
+  Object.keys(parameters).forEach((key) => {
+    const keyValue = `${key}=${parameters[key]}&`;
     path = path.concat(keyValue);
-  }
+  });
+
   return path;
 }
 

@@ -1,11 +1,11 @@
-import Button from "app/components/elements/button";
-import { downloadCSV } from "app/services/awsApiGateway/retrieve";
-import { useState } from "react";
+import Button from 'app/components/elements/button';
+import { downloadCSV } from 'app/services/awsApiGateway/retrieve';
+import { useState } from 'react';
 
-import { retrieveS3CSVUrl } from "../../../../../services/awsApiGateway";
+import { retrieveS3CSVUrl } from '../../../../../services/awsApiGateway';
 
 function openWindow(dataurl, filename) {
-  const link = document.createElement("a");
+  const link = document.createElement('a');
   link.href = dataurl;
   link.download = filename;
   link.click();
@@ -16,7 +16,7 @@ export default function CSVButtonWrapper({ form, surveyingOrganization }) {
   const [loading, setLoading] = useState(false);
 
   const parameters = {
-    specifier: customForm ? "FormResults" : "",
+    specifier: customForm ? 'FormResults' : '',
     surveyingOrganization,
     customFormId,
   };
@@ -34,7 +34,7 @@ export default function CSVButtonWrapper({ form, surveyingOrganization }) {
     <Button
       intent="primary"
       isLoading={loading}
-      text={loading ? "Loading" : "Download"}
+      text={loading ? 'Loading' : 'Download'}
       onClick={fetchData}
     />
   );
