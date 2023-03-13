@@ -1,48 +1,41 @@
-import Button from 'app/components/elements/button';
-import { useRef, useState } from 'react';
-import { CSVLink } from 'react-csv';
+import Button from "app/components/elements/button";
+import { downloadCSV } from "app/services/awsApiGateway/retrieve";
+import { useState } from "react";
 
-import fetchFlaskData from '../../../../../services/flask-api';
-import flatten from './_utils';
+import { retrieveS3CSVUrl } from "../../../../../services/awsApiGateway";
 
-const CSVButton = React.forwardRef(({
-  fetchData, data, loading,
-}, ref) => (
-  <>
-    <Button
-      aria-label="data"
-      text="Download Data"
-      onClick={() => fetchData()}
-      intent="primary"
-      isLoading={loading}
-    />
-    <CSVLink
-      data={data}
-      filename="data.csv"
-      className="hidden"
-      ref={ref}
-      target="_blank"
-    />
-  </>
-));
+function openWindow(dataurl, filename) {
+  const link = document.createElement("a");
+  link.href = dataurl;
+  link.download = filename;
+  link.click();
+}
 
-export default function CSVButtonWrapper({ form }) {
-  const [data, setData] = useState([]);
+export default function CSVButtonWrapper({ form, surveyingOrganization }) {
+  const { objectId: customFormId, customForm } = form;
   const [loading, setLoading] = useState(false);
-  const csvLink = useRef();
 
-  const { objectId } = form;
+  const parameters = {
+    specifier: customForm ? "FormResults" : "",
+    surveyingOrganization,
+    customFormId,
+  };
 
   const fetchData = async () => {
     setLoading(true);
-    const { records } = await fetchFlaskData(`/records-custom-forms/ids/${objectId}`);
-    flatten(records);
-    setData(records);
-    setTimeout(() => {
-      csvLink.current.link.click();
-    });
+    const resp = await retrieveS3CSVUrl(parameters);
+    const { s3_url: s3Url } = resp;
+    const downloadUrl = await downloadCSV(s3Url);
+    openWindow(downloadUrl, `${parameters.specifier}-${customFormId}.csv`);
     setLoading(false);
   };
 
-  return <CSVButton fetchData={fetchData} data={data} filename="data" loading={loading} ref={csvLink} />;
+  return (
+    <Button
+      intent="primary"
+      isLoading={loading}
+      text={loading ? "Loading" : "Download"}
+      onClick={fetchData}
+    />
+  );
 }

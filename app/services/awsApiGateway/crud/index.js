@@ -17,28 +17,33 @@ function retrieveCleanedData(specifier, customFormId, surveyingOrganization) {
     const options = {
       method: 'POST',
       hostname: process.env.NEXT_PUBLIC_awsApiGatewayHost,
-      path: process.env.NEXT_PUBLIC_awsApiGatewayPath + urlSearchParams.toString(),
+      path:
+        process.env.NEXT_PUBLIC_awsApiGatewayPath + urlSearchParams.toString(),
       headers: {},
     };
 
-    const req = https.request(options, (res) => {
-      const chunks = [];
+    const req = https.request(
+      options,
+      (res) => {
+        const chunks = [];
 
-      res.on('data', (chunk) => {
-        chunks.push(chunk);
-      });
+        res.on('data', (chunk) => {
+          chunks.push(chunk);
+        });
 
-      res.on('end', () => {
-        const body = Buffer.concat(chunks);
-        resolve(JSON.parse(body.toString()));
-      });
+        res.on('end', () => {
+          const body = Buffer.concat(chunks);
+          resolve(JSON.parse(body.toString()));
+        });
 
-      res.on('error', (error) => {
+        res.on('error', (error) => {
+          reject(error);
+        });
+      },
+      (error) => {
         reject(error);
-      });
-    }, (error) => {
-      reject(error);
-    });
+      },
+    );
 
     req.end();
   });
@@ -60,8 +65,8 @@ function getDataFromS3(key) {
       Key: objectKey,
     });
 
-    s3Client.send(getObjectCommand)
-    // code for readStream from mozilla: https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream
+    s3Client
+      .send(getObjectCommand)
       .then((data) => data.Body)
       .then((dataBody) => {
         const reader = dataBody.getReader();
@@ -88,17 +93,19 @@ function getDataFromS3(key) {
           },
         });
       })
-      .then((stream) => new Response(stream, { headers: { 'Content-Type': 'text/html' } }).text())
-      .then((result) => {
-        // Do things with result
-        resolve(result);
-      }, (error) => {
-        reject(error);
-      });
+      .then((stream) => new Response(stream, {
+        headers: { 'Content-Type': 'text/html' },
+      }).text())
+      .then(
+        (result) => {
+          // Do things with result
+          resolve(result);
+        },
+        (error) => {
+          reject(error);
+        },
+      );
   });
 }
 
-export {
-  getDataFromS3,
-  retrieveCleanedData,
-};
+export { getDataFromS3, retrieveCleanedData };
