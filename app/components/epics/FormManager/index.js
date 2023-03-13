@@ -172,6 +172,7 @@ const FormManager = ({ context, router, user }) => {
             passDataToFormCreator={passDataToFormCreator}
             organization={organization}
             workflows={workflows}
+            puenteForm
           />
         )}
       </Stack>

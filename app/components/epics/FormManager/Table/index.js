@@ -25,6 +25,7 @@ const FormManagerTable = ({
   retrieveCustomData,
   passDataToFormCreator,
   organization,
+  puenteForm,
 }) => {
   const [open, setOpen] = useState(false);
   const [selectedForm, setSelectedForm] = useState();
@@ -97,6 +98,7 @@ const FormManagerTable = ({
           <TableBody>
             {data.map((row) => (
               <ExpandableTableRow
+                puenteForm
                 row={row}
                 key={row.name}
                 surveyingOrganization={organization}
@@ -107,21 +109,25 @@ const FormManagerTable = ({
                 <TableCell>{row.createdAt}</TableCell>
                 <TableCell>{row.updatedAt}</TableCell>
                 <TableCell>
-                  <Button
-                    aria-label="remove"
-                    text="Delete Form"
-                    onClick={() => handleModal(row)}
-                  />
-                  <Button
-                    aria-label="duplicate"
-                    text="Duplicate Form"
-                    onClick={() => handleDuplicate(row)}
-                  />
-                  <Button
-                    aria-label="edit"
-                    text="Edit Form"
-                    onClick={() => handleEdit(row)}
-                  />
+                  {!puenteForm && (
+                    <>
+                      <Button
+                        aria-label="remove"
+                        text="Delete Form"
+                        onClick={() => handleModal(row)}
+                      />
+                      <Button
+                        aria-label="duplicate"
+                        text="Duplicate Form"
+                        onClick={() => handleDuplicate(row)}
+                      />
+                      <Button
+                        aria-label="edit"
+                        text="Edit Form"
+                        onClick={() => handleEdit(row)}
+                      />
+                    </>
+                  )}
                   <CSVButton form={row} surveyingOrganization={organization} />
                 </TableCell>
               </ExpandableTableRow>
