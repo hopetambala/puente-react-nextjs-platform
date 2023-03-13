@@ -12,13 +12,13 @@ function openWindow(dataurl, filename) {
 }
 
 export default function CSVButtonWrapper({ form, surveyingOrganization }) {
-  const { objectId: customFormId, customForm } = form;
+  const { objectId: customFormId, customForm, name } = form;
   const [loading, setLoading] = useState(false);
 
   const parameters = {
-    specifier: customForm ? 'FormResults' : '',
+    specifier: customForm ? 'FormResults' : name,
     surveyingOrganization,
-    customFormId,
+    ...(customFormId && { customFormId }),
   };
 
   const fetchData = async () => {

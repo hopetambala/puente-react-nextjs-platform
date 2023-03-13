@@ -9,7 +9,7 @@ import { useState } from 'react';
 
 import styles from './index.module.scss';
 
-const ExpandableTableRowDetail = ({ row }) => {
+const ExpandableTableRowDetail = ({ row, surveyingOrganization }) => {
   const [count, setCount] = useState(0);
 
   const { objectId } = row;
@@ -17,6 +17,7 @@ const ExpandableTableRowDetail = ({ row }) => {
   const getCount = async () => {
     const asynCount = await customMultiParamCountService('FormResults', {
       formSpecificationsId: objectId,
+      surveyingOrganization,
     });
 
     setCount(asynCount);
@@ -33,7 +34,7 @@ const ExpandableTableRowDetail = ({ row }) => {
 };
 
 const ExpandableTableRow = ({
-  children, expandComponent, row, ...otherProps
+  children, expandComponent, row, surveyingOrganization, ...otherProps
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -50,7 +51,7 @@ const ExpandableTableRow = ({
       {isExpanded && (
         <TableRow>
           <TableCell padding="checkbox" />
-          <ExpandableTableRowDetail row={row} />
+          <ExpandableTableRowDetail row={row} surveyingOrganization={surveyingOrganization} />
         </TableRow>
       )}
     </>
