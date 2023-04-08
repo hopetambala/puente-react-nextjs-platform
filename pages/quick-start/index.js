@@ -1,31 +1,34 @@
 import { Card } from 'app/components/molecules';
+import { retrieveCurrentUserAsyncFunction } from 'app/modules/user';
 
 import styles from './index.module.scss';
 
 export default function QuickStart() {
+  const user = retrieveCurrentUserAsyncFunction();
+  const { NEXT_PUBLIC_PUENTE_ANALYTICS_DASHBOARD_URL } = process.env;
+
   return (
     <div className={styles.index}>
       <main>
-        <h1 className={styles.title}>
-          Welcome to Puente Manage
-        </h1>
+        <h1 className={styles.title}>Welcome to Puente Manage</h1>
         <h1>Quick Start Guide</h1>
 
         <div className={styles.grid}>
           <Card
             title="Form Creator"
-            description="Create Forms for Puente Collect"
+            description="Create Forms for Collect"
             nextLink="/forms/form-creator"
           />
           <Card
             title="Form Manager"
-            description="Manage Forms for Puente Collect"
+            description="Manage Forms for Collect"
             nextLink="/forms/form-manager"
           />
           <Card
-            title="Form Marketplace"
-            description="Manage Marketplace"
-            nextLink="/forms/form-marketplace"
+            title="Analytics Dashboard"
+            description="Visualize data insights from Collect"
+            nextLink={`${NEXT_PUBLIC_PUENTE_ANALYTICS_DASHBOARD_URL}?organization=${user.get('organization')}`}
+            shouldOpenTab
           />
           <Card
             title="Data Exporter"
@@ -36,19 +39,19 @@ export default function QuickStart() {
       </main>
       <style jsx global>
         {`
-        html,
-        body {
-          padding: 0;
-          margin: 0;
-          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-            Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
-            sans-serif;
-        }
+          html,
+          body {
+            padding: 0;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+              Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
+              sans-serif;
+          }
 
-        * {
-          box-sizing: border-box;
-        }
-      `}
+          * {
+            box-sizing: border-box;
+          }
+        `}
       </style>
     </div>
   );

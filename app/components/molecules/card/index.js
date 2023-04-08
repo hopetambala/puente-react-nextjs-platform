@@ -22,19 +22,21 @@ import styles from './index.module.scss';
  */
 
 const Card = ({
-  title, description, nextLink, actions,
+  title, description, nextLink, shouldOpenTab, actions,
 }) => (
-  <a href={nextLink || null} className={styles.card}>
+  <a href={nextLink || null} className={styles.card} target={shouldOpenTab ? '_blank' : '_self'}>
     <h3>{title}</h3>
     <p>{description}</p>
-    {actions
-    && (
-    <div>
-      {actions.map((action) => <button type="button" onClick={action.action}>{action.text}</button>)}
-    </div>
+    {actions && (
+      <div>
+        {actions.map((action) => (
+          <button type="button" onClick={action.action}>
+            {action.text}
+          </button>
+        ))}
+      </div>
     )}
   </a>
-
 );
 
 export default Card;
