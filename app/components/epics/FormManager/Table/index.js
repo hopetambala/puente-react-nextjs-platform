@@ -1,4 +1,3 @@
-import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -7,9 +6,13 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import { Modal } from 'app/components/molecules/dashboard';
+import Button from 'app/components/elements/button';
+import { Modal } from 'app/components/molecules';
 import { updateObject } from 'app/modules/cloud-code';
 import React, { useState } from 'react';
+
+import CSVButton from './CSVButton';
+import ExpandableTableRow from './ExpandableTableRow';
 
 const useStyles = makeStyles({
   table: {
@@ -19,8 +22,10 @@ const useStyles = makeStyles({
 
 const FormManagerTable = ({
   data,
-  retrieveCustomData, passDataToFormCreator,
+  retrieveCustomData,
+  passDataToFormCreator,
   organization,
+  puenteForm,
 }) => {
   const [open, setOpen] = useState(false);
   const [selectedForm, setSelectedForm] = useState();
@@ -36,7 +41,10 @@ const FormManagerTable = ({
   };
 
   const handleEdit = (object) => {
-    if (compareOrganizations(object.organizations) || object.class === 'PuenteFormModifications') {
+    if (
+      compareOrganizations(object.organizations)
+      || object.class === 'PuenteFormModifications'
+    ) {
       object.organizations = [organization]; //eslint-disable-line
       passDataToFormCreator('edit puente form', object);
     } else {
@@ -71,42 +79,58 @@ const FormManagerTable = ({
         action={handleRemove}
         actionText="Remove"
       />
-      { data !== undefined ? (
+      {data !== undefined ? (
         <Table className={classes.table} aria-label="simple table">
           <TableHead>
             <TableRow>
               {/* {data && headings.map((heading,index)=>(
               <TableCell key={index}>{heading}</TableCell>
             ))} */}
+              <TableCell />
               <TableCell>Name</TableCell>
-              <TableCell align="right">Description</TableCell>
-              <TableCell align="right">Creation Date</TableCell>
-              <TableCell align="right">Updated Date</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell>Description</TableCell>
+              <TableCell>Creation Date</TableCell>
+              <TableCell>Updated Date</TableCell>
+              <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
 
           <TableBody>
             {data.map((row) => (
-              <TableRow key={row.name}>
-                <TableCell component="th" scope="row">
-                  {row.name}
+              <ExpandableTableRow
+                puenteForm
+                row={row}
+                key={row.name}
+                surveyingOrganization={organization}
+                expandComponent={<TableCell colSpan="5" />}
+              >
+                <TableCell>{row.name}</TableCell>
+                <TableCell>{row.description}</TableCell>
+                <TableCell>{row.createdAt}</TableCell>
+                <TableCell>{row.updatedAt}</TableCell>
+                <TableCell>
+                  {!puenteForm && (
+                    <>
+                      <Button
+                        aria-label="remove"
+                        text="Delete Form"
+                        onClick={() => handleModal(row)}
+                      />
+                      <Button
+                        aria-label="duplicate"
+                        text="Duplicate Form"
+                        onClick={() => handleDuplicate(row)}
+                      />
+                      <Button
+                        aria-label="edit"
+                        text="Edit Form"
+                        onClick={() => handleEdit(row)}
+                      />
+                    </>
+                  )}
+                  <CSVButton form={row} surveyingOrganization={organization} />
                 </TableCell>
-                <TableCell align="right">{row.description}</TableCell>
-                <TableCell align="right">{row.createdAt}</TableCell>
-                <TableCell align="right">{row.updatedAt}</TableCell>
-                <TableCell align="right">
-                  <Button aria-label="duplicate" onClick={() => handleDuplicate(row)}>
-                    Duplicate
-                  </Button>
-                  <Button aria-label="edit" onClick={() => handleEdit(row)}>
-                    Edit
-                  </Button>
-                  <Button aria-label="remove" onClick={() => handleModal(row)}>
-                    Remove
-                  </Button>
-                </TableCell>
-              </TableRow>
+              </ExpandableTableRow>
             ))}
           </TableBody>
         </Table>

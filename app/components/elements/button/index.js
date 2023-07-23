@@ -24,26 +24,28 @@ const Button = ({
   text,
   shouldOpenHrefInNewTab,
 }) => {
-  const classname = classNames(
-    {
-      [styles.button]: !isIconOnly,
-      [styles.iconButton]: isIconOnly,
-      [styles.primary]: intent === 'primary',
-      [styles.danger]: intent === 'danger',
-      [styles.disabled]: isDisabled || isLoading,
-      [styles.small]: isSmall,
-      [styles.fullWidth]: isFullWidth,
-      [styles.dropdown]: isDropdown,
-      [styles.loading]: isLoading,
-    },
-  );
+  const classname = classNames({
+    [styles.button]: !isIconOnly,
+    [styles.iconButton]: isIconOnly,
+    [styles.primary]: intent === 'primary',
+    [styles.danger]: intent === 'danger',
+    [styles.disabled]: isDisabled || isLoading,
+    [styles.small]: isSmall,
+    [styles.fullWidth]: isFullWidth,
+    [styles.dropdown]: isDropdown,
+    [styles.loading]: isLoading,
+  });
 
   const contents = (
     <>
       {icon && <Icon name={icon} className={styles.buttonIcon} />}
       {text && <Text className={styles.buttonText} text={text} />}
       {isDropdown && !isIconOnly && (
-        <Icon name="arrowDropDown" className={styles.dropdownIcon} size="tiny" />
+        <Icon
+          name="arrowDropDown"
+          className={styles.dropdownIcon}
+          size="tiny"
+        />
       )}
       {isLoading && (
         <div className={styles.spinner}>

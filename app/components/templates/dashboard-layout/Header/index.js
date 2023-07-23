@@ -9,14 +9,14 @@ import CreateIcon from '@material-ui/icons/Create';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import FormatListBulletedIcon from '@material-ui/icons/FormatListBulleted';
 import GetAppIcon from '@material-ui/icons/GetApp';
+import PersonOutline from '@material-ui/icons/PersonOutline';
 import StoreIcon from '@material-ui/icons/Store';
 import theme from 'app/modules/theme';
-import { retrieveSignOutFunction } from 'app/modules/user';
+import { retrieveCurrentUserAsyncFunction, retrieveSignOutFunction } from 'app/modules/user';
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
 import React from 'react';
 
-import HeaderItem from './HeaderItem';
 import useStyles from './index.style';
 
 export default function Header({ children }) {
@@ -24,7 +24,11 @@ export default function Header({ children }) {
   const [open, setDrawerOpen] = React.useState(false);
   const router = useRouter();
 
-  const logout = () => retrieveSignOutFunction().then(() => router.push('/'));
+  const logout = () => retrieveSignOutFunction().then(() => router.push('/account/login'));
+  const manage = async () => {
+    const user = await retrieveCurrentUserAsyncFunction();
+    return router.push(`/account/management?objectId=${user.id}`);
+  };
 
   return (
     <div className={classes.root}>
@@ -50,20 +54,33 @@ export default function Header({ children }) {
         </div>
         <Divider />
         <List>
-          <HeaderItem link="/forms/form-marketplace" text="Marketplace">
-            <StoreIcon />
-          </HeaderItem>
-          <HeaderItem link="/forms/form-manager" text="Manager">
-            <FormatListBulletedIcon />
-          </HeaderItem>
-          <HeaderItem link="/forms/form-creator" text="Creator">
-            <CreateIcon />
-          </HeaderItem>
-          <HeaderItem link="/data/data-exporter" text="Exporter">
-            <GetAppIcon />
-          </HeaderItem>
+          <ListItem>
+            <IconButton onClick={() => router.push('/forms/form-marketplace')}>
+              <StoreIcon />
+            </IconButton>
+          </ListItem>
+          <ListItem>
+            <IconButton onClick={() => router.push('/forms/form-manager')}>
+              <FormatListBulletedIcon />
+            </IconButton>
+          </ListItem>
+          <ListItem>
+            <IconButton onClick={() => router.push('/forms/form-creator')}>
+              <CreateIcon />
+            </IconButton>
+          </ListItem>
+          <ListItem>
+            <IconButton onClick={() => router.push('/data/data-exporter')}>
+              <GetAppIcon />
+            </IconButton>
+          </ListItem>
         </List>
         <List>
+          <ListItem>
+            <IconButton onClick={manage}>
+              <PersonOutline />
+            </IconButton>
+          </ListItem>
           <ListItem>
             <IconButton onClick={logout} style={{ color: theme.palette.error.main }}>
               {open ? <ExitToAppIcon /> : <ExitToAppIcon />}

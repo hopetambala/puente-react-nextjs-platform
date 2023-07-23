@@ -7,7 +7,7 @@ import styles from './css/toast.module.css';
 
 // const AUTO_DISMISS_DURATION_IN_MS = 4000;
 
-export const Toast = ({
+const Toast = ({
   // duration,
   // id,
   isError,
@@ -28,7 +28,7 @@ export const Toast = ({
       <Text text={text} />
     </div>
     {!shouldHideDismissButton && (
-    <button className={styles.action} onClick={closeToast}>
+    <button className={styles.action} onClick={closeToast} type="button">
       <Text text="Dismiss" />
     </button>
     )}
@@ -76,3 +76,5 @@ Toast.defaultProps = {
   isSuccess: false,
   shouldHideDismissButton: false,
 };
+
+export default Toast;

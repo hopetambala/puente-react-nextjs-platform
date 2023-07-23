@@ -1,17 +1,33 @@
-import {
-  Grid,
-  Modal,
-} from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import AppsIcon from '@material-ui/icons/Apps';
 import MenuIcon from '@material-ui/icons/Menu';
-import { retrieveCustomData, retrievePuenteFormModifications } from 'app/modules/cloud-code';
+import { Stack, Text } from 'app/components/elements';
+import { retrieveCustomData } from 'app/modules/cloud-code';
 import React, { useEffect, useState } from 'react';
 import { isArray } from 'underscore';
 
 import GridTable from './Grid';
 import styles from './index.module.scss';
 import Table from './Table';
+
+const puenteConfig = [
+  {
+    name: 'SurveyData',
+    description: '',
+  },
+  {
+    name: 'HistoryEnvironmentalHealth',
+    description: '',
+  },
+  {
+    name: 'Vitals',
+    description: '',
+  },
+  {
+    name: 'EvaluationMedical',
+    description: '',
+  },
+];
 
 const FormManager = ({ context, router, user }) => {
   /* Admin Workflow
@@ -20,17 +36,9 @@ const FormManager = ({ context, router, user }) => {
   */
 
   const [workflowData, setWorkflowData] = useState({});
-  const [puenteData, setPuenteData] = useState([]);
   const [noWorkflowData, setNoWorkflowData] = useState([]);
-  const [workflowModal, setWorkflowModal] = useState(false);
   const [listView, setListView] = useState(true);
   const [workflows, setWorkflows] = useState(null);
-  const [puenteForms, setPuenteForms] = useState({
-    SurveyData: null,
-    EnvironmentalHealth: null,
-    Vitals: null,
-    MedicalEvaluation: null,
-  });
 
   const organization = user?.organization || ''; // testing
 
@@ -72,56 +80,6 @@ const FormManager = ({ context, router, user }) => {
     // setOrganizationList([organization]);
   }, [organization]);
 
-  const updatePuenteForms = (record) => {
-    switch (record.name) {
-      case 'SurveyData':
-        setPuenteForms((prevForms) => ({ ...prevForms, SurveyData: record }));
-        break;
-      case 'EnvironmentalHealth':
-        setPuenteForms((prevForms) => ({ ...prevForms, EnvironmentalHealth: record }));
-        break;
-      case 'Vitals':
-        setPuenteForms((prevForms) => ({ ...prevForms, Vitals: record }));
-        break;
-      case 'MedicalEvaluation':
-        setPuenteForms((prevForms) => ({ ...prevForms, MedicalEvaluationo: record }));
-        break;
-      default:
-        break;
-    }
-  };
-
-  useEffect(() => {
-    retrieveCustomData('Shared').then((records) => {
-      records.forEach((record) => {
-        if (isArray(record.workflows)) {
-          record.workflows.forEach((workflow) => {
-            if (workflow === 'Puente') {
-              updatePuenteForms(record);
-            }
-          });
-        }
-      });
-    }).then(retrievePuenteFormModifications(organization).then((results) => {
-      results.forEach((record) => {
-        updatePuenteForms(record);
-      });
-    }, (error) => {
-      console.log(error); //eslint-disable-line
-    }));
-  }, [organization]);
-
-  useEffect(() => {
-    let combinedPuenteForms = [];
-    Object.entries(puenteForms).forEach(([, value]) => {
-      if (value !== null) {
-        combinedPuenteForms = combinedPuenteForms === undefined ? [value]
-          : combinedPuenteForms.concat([value]);
-      }
-    });
-    setPuenteData(combinedPuenteForms);
-  }, [puenteForms]);
-
   /**
    * ADMIN WORKFLOW
    * @param {*} action
@@ -143,20 +101,19 @@ const FormManager = ({ context, router, user }) => {
     router.push(href);
   };
 
-  const closeWorkflowModal = () => {
-    setWorkflowModal(false);
-  };
-
   return (
     <div className={styles.formCreator}>
-      <Grid container>
-        <h2>Puente Forms</h2>
+      <Stack isVertical spacing="medium">
+        <Text element="h2" text="Puente Forms" />
         {listView === true ? (
           <div>
             <IconButton
               onClick={() => setListView(true)}
               style={{
-                backgroundColor: 'lightBlue', color: 'blue', marginTop: 'auto', marginBottom: 'auto',
+                backgroundColor: 'lightBlue',
+                color: 'blue',
+                marginTop: 'auto',
+                marginBottom: 'auto',
               }}
             >
               <MenuIcon />
@@ -202,7 +159,7 @@ const FormManager = ({ context, router, user }) => {
         </Grid> */}
         {listView === true ? (
           <Table
-            data={puenteData}
+            data={puenteConfig}
             retrieveCustomData={retrieveCustomData}
             passDataToFormCreator={passDataToFormCreator}
             organization={organization}
@@ -210,31 +167,20 @@ const FormManager = ({ context, router, user }) => {
           />
         ) : (
           <GridTable
-            data={puenteData}
+            data={puenteConfig}
             retrieveCustomData={retrieveCustomData}
             passDataToFormCreator={passDataToFormCreator}
             organization={organization}
             workflows={workflows}
+            puenteForm
           />
         )}
-      </Grid>
-      <h2>Custom Forms</h2>
-      {/* {workflowModal && ( */}
-      <Modal
-        open={workflowModal}
-        onClose={closeWorkflowModal}
-        aria-labelledby="simple-modal-title"
-        aria-describedby="simple-modal-description"
-      >
-        <div style={styles.modalContainer}>
-          <h2 id="simple-modal-title">Hi</h2>
-          <p id="simple-modal-description">you</p>
-        </div>
-      </Modal>
-      {/* )} */}
-      {
-        Object.keys(workflowData).map((key) => (
-          <Grid>
+      </Stack>
+      <Stack isVertical spacing="medium">
+        <Text element="h2" text="Custom Forms" />
+
+        {Object.keys(workflowData).map((key) => (
+          <div isVertical spacing="medium">
             <h3>{key}</h3>
             {listView === true ? (
               <Table
@@ -252,10 +198,11 @@ const FormManager = ({ context, router, user }) => {
                 workflows={workflows}
               />
             )}
-          </Grid>
-        ))
-      }
-      <Grid>
+          </div>
+        ))}
+      </Stack>
+
+      <Stack isVertical spacing="medium">
         <h3>No Workflow Assigned</h3>
         {listView === true ? (
           <Table
@@ -273,7 +220,7 @@ const FormManager = ({ context, router, user }) => {
             workflows={workflows}
           />
         )}
-      </Grid>
+      </Stack>
     </div>
   );
 };

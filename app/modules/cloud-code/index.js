@@ -1,3 +1,4 @@
+import customMultiParamCountService from './aggregate';
 import {
   countObject,
   customMultiParamQueryService,
@@ -14,9 +15,11 @@ import {
   retrievePuenteFormModifications,
   retrieveUniqueListOfOrganizations,
 } from './custom-data-retrieval';
+import sendMessage from './messaging';
 
 export {
   countObject,
+  customMultiParamCountService,
   customMultiParamQueryService,
   customQueryService,
   getObjectsByGeolocation,
@@ -27,5 +30,6 @@ export {
   retrieveCustomData,
   retrievePuenteFormModifications,
   retrieveUniqueListOfOrganizations,
+  sendMessage,
   updateObject,
 };

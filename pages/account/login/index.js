@@ -2,7 +2,7 @@ import { yupResolver } from '@hookform/resolvers';
 import {
   Button, Card, Stack, Text,
 } from 'app/components/elements';
-import FormInput from 'app/components/molecules/dashboard/form-controls/input';
+import FormInput from 'app/components/molecules/form-controls/input';
 import Page from 'app/components/templates/dashboard-layout';
 import { retrieveSignInFunction } from 'app/modules/user';
 import { useRouter } from 'next/router';
@@ -21,7 +21,6 @@ const Login = () => {
   const methods = useForm({
     resolver: yupResolver(validationSchema),
   });
-
   const { handleSubmit, errors } = methods;
 
   const onSubmit = (data) => {
@@ -78,6 +77,12 @@ const Login = () => {
               text="Create account"
               intent="primary"
               href="/account/register"
+              isFullWidth
+            />
+            <Button
+              text="Reset password"
+              intent="danger"
+              href="/account/login/reset-login"
               isFullWidth
             />
           </Stack>
