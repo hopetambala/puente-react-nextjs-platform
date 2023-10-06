@@ -43,33 +43,35 @@ const FormManager = ({ context, router, user }) => {
   const organization = user?.organization || ''; // testing
 
   useEffect(() => {
-    retrieveCustomData(organization).then((records) => {
-      const tableDataByCategory = {};
-      records.forEach((record) => {
-        if (record.active !== 'false') {
-          if (!isArray(record.workflows) || record.workflows.length < 1) {
-            if ('No Workflow Assigned' in tableDataByCategory) {
-              tableDataByCategory['No Workflow Assigned'] = tableDataByCategory['No Workflow Assigned'].concat([record]);
-            } else {
-              tableDataByCategory['No Workflow Assigned'] = [record];
-            }
-          } else if (isArray(record.workflows)) {
-            record.workflows.forEach((workflow) => {
-              if (workflow in tableDataByCategory) {
-                tableDataByCategory[workflow] = tableDataByCategory[workflow].concat([record]);
+      retrieveCustomData(organization).then((records) => {
+        const tableDataByCategory = {};
+        records.forEach((record) => {
+          if (record.active !== 'false') {
+            if (!isArray(record.workflows) || record.workflows.length < 1) {
+              if ('No Workflow Assigned' in tableDataByCategory) {
+                tableDataByCategory['No Workflow Assigned'] = tableDataByCategory['No Workflow Assigned'].concat([record]);
               } else {
-                tableDataByCategory[workflow] = [record];
+                tableDataByCategory['No Workflow Assigned'] = [record];
               }
-            });
+            } else if (isArray(record.workflows)) {
+              record.workflows.forEach((workflow) => {
+                if (workflow in tableDataByCategory) {
+                  tableDataByCategory[workflow] = tableDataByCategory[workflow].concat([record]);
+                } else {
+                  tableDataByCategory[workflow] = [record];
+                }
+              });
+            }
           }
-        }
+        });
+        setNoWorkflowData(tableDataByCategory['No Workflow Assigned']);
+        delete tableDataByCategory['No Workflow Assigned'];
+        setWorkflows(Object.keys(tableDataByCategory));
+        delete tableDataByCategory.Puente;
+        setWorkflowData(tableDataByCategory);
       });
-      setNoWorkflowData(tableDataByCategory['No Workflow Assigned']);
-      delete tableDataByCategory['No Workflow Assigned'];
-      setWorkflows(Object.keys(tableDataByCategory));
-      delete tableDataByCategory.Puente;
-      setWorkflowData(tableDataByCategory);
-    });
+    
+    
 
     /**
      * ADMIN WORKFLOW
@@ -78,7 +80,7 @@ const FormManager = ({ context, router, user }) => {
     //   setOrganizationList(results);
     // });
     // setOrganizationList([organization]);
-  }, [organization]);
+  }, [organization, noWorkflowData]);
 
   /**
    * ADMIN WORKFLOW
