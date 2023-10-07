@@ -177,6 +177,7 @@ function FormCreator({ context, user }) {
         console.log(err); //eslint-disable-line
       });
     }
+    clearForm();
   };
 
   const removeValue = (id) => {
