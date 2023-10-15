@@ -20,15 +20,15 @@ import FormTemplate from './FormTemplate';
 import styles from './index.module.scss';
 
 const COLLECTION = [
-  { id: uuid(), text: 'Input - Number', fieldType: 'numberInput' },
-  { id: uuid(), text: 'Input - Text', fieldType: 'input' },
-  { id: uuid(), text: 'Input - Side Label', fieldType: 'inputSideLabel' },
-  { id: uuid(), text: 'Select - Single Choice', fieldType: 'select' },
-  { id: uuid(), text: 'Select - Multiple Choice', fieldType: 'selectMulti' },
-  { id: uuid(), text: 'Header', fieldType: 'header' },
-  { id: uuid(), text: 'Geolocation', fieldType: 'geolocation' },
-  { id: uuid(), text: 'Repeat Group - Multi Form Submissioon', fieldType: 'loop' },
-  { id: uuid(), text: 'Repeat Group - Single Form Submission', fieldType: 'loopSameForm' },
+  { id: uuid(), text: 'Input - Number', fieldType: 'numberInput', infoText: 'useful info about number inputs' },
+  { id: uuid(), text: 'Input - Text', fieldType: 'input', infoText: 'useful info about text inputs' },
+  { id: uuid(), text: 'Input - Side Label', fieldType: 'inputSideLabel', infoText: 'useful info about side label inputs' },
+  { id: uuid(), text: 'Select - Single Choice', fieldType: 'select', infoText: 'useful info about single choice select' },
+  { id: uuid(), text: 'Select - Multiple Choice', fieldType: 'selectMulti', infoText: 'useful info about multiple choice select' },
+  { id: uuid(), text: 'Header', fieldType: 'header', infoText: 'useful info about headers' },
+  { id: uuid(), text: 'Geolocation', fieldType: 'geolocation', infoText: 'useful info about geolocation' },
+  { id: uuid(), text: 'Repeat Group - Multi Form Submission', fieldType: 'loop', infoText: 'useful info about multi form submission' },
+  { id: uuid(), text: 'Repeat Group - Single Form Submission', fieldType: 'loopSameForm', infoText: 'useful info about single form submission' },
 ];
 
 const formTypes = [
@@ -330,8 +330,10 @@ function FormCreator({ context, user }) {
               </Stack>
             </Grid>
             <Grid item xs={4} className={styles['form-block']}>
-              <Card>
-                <Text element="h2" text="Building Blocks" />
+              <Card className={styles.card}>
+                <div className={styles.element}>
+                <Text element="h2" text="Building Blocks" className={styles.header}/>
+                </div>
                 <FormBlocks items={COLLECTION} />
               </Card>
             </Grid>
