@@ -20,15 +20,15 @@ import FormTemplate from './FormTemplate';
 import styles from './index.module.scss';
 
 const COLLECTION = [
-  { id: uuid(), text: 'Input - Number', fieldType: 'numberInput', infoText: 'useful info about number inputs' },
-  { id: uuid(), text: 'Input - Text', fieldType: 'input', infoText: 'useful info about text inputs' },
-  { id: uuid(), text: 'Input - Side Label', fieldType: 'inputSideLabel', infoText: 'useful info about side label inputs' },
-  { id: uuid(), text: 'Select - Single Choice', fieldType: 'select', infoText: 'useful info about single choice select' },
-  { id: uuid(), text: 'Select - Multiple Choice', fieldType: 'selectMulti', infoText: 'useful info about multiple choice select' },
-  { id: uuid(), text: 'Header', fieldType: 'header', infoText: 'useful info about headers' },
-  { id: uuid(), text: 'Geolocation', fieldType: 'geolocation', infoText: 'useful info about geolocation' },
-  { id: uuid(), text: 'Repeat Group - Multi Form Submission', fieldType: 'loop', infoText: 'useful info about multi form submission' },
-  { id: uuid(), text: 'Repeat Group - Single Form Submission', fieldType: 'loopSameForm', infoText: 'useful info about single form submission' },
+  { id: uuid(), text: 'Input - Number', fieldType: 'numberInput', infoText: 'Number Input: For questions requiring a numerical answer' },
+  { id: uuid(), text: 'Input - Text', fieldType: 'input', infoText: 'Text Input: For questions requiring text as an answer' },
+  { id: uuid(), text: 'Input - Side Label', fieldType: 'inputSideLabel', infoText: 'Side Label Input: A label for adding units of measurement next to the input field' },
+  { id: uuid(), text: 'Select - Single Choice', fieldType: 'select', infoText: 'Single Choice Select: For questions requiring one unique answer from a set of provided options' },
+  { id: uuid(), text: 'Select - Multiple Choice', fieldType: 'selectMulti', infoText: 'Multiple Choice Select: For questions allowing several possible answers from a set of provided options' },
+  { id: uuid(), text: 'Header', fieldType: 'header', infoText: 'Header: A header row/title to your form' },
+  { id: uuid(), text: 'Geolocation', fieldType: 'geolocation', infoText: 'Geolocation: Collect longitude/latitude from a user' },
+  // { id: uuid(), text: 'Repeat Group - Multi Form Submission', fieldType: 'loop', infoText: 'Multi Form Submission: 'An option that allows you to submit multiple records to multiple forms ' },
+  { id: uuid(), text: 'Repeat Group - Single Form Submission', fieldType: 'loopSameForm', infoText: 'Single Form Submission: An option that allows you to submit multiple records in the same form' }
 ];
 
 const formTypes = [

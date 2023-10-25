@@ -5,15 +5,12 @@ import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { getRenderItem } from '../_utils';
 import styles from './index.module.scss';
 import { InfoOutlined } from '@material-ui/icons';
-import { useState} from 'react';
 import { Tooltip, IconButton } from '@material-ui/core';
-import { Zoom } from '@material-ui/core/Tooltip';
 
 
 
 const Copyable = (props) => {
   const { items, className, droppableId } = props;
-  const [isHovering, setIsHovering] = useState(false);
 
   const handleMouseOver = () => {
     setIsHovering(true);
@@ -39,7 +36,6 @@ const Copyable = (props) => {
                 ) : (      
                   <Draggable draggableId={item.id} index={index} className={styles.noDragging}>
                     {(provideded, snapshoted) => (
-                      
                       <div
                         ref={provideded.innerRef}
                         {...provideded.draggableProps}
@@ -47,47 +43,24 @@ const Copyable = (props) => {
                         className={snapshoted.isDragging ? styles.dragging : styles.noDragging}
                       >
                         <p className={styles.nodragging}>{item.text}  
-                        <Tooltip 
-                          title={item.infoText} 
-                          placement="top" 
-                          arrow
-                        >
-                          {/* <IconButton> */}
-                            <IconButton style={{backgroundColor: 'transparent'}}>
-                            <InfoOutlined 
+                          <Tooltip 
+                            title={item.infoText} 
+                            placement="top" 
+                            arrow >
+                            <IconButton 
+                              style={{backgroundColor: 'transparent'}} 
                               className={styles.infoIcon}
-                             
-                            />
+                            >
+                              <InfoOutlined />
                             </IconButton>
-                          {/* </IconButton> */}
                           </Tooltip>
-                           {/* { isHovering && (
-                            <NoSsr>
-                              <Card
-                                open={isHovering}
-                                onClose={setIsHovering}
-                                message={item.text}
-                              >
-                                <p>{item.text}</p>
-                              </Card>
-                              </NoSsr>
-                            )} */}
                         </p>
-                        
                       </div>
-                   
                     )}
                   </Draggable>
-                  
                 )}
-                
-
-              
               </div>
-              
             );
-
-            
           })}
           {provided.placeholder}
         </div>
