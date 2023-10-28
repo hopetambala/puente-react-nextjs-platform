@@ -1,24 +1,15 @@
 /* eslint-disable react/jsx-props-no-spreading */
 
+import { IconButton, Tooltip } from '@material-ui/core';
+import { InfoOutlined } from '@material-ui/icons';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 
 import { getRenderItem } from '../_utils';
 import styles from './index.module.scss';
-import { InfoOutlined } from '@material-ui/icons';
-import { Tooltip, IconButton } from '@material-ui/core';
-
-
 
 const Copyable = (props) => {
   const { items, className, droppableId } = props;
 
-  const handleMouseOver = () => {
-    setIsHovering(true);
-  };
-  
-  const handleMouseOut = () => {
-    setIsHovering(false);
-  };
   return (
     <Droppable
       renderClone={getRenderItem(items, className)}
@@ -32,8 +23,8 @@ const Copyable = (props) => {
             return (
               <div key={item.id}>
                 {shouldRenderClone ? (
-                  <div className={styles.copy}></div>
-                ) : (      
+                  <div className={styles.copy} />
+                ) : (
                   <Draggable draggableId={item.id} index={index} className={styles.noDragging}>
                     {(provideded, snapshoted) => (
                       <div
@@ -42,13 +33,15 @@ const Copyable = (props) => {
                         {...provideded.dragHandleProps}
                         className={snapshoted.isDragging ? styles.dragging : styles.noDragging}
                       >
-                        <p className={styles.nodragging}>{item.text}  
-                          <Tooltip 
-                            title={item.infoText} 
-                            placement="top" 
-                            arrow >
-                            <IconButton 
-                              style={{backgroundColor: 'transparent'}} 
+                        <p className={styles.nodragging}>
+                          {item.text}
+                          <Tooltip
+                            title={item.infoText}
+                            placement="top"
+                            arrow
+                          >
+                            <IconButton
+                              style={{ backgroundColor: 'transparent' }}
                               className={styles.infoIcon}
                             >
                               <InfoOutlined />
