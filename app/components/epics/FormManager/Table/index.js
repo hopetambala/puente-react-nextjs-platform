@@ -68,7 +68,6 @@ const FormManagerTable = ({
     updateObject(params);
     retrieveCustomData(organization);
     setOpen(!open);
-    // window.location.reload();
   };
 
   return (
