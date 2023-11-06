@@ -23,7 +23,7 @@
   stroke: var(--color-blue);
   stroke-width: 10%;
   stroke-dasharray: calc(3.14 * 24px);
-  transform-origin: calc(0.5px * 24px) calc(0.5px * 24px) 0;
+  transform-origin: center;
   animation: spin 1.8s linear infinite;
 }
 
@@ -34,7 +34,7 @@
   }
 
   50% {
-    transform: rotate(720deg);
+    transform: rotate(360deg);
     stroke-dashoffset: calc(3.14 * 24px);
   }
 

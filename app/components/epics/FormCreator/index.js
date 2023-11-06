@@ -245,7 +245,7 @@ function FormCreator({ context, user }) {
                 <Text element="h1" text="Form Creator" />
                 <div>
                   <Button text="Reset Form" onClick={clearForm} />
-                  <Button text="Submit" onClick={submitCustomForm} />
+                  <Button text="Submit" onClick={submitCustomForm} isLoading={submission} />
                 </div>
                 <div>
                   <p>{submissionType}</p>
