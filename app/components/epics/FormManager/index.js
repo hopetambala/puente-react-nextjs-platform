@@ -78,7 +78,7 @@ const FormManager = ({ context, router, user }) => {
     //   setOrganizationList(results);
     // });
     // setOrganizationList([organization]);
-  }, [organization]);
+  }, [organization, noWorkflowData]);
 
   /**
    * ADMIN WORKFLOW

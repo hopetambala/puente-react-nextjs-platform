@@ -142,6 +142,7 @@ function FormCreator({ context, user }) {
         console.log(response); //eslint-disable-line
         setSubmission(true);
         setTimeout(() => setSubmission(false), 3000);
+        clearForm();
       }).catch((err) => {
         console.log(err); //eslint-disable-line
       });
@@ -158,6 +159,7 @@ function FormCreator({ context, user }) {
         console.log(response); //eslint-disable-line
         setSubmission(true);
         setTimeout(() => setSubmission(false), 3000);
+        clearForm();
       }).catch((err) => {
         postObjectsToClass(postParams).then(() => {
           setSubmission(true);
@@ -173,6 +175,7 @@ function FormCreator({ context, user }) {
         setSubmission(true);
         setTimeout(() => setSubmission(false), 3000);
         console.log(postParams); //eslint-disable-line
+        clearForm();
       }).catch((err) => {
         console.log(err); //eslint-disable-line
       });
