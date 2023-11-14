@@ -1,5 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 
+import { IconButton, Tooltip } from '@material-ui/core';
+import { InfoOutlined } from '@material-ui/icons';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 
 import { getRenderItem } from '../_utils';
@@ -7,6 +9,7 @@ import styles from './index.module.scss';
 
 const Copyable = (props) => {
   const { items, className, droppableId } = props;
+
   return (
     <Droppable
       renderClone={getRenderItem(items, className)}
@@ -20,9 +23,9 @@ const Copyable = (props) => {
             return (
               <div key={item.id}>
                 {shouldRenderClone ? (
-                  <div className={styles.copy}>{item.text}</div>
+                  <div className={styles.copy} />
                 ) : (
-                  <Draggable draggableId={item.id} index={index}>
+                  <Draggable draggableId={item.id} index={index} className={styles.noDragging}>
                     {(provideded, snapshoted) => (
                       <div
                         ref={provideded.innerRef}
@@ -30,7 +33,21 @@ const Copyable = (props) => {
                         {...provideded.dragHandleProps}
                         className={snapshoted.isDragging ? styles.dragging : styles.noDragging}
                       >
-                        <p>{item.text}</p>
+                        <p className={styles.nodragging}>
+                          {item.text}
+                          <Tooltip
+                            title={item.infoText}
+                            placement="top"
+                            arrow
+                          >
+                            <IconButton
+                              style={{ backgroundColor: 'transparent' }}
+                              className={styles.infoIcon}
+                            >
+                              <InfoOutlined />
+                            </IconButton>
+                          </Tooltip>
+                        </p>
                       </div>
                     )}
                   </Draggable>

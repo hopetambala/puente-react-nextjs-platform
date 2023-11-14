@@ -20,15 +20,31 @@ import FormTemplate from './FormTemplate';
 import styles from './index.module.scss';
 
 const COLLECTION = [
-  { id: uuid(), text: 'Input - Number', fieldType: 'numberInput' },
-  { id: uuid(), text: 'Input - Text', fieldType: 'input' },
-  { id: uuid(), text: 'Input - Side Label', fieldType: 'inputSideLabel' },
-  { id: uuid(), text: 'Select - Single Choice', fieldType: 'select' },
-  { id: uuid(), text: 'Select - Multiple Choice', fieldType: 'selectMulti' },
-  { id: uuid(), text: 'Header', fieldType: 'header' },
-  { id: uuid(), text: 'Geolocation', fieldType: 'geolocation' },
-  { id: uuid(), text: 'Repeat Group - Multi Form Submissioon', fieldType: 'loop' },
-  { id: uuid(), text: 'Repeat Group - Single Form Submission', fieldType: 'loopSameForm' },
+  {
+    id: uuid(), text: 'Input - Number', fieldType: 'numberInput', infoText: 'Number Input: For questions requiring a numerical answer',
+  },
+  {
+    id: uuid(), text: 'Input - Text', fieldType: 'input', infoText: 'Text Input: For questions requiring text as an answer',
+  },
+  {
+    id: uuid(), text: 'Input - Side Label', fieldType: 'inputSideLabel', infoText: 'Side Label Input: A label for adding units of measurement next to the input field',
+  },
+  {
+    id: uuid(), text: 'Select - Single Choice', fieldType: 'select', infoText: 'Single Choice Select: For questions requiring one unique answer from a set of provided options',
+  },
+  {
+    id: uuid(), text: 'Select - Multiple Choice', fieldType: 'selectMulti', infoText: 'Multiple Choice Select: For questions allowing several possible answers from a set of provided options',
+  },
+  {
+    id: uuid(), text: 'Header', fieldType: 'header', infoText: 'Header: A header row/title to your form',
+  },
+  {
+    id: uuid(), text: 'Geolocation', fieldType: 'geolocation', infoText: 'Geolocation: Collect longitude/latitude from a user',
+  },
+  // { id: uuid(), text: 'Repeat Group - Multi Form Submission', fieldType: 'loop', infoText: 'Multi Form Submission: 'An option that allows you to submit multiple records to multiple forms ' },
+  {
+    id: uuid(), text: 'Repeat Group - Single Form Submission', fieldType: 'loopSameForm', infoText: 'Single Form Submission: An option that allows you to submit multiple records in the same form',
+  },
 ];
 
 const formTypes = [
@@ -330,8 +346,10 @@ function FormCreator({ context, user }) {
               </Stack>
             </Grid>
             <Grid item xs={4} className={styles['form-block']}>
-              <Card>
-                <Text element="h2" text="Building Blocks" />
+              <Card >
+                <div>
+                  <Text element="h2" text="Building Blocks" className={styles.header} />
+                </div>
                 <FormBlocks items={COLLECTION} />
               </Card>
             </Grid>
