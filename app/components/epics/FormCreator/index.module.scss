@@ -1,39 +1,13 @@
 .dragging {
   font-size: 16px;
-  letter-spacing: 0.29px;
-  line-height: 40px;
-  text-align: center;
   color: rgb(61,127,252);
-  background-color:rgb(255,230,128);
-  font-family: Verdana, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
 }
 
 .form-block{
-  font-family: Verdana, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
   margin:  calc(var(--spacer-s));
   position: fixed;
   right: 0vw;
-  bottom: 5vw;
   width: 100%;
-  text-align: center; 
-}
-
-.card {
-  border-color:  rgb(61,127,252);
-}
-
-.element {
-  line-height: 50px;
-  margin-top: 0px;
-  border-color: black;
-  background-color:  rgb(61,127,252);
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-}
-
-.header {
-  color: white;
-  margin-top: 10px;
 }
 
 

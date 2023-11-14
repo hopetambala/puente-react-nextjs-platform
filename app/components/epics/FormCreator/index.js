@@ -346,8 +346,8 @@ function FormCreator({ context, user }) {
               </Stack>
             </Grid>
             <Grid item xs={4} className={styles['form-block']}>
-              <Card className={styles.card}>
-                <div className={styles.element}>
+              <Card >
+                <div>
                   <Text element="h2" text="Building Blocks" className={styles.header} />
                 </div>
                 <FormBlocks items={COLLECTION} />
