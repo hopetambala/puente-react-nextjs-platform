@@ -1,4 +1,4 @@
-import { Card } from 'app/components/molecules';
+import { CardAlt } from 'app/impacto-design-system';
 import { retrieveCurrentUserAsyncFunction } from 'app/modules/user';
 
 import styles from './index.module.scss';
@@ -14,23 +14,23 @@ export default function QuickStart() {
         <h1>Quick Start Guide</h1>
 
         <div className={styles.grid}>
-          <Card
+          <CardAlt
             title="Form Creator"
             description="Create Forms for Collect"
             nextLink="/forms/form-creator"
           />
-          <Card
+          <CardAlt
             title="Form Manager"
             description="Manage Forms for Collect"
             nextLink="/forms/form-manager"
           />
-          <Card
+          <CardAlt
             title="Analytics Dashboard"
             description="Visualize data insights from Collect"
             nextLink={`${NEXT_PUBLIC_PUENTE_ANALYTICS_DASHBOARD_URL}?organization=${user.get('organization')}`}
             shouldOpenTab
           />
-          <Card
+          <CardAlt
             title="Data Exporter"
             description="Download data"
             nextLink="/data/data-exporter"

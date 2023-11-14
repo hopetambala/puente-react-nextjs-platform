@@ -1,11 +1,15 @@
 import { yupResolver } from '@hookform/resolvers';
 import {
-  Button, Card, Stack, Text,
-} from 'app/components/elements';
-import FormInput from 'app/components/molecules/form-controls/input';
-import Page from 'app/components/templates/dashboard-layout';
+  Button,
+  Card,
+  FormInput,
+  Page,
+  Stack,
+  Text,
+} from 'app/impacto-design-system';
 import { retrieveSignInFunction } from 'app/modules/user';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -23,14 +27,16 @@ const Login = () => {
   });
   const { handleSubmit, errors } = methods;
 
+  const [loading, setLoading] = useState(false);
   const onSubmit = (data) => {
+    setLoading(true);
     const { usernameV, passwordV } = data;
-    return retrieveSignInFunction(usernameV, passwordV)
-      .then(() => {
-        // get return url from query parameters or default to '/'
-        const returnUrl = router.query.returnUrl || '/quick-start';
-        router.push(returnUrl);
-      });
+    return retrieveSignInFunction(usernameV, passwordV).then(() => {
+      // get return url from query parameters or default to '/'
+      setLoading(false);
+      const returnUrl = router.query.returnUrl || '/quick-start';
+      router.push(returnUrl);
+    });
   };
 
   return (
@@ -42,11 +48,7 @@ const Login = () => {
             <Text text="Sign in to Manage" element="h2" />
           </Stack>
           <FormProvider {...methods}>
-            <Stack
-              isVertical
-              spacing="large"
-              className={styles.stack}
-            >
+            <Stack isVertical spacing="large" className={styles.stack}>
               <FormInput
                 name="usernameV"
                 label="Phone Number or Email Address"
@@ -72,6 +74,7 @@ const Login = () => {
               text="Continue"
               onClick={handleSubmit(onSubmit)}
               isFullWidth
+              isLoading={loading}
             />
             <Button
               text="Create account"
