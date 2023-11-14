@@ -2,12 +2,11 @@ import { yupResolver } from '@hookform/resolvers';
 import {
   Button,
   Card,
-  Stack,
+  FormInput,
+  Page, Stack,
   Text,
   Toast,
-  FormInput,
-} from "app/impacto-design-system";
-import Page from 'app/components/templates/dashboard-layout';
+} from 'app/impacto-design-system';
 import { retrieveSignUpFunction } from 'app/modules/user';
 import { useRouter } from 'next/router';
 import { useState } from 'react';

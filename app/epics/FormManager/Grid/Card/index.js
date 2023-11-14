@@ -4,7 +4,7 @@ import {
   MenuItem,
 } from '@material-ui/core';
 import FolderOpenOutlinedIcon from '@material-ui/icons/FolderOpenOutlined';
-import { Modal } from 'app/components/molecules';
+import { Modal } from 'app/impacto-design-system';
 import { updateObject } from 'app/modules/cloud-code';
 import { useState } from 'react';
 

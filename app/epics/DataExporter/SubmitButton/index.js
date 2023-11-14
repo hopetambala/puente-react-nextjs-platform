@@ -5,10 +5,9 @@ import IconButton from '@material-ui/core/IconButton';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import CloseIcon from '@material-ui/icons/Close';
 import Alert from '@material-ui/lab/Alert';
+import { getDataFromS3, retrieveCleanedData } from 'app/services/awsApiGateway';
 import React, { useState } from 'react';
 import { CSVLink } from 'react-csv';
-
-import { getDataFromS3, retrieveCleanedData } from 'app/services/awsApiGateway';
 
 const SubmitButton = ({
   handleSubmit, surveyingOrganization, specifier, customFormId, csvData, setCsvData,

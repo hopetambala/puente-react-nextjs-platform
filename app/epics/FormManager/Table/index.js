@@ -6,8 +6,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import Button from 'app/impacto-design-system/button';
-import { Modal } from 'app/components/molecules';
+import { Button, Modal } from 'app/impacto-design-system';
 import { updateObject } from 'app/modules/cloud-code';
 import React, { useState } from 'react';
 

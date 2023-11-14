@@ -2,18 +2,18 @@ import { yupResolver } from '@hookform/resolvers';
 import {
   Button,
   Card,
+  FormInput,
+  Page,
   Stack,
   Text,
-  FormInput,
-} from "app/impacto-design-system";
-import Page from 'app/components/templates/dashboard-layout';
+} from 'app/impacto-design-system';
 import { retrieveSignInFunction } from 'app/modules/user';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import styles from './index.module.scss';
-import { useState } from 'react';
 
 const validationSchema = yup.object().shape({
   usernameV: yup.string().required('Username or Phone Number is Required'),
@@ -27,15 +27,17 @@ const Login = () => {
   });
   const { handleSubmit, errors } = methods;
 
-  const [loading, setLoading] = useState(false)
-    const onSubmit = (data) => {
-      const { usernameV, passwordV } = data;
-      return retrieveSignInFunction(usernameV, passwordV).then(() => {
-        // get return url from query parameters or default to '/'
-        const returnUrl = router.query.returnUrl || "/quick-start";
-        router.push(returnUrl);
-      });
-    };
+  const [loading, setLoading] = useState(false);
+  const onSubmit = (data) => {
+    setLoading(true);
+    const { usernameV, passwordV } = data;
+    return retrieveSignInFunction(usernameV, passwordV).then(() => {
+      // get return url from query parameters or default to '/'
+      setLoading(false);
+      const returnUrl = router.query.returnUrl || '/quick-start';
+      router.push(returnUrl);
+    });
+  };
 
   return (
     <Page>

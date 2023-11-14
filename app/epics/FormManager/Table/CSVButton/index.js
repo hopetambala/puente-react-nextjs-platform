@@ -1,8 +1,7 @@
 import Button from 'app/impacto-design-system/button';
+import { retrieveS3CSVUrl } from 'app/services/awsApiGateway';
 import { downloadCSV } from 'app/services/awsApiGateway/retrieve';
 import { useState } from 'react';
-
-import { retrieveS3CSVUrl } from 'app/services/awsApiGateway';
 
 function openWindow(dataurl, filename) {
   const link = document.createElement('a');

@@ -1,6 +1,6 @@
+import { Button } from 'app/impacto-design-system';
 import { useEffect, useState } from 'react';
 
-import { Button } from 'app/impacto-design-system';
 import ActiveInput from '../Utils';
 import styles from './index.module.scss';
 

@@ -1,7 +1,7 @@
+import { Button, Stack } from 'app/impacto-design-system';
 import React, { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
-import { Button, Stack } from 'app/impacto-design-system';
 import ActiveInput from '../Utils';
 import styles from './index.module.scss';
 

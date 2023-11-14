@@ -1,5 +1,5 @@
 import FormMarketplace from 'app/epics/FormMarketplace';
-import Page from 'app/components/templates/dashboard-layout';
+import { Page } from 'app/impacto-design-system';
 import { parseUserValue } from 'app/modules/user';
 import { useGlobalState } from 'app/store';
 import { useRouter } from 'next/router';

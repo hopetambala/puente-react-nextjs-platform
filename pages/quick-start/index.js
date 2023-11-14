@@ -1,5 +1,6 @@
+import { CardAlt } from 'app/impacto-design-system';
 import { retrieveCurrentUserAsyncFunction } from 'app/modules/user';
-import { CardAlt } from "app/impacto-design-system";
+
 import styles from './index.module.scss';
 
 export default function QuickStart() {

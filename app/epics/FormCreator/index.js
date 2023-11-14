@@ -41,7 +41,10 @@ const COLLECTION = [
   {
     id: uuid(), text: 'Geolocation', fieldType: 'geolocation', infoText: 'Geolocation: Collect longitude/latitude from a user',
   },
-  // { id: uuid(), text: 'Repeat Group - Multi Form Submission', fieldType: 'loop', infoText: 'Multi Form Submission: 'An option that allows you to submit multiple records to multiple forms ' },
+  /** { id: uuid(), text: 'Repeat Group - Multi Form Submission', fieldType: 'loop',
+   *  infoText: 'Multi Form Submission:
+   * 'An option that allows you to submit multiple records to multiple forms ' },
+   * */
   {
     id: uuid(), text: 'Repeat Group - Single Form Submission', fieldType: 'loopSameForm', infoText: 'Single Form Submission: An option that allows you to submit multiple records in the same form',
   },
@@ -346,7 +349,7 @@ function FormCreator({ context, user }) {
               </Stack>
             </Grid>
             <Grid item xs={4} className={styles['form-block']}>
-              <Card >
+              <Card>
                 <div>
                   <Text element="h2" text="Building Blocks" className={styles.header} />
                 </div>
