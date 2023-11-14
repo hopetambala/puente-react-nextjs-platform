@@ -1,8 +1,12 @@
 import { yupResolver } from '@hookform/resolvers';
 import {
-  Button, Card, Stack, Text, Toast,
-} from 'app/impacto-design-system';
-import FormInput from 'app/components/molecules/form-controls/input';
+  Button,
+  Card,
+  Stack,
+  Text,
+  Toast,
+  FormInput,
+} from "app/impacto-design-system";
 import Page from 'app/components/templates/dashboard-layout';
 import { sendMessage } from 'app/modules/cloud-code';
 import { queryUser, retrieveSignOutFunction } from 'app/modules/user';

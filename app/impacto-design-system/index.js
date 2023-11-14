@@ -9,12 +9,14 @@ import Stack from './stack';
 import Text from './text';
 import Toast from './toast';
 import Tooltip from './tooltip';
+import FormInput from "./form-controls/input";
 
 export {
   Button,
   Card,
   CardAlt,
   CardGroup,
+  FormInput,
   Icon,
   Link,
   Spinner,
