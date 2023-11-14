@@ -97,7 +97,7 @@
     "storybook-css-modules": "^1.0.8"
   },
   "engines": {
-    "npm": "^8.19.3",
-    "node": "^16.19.1"
+    "npm": "^8.13.2",
+    "node": "^18.6.0"
   }
 }
