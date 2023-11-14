@@ -1,4 +1,4 @@
-import DataExporter from 'app/components/epics/DataExporter';
+import DataExporter from 'app/epics/DataExporter';
 import Page from 'app/components/templates/dashboard-layout';
 import { parseUserValue } from 'app/modules/user';
 

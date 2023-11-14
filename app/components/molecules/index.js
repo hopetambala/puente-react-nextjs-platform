@@ -1,9 +1,9 @@
-import Card from './card';
+// import Card from './card';
 import Modal from './modal';
 import SearchBar from './search';
 
 export {
-  Card,
+  // Card,
   Modal,
   SearchBar,
 };

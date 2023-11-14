@@ -6,7 +6,7 @@ import 'styles/landing-page/top-loading-bar.css';
 import 'styles/landing-page/page-transition.css';
 import 'styles/landing-page/slick/slick.css';
 import 'styles/landing-page/slick/slick-theme.css';
-import 'app/components/elements/_css/root.css';
+import 'app/impacto-design-system/_css/root.css';
 import 'react-toastify/dist/ReactToastify.css';
 
 import CssBaseline from '@material-ui/core/CssBaseline';

@@ -1,7 +1,7 @@
 import { yupResolver } from '@hookform/resolvers';
 import {
   Button, Card, Stack, Text,
-} from 'app/components/elements';
+} from 'app/impacto-design-system';
 import FormInput from 'app/components/molecules/form-controls/input';
 import Page from 'app/components/templates/dashboard-layout';
 import { retrieveSignInFunction } from 'app/modules/user';
@@ -10,6 +10,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import styles from './index.module.scss';
+import { useState } from 'react';
 
 const validationSchema = yup.object().shape({
   usernameV: yup.string().required('Username or Phone Number is Required'),
@@ -23,15 +24,15 @@ const Login = () => {
   });
   const { handleSubmit, errors } = methods;
 
-  const onSubmit = (data) => {
-    const { usernameV, passwordV } = data;
-    return retrieveSignInFunction(usernameV, passwordV)
-      .then(() => {
+  const [loading, setLoading] = useState(false)
+    const onSubmit = (data) => {
+      const { usernameV, passwordV } = data;
+      return retrieveSignInFunction(usernameV, passwordV).then(() => {
         // get return url from query parameters or default to '/'
-        const returnUrl = router.query.returnUrl || '/quick-start';
+        const returnUrl = router.query.returnUrl || "/quick-start";
         router.push(returnUrl);
       });
-  };
+    };
 
   return (
     <Page>
@@ -42,11 +43,7 @@ const Login = () => {
             <Text text="Sign in to Manage" element="h2" />
           </Stack>
           <FormProvider {...methods}>
-            <Stack
-              isVertical
-              spacing="large"
-              className={styles.stack}
-            >
+            <Stack isVertical spacing="large" className={styles.stack}>
               <FormInput
                 name="usernameV"
                 label="Phone Number or Email Address"
@@ -72,6 +69,7 @@ const Login = () => {
               text="Continue"
               onClick={handleSubmit(onSubmit)}
               isFullWidth
+              isLoading={loading}
             />
             <Button
               text="Create account"

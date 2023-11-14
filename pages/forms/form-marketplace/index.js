@@ -1,4 +1,4 @@
-import FormMarketplace from 'app/components/epics/FormMarketplace';
+import FormMarketplace from 'app/epics/FormMarketplace';
 import Page from 'app/components/templates/dashboard-layout';
 import { parseUserValue } from 'app/modules/user';
 import { useGlobalState } from 'app/store';

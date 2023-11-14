@@ -1,4 +1,4 @@
-import FormCreator from 'app/components/epics/FormCreator';
+import FormCreator from 'app/epics/FormCreator';
 import Page from 'app/components/templates/dashboard-layout';
 import { parseUserValue } from 'app/modules/user';
 import { useGlobalState } from 'app/store';

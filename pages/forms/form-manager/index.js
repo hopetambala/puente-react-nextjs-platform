@@ -1,4 +1,4 @@
-import FormManager from 'app/components/epics/FormManager';
+import FormManager from 'app/epics/FormManager';
 import Page from 'app/components/templates/dashboard-layout';
 import { parseUserValue } from 'app/modules/user';
 import { useGlobalState } from 'app/store';

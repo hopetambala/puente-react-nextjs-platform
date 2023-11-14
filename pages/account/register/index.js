@@ -1,7 +1,7 @@
 import { yupResolver } from '@hookform/resolvers';
 import {
   Button, Card, Stack, Text, Toast,
-} from 'app/components/elements';
+} from 'app/impacto-design-system';
 import FormInput from 'app/components/molecules/form-controls/input';
 import Page from 'app/components/templates/dashboard-layout';
 import { retrieveSignUpFunction } from 'app/modules/user';
