@@ -95,9 +95,5 @@
     "standard-version": "9.1.0",
     "storybook": "^7.5.3",
     "storybook-css-modules": "^1.0.8"
-  },
-  "engines": {
-    "npm": "^8.13.2",
-    "node": "^18.6.0"
   }
 }
