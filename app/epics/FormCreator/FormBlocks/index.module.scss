@@ -1,0 +1,18 @@
+
+.copy ~ div {
+  transform: none !important;
+}
+.noDragging {
+  border-left-color: black;
+}
+
+.noDragging:hover {
+  font-size: 16px;
+  transform: scale(.99);
+}
+
+
+
+.infoIcon:hover {
+  color: white;
+}

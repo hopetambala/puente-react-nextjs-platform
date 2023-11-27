@@ -1,8 +1,7 @@
 import { yupResolver } from '@hookform/resolvers';
 import {
-  Button, Card, Stack, Text,
-} from 'app/components/elements';
-import Page from 'app/components/templates/dashboard-layout';
+  Button, Card, Page, Stack, Text,
+} from 'app/impacto-design-system';
 import { retrieveSignInFunction, retrieveUserByObjectId, updateUser } from 'app/modules/user';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';

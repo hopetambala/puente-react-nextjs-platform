@@ -1,0 +1,32 @@
+/* stylelint-disable declaration-colon-newline-after */
+@font-face {
+  font-family: 'Roboto';
+  font-weight: 500;
+  src: url('../../../public/assets/fonts/Roboto-Black.ttf') format('ttf'),
+    url('../../../public/assets/fonts/Roboto-Black.ttf') format('ttf');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 500;
+  src: url('../../../public/assets/fonts/Roboto-BlackItalic.ttf') format('ttf'),
+    url('../../../public/assets/fonts/Roboto-BlackItalic.ttf') format('ttf');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 400;
+  src: url('../../../public/assets/fonts/Roboto-Italic.ttf') format('ttf'),
+    url('../../../public/assets/fonts/Roboto-Italic.ttf') format('ttf');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-weight: 400;
+  src: url('../../../public/assets/fonts/Roboto-Regular.ttf') format('ttf'),
+    url('../../../public/assets/fonts/Roboto-Regular.ttf') format('ttf');
+}
+
+/* stylelint-enable declaration-colon-newline-after */

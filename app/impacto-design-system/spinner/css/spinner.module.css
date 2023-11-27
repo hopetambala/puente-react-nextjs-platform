@@ -1,0 +1,45 @@
+/* :root {
+  --spinner-size: 24px;
+  --spinner-size-large: 40px;
+} */
+
+.spinner {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  left: calc(50% - (40px / 2));
+  top: calc(50% - (40px / 2));
+}
+
+.smallModifier {
+  width: 24px;
+  height: 24px;
+  left: calc(50% - (24px / 2));
+  top: calc(50% - (24px / 2));
+}
+
+.spinner circle {
+  fill: transparent;
+  stroke: var(--color-blue);
+  stroke-width: 10%;
+  stroke-dasharray: calc(3.14 * 24px);
+  transform-origin: center;
+  animation: spin 1.8s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+    stroke-dashoffset: calc(0.66 * 24px);
+  }
+
+  50% {
+    transform: rotate(360deg);
+    stroke-dashoffset: calc(3.14 * 24px);
+  }
+
+  100% {
+    transform: rotate(1080deg);
+    stroke-dashoffset: calc(0.66 * 24px);
+  }
+}

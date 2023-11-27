@@ -1,5 +1,5 @@
-import DataExporter from 'app/components/epics/DataExporter';
-import Page from 'app/components/templates/dashboard-layout';
+import DataExporter from 'app/epics/DataExporter';
+import { Page } from 'app/impacto-design-system';
 import { parseUserValue } from 'app/modules/user';
 
 export default function Forms() {

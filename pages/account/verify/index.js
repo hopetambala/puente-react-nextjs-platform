@@ -1,7 +1,6 @@
 import {
-  Button, Card, Text,
-} from 'app/components/elements';
-import Page from 'app/components/templates/dashboard-layout';
+  Button, Card, Page, Text,
+} from 'app/impacto-design-system';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
