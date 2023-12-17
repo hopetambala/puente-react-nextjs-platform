@@ -40,7 +40,7 @@ const Forms = () => {
             <button onClick={() => setKey(filters[filter])}>{filter}</button>
           ))}
         </div>
-        <div style={{ height: "100vh", width: "100%" }}>
+        <div style={{ height: "60vh", width: "100%" }}>
           {data.length > 0 && <BarChart data={data} indexBy={key} />}
         </div>
       </main>
