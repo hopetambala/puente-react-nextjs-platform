@@ -8,6 +8,7 @@ const filters = {
   "Biggest Problem": "biggestproblemofcommunity_v2",
   "Floor Material": "floormaterial",
   "Years in Community": "yearslivedinthecommunity",
+  "Type of water you drink": "typeofwaterdoyoudrink",
 };
 const Forms = () => {
   const [data, setData] = useState([]);
