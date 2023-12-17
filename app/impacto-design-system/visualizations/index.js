@@ -1,9 +1,3 @@
-import GroupedBarChart from './Grouped-Bar-Chart';
-import LineChart from './LineChart';
-import ResponsiveScatterPlot from './ScatterPlot';
+import { BarChart } from './bar-chart';
 
-export {
-  GroupedBarChart,
-  LineChart,
-  ResponsiveScatterPlot,
-};
+export { BarChart };
