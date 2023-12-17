@@ -6,6 +6,7 @@ module.exports = {
   extends: [
     'plugin:react/recommended',
     'airbnb',
+    'next',
   ],
   parserOptions: {
     ecmaFeatures: {
@@ -14,10 +15,7 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: 'module',
   },
-  plugins: [
-    'react',
-    'simple-import-sort',
-  ],
+  plugins: ['react', 'simple-import-sort'],
   rules: {
     'react/react-in-jsx-scope': 'off',
     'react/jsx-props-no-spreading': 'off',
@@ -32,6 +30,7 @@ module.exports = {
         aspects: ['invalidHref', 'preferButton'],
       },
     ],
+    'react/jsx-key': 'off',
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
     'sort-imports': 'off',
@@ -40,7 +39,6 @@ module.exports = {
     'import/no-duplicates': 'error',
     'import/no-unresolved': 'off',
     'import/no-extraneous-dependencies': 'off',
-
   },
   globals: {
     React: 'writable',

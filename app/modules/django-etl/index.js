@@ -1,7 +1,8 @@
-import {get, retrieve} from "./environmental-health";
-const environmentalHealthRecord  = {
+import { get, retrieve } from './environmental-health';
+
+const environmentalHealthRecord = {
   get,
-  retrieve
-}
+  retrieve,
+};
 
 export { environmentalHealthRecord };

@@ -1,32 +1,34 @@
-import { ResponsiveBar } from "@nivo/bar";
+import { ResponsiveBar } from '@nivo/bar';
 
 // clinicaccess_v2;
 // count_of_unique_values;
 export const BarChart = ({ data, indexBy }) => (
   <ResponsiveBar
     data={data}
-    keys={["count_of_unique_values"]}
+    keys={['count_of_unique_values']}
     indexBy={indexBy}
-    margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
+    margin={{
+      top: 50, right: 130, bottom: 50, left: 60,
+    }}
     padding={0.3}
-    valueScale={{ type: "linear" }}
-    indexScale={{ type: "band", round: true }}
-    colors={{ scheme: "nivo" }}
+    valueScale={{ type: 'linear' }}
+    indexScale={{ type: 'band', round: true }}
+    colors={{ scheme: 'nivo' }}
     defs={[
       {
-        id: "dots",
-        type: "patternDots",
-        background: "inherit",
-        color: "#38bcb2",
+        id: 'dots',
+        type: 'patternDots',
+        background: 'inherit',
+        color: '#38bcb2',
         size: 4,
         padding: 1,
         stagger: true,
       },
       {
-        id: "lines",
-        type: "patternLines",
-        background: "inherit",
-        color: "#eed312",
+        id: 'lines',
+        type: 'patternLines',
+        background: 'inherit',
+        color: '#eed312',
         rotation: -45,
         lineWidth: 6,
         spacing: 10,
@@ -35,20 +37,20 @@ export const BarChart = ({ data, indexBy }) => (
     fill={[
       {
         match: {
-          id: "fries",
+          id: 'fries',
         },
-        id: "dots",
+        id: 'dots',
       },
       {
         match: {
-          id: "sandwich",
+          id: 'sandwich',
         },
-        id: "lines",
+        id: 'lines',
       },
     ]}
     borderColor={{
-      from: "color",
-      modifiers: [["darker", 1.6]],
+      from: 'color',
+      modifiers: [['darker', 1.6]],
     }}
     axisTop={null}
     axisRight={null}
@@ -56,8 +58,8 @@ export const BarChart = ({ data, indexBy }) => (
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: "country",
-      legendPosition: "middle",
+      legend: 'country',
+      legendPosition: 'middle',
       legendOffset: 32,
       truncateTickAt: 0,
     }}
@@ -65,34 +67,34 @@ export const BarChart = ({ data, indexBy }) => (
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: "food",
-      legendPosition: "middle",
+      legend: 'food',
+      legendPosition: 'middle',
       legendOffset: -40,
       truncateTickAt: 0,
     }}
     labelSkipWidth={12}
     labelSkipHeight={12}
     labelTextColor={{
-      from: "color",
-      modifiers: [["darker", 1.6]],
+      from: 'color',
+      modifiers: [['darker', 1.6]],
     }}
     legends={[
       {
-        dataFrom: "keys",
-        anchor: "bottom-right",
-        direction: "column",
+        dataFrom: 'keys',
+        anchor: 'bottom-right',
+        direction: 'column',
         justify: false,
         translateX: 120,
         translateY: 0,
         itemsSpacing: 2,
         itemWidth: 100,
         itemHeight: 20,
-        itemDirection: "left-to-right",
+        itemDirection: 'left-to-right',
         itemOpacity: 0.85,
         symbolSize: 20,
         effects: [
           {
-            on: "hover",
+            on: 'hover',
             style: {
               itemOpacity: 1,
             },
@@ -102,8 +104,6 @@ export const BarChart = ({ data, indexBy }) => (
     ]}
     role="application"
     ariaLabel="Nivo bar chart demo"
-    barAriaLabel={(e) =>
-      e.id + ": " + e.formattedValue + " in country: " + e.indexValue
-    }
+    barAriaLabel={(e) => `${e.id}: ${e.formattedValue} in country: ${e.indexValue}`}
   />
 );
