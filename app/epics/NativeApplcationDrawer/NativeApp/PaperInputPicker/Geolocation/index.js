@@ -1,4 +1,4 @@
-import Button from '@material-ui/core/Button';
+import Button from 'app/impacto-design-system/button';
 import React from 'react';
 import {
   View,
@@ -15,9 +15,8 @@ const Geolocation = ({ formikKey }) => (
       variant="outlined"
       theme={theme}
       color="primary"
-    >
-      Get Location
-    </Button>
+      text='Get Location'
+    />
   </View>
 );
 

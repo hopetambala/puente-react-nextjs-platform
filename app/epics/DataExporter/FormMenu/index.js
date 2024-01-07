@@ -1,4 +1,4 @@
-import Button from '@material-ui/core/Button';
+import Button from 'app/impacto-design-system/button';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import React, { useEffect, useState } from 'react';
@@ -91,9 +91,8 @@ const FormMenu = ({
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
         onClick={handleClick}
-      >
-        <div>{formType && (<div>{formValue}</div>)}</div>
-      </Button>
+        text={formValue}
+      />
       <Menu
         id="demo-positioned-menu"
         aria-labelledby="demo-positioned-button"

@@ -1,4 +1,4 @@
-import Button from '@material-ui/core/Button';
+import Button from 'app/impacto-design-system/button';
 import { lighten, makeStyles } from '@material-ui/core/styles';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
@@ -141,31 +141,26 @@ const EnhancedTableToolbar = (props) => {
       <Tooltip title="See previous 10 fields in form" placement="top">
         {cellLabelMax === 10 ? (
           <Button
-            disabled
-          >
-            {'<'}
-          </Button>
+            isDisabled
+          />
         ) : (
           <Button
             onClick={() => changeCellLabels('left')}
-          >
-            {'<'}
-          </Button>
+            text='<'
+          />
         )}
       </Tooltip>
       <Tooltip title="See next 10 fields in form" placement="top">
         {cellLabelMax >= cellLabels.length ? (
           <Button
-            disabled
-          >
-            {'>'}
-          </Button>
+          isDisabled
+          />
+            
         ) : (
           <Button
             onClick={() => changeCellLabels('right')}
-          >
-            {'>'}
-          </Button>
+            text='>' 
+          />
         )}
       </Tooltip>
 

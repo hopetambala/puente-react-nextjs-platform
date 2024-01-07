@@ -1,4 +1,4 @@
-import Button from '@material-ui/core/Button';
+import Button from 'app/impacto-design-system/button';
 import React from 'react';
 import {
   View,
@@ -12,7 +12,7 @@ const Looper = ({
   translatedLabel,
 }) => (
   <View style={stylesDefault.container}>
-    <Button variant="outlined" color="primary">
+    <Button variant="outlined" color="primary"> text=
       {'Add additional '}
       {translatedLabel}
     </Button>

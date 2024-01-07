@@ -1,5 +1,5 @@
 import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
+import Button from 'app/impacto-design-system/button';
 import Collapse from '@material-ui/core/Collapse';
 import IconButton from '@material-ui/core/IconButton';
 import LinearProgress from '@material-ui/core/LinearProgress';
@@ -64,9 +64,8 @@ const SubmitButton = ({
         <Button
           variant="contained"
           onClick={() => handleClick()}
-        >
-          Submit
-        </Button>
+          text='Submit'
+        />
         {csvData !== undefined && csvData.length > 0 && (
         <CSVLink
           data={csvData}
@@ -74,9 +73,8 @@ const SubmitButton = ({
         >
           <Button
             variant="contained"
-          >
-            Download Data
-          </Button>
+            text='Download Data'
+          />
         </CSVLink>
         )}
         {downloading && progress !== 0 && (
