@@ -12,7 +12,9 @@ const Looper = ({
   translatedLabel,
 }) => (
   <View style={stylesDefault.container}>
-    <Button variant="outlined" color="primary"> text=
+    <Button variant="outlined" color="primary">
+      {' '}
+      text=
       {'Add additional '}
       {translatedLabel}
     </Button>

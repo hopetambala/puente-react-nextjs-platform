@@ -2,9 +2,9 @@ import {
   Menu,
   MenuItem,
 } from '@material-ui/core';
-import Button from 'app/impacto-design-system/button'
 import FolderOpenOutlinedIcon from '@material-ui/icons/FolderOpenOutlined';
 import { Modal } from 'app/impacto-design-system';
+import Button from 'app/impacto-design-system/button';
 import { updateObject } from 'app/modules/cloud-code';
 import { useState } from 'react';
 
@@ -70,8 +70,8 @@ const Card = ({
       <FolderOpenOutlinedIcon
         fontSize="large"
       />
-      <Button text='Options' style={{ marginBottom: '20px' }} onClick={handleClick}/>
-        
+      <Button text="Options" style={{ marginBottom: '20px' }} onClick={handleClick} />
+
       <Menu
         id="simple-menu"
         anchorEl={anchorEl}

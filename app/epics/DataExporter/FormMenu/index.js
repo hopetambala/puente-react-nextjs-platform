@@ -1,12 +1,12 @@
-import Button from 'app/impacto-design-system/button';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import Button from 'app/impacto-design-system/button';
 import React, { useEffect, useState } from 'react';
 
 import retrieveAllFormResults from '../_data';
 
 const FormMenu = ({
-  setFormType, formType, formValue, setFormValue, setParams, organization, setCsvData,
+  setFormType, formValue, setFormValue, setParams, organization, setCsvData,
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);

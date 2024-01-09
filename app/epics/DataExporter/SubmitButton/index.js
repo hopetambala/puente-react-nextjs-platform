@@ -1,10 +1,10 @@
 import Box from '@material-ui/core/Box';
-import Button from 'app/impacto-design-system/button';
 import Collapse from '@material-ui/core/Collapse';
 import IconButton from '@material-ui/core/IconButton';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import CloseIcon from '@material-ui/icons/Close';
 import Alert from '@material-ui/lab/Alert';
+import Button from 'app/impacto-design-system/button';
 import { getDataFromS3, retrieveCleanedData } from 'app/services/awsApiGateway';
 import React, { useState } from 'react';
 import { CSVLink } from 'react-csv';
@@ -64,7 +64,7 @@ const SubmitButton = ({
         <Button
           variant="contained"
           onClick={() => handleClick()}
-          text='Submit'
+          text="Submit"
         />
         {csvData !== undefined && csvData.length > 0 && (
         <CSVLink
@@ -73,7 +73,7 @@ const SubmitButton = ({
         >
           <Button
             variant="contained"
-            text='Download Data'
+            text="Download Data"
           />
         </CSVLink>
         )}

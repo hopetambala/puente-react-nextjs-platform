@@ -1,4 +1,3 @@
-import Button from 'app/impacto-design-system/button';
 import { lighten, makeStyles } from '@material-ui/core/styles';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
@@ -7,6 +6,7 @@ import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Toolbar from '@material-ui/core/Toolbar';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
+import Button from 'app/impacto-design-system/button';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 
@@ -146,20 +146,20 @@ const EnhancedTableToolbar = (props) => {
         ) : (
           <Button
             onClick={() => changeCellLabels('left')}
-            text='<'
+            text="<"
           />
         )}
       </Tooltip>
       <Tooltip title="See next 10 fields in form" placement="top">
         {cellLabelMax >= cellLabels.length ? (
           <Button
-          isDisabled
+            isDisabled
           />
-            
+
         ) : (
           <Button
             onClick={() => changeCellLabels('right')}
-            text='>' 
+            text=">"
           />
         )}
       </Tooltip>

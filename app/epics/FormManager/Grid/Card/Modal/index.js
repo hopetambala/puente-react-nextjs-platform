@@ -7,7 +7,7 @@ import {
   Modal,
   TextField,
 } from '@material-ui/core';
-import Button from 'app/impacto-design-system/button'
+import Button from 'app/impacto-design-system/button';
 import { updateObject } from 'app/modules/cloud-code';
 import React, { useEffect, useState } from 'react';
 
@@ -105,7 +105,7 @@ const Modl = ({
             {newWorkflow === true && (
             <TextField id="new-workflow" label="New Workflow" onChange={(event) => handleTextChange(event)} />
             )}
-            <Button variant="contained" color="primary" text='Submit' style={{ marginRight: 'auto', marginTop: 10 }} onClick={submit}/>
+            <Button variant="contained" color="primary" text="Submit" style={{ marginRight: 'auto', marginTop: 10 }} onClick={submit} />
           </FormGroup>
         </FormControl>
       </div>

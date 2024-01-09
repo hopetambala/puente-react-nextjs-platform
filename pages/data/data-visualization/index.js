@@ -1,5 +1,5 @@
-import { Button } from 'app/impacto-design-system/button';
 import { Page } from 'app/impacto-design-system';
+import { Button } from 'app/impacto-design-system/button';
 import { GroupedBarChart, LineChart, ResponsiveScatterPlot } from 'app/impacto-design-system/visualizations';
 import dataQueryer from 'app/modules/apollo-grapql';
 import { useState } from 'react';
@@ -134,10 +134,10 @@ const Forms = ({ vitals }) => {
         <div>Data Viz</div>
         <h1>{organization}</h1>
         <div className="buttons around">
-          <Button variant="contained" onClick={() => setRecordNumber(250)} text='250 Records'/>
-          <Button variant="contained" onClick={() => setRecordNumber(500)} text='500 Records'/>
-          <Button variant="contained" onClick={() => setRecordNumber(1000)} text='1000 Records'/>
-          <Button variant="contained" onClick={() => setRecordNumber(2000)} text='2000 Records'/>
+          <Button variant="contained" onClick={() => setRecordNumber(250)} text="250 Records" />
+          <Button variant="contained" onClick={() => setRecordNumber(500)} text="500 Records" />
+          <Button variant="contained" onClick={() => setRecordNumber(1000)} text="1000 Records" />
+          <Button variant="contained" onClick={() => setRecordNumber(2000)} text="2000 Records" />
         </div>
 
         <SChart data={vitals.getVitalByOrganization.slice(0, recordNumber)} />

@@ -15,7 +15,7 @@ const Geolocation = ({ formikKey }) => (
       variant="outlined"
       theme={theme}
       color="primary"
-      text='Get Location'
+      text="Get Location"
     />
   </View>
 );
