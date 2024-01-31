@@ -35,7 +35,7 @@ const Modl = ({
 }) => {
   const classes = useStyles();
   // getModalStyle is not a pure function, we roll the style only on the first render
-  const [modalStyle] = React.useState(getModalStyle);
+  const [modalStyle] = useState(getModalStyle);
   return (
     <Modal
       open={open}

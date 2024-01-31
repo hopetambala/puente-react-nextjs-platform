@@ -10,7 +10,7 @@ const Select = (props) => {
     item, formItems, setFormItems, removeValue,
   } = props;
 
-  const [options, setOptions] = React.useState([{
+  const [options, setOptions] = useState([{
     id: uuid(), label: '', value: '', text: false, textQuestion: '', textKey: '',
   }]);
 
