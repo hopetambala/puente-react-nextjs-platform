@@ -76,6 +76,7 @@
   text-align: left;
 }
 
+.default,
 .primary,
 .danger {
   font-weight: var(--font-weight-emphasis);
@@ -83,6 +84,7 @@
   border: none;
 }
 
+.default:hover,
 .primary:hover,
 .danger:hover {
   box-shadow: var(--shadow-lv2);
@@ -92,6 +94,15 @@
 .primary:hover,
 .primary:active {
   color: var(--color-button-primary-text);
+}
+
+.default {
+  color: var(--color-button-default)
+}
+
+.default:hover {
+  background-color: var(--color-button-default-hover);
+
 }
 
 .primary {
