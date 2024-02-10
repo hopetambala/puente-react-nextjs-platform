@@ -9,7 +9,7 @@ import {
   Button, Card, Stack, Text,
 } from 'app/impacto-design-system';
 import { postObjectsToClass, updateObject } from 'app/modules/cloud-code';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { v4 as uuid } from 'uuid';
 
@@ -208,7 +208,7 @@ function FormCreator({ context, user }) {
     setFormItems(newArray);
   };
 
-  const onDragEnd = React.useCallback(
+  const onDragEnd = useCallback(
     (result) => {
       const { source, destination } = result;
 

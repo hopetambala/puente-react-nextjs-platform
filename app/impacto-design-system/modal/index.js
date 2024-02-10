@@ -3,6 +3,7 @@ import {
 } from '@material-ui/core';
 import Modal from '@material-ui/core/Modal';
 import { makeStyles } from '@material-ui/core/styles';
+import { useState } from 'react';
 
 function rand() {
   return Math.round(Math.random() * 20) - 10;
@@ -35,7 +36,7 @@ const Modl = ({
 }) => {
   const classes = useStyles();
   // getModalStyle is not a pure function, we roll the style only on the first render
-  const [modalStyle] = React.useState(getModalStyle);
+  const [modalStyle] = useState(getModalStyle);
   return (
     <Modal
       open={open}
