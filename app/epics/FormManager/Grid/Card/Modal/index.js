@@ -13,7 +13,7 @@ import React, { useEffect, useState } from 'react';
 
 import styles from './index.module.scss';
 
-const Modl = ({
+const WorkflowModal = ({
   open, handleClose, row, workflows,
 }) => {
   const [newWorkflow, setNewWorkflow] = useState(false);
@@ -113,4 +113,4 @@ const Modl = ({
   );
 };
 
-export default Modl;
+export default WorkflowModal;

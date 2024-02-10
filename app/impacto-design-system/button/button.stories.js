@@ -1,4 +1,4 @@
-import {Button} from "app/impacto-design-system";
+import { Button } from "app/impacto-design-system";
 
 
 export default {
