@@ -36,7 +36,7 @@ const Forms = () => {
 
   return (
     <Page header footer>
-      <h1>Data Analytics</h1>
+      <h1>Quick Insights</h1>
       <div className={dashboardClasses}>
         <div className={styles.dimensions}>
           <h2>Dimensions</h2>

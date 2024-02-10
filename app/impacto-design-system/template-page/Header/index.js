@@ -2,13 +2,15 @@ import { List, ListItem } from '@material-ui/core';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
+import HomeIcon from "@material-ui/icons/HomeOutlined";
 import IconButton from '@material-ui/core/IconButton';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import CreateIcon from '@material-ui/icons/Create';
+import InsightsIcon from "@material-ui/icons/SearchOutlined";
+import CreateIcon from '@material-ui/icons/CreateOutlined';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-import FormatListBulletedIcon from '@material-ui/icons/FormatListBulleted';
-import GetAppIcon from '@material-ui/icons/GetApp';
+import FormatListBulletedIcon from '@material-ui/icons/FormatListBulletedOutlined';
+import BarChartOutlinedIcon from "@material-ui/icons/BarChartOutlined";
 import PersonOutline from '@material-ui/icons/PersonOutline';
 import StoreIcon from '@material-ui/icons/Store';
 import theme from 'app/modules/theme';
@@ -18,6 +20,9 @@ import { useRouter } from 'next/router';
 import React from 'react';
 
 import useStyles from './index.style';
+
+const TabText = ({ isOpen, text }) =>
+  isOpen ? <h4 style={{ marginLeft: "var(--spacer-m)" }}>{text}</h4> : <></>;
 
 export default function Header({ children }) {
   const classes = useStyles();
@@ -47,7 +52,7 @@ export default function Header({ children }) {
         }}
       >
         <div className={classes.toolbar}>
-          {open && <h1>Puente</h1>}
+          {open && <h1>PUENTE</h1>}
           <IconButton onClick={() => setDrawerOpen(!open)}>
             {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
@@ -55,23 +60,39 @@ export default function Header({ children }) {
         <Divider />
         <List>
           <ListItem>
-            <IconButton onClick={() => router.push('/forms/form-marketplace')}>
-              <StoreIcon />
+            <IconButton onClick={() => router.push("/quick-start")}>
+              <HomeIcon />
+              <TabText isOpen={open} text="Home" />
             </IconButton>
           </ListItem>
           <ListItem>
-            <IconButton onClick={() => router.push('/forms/form-manager')}>
+            <IconButton onClick={() => router.push("/forms/form-manager")}>
               <FormatListBulletedIcon />
+              <TabText isOpen={open} text="Form Manager" />
             </IconButton>
           </ListItem>
           <ListItem>
-            <IconButton onClick={() => router.push('/forms/form-creator')}>
+            <IconButton onClick={() => router.push("/forms/form-creator")}>
               <CreateIcon />
+              <TabText isOpen={open} text="Form Creator" />
             </IconButton>
           </ListItem>
           <ListItem>
-            <IconButton onClick={() => router.push('/data/data-exporter')}>
-              <GetAppIcon />
+            <IconButton onClick={() => router.push("/data/data-visualization")}>
+              <InsightsIcon />
+              <TabText isOpen={open} text="Quick Insights" />
+            </IconButton>
+          </ListItem>
+          <ListItem>
+            <IconButton onClick={() => router.push("/data/data-analysis")}>
+              <BarChartOutlinedIcon />
+              <TabText isOpen={open} text="Analytics Manager" />
+            </IconButton>
+          </ListItem>
+          <ListItem>
+            <IconButton onClick={() => router.push("/forms/form-marketplace")}>
+              <StoreIcon />
+              <TabText isOpen={open} text="Home" />
             </IconButton>
           </ListItem>
         </List>
@@ -79,10 +100,14 @@ export default function Header({ children }) {
           <ListItem>
             <IconButton onClick={manage}>
               <PersonOutline />
+              <TabText isOpen={open} text="Account Details" />
             </IconButton>
           </ListItem>
           <ListItem>
-            <IconButton onClick={logout} style={{ color: theme.palette.error.main }}>
+            <IconButton
+              onClick={logout}
+              style={{ color: theme.palette.error.main }}
+            >
               {open ? <ExitToAppIcon /> : <ExitToAppIcon />}
             </IconButton>
           </ListItem>

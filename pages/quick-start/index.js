@@ -24,16 +24,22 @@ export default function QuickStart() {
             description="Manage Forms for Collect"
             nextLink="/forms/form-manager"
           />
-          <CardAlt
-            title="Analytics Dashboard"
+          {/* <CardAlt
+            title="Quick Insights"
             description="Visualize data insights from Collect"
             nextLink={`${NEXT_PUBLIC_PUENTE_ANALYTICS_DASHBOARD_URL}?organization=${user.get('organization')}`}
             shouldOpenTab
+          /> */}
+          <CardAlt
+            title="Quick Insights"
+            description="Visualize data insights from Collect"
+            nextLink={"/data/data-visualization"}
+            shouldOpenTab
           />
           <CardAlt
-            title="Data Exporter"
-            description="Download data"
-            nextLink="/data/data-exporter"
+            title="Analytics Manager"
+            description="In-depth analysis tool to dig into your data"
+            nextLink="/data/data-analysis"
           />
         </div>
       </main>
