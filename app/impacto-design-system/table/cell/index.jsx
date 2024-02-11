@@ -22,12 +22,11 @@ const Cell = ({
     ...style,
   };
 
-  const Element = ({ children, ...rest }) => (isHeaderCell ? (
+  const Element = ({ children: kids, ...rest }) => (isHeaderCell ? (
     <th {...rest}>
-      {' '}
-      {children}
+      {kids}
     </th>
-  ) : <td {...rest}>{children}</td>);
+  ) : <td {...rest}>{kids}</td>);
 
   return (
     <Element
@@ -43,8 +42,10 @@ const Cell = ({
         </a>
       ) : (
         <div
-          role={onClick ? 'button' : ''}
+          role="button"
+          tabIndex={0}
           onClick={onClick}
+          onKeyDown={onClick}
           className={classes}
         >
           {children}

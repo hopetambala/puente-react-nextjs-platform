@@ -12,7 +12,7 @@ import {
 } from '@tanstack/react-table';
 import classNames from 'classnames';
 // import { map } from 'lodash';
-import React, { useState } from 'react';
+import React from 'react';
 
 import Cell from './cell';
 // import { Checkbox, Empty, Icon, MenuOption, Popover } from '../../';
@@ -46,18 +46,19 @@ import Row from './row';
 //   /** A boolean prop to apply resizabilityto columns in the table */
 //   isResizable?: boolean;
 
-//   /** An optional setting controlling the sticky property on the first column. When
-//    * set to `true` the first column will be set to position sticky to the left of the table. When
-//    * the width of the table is smaller than the width of its content, it will scroll horizontally
-//    * and the first column will remain sticky to the left. When set to false, the first column will
-//    * scroll horizontally along with the rest of the columns.
-//    * @default true
-//    */
+/** An optional setting controlling the sticky property on the first column. When
+   * set to `true` the first column will be set to position sticky to the left of the table. When
+   * the width of the table is smaller than the width of its content, it will scroll horizontally
+   * and the first column will remain sticky to the left. When set to false, the first column will
+   * scroll horizontally along with the rest of the columns.
+   * @default true
+   */
 //   isFirstColumnSticky?: boolean;
 
-//   /**
-//    * An optional sorting state prop to manage the asc/desc order of rows in a table based on a column id
-//    */
+/**
+   * An optional sorting state prop to manage the
+   * asc/desc order of rows in a table based on a column id
+   */
 //   sorting?: ColumnSort[];
 
 //   /**
@@ -97,7 +98,9 @@ import Row from './row';
 //   hoverActions?: ColumnDef<Data, any>;
 // }
 
-const renderHeaderCells = (header) => (header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext()));
+const renderHeaderCells = (header) => (header.isPlaceholder
+  ? null
+  : flexRender(header.column.columnDef.header, header.getContext()));
 
 // type SortIconDirection = {
 //   isUp: boolean | (() => number);
@@ -168,7 +171,9 @@ const renderHeaderCells = (header) => (header.isPlaceholder ? null : flexRender(
 //       aria-valuenow={undefined}
 //       onMouseDown={header.getResizeHandler()}
 //       onTouchStart={header.getResizeHandler()}
-//       className={[styles.resizer, header.column.getIsResizing() ? styles.isResizing : ''].join(' ')}
+// className={[styles.resizer, header.column.getIsResizing()
+//   ? styles.isResizing
+//   : ''].join(' ')}
 //     ></div>
 //   );
 
@@ -178,13 +183,13 @@ const renderDefaultEmptyState = (units) => (
 );
 
 // /** Adds a default ID to a column definition if one is not present. */
-// const withGuaranteedId = <Data extends RowData>(
-//   column: ColumnDef<Data, any>,
-//   id: string,
-// ): ColumnDef<Data, any> & { id: string } => ({
-//   ...column,
-//   id: column.id ?? id,
-// });
+const withGuaranteedId = (
+  column,
+  id,
+) => ({
+  ...column,
+  id: column.id ?? id,
+});
 
 const Table = ({
   // allRowsLength,
@@ -219,7 +224,7 @@ const Table = ({
     [styles.hasHoverActions]: !!hoverActionsInput,
   });
 
-  const [isDesc, setIsDesc] = useState(null);
+  // const [isDesc, setIsDesc] = useState(null);
 
   // const shouldSort = sorting ? true : false;
 
@@ -298,10 +303,8 @@ const Table = ({
                 // selectedRows={selectedRows}
               >
                 {hasTableActions && (
-                  <Cell
-                    isHeaderCell
-                  >
-                    <p>I'm a header cell   </p>
+                  <Cell isHeaderCell>
+                    <p>header header</p>
                     {/* <Checkbox
                       id="table-checkbox"
                       isChecked={isHeaderCellChecked}
