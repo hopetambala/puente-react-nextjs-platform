@@ -2,16 +2,16 @@ import { List, ListItem } from '@material-ui/core';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
-import HomeIcon from "@material-ui/icons/HomeOutlined";
 import IconButton from '@material-ui/core/IconButton';
+import BarChartOutlinedIcon from '@material-ui/icons/BarChartOutlined';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import InsightsIcon from "@material-ui/icons/SearchOutlined";
 import CreateIcon from '@material-ui/icons/CreateOutlined';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import FormatListBulletedIcon from '@material-ui/icons/FormatListBulletedOutlined';
-import BarChartOutlinedIcon from "@material-ui/icons/BarChartOutlined";
+import HomeIcon from '@material-ui/icons/HomeOutlined';
 import PersonOutline from '@material-ui/icons/PersonOutline';
+import InsightsIcon from '@material-ui/icons/SearchOutlined';
 import StoreIcon from '@material-ui/icons/Store';
 import theme from 'app/modules/theme';
 import { retrieveCurrentUserAsyncFunction, retrieveSignOutFunction } from 'app/modules/user';
@@ -21,8 +21,7 @@ import React from 'react';
 
 import useStyles from './index.style';
 
-const TabText = ({ isOpen, text }) =>
-  isOpen ? <h4 style={{ marginLeft: "var(--spacer-m)" }}>{text}</h4> : <></>;
+const TabText = ({ isOpen, text }) => (isOpen ? <h4 style={{ marginLeft: 'var(--spacer-m)' }}>{text}</h4> : <></>);
 
 export default function Header({ children }) {
   const classes = useStyles();
@@ -60,37 +59,37 @@ export default function Header({ children }) {
         <Divider />
         <List>
           <ListItem>
-            <IconButton onClick={() => router.push("/quick-start")}>
+            <IconButton onClick={() => router.push('/quick-start')}>
               <HomeIcon />
               <TabText isOpen={open} text="Home" />
             </IconButton>
           </ListItem>
           <ListItem>
-            <IconButton onClick={() => router.push("/forms/form-manager")}>
+            <IconButton onClick={() => router.push('/forms/form-manager')}>
               <FormatListBulletedIcon />
               <TabText isOpen={open} text="Form Manager" />
             </IconButton>
           </ListItem>
           <ListItem>
-            <IconButton onClick={() => router.push("/forms/form-creator")}>
+            <IconButton onClick={() => router.push('/forms/form-creator')}>
               <CreateIcon />
               <TabText isOpen={open} text="Form Creator" />
             </IconButton>
           </ListItem>
           <ListItem>
-            <IconButton onClick={() => router.push("/data/data-visualization")}>
+            <IconButton onClick={() => router.push('/data/data-visualization')}>
               <InsightsIcon />
               <TabText isOpen={open} text="Quick Insights" />
             </IconButton>
           </ListItem>
           <ListItem>
-            <IconButton onClick={() => router.push("/data/data-analysis")}>
+            <IconButton onClick={() => router.push('/data/data-analysis')}>
               <BarChartOutlinedIcon />
               <TabText isOpen={open} text="Analytics Manager" />
             </IconButton>
           </ListItem>
           <ListItem>
-            <IconButton onClick={() => router.push("/forms/form-marketplace")}>
+            <IconButton onClick={() => router.push('/forms/form-marketplace')}>
               <StoreIcon />
               <TabText isOpen={open} text="Home" />
             </IconButton>

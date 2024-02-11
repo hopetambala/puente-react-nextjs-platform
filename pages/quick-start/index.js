@@ -1,11 +1,11 @@
 import { CardAlt } from 'app/impacto-design-system';
-import { retrieveCurrentUserAsyncFunction } from 'app/modules/user';
 
+// import { retrieveCurrentUserAsyncFunction } from 'app/modules/user';
 import styles from './index.module.scss';
 
 export default function QuickStart() {
-  const user = retrieveCurrentUserAsyncFunction();
-  const { NEXT_PUBLIC_PUENTE_ANALYTICS_DASHBOARD_URL } = process.env;
+  // const user = retrieveCurrentUserAsyncFunction();
+  // const { NEXT_PUBLIC_PUENTE_ANALYTICS_DASHBOARD_URL } = process.env;
 
   return (
     <div className={styles.index}>
@@ -33,7 +33,7 @@ export default function QuickStart() {
           <CardAlt
             title="Quick Insights"
             description="Visualize data insights from Collect"
-            nextLink={"/data/data-visualization"}
+            nextLink="/data/data-visualization"
             shouldOpenTab
           />
           <CardAlt

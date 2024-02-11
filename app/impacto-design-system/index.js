@@ -8,6 +8,7 @@ import Link from './Link';
 import Modal from './modal';
 import Spinner from './spinner';
 import Stack from './stack';
+import Table from './table';
 import Page from './template-page';
 import Text from './text';
 import Toast from './toast';
@@ -25,6 +26,7 @@ export {
   Page,
   Spinner,
   Stack,
+  Table,
   Text,
   Toast,
   Tooltip,

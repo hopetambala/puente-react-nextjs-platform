@@ -25,13 +25,11 @@ const Forms = () => {
         JSON.stringify({ fields: [key] }),
       );
 
-      console.log(serverData);
-
       setData(
         serverData.filter((obj) => Object.values(obj).every((value) => value !== null)),
       );
     };
-    fetchData().catch(console.error);
+    fetchData().catch(console.error); //eslint-disable-line
   }, [key]);
 
   return (
