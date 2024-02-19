@@ -18,6 +18,7 @@ module.exports = {
     'react/prop-types': 'off',
     'react/jsx-filename-extension': 'off',
     'react/no-string-refs': 'off',
+    'import/prefer-default-export': 'off',
     'jsx-a11y/anchor-is-valid': [
       'error',
       {

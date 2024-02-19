@@ -25,18 +25,16 @@ const Forms = () => {
         JSON.stringify({ fields: [key] }),
       );
 
-      console.log(serverData);
-
       setData(
         serverData.filter((obj) => Object.values(obj).every((value) => value !== null)),
       );
     };
-    fetchData().catch(console.error);
+    fetchData().catch(console.error); //eslint-disable-line
   }, [key]);
 
   return (
     <Page header footer>
-      <h1>Data Analytics</h1>
+      <h1>Quick Insights</h1>
       <div className={dashboardClasses}>
         <div className={styles.dimensions}>
           <h2>Dimensions</h2>

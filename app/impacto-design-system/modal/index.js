@@ -1,7 +1,7 @@
 import {
   Button,
 } from '@material-ui/core';
-import MaterialModal  from '@material-ui/core/Modal';
+import MaterialModal from '@material-ui/core/Modal';
 import { makeStyles } from '@material-ui/core/styles';
 import { useState } from 'react';
 

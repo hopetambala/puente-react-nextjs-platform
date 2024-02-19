@@ -1,0 +1,25 @@
+.cell {
+  text-align: start;
+  vertical-align: middle;
+  white-space: nowrap;
+  padding: 0 var(--spacer-s);
+  display: flex;
+  align-items: center;
+  position: relative;
+  height: var(--spacer-xxl);
+}
+
+.cell.hasMaxWidth,
+.cell.hasMaxWidth * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cell.hasMaxWidth > * {
+  max-width: 100%;
+}
+
+.cell > * + *,
+.headerCell > * + * {
+  margin-left: var(--spacer-s);
+}

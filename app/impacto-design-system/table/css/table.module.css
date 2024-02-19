@@ -1,0 +1,172 @@
+.wrapper {
+  width: 100%;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.tableWrapper {
+  overflow: auto;
+  width: 100%;
+  background-color: var(--color-bg-light);
+}
+
+.tableWrapper table {
+  width: 100%;
+}
+
+.tableWrapper table thead th {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-table-first-col);
+  background: var(--color-bg-light);
+}
+
+.resizer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 5px;
+  background: var(--hex-neutral-200);
+  cursor: col-resize;
+  user-select: none;
+  touch-action: none;
+}
+
+.resizer.isResizing {
+  background: var(--hex-neutral-400);
+  opacity: 1;
+}
+
+.stickyFirstColumn thead tr th:first-child,
+.stickyFirstColumn tbody tr td:first-child {
+  background-color: var(--color-bg-light);
+  color: var(--color-text);
+  font-weight: var(--font-weight-emphasis);
+  padding-right: var(--spacer-m);
+  padding-left: var(--spacer-m);
+  position: sticky;
+  left: 0;
+  z-index: var(--z-table-first-col);
+}
+
+.stickyFirstColumn thead tr th:first-child {
+  z-index: var(--z-table-header);
+}
+
+.hasTableActions thead tr th:first-child,
+.hasTableActions tbody tr td:first-child {
+  width: 0%;
+}
+
+.footerContainer {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--spacer-m);
+}
+
+.footerContainer > * + * {
+  margin: 0 var(--spacer-s);
+}
+
+.footerContainer > * {
+  min-width: fit-content;
+}
+
+.sortIcon {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.sortIcon > * {
+  margin: 0 auto;
+}
+
+.sortIcon :first-child {
+  margin-bottom: calc(var(--spacer-xs) * -1);
+}
+
+.sortIcon :last-child {
+  margin-top: calc(var(--spacer-xs) * -1);
+}
+
+@media (hover: hover) {
+  .resizer {
+    opacity: 0;
+  }
+
+  *:hover > .resizer {
+    opacity: 1;
+  }
+}
+
+.row {
+  text-align: start;
+  width: 100%;
+  border-bottom: 2px solid var(--color-border-light);
+}
+
+.row th {
+  text-align: start;
+  box-shadow: 0 1px 0 var(--color-border);
+}
+
+/* highlight hovered row if hover actions are present */
+.hasHoverActions tbody .row:hover {
+  background-color: var(--color-bg);
+}
+
+.hasHoverActions.stickyFirstColumn tbody .row:hover td:first-child {
+  background-color: var(--color-bg);
+}
+
+/* hide actions for non hovered rows */
+.hoverActions > * {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.row:hover .hoverActions > * {
+  opacity: 1;
+  pointer-events: unset;
+}
+
+/* keep hover actions on the screen even when the table is narrow */
+.row:hover .hoverActions {
+  z-index: var(--z-table-header);
+  position: sticky;
+  right: 0;
+}
+
+.row:hover .hoverActions::before,
+.row:hover .hoverActions::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  height: 100%;
+  pointer-events: none;
+  width: var(--spacer-l);
+}
+
+.row:hover .hoverActions::before {
+  background: linear-gradient(to right, transparent, var(--color-bg));
+
+  /* -1 * {{width}} + {{cell padding}}   */
+  left: calc(-1 * var(--spacer-l) + var(--spacer-s));
+}
+
+.row:hover .hoverActions::after {
+  background: linear-gradient(to right, var(--color-bg), transparent);
+
+  /* -1 * {{width}} + {{cell padding}}   */
+  right: calc(-1 * var(--spacer-l) + var(--spacer-s));
+}
+
+.emptyContainer {
+  padding-top: var(--spacer-xxxl);
+}
