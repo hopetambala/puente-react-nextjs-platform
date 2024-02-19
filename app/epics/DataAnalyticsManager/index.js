@@ -1,71 +1,54 @@
-import { Table } from "app/impacto-design-system";
-import { environmentalHealthRecord } from "../../../app/modules/django-etl";
+import { Button, Stack, Table } from "app/impacto-design-system";
+import { fact } from "../../../app/modules/django-etl";
 import { useEffect, useState } from "react";
 
-// import { postObjectsToClass, updateObject } from 'app/modules/cloud-code';
-// import { useCallback, useEffect, useState } from 'react';
-// import { v4 as uuid } from 'uuid';
-
-// import styles from './index.module.scss';
-
 const columns = [
-  // header: 'Name',
-  // footer: props => props.column.id,
-  // columns: [
   {
-    accessorKey: "firstName",
+    accessorKey: "surveying_organization",
     cell: (info) => info.getValue(),
   },
   {
-    accessorFn: (row) => row.lastName,
-    id: "lastName",
+    accessorFn: (row) => row.question_answer,
+    id: "question_answer",
     cell: (info) => info.getValue(),
-    header: function lastName() {
-      return <span>Last Name</span>;
+    header: function question_answer() {
+      return <span>Answer to Question</span>;
     },
   },
-  // ],
-  // },
 ];
-const data = [
-  {
-    firstName: "Oleksander",
-    lastName: "Zinchenko",
-  },
-  {
-    firstName: "Ben",
-    lastName: "White",
-  },
-  {
-    firstName: "Gabriel",
-    lastName: "Martinelli",
-  },
-  {
-    firstName: "Bukayo",
-    lastName: "Saka",
-  },
-];
-
 const DataAnalyticsManager = () => {
   const [data, setData] = useState([]);
-  const [key, setKey] = useState('clinicaccess_v2');
 
+  const fetchData = async () => {
+    const serverData = await fact.list_filter_sort({
+      parameters: {
+        sort_by: "created_at",
+        order: "desc",
+        filter_criteria: {
+          question_answer: "{Water}",
+        },
+      },
+    });
+
+    const prunedData = serverData.map(
+      ({ surveying_organization, question_answer }) => ({
+        surveying_organization,
+        question_answer,
+      })
+    );
+    setData(prunedData);
+  };
+ 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!key) return;
-      const serverData = await environmentalHealthRecord.retrieve(
-        "environmentalhealthbronze/get_count/",
-        JSON.stringify({ fields: [key] })
-      );
-
-      console.log(serverData)
-
-      //                                                                                                                                                                                                     
-    };
     fetchData().catch(console.error); //eslint-disable-line
-  }, []);
+  },[]);
 
-  return <Table data={data} columns={columns} />;
+  return (
+    <Stack isVertical spacing="medium">
+      <Button text="Retrieve" onClick={fetchData} />
+      <Table data={data} columns={columns} />
+    </Stack>
+  );
 };
 
 export default DataAnalyticsManager;
