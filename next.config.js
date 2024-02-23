@@ -11,9 +11,22 @@ module.exports = {
   async redirects() {
     return [
       {
-        source: '/',
-        destination: '/account/login',
+        source: "/",
+        destination: "/account/login",
         permanent: true,
+      },
+    ];
+  },
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: "upgrade-insecure-requests",
+          },
+        ],
       },
     ];
   },
