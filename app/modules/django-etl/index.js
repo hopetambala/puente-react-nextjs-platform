@@ -1,6 +1,6 @@
 import { get, retrieve } from './environmental-health';
+import { fact } from './fact';
 
-import {fact} from "./fact";
 const environmentalHealthRecord = {
   get,
   retrieve,
