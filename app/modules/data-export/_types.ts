@@ -2,11 +2,11 @@ import fetchCSV from "../../services/flask-api";
 
 export enum ENDPOINTS {
   Main = "records",
-  EnvironmentalHealth = "records-env/",
-  HistoryMedical = 'records-history-medical/',
-  EvaluationMedical = 'records-evaluation-medical/',
-  Vitals = 'records-vitals/',
-  Custom = 'records-custom-forms/',
+  EnvironmentalHealth = "records-env",
+  HistoryMedical = 'records-history-medical',
+  EvaluationMedical = 'records-evaluation-medical',
+  Vitals = 'records-vitals',
+  Custom = 'records-custom-forms',
 }
 
 
