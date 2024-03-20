@@ -45,7 +45,6 @@ const FormManager = ({ context, router, user }) => {
   useEffect(() => {
     refreshWorkflowData();
 
-    
     /**
      * ADMIN WORKFLOW
      */
@@ -97,7 +96,6 @@ const FormManager = ({ context, router, user }) => {
   // const handleOrganization = (event) => {
   //   setOrganization(event.target.value);
   // };
-
 
   const passDataToFormCreator = (action, data) => {
     const href = '/forms/form-creator';

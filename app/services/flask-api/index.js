@@ -4,6 +4,6 @@ const fetchData = async (path) => await fetch(`${process.env.NEXT_PUBLIC_PUENTE_
     Accept: 'application/json',
     'Content-Type': 'text/csv',
   },
-}).then(async(resp) => resp.text())
+}).then(async (resp) => resp.text());
 
 export default fetchData;
