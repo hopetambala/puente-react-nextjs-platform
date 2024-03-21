@@ -43,20 +43,36 @@ const FormManager = ({ context, router, user }) => {
   const organization = user?.organization || ''; // testing
 
   useEffect(() => {
+    refreshWorkflowData();
+
+    /**
+     * ADMIN WORKFLOW
+     */
+    // retrieveUniqueListOfOrganizations().then((results) => {
+    //   setOrganizationList(results);
+    // });
+    // setOrganizationList([organization]);
+  }, []);
+
+  const refreshWorkflowData = async () => {
     retrieveCustomData(organization).then((records) => {
       const tableDataByCategory = {};
       records.forEach((record) => {
         if (record.active !== 'false') {
           if (!isArray(record.workflows) || record.workflows.length < 1) {
             if ('No Workflow Assigned' in tableDataByCategory) {
-              tableDataByCategory['No Workflow Assigned'] = tableDataByCategory['No Workflow Assigned'].concat([record]);
+              tableDataByCategory['No Workflow Assigned'] = tableDataByCategory[
+                'No Workflow Assigned'
+              ].concat([record]);
             } else {
               tableDataByCategory['No Workflow Assigned'] = [record];
             }
           } else if (isArray(record.workflows)) {
             record.workflows.forEach((workflow) => {
               if (workflow in tableDataByCategory) {
-                tableDataByCategory[workflow] = tableDataByCategory[workflow].concat([record]);
+                tableDataByCategory[workflow] = tableDataByCategory[
+                  workflow
+                ].concat([record]);
               } else {
                 tableDataByCategory[workflow] = [record];
               }
@@ -70,15 +86,7 @@ const FormManager = ({ context, router, user }) => {
       delete tableDataByCategory.Puente;
       setWorkflowData(tableDataByCategory);
     });
-
-    /**
-     * ADMIN WORKFLOW
-     */
-    // retrieveUniqueListOfOrganizations().then((results) => {
-    //   setOrganizationList(results);
-    // });
-    // setOrganizationList([organization]);
-  }, [organization, noWorkflowData]);
+  };
 
   /**
    * ADMIN WORKFLOW

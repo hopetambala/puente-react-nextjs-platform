@@ -1,15 +1,16 @@
-import { Button, Stack, Table } from "app/impacto-design-system";
-import { fact } from "../../../app/modules/django-etl";
-import { useEffect, useState } from "react";
+import { Button, Stack, Table } from 'app/impacto-design-system';
+import { useEffect, useState } from 'react';
+
+import { fact } from '../../modules/django-etl';
 
 const columns = [
   {
-    accessorKey: "surveying_organization",
+    accessorKey: 'surveying_organization',
     cell: (info) => info.getValue(),
   },
   {
     accessorFn: (row) => row.question_answer,
-    id: "question_answer",
+    id: 'question_answer',
     cell: (info) => info.getValue(),
     header: function question_answer() {
       return <span>Answer to Question</span>;
@@ -22,10 +23,10 @@ const DataAnalyticsManager = () => {
   const fetchData = async () => {
     const serverData = await fact.list_filter_sort({
       parameters: {
-        sort_by: "created_at",
-        order: "desc",
+        sort_by: 'created_at',
+        order: 'desc',
         filter_criteria: {
-          question_answer: "{Water}",
+          question_answer: '{Water}',
         },
       },
     });
@@ -34,14 +35,14 @@ const DataAnalyticsManager = () => {
       ({ surveying_organization, question_answer }) => ({
         surveying_organization,
         question_answer,
-      })
+      }),
     );
     setData(prunedData);
   };
- 
+
   useEffect(() => {
     fetchData().catch(console.error); //eslint-disable-line
-  },[]);
+  }, []);
 
   return (
     <Stack isVertical spacing="medium">
