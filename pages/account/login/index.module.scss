@@ -1,9 +1,17 @@
+
 .paper {
-    height: 80vh;
-    width: 40vw;
-    margin: 40px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
-.stack {
-    padding-bottom: 40px;
+.card {
+    min-height: 100px;
+    min-width: 600px;
+}
+
+.logo {
+    width: 150px;
+    margin: auto;
 }

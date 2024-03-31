@@ -67,7 +67,7 @@ Toast.propTypes = {
   shouldHideDismissButton: PropTypes.bool,
 
   /** Closes the toast */
-  closeToast: PropTypes.func.isRequired,
+  closeToast: PropTypes.func,
 };
 
 Toast.defaultProps = {

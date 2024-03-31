@@ -7,13 +7,13 @@ import styles from './index.module.scss';
 function FormInput(props) {
   const { control } = useFormContext();
   const {
-    name, label, required, errorobj,
+    name, label, required, errorobj, errorMessage,
   } = props;
   let isError = false;
-  let errorMessage = '';
-  if (errorobj && Object.prototype.hasOwnProperty.call(errorobj, name)) {
+  let errMsg = errorMessage || '';
+  if (!errorMessage && errorobj && Object.prototype.hasOwnProperty.call(errorobj, name)) {
     isError = true;
-    errorMessage = errorobj[name].message;
+    errMsg = errorobj[name].message;
   }
 
   return (
@@ -25,11 +25,11 @@ function FormInput(props) {
       label={label}
       fullWidth
       InputLabelProps={{
-        className: required ? styles['required-label'] : '',
+        className: required ? styles["required-label"] : "",
         required: required || false,
       }}
       error={isError}
-      helperText={errorMessage}
+      helperText={errMsg}
       {...props}
     />
   );
