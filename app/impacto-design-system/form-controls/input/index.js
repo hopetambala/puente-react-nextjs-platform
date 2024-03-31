@@ -25,7 +25,7 @@ function FormInput(props) {
       label={label}
       fullWidth
       InputLabelProps={{
-        className: required ? styles["required-label"] : "",
+        className: required ? styles['required-label'] : '',
         required: required || false,
       }}
       error={isError}
