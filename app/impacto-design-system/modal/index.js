@@ -1,8 +1,9 @@
 import {
   Button,
 } from '@material-ui/core';
-import Modal from '@material-ui/core/Modal';
+import MaterialModal from '@material-ui/core/Modal';
 import { makeStyles } from '@material-ui/core/styles';
+import { useState } from 'react';
 
 function rand() {
   return Math.round(Math.random() * 20) - 10;
@@ -30,27 +31,25 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Modl = ({
+const Modal = ({
   open, handleClose, text, action, actionText,
 }) => {
   const classes = useStyles();
   // getModalStyle is not a pure function, we roll the style only on the first render
-  const [modalStyle] = React.useState(getModalStyle);
+  const [modalStyle] = useState(getModalStyle);
   return (
-    <Modal
+    <MaterialModal
       open={open}
       onClose={handleClose}
       aria-labelledby="simple-modal-title"
       aria-describedby="simple-modal-description"
     >
       <div style={modalStyle} className={classes.paper}>
-        <p id="simple-modal-description">
-          {text}
-        </p>
+        <p id="simple-modal-description">{text}</p>
         <Button variant="contained" onClick={action} text={actionText} />
       </div>
-    </Modal>
+    </MaterialModal>
   );
 };
 
-export default Modl;
+export default Modal;

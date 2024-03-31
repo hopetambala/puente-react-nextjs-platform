@@ -1,6 +1,7 @@
 @import './blank.css';
 @import './variables.css';
 @import './fonts.css';
+@import './utilities.css';
 
 html {
   margin: 0;

@@ -1,0 +1,24 @@
+.dashboard {
+    display: flex;
+    background-color: var(--color-bg-light);
+}
+
+.dashboard > * {
+    margin: 10px;
+}
+
+.dimensions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.filters {
+
+}
+
+.content {
+    height: 60vh;
+    width: calc(100vw - 480px);
+}
+

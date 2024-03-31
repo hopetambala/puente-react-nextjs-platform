@@ -1,6 +1,7 @@
 import Button from 'app/impacto-design-system/button';
-import { retrieveS3CSVUrl } from 'app/services/awsApiGateway';
-import { downloadCSV } from 'app/services/awsApiGateway/retrieve';
+import {
+  CustomData, EnvironmentalHealth, EvaluationMedical, SurveyData, Vitals,
+} from 'app/modules/data-export/puente';
 import { useState } from 'react';
 
 function openWindow(dataurl, filename) {
@@ -10,22 +11,40 @@ function openWindow(dataurl, filename) {
   link.click();
 }
 
+const puenteMap = {
+  SurveyData,
+  HistoryEnvironmentalHealth: EnvironmentalHealth,
+  Vitals,
+  EvaluationMedical,
+};
+
 export default function CSVButtonWrapper({ form, surveyingOrganization }) {
   const { objectId: customFormId, customForm, name } = form;
   const [loading, setLoading] = useState(false);
 
-  const parameters = {
-    specifier: customForm ? 'FormResults' : name,
-    surveyingOrganization,
-    ...(customFormId && { customFormId }),
-  };
-
   const fetchData = async () => {
     setLoading(true);
-    const resp = await retrieveS3CSVUrl(parameters);
-    const { s3_url: s3Url } = resp;
-    const downloadUrl = await downloadCSV(s3Url);
-    openWindow(downloadUrl, `${parameters.specifier}-${customFormId}.csv`);
+    let CSVData;
+    if (customForm) {
+      CSVData = await CustomData.getSpecificRecordsByOrganization(
+        surveyingOrganization,
+        customFormId,
+      ).catch(() => {
+        setLoading(false);
+        alert('No data');
+      });
+    } else {
+      const model = puenteMap[name];
+      CSVData = await model
+        .getRecordByOrganization(surveyingOrganization)
+        .catch(() => {
+          setLoading(false);
+          alert('No data');
+        });
+    }
+    const blob = new Blob([CSVData], { type: 'text/csv' });
+    const csvUrl = window.URL.createObjectURL(blob);
+    openWindow(csvUrl, `${name}-${new Date()}.csv`);
     setLoading(false);
   };
 

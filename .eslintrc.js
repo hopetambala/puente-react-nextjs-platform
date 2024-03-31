@@ -3,10 +3,7 @@ module.exports = {
     browser: true,
     es2021: true,
   },
-  extends: [
-    'plugin:react/recommended',
-    'airbnb',
-  ],
+  extends: ['plugin:react/recommended', 'airbnb', 'next', 'plugin:storybook/recommended'],
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
@@ -14,16 +11,14 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: 'module',
   },
-  plugins: [
-    'react',
-    'simple-import-sort',
-  ],
+  plugins: ['react', 'simple-import-sort'],
   rules: {
     'react/react-in-jsx-scope': 'off',
     'react/jsx-props-no-spreading': 'off',
     'react/prop-types': 'off',
     'react/jsx-filename-extension': 'off',
     'react/no-string-refs': 'off',
+    'import/prefer-default-export': 'off',
     'jsx-a11y/anchor-is-valid': [
       'error',
       {
@@ -32,6 +27,7 @@ module.exports = {
         aspects: ['invalidHref', 'preferButton'],
       },
     ],
+    'react/jsx-key': 'off',
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
     'sort-imports': 'off',
@@ -40,7 +36,6 @@ module.exports = {
     'import/no-duplicates': 'error',
     'import/no-unresolved': 'off',
     'import/no-extraneous-dependencies': 'off',
-
   },
   globals: {
     React: 'writable',

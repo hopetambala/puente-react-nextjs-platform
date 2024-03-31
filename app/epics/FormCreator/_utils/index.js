@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid';
 import styles from '../index.module.scss';
 
 // This method is needed for rendering clones of draggables
-const getRenderItem = (items) => (provided, snapshot, rubric) => {
+const getRenderItem = (items) => function getRenderItemSecond(provided, snapshot, rubric) {
   const item = items[rubric.source.index];
   return (
     <div
