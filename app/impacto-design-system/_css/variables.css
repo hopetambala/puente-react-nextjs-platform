@@ -56,7 +56,11 @@
   /* BREAKPOINTS
   /* =============================================================== */
 
-  --chromebook-width: 1366px;
+  --breakpoint-s: 300px;
+  --breakpoint-m: 600px;
+  --breakpoint-l: 900px;
+  --breakpoint-xl: 1200px;
+
 
   /* FOCUS STATE
   /* =============================================================== */

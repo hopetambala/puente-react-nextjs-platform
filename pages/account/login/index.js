@@ -16,8 +16,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import * as yup from 'yup';
 
-import logo from '/public/assets/brand/logo-black.png';
-
+import logo from '../../../public/assets/brand/logo-black.png';
 import styles from './index.module.scss';
 
 const validationSchema = yup.object().shape({
