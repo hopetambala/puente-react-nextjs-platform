@@ -3,8 +3,6 @@ import { Page } from 'app/impacto-design-system';
 import { parseUserValue } from 'app/modules/user';
 import { useGlobalState } from 'app/store';
 
-import styles from './index.module.scss';
-
 export default function Forms() {
   const { contextManagment } = useGlobalState();
   const user = parseUserValue();
@@ -13,14 +11,10 @@ export default function Forms() {
       header
       footer
     >
-      <main className={styles.formCreator}>
-        <div className={styles.container}>
-          <FormCreator
-            context={contextManagment}
-            user={user}
-          />
-        </div>
-      </main>
+      <FormCreator
+        context={contextManagment}
+        user={user}
+      />
     </Page>
   );
 }

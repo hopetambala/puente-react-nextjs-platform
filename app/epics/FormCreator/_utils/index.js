@@ -1,3 +1,4 @@
+import { Card } from 'app/impacto-design-system';
 import { v4 as uuid } from 'uuid';
 
 import styles from '../index.module.scss';
@@ -13,7 +14,7 @@ const getRenderItem = (items) => function getRenderItemSecond(provided, snapshot
       style={provided.draggableProps.style}
       className={snapshot.isDragging ? styles.dragging : ''}
     >
-      {item.text}
+      <Card>{item.text}</Card>
     </div>
   );
 };

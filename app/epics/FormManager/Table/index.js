@@ -74,9 +74,10 @@ const FormManagerTable = ({
       <Modal
         open={open}
         handleClose={() => setOpen(!open)}
-        text="Do you want to remove this Form"
+        text="Do you want to remove this form?"
+        actionText="Delete form"
+        intent="danger"
         action={handleRemove}
-        actionText="Remove"
       />
       {data !== undefined ? (
         <Table className={classes.table} aria-label="simple table">

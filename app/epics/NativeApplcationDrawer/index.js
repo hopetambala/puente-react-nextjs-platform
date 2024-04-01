@@ -14,13 +14,7 @@ const styles = {
   },
 };
 
-const TemporaryDrawer = ({ formItems }) => {
-  const [open, setOpen] = useState(false);
-
-  const toggleDrawer = (newOpen) => {
-    setOpen(newOpen);
-  };
-
+const TemporaryDrawer = ({ formItems, isOpen, onClose }) => {
   const sideList = (
     <div>
       <NativeApp
@@ -30,18 +24,11 @@ const TemporaryDrawer = ({ formItems }) => {
   );
 
   return (
-    <div>
-      <Button onClick={() => toggleDrawer(true)}>Show Preview</Button>
-
-      <Drawer anchor="right" open={open} onClose={() => toggleDrawer(false)}>
-        <div
-          tabIndex={0}
-          role="button"
-        >
-          {sideList}
-        </div>
-      </Drawer>
-    </div>
+    <Drawer anchor="right" open={isOpen} onClose={onClose}>
+      <div tabIndex={0} role="button">
+        {sideList}
+      </div>
+    </Drawer>
   );
 };
 

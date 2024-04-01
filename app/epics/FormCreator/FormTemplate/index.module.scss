@@ -1,4 +1,6 @@
 .drop-area {
-  padding: 10px;
-  border: 1px dashed #777;
+  background-color: var(--color-bg-dark);
+  border: 1px dashed var(--hex-neutral-600);
+  border-radius: var(--border-radius-l);
+  min-height: 600px;
 }

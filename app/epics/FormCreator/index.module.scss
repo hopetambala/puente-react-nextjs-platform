@@ -1,14 +1,22 @@
 .dragging {
   font-size: 16px;
   color: rgb(61,127,252);
+  transform: scale(.99);
+}
+.input {
+  width: 50%;
+  background: var(--color-input-bg);
+  border-radius: var(--border-radius-m);
+  height: var(--input-height);
+  border: 1px solid var(--color-border);
+  padding: var(--spacer-xs);
 }
 
-.form-block{
-  margin:  calc(var(--spacer-s));
-  position: fixed;
-  right: 0vw;
-  width: 100%;
+.input:focus-visible {
+  border: 1px solid var(--color-puente-blue);
 }
 
-
-
+.select {
+  width: 25%;
+    padding: var(--spacer-xs);
+}
