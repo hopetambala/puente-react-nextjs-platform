@@ -86,7 +86,7 @@ const FormCreator = ({ context, user }) => {
   const [formName, setFormName] = useState('');
   const [formDescription, setFormDescription] = useState('');
   const [formItems, setFormItems] = useState([]);
-  const [formTypeNames, setFormTypeNames] = useState([]);
+  const [formTypeNames, setFormTypeNames] = useState(['Custom']);
   const [formId, setFormId] = useState();
 
   // const [workflowTypes] = useState(["Puente", "Assets", "Marketplace"]);
@@ -295,8 +295,7 @@ const FormCreator = ({ context, user }) => {
                     value={formTypeNames[0]}
                     onChange={handleFormTypesChange}
                   >
-                    <option value="" />
-                    <option value="custom">Custom</option>
+                    <option value="Custom">Custom</option>
                     <option value="Assets">Assets</option>
                   </select>
                   {/* <Text element="h2" text="Workflows" />
