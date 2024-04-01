@@ -2,6 +2,45 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.3](https://github.com/hopetambala/puente-react-nextjs-platform/compare/v0.1.2...v0.1.3) (2024-04-01)
+
+
+### Features
+
+*  reset account move to cloudcode!! :tada: ([3f27c7b](https://github.com/hopetambala/puente-react-nextjs-platform/commit/3f27c7bc9067dbf923001187e1de5eed36850246))
+* add ability to download data ([1f9b0ed](https://github.com/hopetambala/puente-react-nextjs-platform/commit/1f9b0ed5874e118ff100c8b4ce69199bb48414d5))
+* add button, icon, spinner, and text as components ([dfa8516](https://github.com/hopetambala/puente-react-nextjs-platform/commit/dfa8516eab0445818431c03b20faf288843ada61))
+* add card, card section, and card header ([1aa8d0f](https://github.com/hopetambala/puente-react-nextjs-platform/commit/1aa8d0fc56d49272e88d83f8ebb8722620c4b83f))
+* add custom form data exporting to puente-manage ([1d751c9](https://github.com/hopetambala/puente-react-nextjs-platform/commit/1d751c96aeb2a56f3e1035e8c43e5a54d27535d2))
+* add data visualization ([fcc9397](https://github.com/hopetambala/puente-react-nextjs-platform/commit/fcc9397c40c4d0642ea138e81b70826d91047abf))
+* add delete ([3f86eda](https://github.com/hopetambala/puente-react-nextjs-platform/commit/3f86eda7dca7d322dd507ddcab608cf2cb19a73a))
+* add delete functionality that's public ([722b0dd](https://github.com/hopetambala/puente-react-nextjs-platform/commit/722b0ddd808f31a71b5293e4cf235ad7d003c44d))
+* add landing page changes ([c6c03e0](https://github.com/hopetambala/puente-react-nextjs-platform/commit/c6c03e0c81eca578c79b3a887f7988b7c9af468e))
+* add link to dashboard in puente-manage ([ccdbb47](https://github.com/hopetambala/puente-react-nextjs-platform/commit/ccdbb472d89ff1fb4f85958b641a165a0a9dc1a2))
+* add messaging api to puente-manage ([9439572](https://github.com/hopetambala/puente-react-nextjs-platform/commit/94395725863c0a27c7490c814f77a1ab6213f3cb))
+* add redirect ([09ae9d9](https://github.com/hopetambala/puente-react-nextjs-platform/commit/09ae9d9c2208602811b53fadbc210ac0723b9218))
+* add stack ([e7c9949](https://github.com/hopetambala/puente-react-nextjs-platform/commit/e7c9949830dc7cb63d3231907d7f60fac34dd46a))
+* add storybook ([b926e7d](https://github.com/hopetambala/puente-react-nextjs-platform/commit/b926e7d5a4966ebf1e711c9b924e69044bc1132d))
+* add text and number ([bbc9fdb](https://github.com/hopetambala/puente-react-nextjs-platform/commit/bbc9fdb3fa26172709fce93bcd07b2228f9645fc))
+* add the data table yaa ([aaf3d4f](https://github.com/hopetambala/puente-react-nextjs-platform/commit/aaf3d4f36e09748d9e9d61a8487af2cecf856e97))
+* add vitals historymedical and environmental health forms :congratulations: ([02fbda4](https://github.com/hopetambala/puente-react-nextjs-platform/commit/02fbda42be02722f142c46aab59158df719e43d9))
+* better data handling ([b9211d3](https://github.com/hopetambala/puente-react-nextjs-platform/commit/b9211d3d6e49168fd4329e9e18e8d3428738e91a))
+* filter graph based on keys ([686bf83](https://github.com/hopetambala/puente-react-nextjs-platform/commit/686bf8394482e46ab5a7b78b5a46118d99a673a4))
+
+
+### Bug Fixes
+
+* add count ([f122c81](https://github.com/hopetambala/puente-react-nextjs-platform/commit/f122c81ba5ddc616e318aabfadcd7021323c7ae5))
+* add spinner to submit button and fix spinner transform origin ([18d8f69](https://github.com/hopetambala/puente-react-nextjs-platform/commit/18d8f69b1e33e1436d4d509183af0678db6e3258))
+* add useEffect dependency to refresh after form deletion ([9094bda](https://github.com/hopetambala/puente-react-nextjs-platform/commit/9094bdaa5125ce0e3af7984c0e1061b032e8ff45))
+* build issue ([7f0c736](https://github.com/hopetambala/puente-react-nextjs-platform/commit/7f0c736244061ce165fa768987310cc7659e1c70))
+* mobile readiness ([c9597d5](https://github.com/hopetambala/puente-react-nextjs-platform/commit/c9597d5c555135881149813108ce591815f460f6))
+* modal not using usestate ([c2bb2f6](https://github.com/hopetambala/puente-react-nextjs-platform/commit/c2bb2f66f5710e48a48abcb6d1a55db4f54e2284))
+* refresh all fields in Form Creator after custom for submission ([9cc8c2a](https://github.com/hopetambala/puente-react-nextjs-platform/commit/9cc8c2af07cb7c8b5695e9d59bbfa156b5c41509))
+* remove i18n ([5b4fc28](https://github.com/hopetambala/puente-react-nextjs-platform/commit/5b4fc2828a6ab62ca8fc7b89d54633c610ec6984))
+* update next package ([941c544](https://github.com/hopetambala/puente-react-nextjs-platform/commit/941c5441646a4a98e0462fbe821f5f185dcb2470))
+* validation schema ([b084c8d](https://github.com/hopetambala/puente-react-nextjs-platform/commit/b084c8d66c26d910aaf966f4ef2e95d2274eb3d3))
+
 ### [0.1.2](https://github.com/hopetambala/puente-react-nextjs-platform/compare/v0.1.1...v0.1.2) (2022-04-13)
 
 
