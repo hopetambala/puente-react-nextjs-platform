@@ -1,6 +1,8 @@
 import MaterialModal from '@material-ui/core/Modal';
-import { Button, Text, Card, Stack} from "app/impacto-design-system";
 import { makeStyles } from '@material-ui/core/styles';
+import {
+  Button, Card, Stack, Text,
+} from 'app/impacto-design-system';
 import { useState } from 'react';
 
 function rand() {
@@ -26,7 +28,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const Modal = ({
-  open, handleClose, text, action, actionText,intent
+  open, handleClose, text, action, actionText, intent,
 }) => {
   const classes = useStyles();
   // getModalStyle is not a pure function, we roll the style only on the first render

@@ -146,7 +146,7 @@ const FormCreator = ({ context, user }) => {
     formObject.fields = formItems;
     formObject.organizations = [user.organization];
     formObject.typeOfForm = formTypeNames;
-    let newWorkflowsToAdd = [];
+    const newWorkflowsToAdd = [];
     // if (newWorkflowValue !== "") {
     //   newWorkflowsToAdd = workflowNames.concat([newWorkflowValue]);
     // } else {
@@ -259,7 +259,7 @@ const FormCreator = ({ context, user }) => {
           onClose={() => setPreviewOpen(false)}
           formItems={formItems}
         />
-        <div style={{ paddingBottom: "var(--spacer-xxl)" }}>
+        <div style={{ paddingBottom: 'var(--spacer-xxl)' }}>
           <Text element="h1" text="Form Creator" />
         </div>
         <DragDropContext onDragEnd={onDragEnd}>
