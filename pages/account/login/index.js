@@ -6,13 +6,17 @@ import {
   Page,
   Stack,
   Text,
+  Toast,
 } from 'app/impacto-design-system';
 import { retrieveSignInFunction } from 'app/modules/user';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
 import * as yup from 'yup';
 
+import logo from '../../../public/assets/brand/logo-black.png';
 import styles from './index.module.scss';
 
 const validationSchema = yup.object().shape({
@@ -26,66 +30,77 @@ const Login = () => {
     resolver: yupResolver(validationSchema),
   });
   const { handleSubmit, errors } = methods;
-
   const [loading, setLoading] = useState(false);
-  const onSubmit = (data) => {
+
+  const onSubmit = async (data) => {
     setLoading(true);
     const { usernameV, passwordV } = data;
-    return retrieveSignInFunction(usernameV, passwordV).then(() => {
-      // get return url from query parameters or default to '/'
-      setLoading(false);
-      const returnUrl = router.query.returnUrl || '/quick-start';
-      router.push(returnUrl);
-    });
+    return retrieveSignInFunction(usernameV, passwordV)
+      .then(() => {
+        // get return url from query parameters or default to '/'
+        setLoading(false);
+        const returnUrl = router.query.returnUrl || '/quick-start';
+        router.push(returnUrl);
+      })
+      .catch((e) => {
+        setLoading(false);
+        return toast(<Toast text={`${e.message}`} isError />);
+      });
   };
 
   return (
     <Page>
       <div className={styles.paper}>
-        <Card padding="extraLarge">
-          <Text text="PUENTE" element="h1" className={styles.stack} />
-          <Stack isVertical className={styles.stack}>
-            <Text text="Sign in to Manage" element="h2" />
-          </Stack>
+        <Card padding="extraLarge" className={styles.card}>
           <FormProvider {...methods}>
             <Stack isVertical spacing="large" className={styles.stack}>
-              <FormInput
-                name="usernameV"
-                label="Phone Number or Email Address"
-                required
-                errorobj={errors}
-                InputProps={{
-                  startAdornment: <span position="start" />,
-                }}
-              />
-              <FormInput
-                name="passwordV"
-                label="Password"
-                required
-                errorobj={errors}
-                InputProps={{
-                  startAdornment: <span position="start" />,
-                }}
-              />
+              <div className={styles.logo}>
+                <Image fill src={logo} alt="Picture of the author" />
+              </div>
+              <Text text="Welcome" element="h2" />
+              <div>
+                <Text text="Email or phone number" element="p" />
+                <FormInput
+                  name="usernameV"
+                  // label="Email or phone number"
+                  required
+                  errorobj={errors}
+                  InputProps={{
+                    startAdornment: <span position="start" />,
+                  }}
+                />
+              </div>
+              <div>
+                <Text text="Password" element="p" />
+                <FormInput
+                  name="passwordV"
+                  // label="Password"
+                  required
+                  errorobj={errors}
+                  InputProps={{
+                    startAdornment: <span position="start" />,
+                  }}
+                />
+              </div>
             </Stack>
           </FormProvider>
-          <Stack isVertical spacing="large">
+          <Stack isVertical spacing="medium">
             <Button
-              text="Continue"
+              text="Log in"
               onClick={handleSubmit(onSubmit)}
               isFullWidth
               isLoading={loading}
             />
             <Button
-              text="Create account"
-              intent="primary"
-              href="/account/register"
+              text="Forgot password"
+              intent="danger"
+              href="/account/login/reset-login"
               isFullWidth
             />
             <Button
-              text="Reset password"
-              intent="danger"
-              href="/account/login/reset-login"
+              text="Create account"
+              intent="primary"
+              href="/account/register"
               isFullWidth
             />
           </Stack>

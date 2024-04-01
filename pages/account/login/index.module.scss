@@ -1,9 +1,23 @@
+$ids-base-unit:100px;
+
 .paper {
-    height: 80vh;
-    width: 40vw;
-    margin: 40px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
-.stack {
-    padding-bottom: 40px;
+.card {
+    min-height: $ids-base-unit;
+}
+
+.logo {
+    width: 150px;
+    margin: auto;
+}
+
+@media (min-width: 600px) {
+.card {
+        min-width: $ids-base-unit * 6;
+    }
 }

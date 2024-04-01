@@ -56,7 +56,11 @@
   /* BREAKPOINTS
   /* =============================================================== */
 
-  --chromebook-width: 1366px;
+  --breakpoint-s: 300px;
+  --breakpoint-m: 600px;
+  --breakpoint-l: 900px;
+  --breakpoint-xl: 1200px;
+
 
   /* FOCUS STATE
   /* =============================================================== */
@@ -409,33 +413,33 @@
   --color-menu-item-danger-hover-text: var(--hex-white);
   --color-menu-item-danger-hover-icon: var(--hex-red-100);
 
-  /* Toasts: Default */
-  --color-toast-bg: var(--hex-neutral-900);
-  --color-toast-text: var(--hex-white);
-  --color-toast-icon: var(--hex-neutral-100);
-  --color-toast-button-hover: var(--hex-neutral-800);
-  --color-toast-button-active: var(--hex-neutral-700);
+  /* s: Default */
+  --color--bg: var(--hex-neutral-900);
+  --color--text: var(--hex-white);
+  --color--icon: var(--hex-neutral-100);
+  --color--button-hover: var(--hex-neutral-800);
+  --color--button-active: var(--hex-neutral-700);
 
-  /* Toasts: Error */
-  --color-toast-error-bg: var(--hex-red-600);
-  --color-toast-error-text: var(--hex-white);
-  --color-toast-error-icon: var(--hex-red-200);
-  --color-toast-error-button-hover: var(--hex-red-700);
-  --color-toast-error-button-active: var(--hex-red-800);
+  /* s: Error */
+  --color--error-bg: var(--hex-red-600);
+  --color--error-text: var(--hex-white);
+  --color--error-icon: var(--hex-red-200);
+  --color--error-button-hover: var(--hex-red-700);
+  --color--error-button-active: var(--hex-red-800);
 
-  /* Toasts: Warning */
-  --color-toast-warning-bg: var(--hex-yellow-600);
-  --color-toast-warning-text: var(--hex-yellow-900);
-  --color-toast-warning-icon: var(--hex-yellow-900);
-  --color-toast-warning-button-hover: var(--hex-yellow-500);
-  --color-toast-warning-button-active: var(--hex-red-400);
+  /* s: Warning */
+  --color--warning-bg: var(--hex-yellow-600);
+  --color--warning-text: var(--hex-yellow-900);
+  --color--warning-icon: var(--hex-yellow-900);
+  --color--warning-button-hover: var(--hex-yellow-500);
+  --color--warning-button-active: var(--hex-red-400);
 
-  /* Toasts: Success */
-  --color-toast-success-bg: var(--hex-green-100);
-  --color-toast-success-text: var(--hex-green-900);
-  --color-toast-success-icon: var(--hex-green-600);
-  --color-toast-success-button-hover: var(--hex-green-100);
-  --color-toast-success-button-active: var(--hex-green-100);
+  /* s: Success */
+  --color--success-bg: var(--hex-green-100);
+  --color--success-text: var(--hex-green-900);
+  --color--success-icon: var(--hex-green-600);
+  --color--success-button-hover: var(--hex-green-100);
+  --color--success-button-active: var(--hex-green-100);
 
   /* Tables */
   --table-loading-gradient: linear-gradient(
@@ -654,26 +658,26 @@
   --color-menu-item-danger-hover-text: var(--hex-white);
   --color-menu-item-danger-hover-icon: var(--hex-red-100);
 
-  /* Toasts: Default */
-  --color-toast-bg: var(--hex-neutral-100);
-  --color-toast-text: var(--hex-neutral-900);
-  --color-toast-icon: var(--hex-neutral-700);
-  --color-toast-button-hover: var(--hex-neutral-200);
-  --color-toast-button-active: var(--hex-neutral-300);
+  /* s: Default */
+  --color--bg: var(--hex-neutral-100);
+  --color--text: var(--hex-neutral-900);
+  --color--icon: var(--hex-neutral-700);
+  --color--button-hover: var(--hex-neutral-200);
+  --color--button-active: var(--hex-neutral-300);
 
-  /* Toasts: Error */
-  --color-toast-error-bg: var(--hex-red-600);
-  --color-toast-error-text: var(--hex-white);
-  --color-toast-error-icon: var(--hex-red-200);
-  --color-toast-error-button-hover: var(--hex-red-700);
-  --color-toast-error-button-active: var(--hex-red-800);
+  /* s: Error */
+  --color--error-bg: var(--hex-red-600);
+  --color--error-text: var(--hex-white);
+  --color--error-icon: var(--hex-red-200);
+  --color--error-button-hover: var(--hex-red-700);
+  --color--error-button-active: var(--hex-red-800);
 
-  /* Toasts: Warning */
-  --color-toast-warning-bg: var(--hex-yellow-600);
-  --color-toast-warning-text: var(--hex-yellow-900);
-  --color-toast-warning-icon: var(--hex-yellow-900);
-  --color-toast-warning-button-hover: var(--hex-yellow-500);
-  --color-toast-warning-button-active: var(--hex-red-400);
+  /* s: Warning */
+  --color--warning-bg: var(--hex-yellow-600);
+  --color--warning-text: var(--hex-yellow-900);
+  --color--warning-icon: var(--hex-yellow-900);
+  --color--warning-button-hover: var(--hex-yellow-500);
+  --color--warning-button-active: var(--hex-red-400);
 
   /* Tables */
   --table-loading-gradient: linear-gradient(
