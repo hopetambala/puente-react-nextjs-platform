@@ -25,7 +25,7 @@ const ActiveInput = ({
         control={(
           <Checkbox onChange={() => handleChange()} />
           )}
-        label="Disable Input"
+        label="Answer is required"
         checked={!activeInput}
       />
     </div>

@@ -41,9 +41,26 @@ const Header = (props) => {
     <div className={styles.element}>
       {item.fieldType === 'header' && (
         <div key={item.id}>
-          <h3>Header</h3>
-          <input className={styles.input} type="text" value={item.label || ''} id={item.id} onChange={setValue} placeholder="Untitled Header" />
-          <Button text="REMOVE HEADER" intent="danger" className={styles.remove} onClick={() => removeValue(item.id)} />
+          <div className="ids-flex-space-between">
+            <h4>Input - Header</h4>
+            <Button
+              text="Remove header"
+              intent="danger"
+              className={styles.remove}
+              onClick={() => removeValue(item.id)}
+              isIconOnly
+              icon="delete"
+            />
+          </div>
+          <input
+            className={styles.input}
+            type="text"
+            value={item.label || ''}
+            id={item.id}
+            onChange={setValue}
+            placeholder="Untitled Header"
+          />
+
           <ActiveInput
             activeInput={activeInput}
             setActiveInput={setActiveInput}
