@@ -79,12 +79,12 @@ export default function Header({ children }) {
               <TabText isOpen={open} text="Quick Insights" />
             </IconButton>
           </ListItem>
-          <ListItem>
+          {/* <ListItem>
             <IconButton onClick={() => router.push('/data/data-analysis')}>
               <BarChartOutlinedIcon />
               <TabText isOpen={open} text="Analytics Manager" />
             </IconButton>
-          </ListItem>
+          </ListItem> */}
         </List>
         <Divider />
         <List>
