@@ -9,7 +9,6 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import CreateIcon from '@material-ui/icons/CreateOutlined';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import FormatListBulletedIcon from '@material-ui/icons/FormatListBulletedOutlined';
-import HomeIcon from '@material-ui/icons/HomeOutlined';
 import PersonOutline from '@material-ui/icons/PersonOutline';
 import InsightsIcon from '@material-ui/icons/SearchOutlined';
 import StoreIcon from '@material-ui/icons/Store';
@@ -17,7 +16,7 @@ import theme from 'app/modules/theme';
 import { retrieveCurrentUserAsyncFunction, retrieveSignOutFunction } from 'app/modules/user';
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useState } from 'react';
 
 import useStyles from './index.style';
 
@@ -25,7 +24,7 @@ const TabText = ({ isOpen, text }) => (isOpen ? <h4 style={{ marginLeft: 'var(--
 
 export default function Header({ children }) {
   const classes = useStyles();
-  const [open, setDrawerOpen] = React.useState(false);
+  const [open, setDrawerOpen] = useState(true);
   const router = useRouter();
 
   const logout = () => retrieveSignOutFunction().then(() => router.push('/account/login'));
@@ -51,19 +50,11 @@ export default function Header({ children }) {
         }}
       >
         <div className={classes.toolbar}>
-          {open && <h1>PUENTE</h1>}
           <IconButton onClick={() => setDrawerOpen(!open)}>
             {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
         </div>
-        <Divider />
         <List>
-          <ListItem>
-            <IconButton onClick={() => router.push('/quick-start')}>
-              <HomeIcon />
-              <TabText isOpen={open} text="Home" />
-            </IconButton>
-          </ListItem>
           <ListItem>
             <IconButton onClick={() => router.push('/forms/form-manager')}>
               <FormatListBulletedIcon />
@@ -74,6 +65,12 @@ export default function Header({ children }) {
             <IconButton onClick={() => router.push('/forms/form-creator')}>
               <CreateIcon />
               <TabText isOpen={open} text="Form Creator" />
+            </IconButton>
+          </ListItem>
+          <ListItem>
+            <IconButton onClick={() => router.push('/forms/form-marketplace')}>
+              <StoreIcon />
+              <TabText isOpen={open} text="Form Marketplace" />
             </IconButton>
           </ListItem>
           <ListItem>
@@ -88,13 +85,8 @@ export default function Header({ children }) {
               <TabText isOpen={open} text="Analytics Manager" />
             </IconButton>
           </ListItem>
-          <ListItem>
-            <IconButton onClick={() => router.push('/forms/form-marketplace')}>
-              <StoreIcon />
-              <TabText isOpen={open} text="Home" />
-            </IconButton>
-          </ListItem>
         </List>
+        <Divider />
         <List>
           <ListItem>
             <IconButton onClick={manage}>
@@ -107,7 +99,8 @@ export default function Header({ children }) {
               onClick={logout}
               style={{ color: theme.palette.error.main }}
             >
-              {open ? <ExitToAppIcon /> : <ExitToAppIcon />}
+              <ExitToAppIcon />
+              <TabText isOpen={open} text="Log out" />
             </IconButton>
           </ListItem>
         </List>
