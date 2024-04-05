@@ -66,7 +66,7 @@ const Management = (props) => {
   };
 
   return (
-    <Page>
+    <Page header footer>
       <div className={styles.paper}>
         <Card padding="extraLarge">
           <Text text="PUENTE" element="h1" className={styles.stack} />

@@ -16,12 +16,12 @@ export default function QuickStart() {
         <div className={styles.grid}>
           <CardAlt
             title="Form Creator"
-            description="Create Forms for Collect"
+            description="Create forms for Collect"
             nextLink="/forms/form-creator"
           />
           <CardAlt
             title="Form Manager"
-            description="Manage Forms for Collect"
+            description="Manage forms for Collect"
             nextLink="/forms/form-manager"
           />
           <CardAlt
@@ -30,11 +30,11 @@ export default function QuickStart() {
             nextLink="/data/data-visualization"
             shouldOpenTab
           />
-          <CardAlt
+          {/* <CardAlt
             title="Analytics Manager"
             description="In-depth analysis tool to dig into your data"
             nextLink="/data/data-analysis"
-          />
+          /> */}
         </div>
       </main>
       <style jsx global>
