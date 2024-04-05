@@ -26,7 +26,7 @@ import styles from './index.module.scss';
 const COLLECTION = [
   {
     id: uuid(),
-    text: 'Question - Numeric response',
+    text: 'Question - Number response',
     fieldType: 'numberInput',
     infoText: 'Number Input: For questions requiring a numerical answer',
   },
@@ -35,6 +35,13 @@ const COLLECTION = [
     text: 'Question - Text response',
     fieldType: 'input',
     infoText: 'Text Input: For questions requiring text as an answer',
+  },
+  {
+    id: uuid(),
+    text: 'Question (Side label) - Text or Number Response',
+    fieldType: 'inputSideLabel',
+    infoText:
+      'Similar to number or text response but with additional label for adding units of measurement next to the input field',
   },
   {
     id: uuid(),
@@ -56,13 +63,7 @@ const COLLECTION = [
     fieldType: 'header',
     infoText: 'Header: A header row/title to your form',
   },
-  {
-    id: uuid(),
-    text: 'Input - Side Label',
-    fieldType: 'inputSideLabel',
-    infoText:
-      'Side Label Input: A label for adding units of measurement next to the input field',
-  },
+
   {
     id: uuid(),
     text: 'Geolocation',
@@ -286,7 +287,7 @@ const FormCreator = ({ context, user }) => {
                 </Stack>
                 <Text text={submissionType} />
                 <Stack isVertical spacing="small">
-                  <Text element="h4" text="Type of custom form" />
+                  <Text element="h3" text="Type of custom form" />
                   <select
                     name="formType"
                     value={formTypeNames[0]}
@@ -325,7 +326,7 @@ const FormCreator = ({ context, user }) => {
                   label="New Workflow"
                   onChange={(event) => handleTextChange(event)}
                 /> */}
-                  <Text element="h4" text="Form Name" />
+                  <Text element="h3" text="Form Name" />
                   <input
                     value={formName}
                     onChange={(e) => setFormName(e.target.value)}
@@ -333,7 +334,7 @@ const FormCreator = ({ context, user }) => {
                     placeholder="Give your form a detailed name"
                     className={styles.input}
                   />
-                  <Text element="h4" text="Form Description" />
+                  <Text element="h3" text="Form Description" />
                   <input
                     value={formDescription}
                     onChange={(e) => setFormDescription(e.target.value)}
@@ -343,7 +344,14 @@ const FormCreator = ({ context, user }) => {
                   />
                 </Stack>
                 <Stack isVertical>
-                  <Text element="h4" text="Form Builder" />
+                  <div
+                    style={{
+                      paddingTop: 'var(--spacer-s)',
+                      paddingBottom: 'var(--spacer-m)',
+                    }}
+                  >
+                    <Text element="h3" text="Form Builder" />
+                  </div>
                   <FormTemplate
                     formItems={formItems}
                     setFormItems={setFormItems}

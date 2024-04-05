@@ -34,16 +34,26 @@ const Input = (props) => {
     <div className={styles.element}>
       {item.fieldType === 'geolocation' && (
         <div key={item.id}>
-          <h3>Geolocation</h3>
-          <Button text="REMOVE QUESTION" intent="danger" className={styles.remove} onClick={() => removeValue(item.id)} />
+          <div className="ids-flex-space-between">
+            <h4>Geolocation</h4>
+            <Button
+              text="Remove question"
+              intent="danger"
+              className={styles.remove}
+              onClick={() => removeValue(item.id)}
+              isIconOnly
+              icon="delete"
+            />
+          </div>
+
           <ActiveInput
             activeInput={activeInput}
             setActiveInput={setActiveInput}
           />
           {geolocationCount > 1 && (
             <h5>
-              There should be only one geolocation field per form.
-              Remove one before submission.
+              There should be only one geolocation field per form. Remove one
+              before submission.
             </h5>
           )}
         </div>

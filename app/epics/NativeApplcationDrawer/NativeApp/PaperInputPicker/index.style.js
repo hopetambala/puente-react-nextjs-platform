@@ -46,7 +46,7 @@ const stylesPaper = {
   colors: {
     placeholder: theme.colors.black,
   },
-  text: theme.colors.priary,
+  text: theme.colors.primary,
 };
 
 const styles = StyleSheet.create({

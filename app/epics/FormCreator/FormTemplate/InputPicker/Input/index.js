@@ -1,4 +1,4 @@
-import { Button } from 'app/impacto-design-system';
+import { Button, Text } from 'app/impacto-design-system';
 import { useEffect, useState } from 'react';
 
 import ActiveInput from '../Utils';
@@ -47,9 +47,26 @@ const Input = (props) => {
     <div className={styles.element}>
       {item.fieldType === 'input' && (
         <div key={item.id}>
-          <h3>Text Input Element</h3>
-          <input className={styles.input} type="text" value={item.label || ''} id={item.id} onChange={setValue} placeholder="Untitled Question" />
-          <Button text="REMOVE QUESTION" intent="danger" className={styles.remove} onClick={() => removeValue(item.id)} />
+          <div className="ids-flex-space-between">
+            <Text text="Question - Text response" element="h4" />
+            <Button
+              text="Remove question"
+              intent="danger"
+              className={styles.remove}
+              onClick={() => removeValue(item.id)}
+              isIconOnly
+              icon="delete"
+            />
+          </div>
+          <input
+            className={styles.input}
+            type="text"
+            value={item.label || ''}
+            id={item.id}
+            onChange={setValue}
+            placeholder="Enter your question here"
+          />
+
           <ActiveInput
             activeInput={activeInput}
             setActiveInput={setActiveInput}
@@ -58,9 +75,26 @@ const Input = (props) => {
       )}
       {item.fieldType === 'numberInput' && (
         <div key={item.id}>
-          <h3>Number Input Element</h3>
-          <input className={styles.input} type="text" value={item.label || ''} id={item.id} onChange={setValue} placeholder="Untitled Question" />
-          <Button text="REMOVE QUESTION" intent="danger" className={styles.remove} onClick={() => removeValue(item.id)} />
+          <div className="ids-flex-space-between">
+            <Text text="Question - Number response" element="h4" />
+            <Button
+              text="Remove question"
+              intent="danger"
+              className={styles.remove}
+              onClick={() => removeValue(item.id)}
+              isIconOnly
+              icon="delete"
+            />
+          </div>
+          <input
+            className={styles.input}
+            type="text"
+            value={item.label || ''}
+            id={item.id}
+            onChange={setValue}
+            placeholder="Enter your question here"
+          />
+
           <ActiveInput
             activeInput={activeInput}
             setActiveInput={setActiveInput}
@@ -69,10 +103,38 @@ const Input = (props) => {
       )}
       {item.fieldType === 'inputSideLabel' && (
         <div key={item.id}>
-          <h3>Input (Side Label) Element</h3>
-          <input className={styles.input} type="text" value={item.label || ''} id={item.id} onChange={setValue} placeholder="Untitled Question" />
-          <input className={styles.input} type="text" value={item.sideLabel || ''} id={item.id} onChange={(e) => setValue(e, 'sideLabel')} placeholder="Side Label" />
-          <Button text="REMOVE QUESTION" intent="danger" className={styles.remove} onClick={() => removeValue(item.id)} />
+          <div className="ids-flex-space-between">
+            <Text
+              text="Question (Side label) - Text or Number Response"
+              element="h4"
+            />
+
+            <Button
+              text="Remove question"
+              intent="danger"
+              className={styles.remove}
+              onClick={() => removeValue(item.id)}
+              isIconOnly
+              icon="delete"
+            />
+          </div>
+          <input
+            className={styles.input}
+            type="text"
+            value={item.label || ''}
+            id={item.id}
+            onChange={setValue}
+            placeholder="Enter your question here"
+          />
+          <input
+            className={styles.input}
+            type="text"
+            value={item.sideLabel || ''}
+            id={item.id}
+            onChange={(e) => setValue(e, 'sideLabel')}
+            placeholder="Side Label"
+          />
+
           <ActiveInput
             activeInput={activeInput}
             setActiveInput={setActiveInput}
