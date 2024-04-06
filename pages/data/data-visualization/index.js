@@ -2,7 +2,7 @@ import { Card, Page } from 'app/impacto-design-system';
 import { BarChart } from 'app/impacto-design-system/visualizations';
 import { useEffect, useState } from 'react';
 
-import { environmentalHealthRecord } from '../../../app/modules/django-etl';
+import { environmentalHealthBronze } from '../../../app/modules/django-etl';
 import styles from './css/dashboard.module.css';
 
 const filters = {
@@ -20,9 +20,8 @@ function Forms() {
   useEffect(() => {
     const fetchData = async () => {
       if (!key) return;
-      const serverData = await environmentalHealthRecord.retrieve(
-        'environmentalhealthbronze/get_count/',
-        JSON.stringify({ fields: [key] }),
+      const serverData = await environmentalHealthBronze.get_count(
+        { fields: [key] },
       );
 
       setData(

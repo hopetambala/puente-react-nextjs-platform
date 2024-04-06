@@ -1,9 +1,4 @@
-import { get, retrieve } from './environmental-health';
+import { environmentalHealthBronze } from './environmental-health';
 import { fact } from './fact';
 
-const environmentalHealthRecord = {
-  get,
-  retrieve,
-};
-
-export { environmentalHealthRecord, fact };
+export { environmentalHealthBronze, fact };

@@ -1,18 +1,21 @@
-const get = (path) => fetch(`${process.env.NEXT_PUBLIC_PUENTE_REST_ETL_URL}${path}`, {
-  method: 'GET',
-  headers: {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
-  },
-}).then((resp) => resp.json());
+const MODEL = 'environmentalhealthbronze';
 
-const retrieve = (path, body) => fetch(`${process.env.NEXT_PUBLIC_PUENTE_REST_ETL_URL}${path}`, {
+const get = (path) =>
+  fetch(`${process.env.NEXT_PUBLIC_PUENTE_REST_ETL_URL}${MODEL}/${path}`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  }).then((resp) => resp.json());
+
+const get_count = (body) => fetch(`${process.env.NEXT_PUBLIC_PUENTE_REST_ETL_URL}${MODEL}/get_count/`, {
   method: 'POST',
-  body,
+  body: JSON.stringify(body),
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',
   },
 }).then((resp) => resp.json());
 
-export { get, retrieve };
+export const environmentalHealthBronze = { get, get_count };
