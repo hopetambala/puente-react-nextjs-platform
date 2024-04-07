@@ -2,13 +2,16 @@
   "extends": [
     "next",
     "next/core-web-vitals",
-    "prettier",
     "plugin:react/recommended",
     "airbnb",
-    "plugin:storybook/recommended"
+    "plugin:storybook/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
   ],
-  "plugins": ["react", "simple-import-sort"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["react", "simple-import-sort", "@typescript-eslint"],
   "rules": {
+    "prefer-const": "error",
     "react/react-in-jsx-scope": "off",
     "react/jsx-filename-extension": "off",
     "react/jsx-props-no-spreading": "off",

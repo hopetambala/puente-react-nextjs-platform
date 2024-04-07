@@ -36,7 +36,7 @@ export default function QuickStart() {
             nextLink="/data/data-analysis"
           /> */}
         </div>
-      </main>  
+      </main>
     </div>
   );
 }
