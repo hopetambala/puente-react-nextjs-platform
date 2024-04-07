@@ -11,7 +11,7 @@ export default function QuickStart() {
     <div className={styles.index}>
       <main>
         <h1 className={styles.title}>Welcome to Puente Manage</h1>
-        <h1>Quick Start Guide</h1>
+        <h2>Quick Start Guide</h2>
 
         <div className={styles.grid}>
           <CardAlt
