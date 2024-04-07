@@ -1,33 +1,35 @@
-/* import css vendors */
-import 'styles/landing-page/hamburger-menu.css';
-import 'animate.css';
-import 'styles/landing-page/animate-extends.css';
-import 'styles/landing-page/top-loading-bar.css';
-import 'styles/landing-page/page-transition.css';
-import 'styles/landing-page/slick/slick.css';
-import 'styles/landing-page/slick/slick-theme.css';
-import 'app/impacto-design-system/_css/root.css';
-import 'react-toastify/dist/ReactToastify.css';
+/* eslint-disable import/no-extraneous-dependencies */ // TODO: upgrade to latest eslint tooling
 
-import CssBaseline from '@material-ui/core/CssBaseline';
-import { ThemeProvider } from '@material-ui/core/styles';
-import theme from 'app/modules/theme';
-import { parseUserValue } from 'app/modules/user';
+/* import css vendors */
+import 'animate.css'
+import 'app/impacto-design-system/_css/root.css'
+import 'react-toastify/dist/ReactToastify.css'
+import 'styles/landing-page/animate-extends.css'
+import 'styles/landing-page/hamburger-menu.css'
+import 'styles/landing-page/page-transition.css'
+import 'styles/landing-page/slick/slick-theme.css'
+import 'styles/landing-page/slick/slick.css'
+import 'styles/landing-page/top-loading-bar.css'
+
+import CssBaseline from '@material-ui/core/CssBaseline'
+import { ThemeProvider } from '@material-ui/core/styles'
+import theme from 'app/modules/theme'
+import { parseUserValue } from 'app/modules/user'
 import { AppWrapper } from 'app/store'; // import based on where you put it
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import PropTypes from 'prop-types';
-import { useEffect, useState } from 'react';
-import { ToastContainer } from 'react-toastify';
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import PropTypes from 'prop-types'
+import { useEffect, useState } from 'react'
+import { ToastContainer } from 'react-toastify'
 
 function App(props) {
-  const { Component, pageProps } = props;
-  const router = useRouter();
-  const [authorized, setAuthorized] = useState(false);
+  const { Component, pageProps } = props
+  const router = useRouter()
+  const [authorized, setAuthorized] = useState(false)
 
   const authCheck = (url) => {
     // redirect to login page if accessing a private page and not logged in
-    const parseUser = parseUserValue();
+    const parseUser = parseUserValue()
     const publicPaths = [
       '/',
       '/account/login',
@@ -37,55 +39,57 @@ function App(props) {
       '/account/register',
       '/account/reset',
       '/account/management',
-    ];
-    const path = url.split('?')[0];
+    ]
+    const path = url.split('?')[0]
     if (!parseUser && !publicPaths.includes(path)) {
-      setAuthorized(false);
+      setAuthorized(false)
       router.push({
         pathname: '/account/login',
         query: { returnUrl: router.asPath },
-      });
+      })
     } else {
-      setAuthorized(true);
+      setAuthorized(true)
     }
-  };
+  }
 
   useEffect(() => {
     // Remove the server-side injected CSS.
-    const jssStyles = document.querySelector('#jss-server-side');
+    const jssStyles = document.querySelector('#jss-server-side')
     if (jssStyles) {
-      jssStyles.parentElement.removeChild(jssStyles);
+      jssStyles.parentElement.removeChild(jssStyles)
     }
 
     // on initial load - run auth check
-    authCheck(router.asPath);
+    authCheck(router.asPath)
 
     // on route change start - hide page content by setting authorized to false
-    const hideContent = () => setAuthorized(false);
-    router.events.on('routeChangeStart', hideContent);
+    const hideContent = () => setAuthorized(false)
+    router.events.on('routeChangeStart', hideContent)
 
     // on route change complete - run auth check
-    router.events.on('routeChangeComplete', authCheck);
+    router.events.on('routeChangeComplete', authCheck)
 
     // unsubscribe from events in useEffect return function
     return () => {
-      router.events.off('routeChangeStart', hideContent);
-      router.events.off('routeChangeComplete', authCheck);
-    };
-  }, []);
+      router.events.off('routeChangeStart', hideContent)
+      router.events.off('routeChangeComplete', authCheck)
+    }
+  }, [])
 
   return (
     <>
       <Head>
         <title>Puente</title>
-        <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
+        <meta
+          name="viewport"
+          content="minimum-scale=1, initial-scale=1, width=device-width"
+        />
       </Head>
       <AppWrapper>
         <ThemeProvider theme={theme}>
           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
-          {authorized
-            && (
+          {authorized && (
             <>
               <Component {...pageProps} />
               <ToastContainer
@@ -99,17 +103,16 @@ function App(props) {
                 closeButton={false}
               />
             </>
-            )}
+          )}
         </ThemeProvider>
       </AppWrapper>
-
     </>
-  );
+  )
 }
 
-export default App;
+export default App
 
 App.propTypes = {
   Component: PropTypes.elementType.isRequired,
   pageProps: PropTypes.object.isRequired, //eslint-disable-line
-};
+}

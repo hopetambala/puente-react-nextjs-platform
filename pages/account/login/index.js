@@ -55,7 +55,7 @@ function Login() {
           <FormProvider {...methods}>
             <Stack isVertical spacing="large" className={styles.stack}>
               <div className={styles.logo}>
-                <Image fill src={logo} alt="Picture of the author" />
+                <Image fill src={logo} alt="Puente logo" />
               </div>
               <Text text="Welcome" element="h2" />
               <div>
@@ -65,9 +65,6 @@ function Login() {
                   // label="Email or phone number"
                   required
                   errorobj={errors}
-                  InputProps={{
-                    startAdornment: <span position="start" />,
-                  }}
                 />
               </div>
               <div>
@@ -77,9 +74,6 @@ function Login() {
                   // label="Password"
                   required
                   errorobj={errors}
-                  InputProps={{
-                    startAdornment: <span position="start" />,
-                  }}
                 />
               </div>
             </Stack>

@@ -60,9 +60,6 @@ function ResetLogin() {
                 label="Phone Number or Email Address"
                 required
                 errorobj={errors}
-                InputProps={{
-                  startAdornment: <span position="start" />,
-                }}
               />
             </Stack>
           </FormProvider>
