@@ -1,6 +1,5 @@
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import React from 'react';
 
 import Tooltip from '../tooltip';
 import styles from './css/text.module.css';
@@ -46,9 +45,6 @@ const Text = ({
     </Tag>
   );
 
-  // DefaultMessage is an empty string so that in the chance that an object is
-  // passed without an `id`, the app does not crash, which is react-intl's default behavior:
-  // https://github.com/formatjs/formatjs/issues/1108
   const formattedMessage = (
     <div defaultMessage="" {...text}>
       {(...content) => (

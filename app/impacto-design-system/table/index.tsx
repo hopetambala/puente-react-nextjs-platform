@@ -1,18 +1,18 @@
 import {
-  // ColumnDef,
-  // ColumnSort,
-  // OnChangeFn,
-  // RowData,
-  // SortingState,
-  // VisibilityState,
+  ColumnDef,
+  ColumnSort,
+  OnChangeFn,
+  RowData,
+  SortingState,
+  VisibilityState,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
-  useReactTable,
+  useReactTable
 } from '@tanstack/react-table';
 import classNames from 'classnames';
 // import { map } from 'lodash';
-import React from 'react';
+import { ReactNode } from 'react';
 
 import Cell from './cell';
 // import { Checkbox, Empty, Icon, MenuOption, Popover } from '../../';
@@ -20,31 +20,31 @@ import Cell from './cell';
 import styles from './css/table.module.css';
 // import { ITableActionsProps, TableActions } from './table-actions/table-actions';
 import Row from './row';
-// import { cell, headerFooterGroup } from './types';
+import { cell, headerFooterGroup } from './types';
 
-// interface ITableProps<Data extends IdentifiedRowData> {
-//   /** An optional classname string to apply to the outer level rendered DOM node. */
-//   className?: string;
+ interface TableProps<Data extends RowData> {
+   /** An optional classname string to apply to the outer level rendered DOM node. */
+   className?: string;
 
-//   /** An array prop for column headers and accessors for the table */
-//   columns: ColumnDef<Data, any>[];
+   /** An array prop for column headers and accessors for the table */
+   columns: ColumnDef<Data, any>[];
 
-//   /** A string prop for the desired name for rows used in table */
-//   units: string;
+   /** A string prop for the desired name for rows used in table */
+   units: string;
 
-//   /** An array of data to pass into the table */
-//   data: readonly Data[];
+   /** An array of data to pass into the table */
+   data: readonly Data[];
 
-//   /**
-//    * An optional column visibility state
-//    */
-//   columnVisibility?: VisibilityState;
+   /**
+    * An optional column visibility state
+    */
+   columnVisibility?: VisibilityState;
 
-//   /** An optional prop to manage the state of the header checked cell */
-//   isGloballySelected?: boolean;
+   /** An optional prop to manage the state of the header checked cell */
+   isGloballySelected?: boolean;
 
-//   /** A boolean prop to apply resizabilityto columns in the table */
-//   isResizable?: boolean;
+   /** A boolean prop to apply resizabilityto columns in the table */
+   isResizable?: boolean;
 
 /** An optional setting controlling the sticky property on the first column. When
    * set to `true` the first column will be set to position sticky to the left of the table. When
@@ -53,59 +53,59 @@ import Row from './row';
    * scroll horizontally along with the rest of the columns.
    * @default true
    */
-//   isFirstColumnSticky?: boolean;
+   isFirstColumnSticky?: boolean;
 
 /**
    * An optional sorting state prop to manage the
    * asc/desc order of rows in a table based on a column id
    */
-//   sorting?: ColumnSort[];
+   sorting?: ColumnSort[];
 
-//   /**
-//    * Setter for columnVisibility
-//    */
-//   setColumnVisibility?: OnChangeFn<VisibilityState>;
+   /**
+    * Setter for columnVisibility
+    */
+   setColumnVisibility?: OnChangeFn<VisibilityState>;
 
-//   /**
-//    * An optional hook prop to set the sorting state of the table.
-//    */
-//   onSortingChange?: OnChangeFn<SortingState>;
+   /**
+    * An optional hook prop to set the sorting state of the table.
+    */
+   onSortingChange?: OnChangeFn<SortingState>;
 
-//   /**
-//    * An optional boolean prop to toggle if the table has header actions
-//    */
-//   hasTableActions?: boolean;
+   /**
+    * An optional boolean prop to toggle if the table has header actions
+    */
+   hasTableActions?: boolean;
 
-//   /**
-//    * A optional string array that holds the ids of selected rows
-//    */
-//   selectedRows?: string[];
+   /**
+    * A optional string array that holds the ids of selected rows
+    */
+   selectedRows?: string[];
 
-//   /**
-//    * An optional hook prop to set the selected rows of the table.
-//    */
-//   onSelectedRowsChanged?: (rows: string[]) => void;
+   /**
+    * An optional hook prop to set the selected rows of the table.
+    */
+   onSelectedRowsChanged?: (rows: string[]) => void;
 
-//   /**
-//    * An optional prop for empty state content
-//    */
-//   emptyContent?: StrictReactNode;
+   /**
+    * An optional prop for empty state content
+    */
+   emptyContent?: ReactNode;
 
-//   /**An optional prop for footer content like pagination */
-//   footer?: React.ReactNode;
+   /**An optional prop for footer content like pagination */
+   footer?: ReactNode;
 
-//   /**An optional column that will appear when the users mouse is over the row. */
-//   hoverActions?: ColumnDef<Data, any>;
-// }
+   /**An optional column that will appear when the users mouse is over the row. */
+   hoverActions?: ColumnDef<Data, any>;
+ }
 
-const renderHeaderCells = (header) => (header.isPlaceholder
+const renderHeaderCells = (header: cell) => (header.isPlaceholder
   ? null
   : flexRender(header.column.columnDef.header, header.getContext()));
 
-// type SortIconDirection = {
-//   isUp: boolean | (() => number);
-//   isDown: boolean | (() => number);
-// };
+type SortDirection = {
+  isUp: boolean | (() => number);
+  isDown: boolean | (() => number);
+};
 
 // const RenderSortIcon = (
 //   header: cell,
@@ -132,7 +132,7 @@ const renderHeaderCells = (header) => (header.isPlaceholder
 //   }
 
 //   type SortArrowProps = {
-//     direction: SortIconDirection;
+//     direction: SortDirection;
 //   };
 
 //   const SortArrow = ({ direction }: SortArrowProps) => {
@@ -178,20 +178,23 @@ const renderHeaderCells = (header) => (header.isPlaceholder
 //   );
 
 // const renderDefaultEmptyState = (units: string) => <Empty title={`No ${units} found`} />;
-const renderDefaultEmptyState = (units) => (
-  <p title={`No ${units} found`} />
-);
+const renderDefaultEmptyState = (units: string) => <div>{`No ${units} found`}</div>;
+
 
 // /** Adds a default ID to a column definition if one is not present. */
-const withGuaranteedId = (
-  column,
-  id,
-) => ({
+const withGuaranteedId = <Data extends RowData>(
+  column: ColumnDef<Data, any>,
+  id: string,
+): ColumnDef<Data, any> & { id: string } => ({
   ...column,
   id: column.id ?? id,
 });
 
-const Table = ({
+// export type AllTableProps<Data extends RowData> = ITableProps<Data> & ITableActionsProps;
+
+export type AllTableProps<Data extends RowData> = TableProps<Data>;
+
+const Table = <Data extends RowData>({
   // allRowsLength,
   className,
   columns,
@@ -217,19 +220,24 @@ const Table = ({
   // subTitle,
   // isTitleVertical,
   hoverActions: hoverActionsInput,
-}) => {
-  const wrapperClasses = classNames(styles.wrapper, className);
-  const tableClasses = classNames(styles.tableWrapper, styles.stickyFirstColumn, {
-    [styles.hasTableActions]: !!hasTableActions,
-    [styles.hasHoverActions]: !!hoverActionsInput,
-  });
+}: AllTableProps<Data>) => {
+  const wrapperClasses = classNames(styles.wrapper, className)
+  const tableClasses = classNames(
+    styles.tableWrapper,
+    styles.stickyFirstColumn,
+    {
+      [styles.hasTableActions]: !!hasTableActions,
+      [styles.hasHoverActions]: !!hoverActionsInput,
+    }
+  )
 
   // const [isDesc, setIsDesc] = useState(null);
 
   // const shouldSort = sorting ? true : false;
 
   // this needs an ID so we can attach CSS to the associated cell
-  const hoverActions = hoverActionsInput && withGuaranteedId(hoverActionsInput, 'hoverColumn');
+  const hoverActions =
+    hoverActionsInput && withGuaranteedId(hoverActionsInput, 'hoverColumn')
 
   // const isHeaderCellChecked =
   //   isGloballySelected ||
@@ -240,8 +248,8 @@ const Table = ({
   //   ? selectedRows?.length > 0 && selectedRows.length < data.length
   //   : undefined;
 
-  const table = useReactTable({
-    data, // ignore readonly restriction as we pass into third party code we cannot change
+  const table = useReactTable<Data>({
+    data: data as Data[], // ignore readonly restriction as we pass into third party code we cannot change
     columns: [...columns, ...(hoverActions ? [hoverActions] : [])],
     enableColumnResizing: isResizable || false,
     columnResizeMode: isResizable === true ? 'onChange' : undefined,
@@ -254,7 +262,7 @@ const Table = ({
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
-  });
+  })
 
   // const handleSelect = (rowId) => {
   //   if (!selectedRows) return;
@@ -296,7 +304,7 @@ const Table = ({
       <div className={tableClasses}>
         <table>
           <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
+            {table.getHeaderGroups().map((headerGroup: headerFooterGroup) => (
               <Row
                 key={headerGroup.id}
                 // hasTableActions={hasTableActions}
@@ -313,7 +321,7 @@ const Table = ({
                     /> */}
                   </Cell>
                 )}
-                {headerGroup.headers.map((header) => (
+                {headerGroup.headers.map((header: cell) => (
                   <Cell key={header.id} isHeaderCell>
                     {renderHeaderCells(header)}
                     {/* {RenderSortIcon(header, shouldSort, isDesc, setIsDesc, sorting || [])}
@@ -347,7 +355,7 @@ const Table = ({
       </div>
       {table.getRowModel().rows.length !== 0 && footer}
     </div>
-  );
-};
+  )
+}
 
 export default Table;

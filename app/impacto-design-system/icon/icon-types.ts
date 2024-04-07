@@ -1,3 +1,5 @@
+import icons from "./icon-components";
+
 const IconNames = [
   'accessAlarms',
   'accountBox',
@@ -190,4 +192,6 @@ const IconNames = [
   'zoomIn',
   'zoomOut'];
 
+
+export type IconName = keyof typeof icons;
 export default IconNames;
