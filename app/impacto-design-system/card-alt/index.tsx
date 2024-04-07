@@ -21,10 +21,19 @@ import styles from './index.module.scss';
  * @returns Card Component
  */
 
+
+type CardProps = {
+  title:string;
+  description:string
+  nextLink: string;
+  shouldOpenTab?: boolean
+  actions?: any[]
+}
+
 const Card = ({
   title, description, nextLink, shouldOpenTab, actions,
-}) => (
-  <a href={nextLink || null} className={styles.card} target={shouldOpenTab ? '_blank' : '_self'}>
+}: CardProps) => (
+  <a href={nextLink} className={styles.card} target={shouldOpenTab ? '_blank' : '_self'}>
     <h3>{title}</h3>
     <p>{description}</p>
     {actions && (

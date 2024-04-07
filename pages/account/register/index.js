@@ -29,7 +29,7 @@ const validationSchema = yup.object().shape({
     .oneOf([yup.ref('password'), null], 'Passwords must match'),
 });
 
-const Register = () => {
+function Register() {
   const router = useRouter();
   const methods = useForm({
     resolver: yupResolver(validationSchema),
@@ -131,6 +131,6 @@ const Register = () => {
       </div>
     </Page>
   );
-};
+}
 
 export default Register;

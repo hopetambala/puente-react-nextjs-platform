@@ -24,7 +24,7 @@ const validationSchema = yup.object().shape({
   passwordV: yup.string().required('Password is Required'),
 });
 
-const Login = () => {
+function Login() {
   const router = useRouter();
   const methods = useForm({
     resolver: yupResolver(validationSchema),
@@ -55,7 +55,7 @@ const Login = () => {
           <FormProvider {...methods}>
             <Stack isVertical spacing="large" className={styles.stack}>
               <div className={styles.logo}>
-                <Image fill src={logo} alt="Picture of the author" />
+                <Image fill src={logo} alt="Puente logo" />
               </div>
               <Text text="Welcome" element="h2" />
               <div>
@@ -65,9 +65,6 @@ const Login = () => {
                   // label="Email or phone number"
                   required
                   errorobj={errors}
-                  InputProps={{
-                    startAdornment: <span position="start" />,
-                  }}
                 />
               </div>
               <div>
@@ -77,9 +74,6 @@ const Login = () => {
                   // label="Password"
                   required
                   errorobj={errors}
-                  InputProps={{
-                    startAdornment: <span position="start" />,
-                  }}
                 />
               </div>
             </Stack>
@@ -108,6 +102,6 @@ const Login = () => {
       </div>
     </Page>
   );
-};
+}
 
 export default Login;

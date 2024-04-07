@@ -20,7 +20,7 @@ const validationSchema = yup.object().shape({
   usernameV: yup.string().required('Username or Phone Number is Required'),
 });
 
-const ResetLogin = () => {
+function ResetLogin() {
   const [notificationType, setNotificationType] = useState('email');
   const methods = useForm({
     resolver: yupResolver(validationSchema),
@@ -60,9 +60,6 @@ const ResetLogin = () => {
                 label="Phone Number or Email Address"
                 required
                 errorobj={errors}
-                InputProps={{
-                  startAdornment: <span position="start" />,
-                }}
               />
             </Stack>
           </FormProvider>
@@ -91,6 +88,6 @@ const ResetLogin = () => {
       </div>
     </Page>
   );
-};
+}
 
 export default ResetLogin;

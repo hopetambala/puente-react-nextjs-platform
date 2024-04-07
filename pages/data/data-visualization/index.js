@@ -11,7 +11,7 @@ const filters = {
   'Clinic Access': 'clinicaccess_v2',
   'Floor Material': 'floormaterial',
 };
-const Forms = () => {
+function Forms() {
   const [data, setData] = useState([]);
   const [key, setKey] = useState();
 
@@ -54,6 +54,6 @@ const Forms = () => {
       </div>
     </Page>
   );
-};
+}
 
 export default Forms;

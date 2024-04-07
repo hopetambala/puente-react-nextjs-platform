@@ -11,7 +11,7 @@ export default function QuickStart() {
     <div className={styles.index}>
       <main>
         <h1 className={styles.title}>Welcome to Puente Manage</h1>
-        <h1>Quick Start Guide</h1>
+        <h2>Quick Start Guide</h2>
 
         <div className={styles.grid}>
           <CardAlt
@@ -37,22 +37,6 @@ export default function QuickStart() {
           /> */}
         </div>
       </main>
-      <style jsx global>
-        {`
-          html,
-          body {
-            padding: 0;
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-              Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
-              sans-serif;
-          }
-
-          * {
-            box-sizing: border-box;
-          }
-        `}
-      </style>
     </div>
   );
 }

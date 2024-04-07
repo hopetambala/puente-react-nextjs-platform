@@ -1,0 +1,7 @@
+{
+  "editor.codeActionsOnSave": [
+    "source.fixAll.eslint",
+    "editor.formatOnSave", // Tell VSCode to format files on save
+    "source.organizeImports"
+  ]
+}

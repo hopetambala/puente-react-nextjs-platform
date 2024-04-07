@@ -13,7 +13,7 @@ const Footer = () => (
           alt="Vercel Logo"
           className={styles.logo}
         />
-        Bridge between data and development
+        Building the bridge between data and development since 2017
       </a>
     </footer>
   </div>
