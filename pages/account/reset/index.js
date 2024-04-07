@@ -18,7 +18,7 @@ const validationSchema = yup.object().shape({
   Password: yup.string().required('Password is Required'),
 }).required();
 
-const Reset = (props) => {
+function Reset(props) {
   const { user, userId, router } = props;
   const methods = useForm({
     resolver: yupResolver(validationSchema),
@@ -89,9 +89,9 @@ const Reset = (props) => {
       </div>
     </Page>
   );
-};
+}
 
-const ResetWrapper = () => {
+function ResetWrapper() {
   const router = useRouter();
   const { objectId: userId } = router.query;
   const [user, setUser] = useState();
@@ -116,6 +116,6 @@ const ResetWrapper = () => {
   }, [userId]);
 
   return <Reset user={user} userId={userId} router={router} />;
-};
+}
 
 export default ResetWrapper;

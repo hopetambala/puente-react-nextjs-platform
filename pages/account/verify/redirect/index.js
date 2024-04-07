@@ -3,7 +3,7 @@ import { updateUser } from 'app/modules/user';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
-const Verify = () => {
+function Verify() {
   const router = useRouter();
 
   const { objectId: userId } = router.query;
@@ -35,6 +35,6 @@ const Verify = () => {
       </Card>
     </Page>
   );
-};
+}
 
 export default Verify;

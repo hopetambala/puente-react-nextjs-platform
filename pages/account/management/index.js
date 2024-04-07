@@ -18,7 +18,7 @@ const validationSchema = yup.object().shape({
   Password: yup.string(),
 }).required();
 
-const Management = (props) => {
+function Management(props) {
   const { user, userId, router } = props;
   const methods = useForm({
     resolver: yupResolver(validationSchema),
@@ -113,9 +113,9 @@ const Management = (props) => {
       </div>
     </Page>
   );
-};
+}
 
-const ManagementWrapper = () => {
+function ManagementWrapper() {
   const router = useRouter();
   const [user, setUser] = useState();
   const [userId, setUserID] = useState();
@@ -144,6 +144,6 @@ const ManagementWrapper = () => {
   }, [objectId]);
 
   return <Management user={user} userId={userId} router={router} />;
-};
+}
 
 export default ManagementWrapper;

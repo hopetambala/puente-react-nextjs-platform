@@ -1,6 +1,6 @@
 /* import css vendors */
 import 'styles/landing-page/hamburger-menu.css';
-import '../node_modules/animate.css/animate.css';
+import 'animate.css';
 import 'styles/landing-page/animate-extends.css';
 import 'styles/landing-page/top-loading-bar.css';
 import 'styles/landing-page/page-transition.css';
@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
 
-const App = (props) => {
+function App(props) {
   const { Component, pageProps } = props;
   const router = useRouter();
   const [authorized, setAuthorized] = useState(false);
@@ -105,7 +105,7 @@ const App = (props) => {
 
     </>
   );
-};
+}
 
 export default App;
 

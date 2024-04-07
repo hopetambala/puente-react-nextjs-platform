@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 
 import styles from './index.module.scss';
 
-const Verify = () => {
+function Verify() {
   const router = useRouter();
 
   const { objectId: userId } = router.query;
@@ -43,6 +43,6 @@ const Verify = () => {
       </div>
     </Page>
   );
-};
+}
 
 export default Verify;

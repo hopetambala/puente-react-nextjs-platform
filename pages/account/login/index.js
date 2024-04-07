@@ -24,7 +24,7 @@ const validationSchema = yup.object().shape({
   passwordV: yup.string().required('Password is Required'),
 });
 
-const Login = () => {
+function Login() {
   const router = useRouter();
   const methods = useForm({
     resolver: yupResolver(validationSchema),
@@ -108,6 +108,6 @@ const Login = () => {
       </div>
     </Page>
   );
-};
+}
 
 export default Login;
