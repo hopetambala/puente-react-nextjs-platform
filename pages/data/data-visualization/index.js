@@ -1,35 +1,37 @@
-import { Card, Page } from 'app/impacto-design-system';
-import { BarChart } from 'app/impacto-design-system/visualizations';
-import { useEffect, useState } from 'react';
+import { Card, Page } from "app/impacto-design-system"
+import { BarChart } from "app/impacto-design-system/visualizations"
+import { useEffect, useState } from "react"
 
-import { environmentalHealthBronze } from '../../../app/modules/django-etl';
-import styles from './css/dashboard.module.css';
+import { environmentalHealthBronze } from "../../../app/modules/django-etl"
+import styles from "./css/dashboard.module.css"
 
 const filters = {
-  'Type of water you drink': 'typeofwaterdoyoudrink',
-  'Years in Community': 'yearslivedinthecommunity',
-  'Clinic Access': 'clinicaccess_v2',
-  'Floor Material': 'floormaterial',
-};
+  "Type of water you drink": "typeofwaterdoyoudrink",
+  "Years in Community": "yearslivedinthecommunity",
+  "Clinic Access": "clinicaccess_v2",
+  "Floor Material": "floormaterial",
+}
 function Forms() {
-  const [data, setData] = useState([]);
-  const [key, setKey] = useState();
+  const [data, setData] = useState([])
+  const [key, setKey] = useState()
 
-  const dashboardClasses = [styles.dashboard, 'impacto-card'].join(' ');
+  const dashboardClasses = [styles.dashboard, "impacto-card"].join(" ")
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!key) return;
-      const serverData = await environmentalHealthBronze.get_count(
-        { fields: [key] },
-      );
+      if (!key) return
+      const serverData = await environmentalHealthBronze.get_count({
+        fields: [key],
+      })
 
       setData(
-        serverData.filter((obj) => Object.values(obj).every((value) => value !== null)),
-      );
-    };
+        serverData.filter((obj) =>
+          Object.values(obj).every((value) => value !== null)
+        )
+      )
+    }
     fetchData().catch(console.error); //eslint-disable-line
-  }, [key]);
+  }, [key])
 
   return (
     <Page header footer>
@@ -38,9 +40,7 @@ function Forms() {
         <div className={styles.dimensions}>
           <h2>Dimensions</h2>
           {Object.keys(filters).map((filter) => (
-            <Card onClick={() => setKey(filters[filter])}>
-              {filter}
-            </Card>
+            <Card onClick={() => setKey(filters[filter])}>{filter}</Card>
           ))}
         </div>
         <div className={styles.filters}>
@@ -52,7 +52,7 @@ function Forms() {
         </div>
       </div>
     </Page>
-  );
+  )
 }
 
-export default Forms;
+export default Forms

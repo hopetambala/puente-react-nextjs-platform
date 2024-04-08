@@ -1,7 +1,7 @@
-import { CardAlt } from 'app/impacto-design-system';
+import { CardAlt } from "app/impacto-design-system"
 
 // import { retrieveCurrentUserAsyncFunction } from 'app/modules/user';
-import styles from './index.module.scss';
+import styles from "./index.module.scss"
 
 export default function QuickStart() {
   // const user = retrieveCurrentUserAsyncFunction();
@@ -38,5 +38,5 @@ export default function QuickStart() {
         </div>
       </main>
     </div>
-  );
+  )
 }

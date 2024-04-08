@@ -7,7 +7,7 @@
     "airbnb",
     "plugin:storybook/recommended",
     "plugin:@typescript-eslint/recommended",
-    "prettier"
+    "plugin:prettier/recommended"
   ],
   "parser": "@typescript-eslint/parser",
   "plugins": ["react", "simple-import-sort", "@typescript-eslint"],

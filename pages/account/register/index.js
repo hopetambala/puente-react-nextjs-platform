@@ -1,50 +1,56 @@
-import { yupResolver } from '@hookform/resolvers';
+import { yupResolver } from "@hookform/resolvers"
 import {
   Button,
   Card,
   FormInput,
-  Page, Stack,
+  Page,
+  Stack,
   Text,
   Toast,
-} from 'app/impacto-design-system';
-import { retrieveSignUpFunction } from 'app/modules/user';
-import { useRouter } from 'next/router';
-import { useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
-import * as yup from 'yup';
+} from "app/impacto-design-system"
+import { retrieveSignUpFunction } from "app/modules/user"
+import { useRouter } from "next/router"
+import { useState } from "react"
+import { FormProvider, useForm } from "react-hook-form"
+import { toast } from "react-toastify"
+import * as yup from "yup"
 
-import styles from './index.module.scss';
+import styles from "./index.module.scss"
 
-const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
+const phoneRegExp =
+  /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
 
 const validationSchema = yup.object().shape({
   firstname: yup.string(),
   lastname: yup.string(),
-  organization: yup.string().required('Organization Name is required'),
-  email: yup.string().email('Invalid email format').required('Email Address is required'),
-  phonenumber: yup.string().matches(phoneRegExp, 'Password is required'),
-  password: yup.string().required('Password is required'),
-  passwordconfirmation: yup.string()
-    .oneOf([yup.ref('password'), null], 'Passwords must match'),
-});
+  organization: yup.string().required("Organization Name is required"),
+  email: yup
+    .string()
+    .email("Invalid email format")
+    .required("Email Address is required"),
+  phonenumber: yup.string().matches(phoneRegExp, "Password is required"),
+  password: yup.string().required("Password is required"),
+  passwordconfirmation: yup
+    .string()
+    .oneOf([yup.ref("password"), null], "Passwords must match"),
+})
 
 function Register() {
-  const router = useRouter();
+  const router = useRouter()
   const methods = useForm({
     resolver: yupResolver(validationSchema),
-  });
-  const [notificationType, setNotificationType] = useState('email');
+  })
+  const [notificationType, setNotificationType] = useState("email")
 
-  const { handleSubmit, errors } = methods;
+  const { handleSubmit, errors } = methods
 
   const onSubmit = async (user) => {
-    await retrieveSignUpFunction(user, notificationType).then(() => {
-      router.push('/quick-start');
-    }).catch((e) => toast(
-      <Toast text={`${e.message}`} isError />,
-    ));
-  };
+    await retrieveSignUpFunction(user, notificationType)
+      .then(() => {
+        router.push("/quick-start")
+      })
+      .catch((e) => toast(<Toast text={`${e.message}`} isError />))
+  }
 
   return (
     <Page>
@@ -61,11 +67,7 @@ function Register() {
                 label="First Name"
                 errorobj={errors}
               />
-              <FormInput
-                name="lastname"
-                label="Last Name"
-                errorobj={errors}
-              />
+              <FormInput name="lastname" label="Last Name" errorobj={errors} />
               <FormInput
                 name="organization"
                 label="Organization Name"
@@ -102,14 +104,14 @@ function Register() {
           </FormProvider>
           <Stack spacing="medium" fill>
             <Button
-              intent={notificationType === 'email' ? 'primary' : ''}
-              onClick={() => setNotificationType('email')}
+              intent={notificationType === "email" ? "primary" : ""}
+              onClick={() => setNotificationType("email")}
               text="Send confirmation via email?"
               isFullWidth
             />
             <Button
-              intent={notificationType === 'text' ? 'primary' : ''}
-              onClick={() => setNotificationType('text')}
+              intent={notificationType === "text" ? "primary" : ""}
+              onClick={() => setNotificationType("text")}
               text="Send confirmation via text?"
               isFullWidth
             />
@@ -121,16 +123,12 @@ function Register() {
               text="Register"
               isFullWidth
             />
-            <Button
-              href="/account/login"
-              text="Cancel"
-              isFullWidth
-            />
+            <Button href="/account/login" text="Cancel" isFullWidth />
           </Stack>
         </Card>
       </div>
     </Page>
-  );
+  )
 }
 
-export default Register;
+export default Register

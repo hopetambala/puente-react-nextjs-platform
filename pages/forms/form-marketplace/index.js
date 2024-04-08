@@ -1,21 +1,18 @@
-import FormMarketplace from 'app/epics/FormMarketplace';
-import { Page } from 'app/impacto-design-system';
-import { parseUserValue } from 'app/modules/user';
-import { useGlobalState } from 'app/store';
-import { useRouter } from 'next/router';
+import FormMarketplace from "app/epics/FormMarketplace"
+import { Page } from "app/impacto-design-system"
+import { parseUserValue } from "app/modules/user"
+import { useGlobalState } from "app/store"
+import { useRouter } from "next/router"
 
-import styles from './index.module.scss';
+import styles from "./index.module.scss"
 
 export default function Marketplace() {
-  const { contextManagment } = useGlobalState();
-  const router = useRouter();
-  const user = parseUserValue();
+  const { contextManagment } = useGlobalState()
+  const router = useRouter()
+  const user = parseUserValue()
 
   return (
-    <Page
-      header
-      footer
-    >
+    <Page header footer>
       <main className={styles.formMarketplace}>
         <div className={styles.container}>
           <FormMarketplace
@@ -26,5 +23,5 @@ export default function Marketplace() {
         </div>
       </main>
     </Page>
-  );
+  )
 }

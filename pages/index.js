@@ -5,7 +5,7 @@ function Homepage() {
         <p>Hi</p>
       </div>
     </main>
-  );
+  )
 }
 
-export default Homepage;
+export default Homepage

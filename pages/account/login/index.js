@@ -1,4 +1,4 @@
-import { yupResolver } from '@hookform/resolvers';
+import { yupResolver } from "@hookform/resolvers"
 import {
   Button,
   Card,
@@ -7,46 +7,46 @@ import {
   Stack,
   Text,
   Toast,
-} from 'app/impacto-design-system';
-import { retrieveSignInFunction } from 'app/modules/user';
-import Image from 'next/image';
-import { useRouter } from 'next/router';
-import { useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
-import * as yup from 'yup';
+} from "app/impacto-design-system"
+import { retrieveSignInFunction } from "app/modules/user"
+import Image from "next/image"
+import { useRouter } from "next/router"
+import { useState } from "react"
+import { FormProvider, useForm } from "react-hook-form"
+import { toast } from "react-toastify"
+import * as yup from "yup"
 
-import logo from '../../../public/assets/brand/logo-black.png';
-import styles from './index.module.scss';
+import logo from "../../../public/assets/brand/logo-black.png"
+import styles from "./index.module.scss"
 
 const validationSchema = yup.object().shape({
-  usernameV: yup.string().required('Username or Phone Number is Required'),
-  passwordV: yup.string().required('Password is Required'),
-});
+  usernameV: yup.string().required("Username or Phone Number is Required"),
+  passwordV: yup.string().required("Password is Required"),
+})
 
 function Login() {
-  const router = useRouter();
+  const router = useRouter()
   const methods = useForm({
     resolver: yupResolver(validationSchema),
-  });
-  const { handleSubmit, errors } = methods;
-  const [loading, setLoading] = useState(false);
+  })
+  const { handleSubmit, errors } = methods
+  const [loading, setLoading] = useState(false)
 
   const onSubmit = async (data) => {
-    setLoading(true);
-    const { usernameV, passwordV } = data;
+    setLoading(true)
+    const { usernameV, passwordV } = data
     return retrieveSignInFunction(usernameV, passwordV)
       .then(() => {
         // get return url from query parameters or default to '/'
-        setLoading(false);
-        const returnUrl = router.query.returnUrl || '/quick-start';
-        router.push(returnUrl);
+        setLoading(false)
+        const returnUrl = router.query.returnUrl || "/quick-start"
+        router.push(returnUrl)
       })
       .catch((e) => {
-        setLoading(false);
-        return toast(<Toast text={`${e.message}`} isError />);
-      });
-  };
+        setLoading(false)
+        return toast(<Toast text={`${e.message}`} isError />)
+      })
+  }
 
   return (
     <Page>
@@ -101,7 +101,7 @@ function Login() {
         </Card>
       </div>
     </Page>
-  );
+  )
 }
 
-export default Login;
+export default Login
