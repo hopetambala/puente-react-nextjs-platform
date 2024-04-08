@@ -5,6 +5,8 @@
   flex-direction: column;
   overflow: hidden;
   position: relative;
+  border: 1px solid #eaeaea;
+  border-radius: 10px;
 }
 
 .tableWrapper {
@@ -68,11 +70,11 @@
   padding: 0 var(--spacer-m);
 }
 
-.footerContainer > * + * {
+.footerContainer>*+* {
   margin: 0 var(--spacer-s);
 }
 
-.footerContainer > * {
+.footerContainer>* {
   min-width: fit-content;
 }
 
@@ -83,7 +85,7 @@
   align-items: center;
 }
 
-.sortIcon > * {
+.sortIcon>* {
   margin: 0 auto;
 }
 
@@ -100,7 +102,7 @@
     opacity: 0;
   }
 
-  *:hover > .resizer {
+  *:hover>.resizer {
     opacity: 1;
   }
 }
@@ -126,12 +128,12 @@
 }
 
 /* hide actions for non hovered rows */
-.hoverActions > * {
+.hoverActions>* {
   opacity: 0;
   pointer-events: none;
 }
 
-.row:hover .hoverActions > * {
+.row:hover .hoverActions>* {
   opacity: 1;
   pointer-events: unset;
 }
