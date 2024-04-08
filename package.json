@@ -17,7 +17,7 @@
     "export": "next build && next export",
     "reinstall": "rm yarn.lock && rm -rf node_modules/ && yarn install",
     "release": "standard-version",
-    "lint": "next lint --fix",
+    "lint": "next lint",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
