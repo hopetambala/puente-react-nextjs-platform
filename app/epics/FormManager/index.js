@@ -1,14 +1,13 @@
 import IconButton from '@material-ui/core/IconButton';
-import AppsIcon from '@material-ui/icons/Apps';
 import MenuIcon from '@material-ui/icons/Menu';
 import { Stack, Text } from 'app/impacto-design-system';
 import { retrieveCustomData } from 'app/modules/cloud-code';
 import React, { useEffect, useState } from 'react';
 import { isArray } from 'underscore';
 
-import GridTable from './Grid';
 import styles from './index.module.scss';
 import Table from './Table';
+import TableV2 from './TableV2';
 
 const puenteConfig = [
   {
@@ -37,7 +36,7 @@ const FormManager = ({ context, router, user }) => {
 
   const [workflowData, setWorkflowData] = useState({});
   const [noWorkflowData, setNoWorkflowData] = useState([]);
-  const [listView, setListView] = useState(true);
+  const [listView, setListView] = useState(false);
   const [workflows, setWorkflows] = useState(null);
 
   const organization = user?.organization || ''; // testing
@@ -112,7 +111,6 @@ const FormManager = ({ context, router, user }) => {
   return (
     <div className={styles.formCreator}>
       <Stack isVertical spacing="medium">
-        <Text element="h2" text="Puente Forms" />
         {listView === true ? (
           <div>
             <IconButton
@@ -130,7 +128,7 @@ const FormManager = ({ context, router, user }) => {
               onClick={() => setListView(false)}
               style={{ color: 'grey' }}
             >
-              <AppsIcon />
+              <MenuIcon />
             </IconButton>
           </div>
         ) : (
@@ -145,92 +143,72 @@ const FormManager = ({ context, router, user }) => {
               onClick={() => setListView(false)}
               style={{ backgroundColor: 'lightBlue', color: 'blue' }}
             >
-              <AppsIcon />
+              <MenuIcon />
             </IconButton>
           </div>
         )}
-        {/**
-         * ADMIN WORKFLOW
-         */}
-        {/* <Grid item xs={12}>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={organization}
-            onChange={handleOrganization}
-          >
-            {organizationList.length < 1
-                  && <CircularProgress />}
-            {organization.length > 1
-            && organizationList.map((value) => <MenuItem value={value}>{value}</MenuItem>)}
-          </Select>
-        </Grid> */}
-        {listView === true ? (
-          <Table
+        {listView === true && (
+          <>
+            <Text element="h2" text="Puente Forms" />
+            <Table
+              data={puenteConfig}
+              retrieveCustomData={retrieveCustomData}
+              passDataToFormCreator={passDataToFormCreator}
+              organization={organization}
+              puenteForm
+            />
+          </>
+        )}
+        {/* {listView === false && (
+          <TableV2
             data={puenteConfig}
             retrieveCustomData={retrieveCustomData}
             passDataToFormCreator={passDataToFormCreator}
             organization={organization}
             puenteForm
           />
-        ) : (
-          <GridTable
-            data={puenteConfig}
-            retrieveCustomData={retrieveCustomData}
-            passDataToFormCreator={passDataToFormCreator}
+        )} */}
+      </Stack>
+      <Stack isVertical spacing="medium">
+        {Object.keys(workflowData).map((key) => (
+          <>
+            <Text element="h2" text="Custom Forms" />
+            <div isVertical spacing="medium">
+              <h3>{key}</h3>
+              {listView === true && (
+                <Table
+                  data={workflowData[key]}
+                  retrieveCustomData={retrieveCustomData}
+                  passDataToFormCreator={passDataToFormCreator}
+                  organization={organization}
+                />
+              )}
+            </div>
+          </>
+        ))}
+        {listView === false && (
+          <TableV2
             organization={organization}
-            workflows={workflows}
-            puenteForm
+            passDataToFormCreator={passDataToFormCreator}
           />
         )}
       </Stack>
-      <Stack isVertical spacing="medium">
-        <Text element="h2" text="Custom Forms" />
-
-        {Object.keys(workflowData).map((key) => (
-          <div isVertical spacing="medium">
-            <h3>{key}</h3>
-            {listView === true ? (
-              <Table
-                data={workflowData[key]}
-                retrieveCustomData={retrieveCustomData}
-                passDataToFormCreator={passDataToFormCreator}
-                organization={organization}
-              />
-            ) : (
-              <GridTable
-                data={workflowData[key]}
-                retrieveCustomData={retrieveCustomData}
-                passDataToFormCreator={passDataToFormCreator}
-                organization={organization}
-                workflows={workflows}
-              />
-            )}
-          </div>
-        ))}
-      </Stack>
 
       <Stack isVertical spacing="medium">
-        <h3>No Workflow Assigned</h3>
-        {listView === true ? (
-          <Table
-            data={noWorkflowData}
-            retrieveCustomData={retrieveCustomData}
-            passDataToFormCreator={passDataToFormCreator}
-            organization={organization}
-          />
-        ) : (
-          <GridTable
-            data={noWorkflowData}
-            retrieveCustomData={retrieveCustomData}
-            passDataToFormCreator={passDataToFormCreator}
-            organization={organization}
-            workflows={workflows}
-          />
+        {listView === true && (
+          <>
+            <h3>No Workflow Assigned</h3>
+            <Table
+              data={noWorkflowData}
+              retrieveCustomData={retrieveCustomData}
+              passDataToFormCreator={passDataToFormCreator}
+              organization={organization}
+            />
+          </>
         )}
       </Stack>
     </div>
-  );
+  )
 };
 
 export default FormManager;
