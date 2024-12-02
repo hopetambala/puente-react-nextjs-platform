@@ -108,7 +108,7 @@ const FormManagerTable = ({
                 <TableCell>{row.description}</TableCell>
                 <TableCell>{row.createdAt}</TableCell>
                 <TableCell>{row.updatedAt}</TableCell>
-                <TableCell>
+                <TableCell align='right'>
                   {!puenteForm && (
                     <>
                       <Button

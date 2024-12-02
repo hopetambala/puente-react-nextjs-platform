@@ -1,6 +1,3 @@
-import IconButton from '@material-ui/core/IconButton';
-import AppsIcon from '@material-ui/icons/Apps';
-import MenuIcon from '@material-ui/icons/Menu';
 import { Stack, Text } from 'app/impacto-design-system';
 import { retrieveCustomData } from 'app/modules/cloud-code';
 import React, { useEffect, useState } from 'react';
@@ -30,28 +27,15 @@ const puenteConfig = [
 ];
 
 const FormManager = ({ context, router, user }) => {
-  /* Admin Workflow
-  const [organization, setOrganization] = useState('Puente');
-  const [organizationList, setOrganizationList] = useState([]);
-  */
-
   const [workflowData, setWorkflowData] = useState({});
   const [noWorkflowData, setNoWorkflowData] = useState([]);
   const [listView, setListView] = useState(true);
   const [workflows, setWorkflows] = useState(null);
 
-  const organization = user?.organization || ''; // testing
+  const organization = user?.organization || '';
 
   useEffect(() => {
     refreshWorkflowData();
-
-    /**
-     * ADMIN WORKFLOW
-     */
-    // retrieveUniqueListOfOrganizations().then((results) => {
-    //   setOrganizationList(results);
-    // });
-    // setOrganizationList([organization]);
   }, []);
 
   const refreshWorkflowData = async () => {
@@ -88,15 +72,6 @@ const FormManager = ({ context, router, user }) => {
     });
   };
 
-  /**
-   * ADMIN WORKFLOW
-   * @param {*} action
-   * @param {*} data
-   */
-  // const handleOrganization = (event) => {
-  //   setOrganization(event.target.value);
-  // };
-
   const passDataToFormCreator = (action, data) => {
     const href = '/forms/form-creator';
 
@@ -113,59 +88,6 @@ const FormManager = ({ context, router, user }) => {
     <div className={styles.formCreator}>
       <Stack isVertical spacing="medium">
         <Text element="h2" text="Puente Forms" />
-        {listView === true ? (
-          <div>
-            <IconButton
-              onClick={() => setListView(true)}
-              style={{
-                backgroundColor: 'lightBlue',
-                color: 'blue',
-                marginTop: 'auto',
-                marginBottom: 'auto',
-              }}
-            >
-              <MenuIcon />
-            </IconButton>
-            <IconButton
-              onClick={() => setListView(false)}
-              style={{ color: 'grey' }}
-            >
-              <AppsIcon />
-            </IconButton>
-          </div>
-        ) : (
-          <div>
-            <IconButton
-              onClick={() => setListView(true)}
-              style={{ color: 'grey' }}
-            >
-              <MenuIcon />
-            </IconButton>
-            <IconButton
-              onClick={() => setListView(false)}
-              style={{ backgroundColor: 'lightBlue', color: 'blue' }}
-            >
-              <AppsIcon />
-            </IconButton>
-          </div>
-        )}
-        {/**
-         * ADMIN WORKFLOW
-         */}
-        {/* <Grid item xs={12}>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={organization}
-            onChange={handleOrganization}
-          >
-            {organizationList.length < 1
-                  && <CircularProgress />}
-            {organization.length > 1
-            && organizationList.map((value) => <MenuItem value={value}>{value}</MenuItem>)}
-          </Select>
-        </Grid> */}
-        {listView === true ? (
           <Table
             data={puenteConfig}
             retrieveCustomData={retrieveCustomData}
@@ -173,16 +95,6 @@ const FormManager = ({ context, router, user }) => {
             organization={organization}
             puenteForm
           />
-        ) : (
-          <GridTable
-            data={puenteConfig}
-            retrieveCustomData={retrieveCustomData}
-            passDataToFormCreator={passDataToFormCreator}
-            organization={organization}
-            workflows={workflows}
-            puenteForm
-          />
-        )}
       </Stack>
       <Stack isVertical spacing="medium">
         <Text element="h2" text="Custom Forms" />
@@ -212,22 +124,13 @@ const FormManager = ({ context, router, user }) => {
 
       <Stack isVertical spacing="medium">
         <h3>No Workflow Assigned</h3>
-        {listView === true ? (
           <Table
             data={noWorkflowData}
             retrieveCustomData={retrieveCustomData}
             passDataToFormCreator={passDataToFormCreator}
             organization={organization}
           />
-        ) : (
-          <GridTable
-            data={noWorkflowData}
-            retrieveCustomData={retrieveCustomData}
-            passDataToFormCreator={passDataToFormCreator}
-            organization={organization}
-            workflows={workflows}
-          />
-        )}
+
       </Stack>
     </div>
   );

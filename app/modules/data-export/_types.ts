@@ -9,7 +9,6 @@ export enum ENDPOINTS {
   Custom = 'records-custom-forms',
 }
 
-
 export class DataExporter {
   endpoint: ENDPOINTS;
   constructor(endpoint:ENDPOINTS) {
@@ -35,8 +34,6 @@ export class DataExporter {
     return records;
   }
 }
-
-
 
 export class CustomDataExporter extends DataExporter {
   constructor() {
