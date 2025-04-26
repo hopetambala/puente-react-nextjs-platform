@@ -10,19 +10,33 @@ export enum ENDPOINTS {
 }
 
 export class DataExporter {
-  endpoint: ENDPOINTS;
-  constructor(endpoint:ENDPOINTS) {
-    this.endpoint = endpoint;
+  endpoint: ENDPOINTS
+  constructor(endpoint: ENDPOINTS) {
+    this.endpoint = endpoint
   }
 
   /**
-   * 
+   *
    * @param organization Surveying Organization like "Puente" or "WOF"
    * @returns All records in database related to this model and its surveyingOrganization
    */
-  async getRecordByOrganization(organization:string) {
-    const orgsData = await fetchCSV(`v2/${this.endpoint}/organizations/${organization}`)
-    return orgsData;
+  async getRecordByOrganization(organization: string) {
+    const orgsData = await fetchCSV(
+      `v2/${this.endpoint}/organizations/${organization}`
+    )
+    return orgsData
+  }
+
+  /**
+   *
+   * @param organization Surveying Organization like "Puente" or "WOF"
+   * @returns All records in database related to this model and its surveyingOrganization
+   */
+  async getIdRecordByOrganization(organization: string) {
+    const orgsData = await fetchCSV(
+      `v3/${this.endpoint}/organizations/${organization}`
+    )
+    return orgsData
   }
 
   /**
@@ -31,7 +45,7 @@ export class DataExporter {
    */
   async getAllRecords() {
     const records = await fetchCSV(`v2/${this.endpoint}/`)
-    return records;
+    return records
   }
 }
 
