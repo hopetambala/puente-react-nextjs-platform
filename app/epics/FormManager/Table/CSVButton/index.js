@@ -34,13 +34,26 @@ export default function CSVButtonWrapper({ form, surveyingOrganization }) {
         alert('No data');
       });
     } else {
-      const model = puenteMap[name];
-      CSVData = await model
-        .getRecordByOrganization(surveyingOrganization)
-        .catch(() => {
-          setLoading(false);
-          alert('No data');
-        });
+      /**
+       * This is a workaround for the SurveyData class, which has a different endpoint (v3)
+       */
+      if (name === 'SurveyData') {
+        CSVData = await SurveyData.getIdRecordByOrganization(
+          surveyingOrganization
+        ).catch(() => {
+          setLoading(false)
+          alert('No data')
+        })
+      }
+      else{
+        const model = puenteMap[name]
+        CSVData = await model
+          .getRecordByOrganization(surveyingOrganization)
+          .catch(() => {
+            setLoading(false)
+            alert('No data')
+          })
+      }
     }
     const blob = new Blob([CSVData], { type: 'text/csv' });
     const csvUrl = window.URL.createObjectURL(blob);

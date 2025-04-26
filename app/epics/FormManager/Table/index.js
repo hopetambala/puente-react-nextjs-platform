@@ -55,6 +55,7 @@ const FormManagerTable = ({
     setOpen(!open);
     setSelectedForm(row);
   };
+  
   const handleRemove = () => {
     const params = {
       parseClass: 'FormSpecificationsV2',
