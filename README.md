@@ -1,28 +1,88 @@
-# Puente - Manage
+# Puente Platform
 
-[![Build Status](https://travis-ci.com/hopetambala/puente-react-nextjs-platform.svg?branch=master)](https://travis-ci.com/hopetambala/puente-react-nextjs-platform)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/490748505d184028b66bbdaf9c83f887)](https://app.codacy.com/manual/hopetambala/puente-reactnative-collect?utm_source=github.com&utm_medium=referral&utm_content=hopetambala/puente-reactnative-collect&utm_campaign=Badge_Grade_Dashboard)
-[![codecov](https://codecov.io/gh/hopetambala/puente-react-nextjs-platform/branch/master/graph/badge.svg)](https://codecov.io/gh/hopetambala/puente-react-nextjs-platform)
-[![Tuple](https://img.shields.io/badge/Pairing%20with-Tuple-5A67D8)](https://tuple.app)
+A web platform for managing humanitarian data collection — form creation, data analysis, and visualization — built with Next.js and the Puente design language (dlite).
 
-Here are some quick npm commands to get started:
+## Prerequisites
 
-- `npm install`: Install Node dependencies
-- `npm run build`: Builds the production application in the .next folder
-- `npm run start`: Starts a Node.js server that supports hybrid pages, serving both statically generated and server-side rendered pages
-- `npm lint-fix`: Run the ESLinter. Fixes issues that are solvable
+- **Node.js** `^18.6.0` (see `.nvmrc` for the recommended version `v18.18.0`)
+- **Yarn** as the package manager
 
-## Structure
+## Getting Started
 
-- Elements --> Molecules --> Charts/Templates --> Epics
+```bash
+# Install dependencies
+yarn install
 
-## Resources
+# Start the dev server
+yarn dev
 
-- [React Material UI](https://material-ui.com/)
-- [Material Icons](https://materialdesignicons.com/)
-- [Next.js](https://nextjs.org/)
-- [NVM](https://github.com/nvm-sh/nvm)
+# Build for production
+yarn build
 
-## Standards
+# Start the production server
+yarn start
 
-![js-standard-style](https://github.com/conventional-changelog/standard-version)
+# Lint and auto-fix
+yarn lint
+```
+
+## Project Structure
+
+```
+pages/                  # Next.js pages (file-based routing)
+  account/              # Login, register, verify, reset, management
+  data/                 # Data analysis & visualization
+  forms/                # Form creator, manager, marketplace
+  quick-start/          # Post-login landing page
+
+app/
+  epics/                # Feature modules
+    FormCreator/        # Build custom forms
+    FormManager/        # Manage submitted form data
+    FormMarketplace/    # Browse and import shared forms
+    DataAnalyticsManager/ # Data analysis tools
+  impacto-design-system/ # In-house component library
+    button, card, card-alt, card-group, form-controls,
+    icon, Link, modal, portal, spinner, stack, table,
+    template-page, text, toast, tooltip, visualizations
+    _css/               # Design tokens, variables, reset, utilities
+  modules/              # Shared app modules
+    theme/              # MUI theme aligned to dlite tokens
+    user/               # User authentication helpers
+    hooks/              # Custom React hooks
+  services/             # External service integrations
+    parse/              # Parse Server
+    apollo-graphql/     # GraphQL client
+    flask-api/          # Flask backend
+    messaging-api/      # Messaging service
+  store/                # Global state (React Context)
+```
+
+## Design Tokens
+
+Styling is powered by [style-dictionary-dlite-tokens](https://github.com/nicholasgalante1997/style-dictionary-dlite-tokens) using the **Puente default** brand. Tokens are imported as CSS custom properties and consumed throughout the app:
+
+- **Typography** — Plus Jakarta Sans (headings), Source Serif 4 (body)
+- **Colors** — Blue `#3D80FC` (primary), Yellow `#FFE680` (accent), Neutral `#F7F7F7` (background)
+- **Spacing, elevation, border-radius, breakpoints, duration** — all from dlite semantic tokens
+
+## Tech Stack
+
+| Category | Technology |
+|---|---|
+| Framework | Next.js 12 (Pages Router) |
+| UI | React 17, Material-UI 4 |
+| Styling | CSS Modules, Sass, dlite design tokens, styled-components |
+| Data | Apollo Client (GraphQL), Parse SDK |
+| Forms | react-hook-form, yup |
+| State | React Context |
+| Linting | ESLint (Airbnb + Prettier) |
+| Dev Tools | Storybook 7, TypeScript 5 |
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on pull requests, issues, and conventions.
+
+## License
+
+[MIT](LICENSE) — Copyright (c) 2026 Puente
