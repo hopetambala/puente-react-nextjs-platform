@@ -4,7 +4,7 @@ A web platform for managing humanitarian data collection — form creation, data
 
 ## Prerequisites
 
-- **Node.js** `^18.6.0` (see `.nvmrc` for the recommended version `v18.18.0`)
+- **Node.js** `20.x` (see `.nvmrc`)
 - **Yarn** as the package manager
 
 ## Getting Started
