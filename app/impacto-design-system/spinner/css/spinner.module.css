@@ -5,17 +5,17 @@
 
 .spinner {
   position: relative;
-  width: 40px;
-  height: 40px;
-  left: calc(50% - (40px / 2));
-  top: calc(50% - (40px / 2));
+  width: var(--spacer-xxl);
+  height: var(--spacer-xxl);
+  left: calc(50% - (var(--spacer-xxl) / 2));
+  top: calc(50% - (var(--spacer-xxl) / 2));
 }
 
 .smallModifier {
-  width: 24px;
-  height: 24px;
-  left: calc(50% - (24px / 2));
-  top: calc(50% - (24px / 2));
+  width: var(--spacer-l);
+  height: var(--spacer-l);
+  left: calc(50% - (var(--spacer-l) / 2));
+  top: calc(50% - (var(--spacer-l) / 2));
 }
 
 .spinner circle {

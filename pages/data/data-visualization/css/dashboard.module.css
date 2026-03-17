@@ -4,13 +4,13 @@
 }
 
 .dashboard > * {
-    margin: 10px;
+    margin: var(--spacer-s);
 }
 
 .dimensions {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--spacer-s);
 }
 
 .filters {

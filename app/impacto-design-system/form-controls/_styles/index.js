@@ -4,7 +4,7 @@ import styled from 'styled-components';
 export const StyledInputLabel = styled(InputLabel)`
   && {
     .req-label {
-      color: #f44336;
+      color: var(--tk-dlite-semantic-color-feedback-danger);
     }
   }
 `;
@@ -21,7 +21,7 @@ export const StyledAutoSelectInputLabel = styled(InputLabel)`
   && {
     position: relative;
     .req-label {
-      color: #f44336;
+      color: var(--tk-dlite-semantic-color-feedback-danger);
     }
     transform: translate(0, 1.5px) scale(0.75);
     transform-origin: top left;

@@ -3,7 +3,6 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
 import IconButton from '@material-ui/core/IconButton';
-import BarChartOutlinedIcon from '@material-ui/icons/BarChartOutlined';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import CreateIcon from '@material-ui/icons/CreateOutlined';
@@ -12,11 +11,10 @@ import FormatListBulletedIcon from '@material-ui/icons/FormatListBulletedOutline
 import PersonOutline from '@material-ui/icons/PersonOutline';
 import InsightsIcon from '@material-ui/icons/SearchOutlined';
 import StoreIcon from '@material-ui/icons/Store';
-import theme from 'app/modules/theme';
 import { retrieveCurrentUserAsyncFunction, retrieveSignOutFunction } from 'app/modules/user';
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import useStyles from './index.style';
 
@@ -97,7 +95,7 @@ export default function Header({ children }) {
           <ListItem>
             <IconButton
               onClick={logout}
-              style={{ color: theme.palette.error.main }}
+              style={{ color: 'var(--tk-dlite-semantic-color-feedback-danger)' }}
             >
               <ExitToAppIcon />
               <TabText isOpen={open} text="Log out" />

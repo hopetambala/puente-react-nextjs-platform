@@ -9,9 +9,7 @@ export default function Forms() {
       <div className="container">
         <main>
           <h1 className="title">Data Analysis</h1>
-          <div style={{ width: '50' }}>
-            <DataAnalyticsManager user={user} />
-          </div>
+          <DataAnalyticsManager user={user} />
         </main>
       </div>
     </Page>

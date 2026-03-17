@@ -1,11 +1,11 @@
 .formMarketplace{
   .container {
     min-height: 100vh;
-    padding: 0 0.5rem;
+    padding: 0 var(--spacer-s);
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 5rem 0;
+    padding: var(--tk-dlite-semantic-spacing-xxxl) 0;
     flex: 1;
   }
 }

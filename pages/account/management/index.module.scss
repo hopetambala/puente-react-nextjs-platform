@@ -1,13 +1,13 @@
 .paper {
     height: 80vh;
     width: 40vw;
-    margin: 40px auto;
+    margin: var(--spacer-xxl) auto;
 }
 
 .stack {
-    padding-bottom: 40px;
+    padding-bottom: var(--spacer-xxl);
 }
 
 .errorText{
-    color: red;
+    color: var(--tk-dlite-semantic-color-feedback-danger);
 }
