@@ -361,6 +361,7 @@ const FormCreator = ({ context, user }) => {
               </Stack>
             </Grid>
             <Grid item xs={4}>
+              <div className={styles.blocksSidebar}>
               <Card>
                 <div>
                   <Text
@@ -371,6 +372,7 @@ const FormCreator = ({ context, user }) => {
                 </div>
                 <FormBlocks items={COLLECTION} />
               </Card>
+              </div>
             </Grid>
           </Grid>
         </DragDropContext>

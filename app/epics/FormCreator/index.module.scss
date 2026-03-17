@@ -20,3 +20,10 @@
   width: 25%;
     padding: var(--spacer-xs);
 }
+
+.blocksSidebar {
+  position: sticky;
+  top: var(--spacer-m);
+  max-height: calc(100vh - var(--spacer-xl));
+  overflow-y: auto;
+}
