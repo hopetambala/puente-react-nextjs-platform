@@ -2,12 +2,12 @@
 
 /* import css vendors */
 import 'animate.css'
-import 'style-dictionary-dlite-tokens/dist/web/puente/default/reset.css'
-import 'style-dictionary-dlite-tokens/dist/web/puente/default/primitives.css'
-import 'style-dictionary-dlite-tokens/dist/web/puente/default/variables.css'
-import 'style-dictionary-dlite-tokens/dist/web/puente/default/semantics.css'
-import 'style-dictionary-dlite-tokens/dist/web/puente/default/components.css'
-import 'style-dictionary-dlite-tokens/dist/web/puente/default/utilities.css'
+import 'style-dictionary-dlite-tokens/web/puente/default/reset.css'
+import 'style-dictionary-dlite-tokens/web/puente/default/primitives.css'
+import 'style-dictionary-dlite-tokens/web/puente/default/variables.css'
+import 'style-dictionary-dlite-tokens/web/puente/default/semantics.css'
+import 'style-dictionary-dlite-tokens/web/puente/default/components.css'
+import 'style-dictionary-dlite-tokens/web/puente/default/utilities.css'
 import 'app/impacto-design-system/_css/root.css'
 import 'react-toastify/dist/ReactToastify.css'
 import 'styles/landing-page/animate-extends.css'
