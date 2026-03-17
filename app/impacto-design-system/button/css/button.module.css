@@ -260,7 +260,7 @@
 .loading:not(.iconButton) .buttonIcon,
 .loading:not(.iconButton) .buttonText,
 .loading:not(.iconButton) .dropdownIcon {
-  opacity: 0.3;
+  opacity: 0;
 }
 
 .loading.iconButton .buttonIcon {
