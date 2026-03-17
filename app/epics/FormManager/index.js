@@ -1,6 +1,5 @@
-import { Text } from 'app/impacto-design-system';
 import { retrieveCustomData } from 'app/modules/cloud-code';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { isArray } from 'underscore';
 
 import GridTable from './Grid';

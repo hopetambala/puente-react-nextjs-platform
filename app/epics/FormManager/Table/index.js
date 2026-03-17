@@ -1,6 +1,6 @@
 import { Button, Modal } from 'app/impacto-design-system';
 import { updateObject } from 'app/modules/cloud-code';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import CSVButton from './CSVButton';
 import ExpandableTableRow from './ExpandableTableRow';
