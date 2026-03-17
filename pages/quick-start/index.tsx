@@ -22,10 +22,9 @@ export default function QuickStart() {
               nextLink="/forms/form-manager"
             />
             <CardAlt
-              title="Quick Insights"
-              description="Visualize data insights from Collect"
-              nextLink="/data/data-visualization"
-              shouldOpenTab
+              title="Marketplace"
+              description="Browse and install community forms"
+              nextLink="/forms/form-marketplace"
             />
           </div>
         </main>

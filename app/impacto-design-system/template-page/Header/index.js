@@ -1,8 +1,4 @@
-import { List, ListItem } from '@material-ui/core';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
-import IconButton from '@material-ui/core/IconButton';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import CreateIcon from '@material-ui/icons/CreateOutlined';
@@ -17,7 +13,30 @@ import { useState } from 'react';
 
 import useStyles from './index.style';
 
-const TabText = ({ isOpen, text }) => (isOpen ? <h4 style={{ marginLeft: 'var(--spacer-m)' }}>{text}</h4> : <></>);
+const navItems = [
+  { icon: FormatListBulletedIcon, label: 'Form Manager', path: '/forms/form-manager' },
+  { icon: CreateIcon, label: 'Form Creator', path: '/forms/form-creator' },
+  { icon: StoreIcon, label: 'Marketplace', path: '/forms/form-marketplace' },
+];
+
+function NavItem({ icon: Icon, label, onClick, active, danger, open, classes }) {
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      className={clsx(classes.navItem, {
+        [classes.navItemActive]: active,
+        [classes.dangerItem]: danger,
+      })}
+      onClick={onClick}
+      onKeyDown={(e) => e.key === 'Enter' && onClick()}
+      title={!open ? label : undefined}
+    >
+      <Icon className={classes.navIcon} fontSize="small" />
+      {open && <span className={classes.navLabel}>{label}</span>}
+    </div>
+  );
+}
 
 export default function Header({ children }) {
   const classes = useStyles();
@@ -32,7 +51,6 @@ export default function Header({ children }) {
 
   return (
     <div className={classes.root}>
-      <CssBaseline />
       <Drawer
         variant="permanent"
         className={clsx(classes.drawer, {
@@ -46,64 +64,52 @@ export default function Header({ children }) {
           }),
         }}
       >
-        <div className={classes.toolbar}>
-          <IconButton onClick={() => setDrawerOpen(!open)}>
-            {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-          </IconButton>
+        <div className={classes.brand}>
+          {open && <span className={classes.brandName}>Puente</span>}
+          <div
+            role="button"
+            tabIndex={0}
+            className={classes.collapseBtn}
+            onClick={() => setDrawerOpen(!open)}
+            onKeyDown={(e) => e.key === 'Enter' && setDrawerOpen(!open)}
+          >
+            {open ? <ChevronLeftIcon fontSize="small" /> : <ChevronRightIcon fontSize="small" />}
+          </div>
         </div>
-        <List>
-          <ListItem>
-            <IconButton onClick={() => router.push('/forms/form-manager')}>
-              <FormatListBulletedIcon />
-              <TabText isOpen={open} text="Form Manager" />
-            </IconButton>
-          </ListItem>
-          <ListItem>
-            <IconButton onClick={() => router.push('/forms/form-creator')}>
-              <CreateIcon />
-              <TabText isOpen={open} text="Form Creator" />
-            </IconButton>
-          </ListItem>
-          <ListItem>
-            <IconButton onClick={() => router.push('/forms/form-marketplace')}>
-              <StoreIcon />
-              <TabText isOpen={open} text="Form Marketplace" />
-            </IconButton>
-          </ListItem>
-          {/* <ListItem>
-            <IconButton onClick={() => router.push('/data/data-visualization')}>
-              <InsightsIcon />
-              <TabText isOpen={open} text="Quick Insights" />
-            </IconButton>
-          </ListItem> */}
-          {/* <ListItem>
-            <IconButton onClick={() => router.push('/data/data-analysis')}>
-              <BarChartOutlinedIcon />
-              <TabText isOpen={open} text="Analytics Manager" />
-            </IconButton>
-          </ListItem> */}
-        </List>
-        <Divider />
-        <List>
-          <ListItem>
-            <IconButton onClick={manage}>
-              <PersonOutline />
-              <TabText isOpen={open} text="Account Details" />
-            </IconButton>
-          </ListItem>
-          <ListItem>
-            <IconButton
-              onClick={logout}
-              style={{ color: 'var(--tk-dlite-semantic-color-feedback-danger)' }}
-            >
-              <ExitToAppIcon />
-              <TabText isOpen={open} text="Log out" />
-            </IconButton>
-          </ListItem>
-        </List>
+
+        <div className={classes.navSection}>
+          {navItems.map((item) => (
+            <NavItem
+              key={item.path}
+              icon={item.icon}
+              label={item.label}
+              onClick={() => router.push(item.path)}
+              active={router.pathname === item.path}
+              open={open}
+              classes={classes}
+            />
+          ))}
+        </div>
+
+        <div className={classes.bottomSection}>
+          <NavItem
+            icon={PersonOutline}
+            label="Account"
+            onClick={manage}
+            open={open}
+            classes={classes}
+          />
+          <NavItem
+            icon={ExitToAppIcon}
+            label="Log out"
+            onClick={logout}
+            danger
+            open={open}
+            classes={classes}
+          />
+        </div>
       </Drawer>
       <main className={classes.content}>
-        <div className={classes.toolbar} />
         {children}
       </main>
     </div>
