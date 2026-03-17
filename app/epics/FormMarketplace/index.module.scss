@@ -1,29 +1,44 @@
 .formMarketplace{
   h1 {
     text-align: center;
+    font-family: var(--font-family-heading);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text);
   }
 
-  .carousel {
-    flex: 1;
-    display: flex;
-    overflow: auto;
-    .box {
-      display: flex;
-      min-height: min-content; /* needs vendor prefixes */
-    }
-  }
-
-  .searchbar {
-    align-items: center;
-    display: flex;
-    justify-content: center;
+  h2 {
+    text-align: center;
+    font-family: var(--font-family-heading);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacer-l);
   }
 
   .cards {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     justify-content: center;
     flex-wrap: wrap;
-      margin-top: 3rem;
+    gap: var(--spacer-m);
+    margin-top: var(--spacer-l);
+  }
+
+  .loadingState {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    width: 100%;
+  }
+
+  .loadingState svg {
+    left: 0;
+    top: 0;
+  }
+
+  .emptyState {
+    text-align: center;
+    padding: var(--spacer-xl) 0;
+    color: var(--color-text-secondary);
   }
 }

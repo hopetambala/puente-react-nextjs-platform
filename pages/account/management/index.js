@@ -1,11 +1,11 @@
 /* eslint-disable react/prop-types */ // TODO: upgrade to latest eslint tooling
 
 import { yupResolver } from '@hookform/resolvers'
-import { Button, Card, Page, Stack, Text } from 'app/impacto-design-system'
+import { Button, Card, Page, Spinner, Stack, Text } from 'app/impacto-design-system'
 import {
-  retrieveSignInFunction,
-  retrieveUserByObjectId,
-  updateUser,
+    retrieveSignInFunction,
+    retrieveUserByObjectId,
+    updateUser,
 } from 'app/modules/user'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -26,7 +26,7 @@ const validationSchema = yup
   .required()
 
 function Management(props) {
-  const { user, userId, router } = props
+  const { user, userId, router, loading } = props
   const methods = useForm({
     resolver: yupResolver(validationSchema),
   })
@@ -75,6 +75,11 @@ function Management(props) {
   return (
     <Page header footer>
       <div className={styles.paper}>
+        {loading ? (
+          <div className={styles.loadingState}>
+            <Spinner />
+          </div>
+        ) : (
         <Card padding="extraLarge">
           <Text text="PUENTE" element="h1" className={styles.stack} />
           <Stack isVertical className={styles.stack}>
@@ -114,6 +119,7 @@ function Management(props) {
             </form>
           </FormProvider>
         </Card>
+        )}
       </div>
     </Page>
   )
@@ -147,7 +153,7 @@ function ManagementWrapper() {
     retrieveAccountDetails()
   }, [objectId])
 
-  return <Management user={user} userId={userId} router={router} />
+  return <Management user={user} userId={userId} router={router} loading={!user} />
 }
 
 export default ManagementWrapper

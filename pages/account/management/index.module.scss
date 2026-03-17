@@ -4,6 +4,19 @@
     padding: 0 var(--spacer-m);
 }
 
+.loadingState {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    width: 100%;
+}
+
+.loadingState svg {
+    left: 0;
+    top: 0;
+}
+
 .stack {
     padding-bottom: var(--spacer-l);
 }
