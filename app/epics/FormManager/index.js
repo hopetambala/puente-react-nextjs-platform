@@ -1,4 +1,4 @@
-import { Stack, Text } from 'app/impacto-design-system';
+import { Text } from 'app/impacto-design-system';
 import { retrieveCustomData } from 'app/modules/cloud-code';
 import React, { useEffect, useState } from 'react';
 import { isArray } from 'underscore';
@@ -85,9 +85,10 @@ const FormManager = ({ context, router, user }) => {
   };
 
   return (
-    <div className={styles.formCreator}>
-      <Stack isVertical spacing="medium">
-        <Text element="h2" text="Puente Forms" />
+    <div className={styles.formManager}>
+      <div className={styles.section}>
+        <h2>Puente Forms</h2>
+        <div className={styles.tableWrap}>
           <Table
             data={puenteConfig}
             retrieveCustomData={retrieveCustomData}
@@ -95,43 +96,53 @@ const FormManager = ({ context, router, user }) => {
             organization={organization}
             puenteForm
           />
-      </Stack>
-      <Stack isVertical spacing="medium">
-        <Text element="h2" text="Custom Forms" />
+        </div>
+      </div>
 
-        {Object.keys(workflowData).map((key) => (
-          <div isVertical spacing="medium">
-            <h3>{key}</h3>
-            {listView === true ? (
-              <Table
-                data={workflowData[key]}
-                retrieveCustomData={retrieveCustomData}
-                passDataToFormCreator={passDataToFormCreator}
-                organization={organization}
-              />
-            ) : (
-              <GridTable
-                data={workflowData[key]}
-                retrieveCustomData={retrieveCustomData}
-                passDataToFormCreator={passDataToFormCreator}
-                organization={organization}
-                workflows={workflows}
-              />
-            )}
+      <div className={styles.section}>
+        <h2>Custom Forms</h2>
+        {Object.keys(workflowData).length > 0 ? (
+          Object.keys(workflowData).map((key) => (
+            <div key={key}>
+              <h3>{key}</h3>
+              <div className={styles.tableWrap}>
+                {listView ? (
+                  <Table
+                    data={workflowData[key]}
+                    retrieveCustomData={retrieveCustomData}
+                    passDataToFormCreator={passDataToFormCreator}
+                    organization={organization}
+                  />
+                ) : (
+                  <GridTable
+                    data={workflowData[key]}
+                    retrieveCustomData={retrieveCustomData}
+                    passDataToFormCreator={passDataToFormCreator}
+                    organization={organization}
+                    workflows={workflows}
+                  />
+                )}
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className={styles.emptyState}>No custom forms yet.</p>
+        )}
+      </div>
+
+      {noWorkflowData && noWorkflowData.length > 0 && (
+        <div className={styles.section}>
+          <h2>No Workflow Assigned</h2>
+          <div className={styles.tableWrap}>
+            <Table
+              data={noWorkflowData}
+              retrieveCustomData={retrieveCustomData}
+              passDataToFormCreator={passDataToFormCreator}
+              organization={organization}
+            />
           </div>
-        ))}
-      </Stack>
-
-      <Stack isVertical spacing="medium">
-        <h3>No Workflow Assigned</h3>
-          <Table
-            data={noWorkflowData}
-            retrieveCustomData={retrieveCustomData}
-            passDataToFormCreator={passDataToFormCreator}
-            organization={organization}
-          />
-
-      </Stack>
+        </div>
+      )}
     </div>
   );
 };

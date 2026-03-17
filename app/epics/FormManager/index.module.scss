@@ -1,27 +1,79 @@
-.formCreator{
-    h2 {
-      color: rgba(0,0,0,0.88);
-      font-size: 24px;
-      font-weight: 700;
-  }
+.formManager {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-xl);
 }
 
-.formButtons{
+.section {
+  background: var(--color-surface-base);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-m);
+  padding: var(--spacer-l);
+  box-shadow: var(--shadow-lv1);
+}
+
+.section h2 {
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  margin: 0 0 var(--spacer-s) 0;
+}
+
+.section h3 {
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  margin: var(--spacer-m) 0 var(--spacer-xs) 0;
+}
+
+.tableWrap {
+  overflow-x: auto;
+  margin: 0 calc(var(--spacer-l) * -1);
+  padding: 0 var(--spacer-l);
+}
+
+.tableWrap table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tableWrap th {
+  text-align: left;
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  letter-spacing: var(--letter-spacing-label);
+  text-transform: uppercase;
+  padding: var(--spacer-s) var(--spacer-m);
+  border-bottom: 2px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.tableWrap td {
+  padding: var(--spacer-s) var(--spacer-m);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--font-size-body);
+  color: var(--color-text);
+  vertical-align: middle;
+}
+
+.tableWrap tbody tr:hover {
+  background: var(--tk-dlite-semantic-color-neutral-100);
+}
+
+.emptyState {
+  text-align: center;
+  padding: var(--spacer-xl) var(--spacer-m);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body);
+}
+
+.formButtons {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content:flex-start;
-  & *{
-    margin: 10;
-  }
-
-  .modalContainer{
-    // color: white;
-    margin-left: 'auto';
-    margin-right: 'auto';
-    margin-top: 'auto';
-    margin-bottom: 'auto';
-    // width: 10;
-    // height: 10;
-  }
+  gap: var(--spacer-s);
 }
