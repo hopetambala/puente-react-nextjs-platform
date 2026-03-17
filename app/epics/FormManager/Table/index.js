@@ -1,23 +1,9 @@
-import Paper from '@material-ui/core/Paper';
-import { makeStyles } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
 import { Button, Modal } from 'app/impacto-design-system';
 import { updateObject } from 'app/modules/cloud-code';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import CSVButton from './CSVButton';
 import ExpandableTableRow from './ExpandableTableRow';
-
-const useStyles = makeStyles({
-  table: {
-    minWidth: 650,
-  },
-});
 
 const FormManagerTable = ({
   data,
@@ -28,7 +14,6 @@ const FormManagerTable = ({
 }) => {
   const [open, setOpen] = useState(false);
   const [selectedForm, setSelectedForm] = useState();
-  const classes = useStyles();
 
   const handleDuplicate = (object) => {
     passDataToFormCreator('duplicate', object);
@@ -71,7 +56,7 @@ const FormManagerTable = ({
   };
 
   return (
-    <TableContainer component={Paper}>
+    <>
       <Modal
         open={open}
         handleClose={() => setOpen(!open)}
@@ -81,64 +66,61 @@ const FormManagerTable = ({
         action={handleRemove}
       />
       {data !== undefined ? (
-        <Table className={classes.table} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              {/* {data && headings.map((heading,index)=>(
-              <TableCell key={index}>{heading}</TableCell>
-            ))} */}
-              <TableCell />
-              <TableCell>Name</TableCell>
-              <TableCell>Description</TableCell>
-              <TableCell>Creation Date</TableCell>
-              <TableCell>Updated Date</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
+        <table>
+          <thead>
+            <tr>
+              <th style={{ width: 40 }} />
+              <th>Name</th>
+              <th>Description</th>
+              <th>Created</th>
+              <th>Updated</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
             {data.map((row) => (
               <ExpandableTableRow
-                puenteForm
                 row={row}
                 key={row.name}
                 surveyingOrganization={organization}
-                expandComponent={<TableCell colSpan="5" />}
               >
-                <TableCell>{row.name}</TableCell>
-                <TableCell>{row.description}</TableCell>
-                <TableCell>{row.createdAt}</TableCell>
-                <TableCell>{row.updatedAt}</TableCell>
-                <TableCell align='right'>
-                  {!puenteForm && (
-                    <>
-                      <Button
-                        aria-label="remove"
-                        text="Delete Form"
-                        onClick={() => handleModal(row)}
-                      />
-                      <Button
-                        aria-label="duplicate"
-                        text="Duplicate Form"
-                        onClick={() => handleDuplicate(row)}
-                      />
-                      <Button
-                        aria-label="edit"
-                        text="Edit Form"
-                        onClick={() => handleEdit(row)}
-                      />
-                    </>
-                  )}
-                  <CSVButton form={row} surveyingOrganization={organization} />
-                </TableCell>
+                <td>{row.name}</td>
+                <td>{row.description || '—'}</td>
+                <td>{row.createdAt ? new Date(row.createdAt).toLocaleDateString() : '—'}</td>
+                <td>{row.updatedAt ? new Date(row.updatedAt).toLocaleDateString() : '—'}</td>
+                <td>
+                  <div style={{ display: 'flex', gap: 'var(--spacer-xs)', justifyContent: 'flex-end' }}>
+                    {!puenteForm && (
+                      <>
+                        <Button
+                          text="Delete"
+                          intent="danger"
+                          isSmall
+                          onClick={() => handleModal(row)}
+                        />
+                        <Button
+                          text="Duplicate"
+                          isSmall
+                          onClick={() => handleDuplicate(row)}
+                        />
+                        <Button
+                          text="Edit"
+                          isSmall
+                          onClick={() => handleEdit(row)}
+                        />
+                      </>
+                    )}
+                    <CSVButton form={row} surveyingOrganization={organization} />
+                  </div>
+                </td>
               </ExpandableTableRow>
             ))}
-          </TableBody>
-        </Table>
+          </tbody>
+        </table>
       ) : (
-        <h3>No Data Available</h3>
+        <p style={{ textAlign: 'center', padding: 'var(--spacer-l)', color: 'var(--color-text-secondary)' }}>No data available.</p>
       )}
-    </TableContainer>
+    </>
   );
 };
 

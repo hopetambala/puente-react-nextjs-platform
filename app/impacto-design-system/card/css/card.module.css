@@ -1,9 +1,10 @@
 .card {
-  background-color: var(--color-bg-light);
+  background-color: var(--tk-dlite-semantic-color-surface-base);
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-l);
   padding: var(--spacer-l);
   display: block;
+  box-shadow: var(--shadow-lv1);
 }
 
 .card + .card,

@@ -27,7 +27,7 @@ export const BarChart = ({
         id: 'dots',
         type: 'patternDots',
         background: 'inherit',
-        color: '#38bcb2',
+        color: '#38bcb2',  // teal pattern - TODO: use dlite token when chart lib supports CSS vars
         size: 4,
         padding: 1,
         stagger: true,
@@ -36,7 +36,7 @@ export const BarChart = ({
         id: 'lines',
         type: 'patternLines',
         background: 'inherit',
-        color: '#eed312',
+        color: '#eed312',  // yellow pattern - TODO: use dlite token when chart lib supports CSS vars
         rotation: -45,
         lineWidth: 6,
         spacing: 10,

@@ -1,7 +1,7 @@
 import { ServerStyleSheets } from '@material-ui/core/styles';
 import theme from 'app/modules/theme';
 import Document, {
-  Head, Html, Main, NextScript,
+    Head, Html, Main, NextScript,
 } from 'next/document';
 import React from 'react';
 
@@ -12,9 +12,12 @@ export default class MyDocument extends Document {
         <Head>
           {/* PWA primary color */}
           <meta name="theme-color" content={theme.palette.primary.main} />
+          {/* dlite brand typefaces: Plus Jakarta Sans (headings) + Source Serif 4 (body) */}
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
           <link
+            href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap"
             rel="stylesheet"
-            href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
           />
         </Head>
         <body>

@@ -1,10 +1,17 @@
 .paper {
-    padding: 40px;
-    height: 80vh;
-    width: 40vw;
-    margin: 40px auto;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background:
+      linear-gradient(
+        135deg,
+        var(--tk-dlite-primitive-color-blue-100) 0%,
+        var(--tk-dlite-primitive-color-neutral-100) 50%,
+        var(--tk-dlite-primitive-color-yellow-100) 100%
+      );
 }
 
 .stack {
-    padding-bottom: 40px;
+    padding-bottom: var(--spacer-l);
 }

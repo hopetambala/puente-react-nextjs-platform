@@ -1,11 +1,11 @@
 .autoselect-options {
-  padding: 6px 16px;
+  padding: var(--spacer-xs) var(--spacer-m);
   line-height: 1.5;
   width: auto;
   min-height: auto;
-  font-size: 1rem;
+  font-size: var(--font-size-body);
   letter-spacing: 0.00938em;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   cursor: pointer;
 }
 

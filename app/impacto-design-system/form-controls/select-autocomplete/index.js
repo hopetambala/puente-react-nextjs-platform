@@ -1,5 +1,5 @@
 import FormHelperText from '@material-ui/core/FormHelperText';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import Select, { createFilter } from 'react-select';
 
@@ -22,19 +22,19 @@ const stylesReactSelect = {
   placeholder: (provided, state) => ({
     ...provided,
     fontFamily: 'Roboto, Helvetica, Arial, sans-serif',
-    color: state.selectProps.error ? '#f44336' : 'rgba(0, 0, 0, 0.54)',
+    color: state.selectProps.error ? 'var(--tk-dlite-semantic-color-feedback-danger)' : 'var(--color-text-placeholder)',
   }),
   control: (provided, state) => ({
     ...provided,
     borderRadius: 0,
     border: 0,
     borderBottom: state.selectProps.error
-      ? '1px solid #f44336'
+      ? '1px solid var(--tk-dlite-semantic-color-feedback-danger)'
       : '1px solid rgba(0,0,0,0.87)',
     boxShadow: 'none',
     ':hover': {
-      borderColor: state.selectProps.error ? '1px solid #f44336' : 'inherit',
-      boxShadow: state.selectProps.error ? '1px solid #f44336' : 'none',
+      borderColor: state.selectProps.error ? '1px solid var(--tk-dlite-semantic-color-feedback-danger)' : 'inherit',
+      boxShadow: state.selectProps.error ? '1px solid var(--tk-dlite-semantic-color-feedback-danger)' : 'none',
     },
   }),
   valueContainer: (provided) => ({

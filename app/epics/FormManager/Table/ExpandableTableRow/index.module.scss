@@ -1,7 +1,40 @@
 .rowDetail {
-  padding: var(--spacer-m);
+  padding: var(--spacer-m) 0;
 }
 
 .rowDetail h3 {
-  width: calc(var(--spacer-m) * 30);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+.expandableRow {
+  cursor: pointer;
+}
+
+.expandBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: var(--border-radius-m);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  cursor: pointer;
+  transition: background var(--duration-fast) ease-out;
+}
+
+.expandBtn:hover {
+  background: var(--tk-dlite-semantic-color-neutral-100);
+}
+
+.detailRow {
+  background: var(--tk-dlite-semantic-color-neutral-50, var(--color-bg-light));
+}
+
+.detailRow td {
+  border-bottom: 1px solid var(--color-border);
 }

@@ -1,8 +1,3 @@
-import IconButton from '@material-ui/core/IconButton';
-import TableCell from '@material-ui/core/TableCell';
-import TableRow from '@material-ui/core/TableRow';
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import { Button, Stack, Text } from 'app/impacto-design-system';
 import { customMultiParamCountService } from 'app/modules/cloud-code';
 import { useState } from 'react';
@@ -26,33 +21,40 @@ const ExpandableTableRowDetail = ({ row, surveyingOrganization }) => {
   return (
     <div className={styles.rowDetail}>
       <Stack spacing="extraLarge" isWrapDisabled>
-        <Text text={`Count Number of forms collected: ${count}`} element="h3" />
-        <Button text="Refresh" onClick={getCount} />
+        <Text text={`Forms collected: ${count}`} element="h3" />
+        <Button text="Refresh" isSmall onClick={getCount} />
       </Stack>
     </div>
   );
 };
 
 const ExpandableTableRow = ({
-  children, expandComponent, row, surveyingOrganization, ...otherProps
+  children, row, surveyingOrganization,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <>
-      <TableRow {...otherProps}>
-        <TableCell padding="checkbox">
-          <IconButton onClick={() => setIsExpanded(!isExpanded)}>
-            {isExpanded ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
-        </TableCell>
+      <tr className={styles.expandableRow}>
+        <td style={{ width: 40 }}>
+          <button
+            type="button"
+            className={styles.expandBtn}
+            onClick={() => setIsExpanded(!isExpanded)}
+            aria-label={isExpanded ? 'Collapse row' : 'Expand row'}
+          >
+            {isExpanded ? '▲' : '▼'}
+          </button>
+        </td>
         {children}
-      </TableRow>
+      </tr>
       {isExpanded && (
-        <TableRow>
-          <TableCell padding="checkbox" />
-          <ExpandableTableRowDetail row={row} surveyingOrganization={surveyingOrganization} />
-        </TableRow>
+        <tr className={styles.detailRow}>
+          <td />
+          <td colSpan={5}>
+            <ExpandableTableRowDetail row={row} surveyingOrganization={surveyingOrganization} />
+          </td>
+        </tr>
       )}
     </>
   );

@@ -1,9 +1,15 @@
 /* eslint-disable import/no-extraneous-dependencies */ // TODO: upgrade to latest eslint tooling
 
-/* import css vendors */
+/* dlite design tokens + app design system */
 import 'animate.css'
 import 'app/impacto-design-system/_css/root.css'
 import 'react-toastify/dist/ReactToastify.css'
+import 'style-dictionary-dlite-tokens/web/puente/default/components.css'
+import 'style-dictionary-dlite-tokens/web/puente/default/primitives.css'
+import 'style-dictionary-dlite-tokens/web/puente/default/reset.css'
+import 'style-dictionary-dlite-tokens/web/puente/default/semantics.css'
+import 'style-dictionary-dlite-tokens/web/puente/default/utilities.css'
+import 'style-dictionary-dlite-tokens/web/puente/default/variables.css'
 import 'styles/landing-page/animate-extends.css'
 import 'styles/landing-page/hamburger-menu.css'
 import 'styles/landing-page/page-transition.css'

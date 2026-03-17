@@ -1,13 +1,27 @@
 .paper {
-    height: 80vh;
-    width: 40vw;
-    margin: 40px auto;
+    max-width: 640px;
+    margin: var(--spacer-xxl) auto;
+    padding: 0 var(--spacer-m);
+}
+
+.loadingState {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    width: 100%;
+}
+
+.loadingState svg {
+    left: 0;
+    top: 0;
 }
 
 .stack {
-    padding-bottom: 40px;
+    padding-bottom: var(--spacer-l);
 }
 
 .errorText{
-    color: red;
+    color: var(--tk-dlite-semantic-color-feedback-danger);
+    font-size: var(--font-size-small);
 }

@@ -6,7 +6,12 @@
   height: 40px;
   cursor: pointer;
   text-align: center;
-  transition: background-color 0.1s ease-out, box-shadow 0.1s ease-out;
+  font-family: var(--font-family-heading);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.01em;
+  transition: background-color var(--duration-fast) ease-out,
+              box-shadow var(--duration-fast) ease-out,
+              transform var(--duration-fast) ease-out;
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
@@ -255,7 +260,7 @@
 .loading:not(.iconButton) .buttonIcon,
 .loading:not(.iconButton) .buttonText,
 .loading:not(.iconButton) .dropdownIcon {
-  opacity: 0.3;
+  opacity: 0;
 }
 
 .loading.iconButton .buttonIcon {
