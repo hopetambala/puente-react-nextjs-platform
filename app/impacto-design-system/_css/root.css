@@ -22,7 +22,7 @@ html {
 html,
 body {
   padding: 0;
-  letter-spacing: 0;
+  letter-spacing: var(--letter-spacing-body);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -45,39 +45,51 @@ body {
 }
 
 h1 {
-  font-weight: var(--font-weight-emphasis);
+  font-family: var(--font-family-heading);
+  font-weight: var(--font-weight-bold);
   font-size: var(--font-size-h1);
   line-height: var(--line-height-h1);
+  letter-spacing: var(--letter-spacing-h1);
 }
 
 h2 {
+  font-family: var(--font-family-heading);
   font-weight: var(--font-weight-emphasis);
   font-size: var(--font-size-h2);
   line-height: var(--line-height-h2);
+  letter-spacing: var(--letter-spacing-h2);
 }
 
 h3 {
+  font-family: var(--font-family-heading);
   font-weight: var(--font-weight-emphasis);
   font-size: var(--font-size-h3);
   line-height: var(--line-height-h3);
+  letter-spacing: var(--letter-spacing-h3);
 }
 
 h4 {
+  font-family: var(--font-family-heading);
   font-weight: var(--font-weight-emphasis);
   font-size: var(--font-size-h4);
   line-height: var(--line-height-h4);
+  letter-spacing: var(--letter-spacing-h4);
 }
 
 h5 {
+  font-family: var(--font-family-heading);
   font-weight: var(--font-weight-emphasis);
   font-size: var(--font-size-h5);
   line-height: var(--line-height-h5);
+  letter-spacing: var(--letter-spacing-h5);
 }
 
 h6 {
+  font-family: var(--font-family-heading);
   font-weight: var(--font-weight-emphasis);
   font-size: var(--font-size-h6);
   line-height: var(--line-height-h6);
+  letter-spacing: var(--letter-spacing-h6);
 }
 
 strong {

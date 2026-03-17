@@ -1,65 +1,96 @@
 :root {
-  /* TYPOGRAPHY — sourced from dlite tokens
+  /* TYPOGRAPHY — dlite brand typefaces
   /* =============================================================== */
 
+  /* dlite: Plus Jakarta Sans for headings, Source Serif 4 for body */
   --font-family: var(--tk-dlite-semantic-typography-font-body), 'Roboto', helvetica, sans-serif;
+  --font-family-heading: var(--tk-dlite-semantic-typography-font-heading), 'Plus Jakarta Sans', 'Roboto', sans-serif;
+  --font-family-mono: var(--tk-dlite-semantic-typography-font-mono), 'Source Code Pro', monospace;
   --font-weight-regular: var(--tk-dlite-primitive-fontWeight-regular, 400);
+  --font-weight-medium: var(--tk-dlite-primitive-fontWeight-medium, 500);
   --font-weight-emphasis: var(--tk-dlite-primitive-fontWeight-semibold, 600);
+  --font-weight-bold: var(--tk-dlite-primitive-fontWeight-bold, 700);
 
-  /* Headers — mapped to dlite type scale */
-  --font-size-h1: var(--tk-dlite-semantic-typography-size-1000);  /* 3rem */
-  --line-height-h1: 1;
-  --font-size-h2: var(--tk-dlite-semantic-typography-size-800);   /* 1.875rem ≈ 2rem */
-  --line-height-h2: 1;
-  --font-size-h3: var(--tk-dlite-semantic-typography-size-700);   /* 1.5rem */
-  --line-height-h3: 1;
-  --font-size-h4: var(--tk-dlite-semantic-typography-size-600);   /* 1.25rem */
-  --line-height-h4: 1.2;
-  --font-size-h5: var(--tk-dlite-semantic-typography-size-500);   /* 1.125rem ≈ 17px */
-  --line-height-h5: 20px;
-  --font-size-h6: var(--tk-dlite-semantic-typography-size-400);   /* 1rem ≈ 15px */
-  --line-height-h6: 20px;
+  /* Headers — mapped to dlite type scale + semantic line heights */
+  --font-size-h1: var(--tk-dlite-semantic-typography-size-1000);
+  --line-height-h1: var(--tk-dlite-primitive-number-line-height-tight, 1.1);
+  --letter-spacing-h1: var(--tk-dlite-primitive-dimension-letter-spacing-tight, -0.02em);
 
-  /* Body */
-  --font-size-body: var(--tk-dlite-semantic-typography-size-400);  /* 1rem ≈ 15px */
-  --line-height-body: 20px;
-  --font-size-small: var(--tk-dlite-semantic-typography-size-200); /* 0.75rem ≈ 13px */
-  --line-height-small: 16px;
+  --font-size-h2: var(--tk-dlite-semantic-typography-size-800);
+  --line-height-h2: var(--tk-dlite-primitive-number-line-height-snug, 1.25);
+  --letter-spacing-h2: var(--tk-dlite-primitive-dimension-letter-spacing-tight, -0.02em);
+
+  --font-size-h3: var(--tk-dlite-semantic-typography-size-700);
+  --line-height-h3: var(--tk-dlite-primitive-number-line-height-snug, 1.25);
+  --letter-spacing-h3: var(--tk-dlite-primitive-dimension-letter-spacing-tight, -0.02em);
+
+  --font-size-h4: var(--tk-dlite-semantic-typography-size-600);
+  --line-height-h4: var(--tk-dlite-primitive-number-line-height-snug, 1.25);
+  --letter-spacing-h4: var(--tk-dlite-primitive-dimension-letter-spacing-normal, 0);
+
+  --font-size-h5: var(--tk-dlite-semantic-typography-size-500);
+  --line-height-h5: var(--tk-dlite-primitive-number-line-height-normal, 1.5);
+  --letter-spacing-h5: var(--tk-dlite-primitive-dimension-letter-spacing-normal, 0);
+
+  --font-size-h6: var(--tk-dlite-semantic-typography-size-400);
+  --line-height-h6: var(--tk-dlite-primitive-number-line-height-normal, 1.5);
+  --letter-spacing-h6: var(--tk-dlite-primitive-dimension-letter-spacing-normal, 0);
+
+  /* Body — dlite type-body-default preset */
+  --font-size-body: var(--tk-dlite-semantic-typography-size-400);
+  --line-height-body: var(--tk-dlite-primitive-number-line-height-normal, 1.5);
+  --letter-spacing-body: var(--tk-dlite-primitive-dimension-letter-spacing-normal, 0);
+
+  --font-size-small: var(--tk-dlite-semantic-typography-size-200);
+  --line-height-small: var(--tk-dlite-primitive-number-line-height-normal, 1.5);
+
+  /* Labels — dlite type-label-s preset */
+  --font-size-label: var(--tk-dlite-semantic-typography-size-200);
+  --letter-spacing-label: var(--tk-dlite-primitive-dimension-letter-spacing-wide, 0.025em);
+  --font-weight-label: var(--tk-dlite-primitive-fontWeight-medium, 500);
 
   /* SPACING — sourced from dlite tokens
   /* =============================================================== */
 
-  --spacer-xxs: var(--tk-dlite-semantic-spacing-xxs);   /* 0.125rem ≈ 2px */
-  --spacer-xs: var(--tk-dlite-semantic-spacing-xs);     /* 0.25rem = 4px */
-  --spacer-s: var(--tk-dlite-semantic-spacing-sm);      /* 0.5rem = 8px */
-  --spacer-sm: var(--tk-dlite-semantic-spacing-300);    /* 0.75rem = 12px */
-  --spacer-m: var(--tk-dlite-semantic-spacing-md);      /* 1rem = 16px */
-  --spacer-l: var(--tk-dlite-semantic-spacing-lg);      /* 1.5rem = 24px */
-  --spacer-xl: var(--tk-dlite-semantic-spacing-xl);     /* 2rem = 32px */
-  --spacer-xxl: var(--tk-dlite-semantic-spacing-xxl);   /* 3rem ≈ 40px */
+  --spacer-xxs: var(--tk-dlite-semantic-spacing-xxs);
+  --spacer-xs: var(--tk-dlite-semantic-spacing-xs);
+  --spacer-s: var(--tk-dlite-semantic-spacing-sm);
+  --spacer-sm: var(--tk-dlite-semantic-spacing-300);
+  --spacer-m: var(--tk-dlite-semantic-spacing-md);
+  --spacer-l: var(--tk-dlite-semantic-spacing-lg);
+  --spacer-xl: var(--tk-dlite-semantic-spacing-xl);
+  --spacer-xxl: var(--tk-dlite-semantic-spacing-xxl);
+  --spacer-xxxl: var(--tk-dlite-semantic-spacing-xxxl);
 
   /* BORDER RADII — sourced from dlite tokens
   /* =============================================================== */
 
-  /* Use the small radius for elements smaller than a button (like tags). */
-  --border-radius-s: var(--tk-dlite-semantic-border-radius-sm);   /* 4px */
-
-  /* Use the medium radius for buttons and button-sized elements. */
-  --border-radius-m: 6px;
-
-  /* Use the large radius for elements larger than a button (modals, cards, etc). */
-  --border-radius-l: var(--tk-dlite-semantic-border-radius-md);   /* 8px */
-
-  /* Circles! */
+  --border-radius-s: var(--tk-dlite-semantic-border-radius-sm);
+  --border-radius-m: var(--tk-dlite-semantic-border-radius-md);
+  --border-radius-l: var(--tk-dlite-semantic-border-radius-lg);
   --border-radius-full: var(--tk-dlite-semantic-border-radius-full);
 
-  /* BREAKPOINTS
+  /* SHADOWS — sourced from dlite elevation tokens
   /* =============================================================== */
 
-  --breakpoint-s: 300px;
-  --breakpoint-m: 600px;
-  --breakpoint-l: 900px;
-  --breakpoint-xl: 1200px;
+  --shadow-lv1: var(--tk-dlite-semantic-elevation-low);
+  --shadow-lv1-hover: var(--tk-dlite-semantic-elevation-medium);
+  --shadow-lv2: var(--tk-dlite-semantic-elevation-medium);
+  --shadow-lv3: var(--tk-dlite-semantic-elevation-high);
+
+  /* BREAKPOINTS — sourced from dlite tokens
+  /* =============================================================== */
+
+  --breakpoint-s: var(--tk-dlite-semantic-breakpoint-sm, 640px);
+  --breakpoint-m: var(--tk-dlite-semantic-breakpoint-md, 768px);
+  --breakpoint-l: var(--tk-dlite-semantic-breakpoint-lg, 1024px);
+  --breakpoint-xl: var(--tk-dlite-semantic-breakpoint-xl, 1280px);
+
+  /* TRANSITIONS — sourced from dlite tokens
+  /* =============================================================== */
+
+  --duration-fast: var(--tk-dlite-semantic-duration-fast, 0.15s);
+  --duration-normal: var(--tk-dlite-semantic-duration-normal, 0.3s);
 
 
   /* FOCUS STATE

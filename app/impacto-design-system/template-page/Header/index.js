@@ -9,7 +9,6 @@ import CreateIcon from '@material-ui/icons/CreateOutlined';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import FormatListBulletedIcon from '@material-ui/icons/FormatListBulletedOutlined';
 import PersonOutline from '@material-ui/icons/PersonOutline';
-import InsightsIcon from '@material-ui/icons/SearchOutlined';
 import StoreIcon from '@material-ui/icons/Store';
 import { retrieveCurrentUserAsyncFunction, retrieveSignOutFunction } from 'app/modules/user';
 import clsx from 'clsx';
@@ -71,12 +70,12 @@ export default function Header({ children }) {
               <TabText isOpen={open} text="Form Marketplace" />
             </IconButton>
           </ListItem>
-          <ListItem>
+          {/* <ListItem>
             <IconButton onClick={() => router.push('/data/data-visualization')}>
               <InsightsIcon />
               <TabText isOpen={open} text="Quick Insights" />
             </IconButton>
-          </ListItem>
+          </ListItem> */}
           {/* <ListItem>
             <IconButton onClick={() => router.push('/data/data-analysis')}>
               <BarChartOutlinedIcon />

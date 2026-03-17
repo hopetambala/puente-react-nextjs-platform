@@ -18,6 +18,19 @@ const theme = createTheme({
       default: '#F7F7F7', // --tk-dlite-primitive-color-neutral-100
     },
   },
+  typography: {
+    fontFamily: '"Source Serif 4", Roboto, Helvetica, Arial, sans-serif',
+    h1: { fontFamily: '"Plus Jakarta Sans", Roboto, sans-serif', fontWeight: 700, letterSpacing: '-0.02em' },
+    h2: { fontFamily: '"Plus Jakarta Sans", Roboto, sans-serif', fontWeight: 600, letterSpacing: '-0.02em' },
+    h3: { fontFamily: '"Plus Jakarta Sans", Roboto, sans-serif', fontWeight: 600, letterSpacing: '-0.02em' },
+    h4: { fontFamily: '"Plus Jakarta Sans", Roboto, sans-serif', fontWeight: 600 },
+    h5: { fontFamily: '"Plus Jakarta Sans", Roboto, sans-serif', fontWeight: 600 },
+    h6: { fontFamily: '"Plus Jakarta Sans", Roboto, sans-serif', fontWeight: 600 },
+    button: { fontFamily: '"Plus Jakarta Sans", Roboto, sans-serif', fontWeight: 500, letterSpacing: '0.01em' },
+  },
+  shape: {
+    borderRadius: 8, // --tk-dlite-semantic-border-radius-md
+  },
 });
 
 export default theme;

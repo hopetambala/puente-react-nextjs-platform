@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */ // TODO: upgrade to latest eslint tooling
 
-/* import css vendors */
+/* dlite design tokens + app design system */
 import 'animate.css'
 import 'app/impacto-design-system/_css/root.css'
 import 'react-toastify/dist/ReactToastify.css'

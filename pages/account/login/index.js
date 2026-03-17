@@ -1,12 +1,12 @@
 import { yupResolver } from '@hookform/resolvers';
 import {
-  Button,
-  Card,
-  FormInput,
-  Page,
-  Stack,
-  Text,
-  Toast,
+    Button,
+    Card,
+    FormInput,
+    Page,
+    Stack,
+    Text,
+    Toast,
 } from 'app/impacto-design-system';
 import { retrieveSignInFunction } from 'app/modules/user';
 import Image from 'next/image';
@@ -81,19 +81,18 @@ function Login() {
           <Stack isVertical spacing="medium">
             <Button
               text="Log in"
+              intent="primary"
               onClick={handleSubmit(onSubmit)}
               isFullWidth
               isLoading={loading}
             />
             <Button
               text="Forgot password"
-              intent="danger"
               href="/account/login/reset-login"
               isFullWidth
             />
             <Button
               text="Create account"
-              intent="primary"
               href="/account/register"
               isFullWidth
             />

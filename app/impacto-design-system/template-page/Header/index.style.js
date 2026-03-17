@@ -31,6 +31,11 @@ const useStyles = makeStyles((theme) => ({
     width: drawerWidth,
     flexShrink: 0,
     whiteSpace: 'nowrap',
+    '& .MuiDrawer-paper': {
+      borderRight: 'none',
+      boxShadow: '1px 0 8px rgba(0, 0, 0, 0.06)',
+      backgroundColor: '#FFFFFF',
+    },
   },
   drawerOpen: {
     width: drawerWidth,
@@ -61,6 +66,8 @@ const useStyles = makeStyles((theme) => ({
   content: {
     flexGrow: 1,
     padding: theme.spacing(3),
+    backgroundColor: '#F7F7F7',
+    minHeight: '100vh',
   },
 
 }));

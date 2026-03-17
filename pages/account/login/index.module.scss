@@ -3,10 +3,19 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    background:
+      linear-gradient(
+        135deg,
+        var(--tk-dlite-primitive-color-blue-100) 0%,
+        var(--tk-dlite-primitive-color-neutral-100) 50%,
+        var(--tk-dlite-primitive-color-yellow-100) 100%
+      );
 }
 
 .card {
     min-height: var(--tk-dlite-semantic-spacing-900);
+    box-shadow: var(--shadow-lv2);
+    border: none;
 }
 
 .logo {
@@ -14,8 +23,12 @@
     margin: auto;
 }
 
-@media (min-width: var(--tk-dlite-semantic-breakpoint-sm)) {
-.card {
-        min-width: 600px;
+.stack {
+    padding-bottom: var(--spacer-l);
+}
+
+@media (min-width: 640px) {
+    .card {
+        min-width: 440px;
     }
 }

@@ -1,3 +1,7 @@
+/* dlite brand typefaces: Plus Jakarta Sans (heading), Source Serif 4 (body)
+   loaded via Google Fonts in _app.js <Head>.
+   Roboto kept as local fallback. */
+
 /* stylelint-disable declaration-colon-newline-after */
 @font-face {
   font-family: 'Roboto';

@@ -1,9 +1,17 @@
 .paper {
-    height: 80vh;
-    width: 40vw;
-    margin: var(--spacer-xxl) auto;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: var(--spacer-xxl) 0;
+    background:
+      linear-gradient(
+        135deg,
+        var(--tk-dlite-primitive-color-blue-100) 0%,
+        var(--tk-dlite-primitive-color-neutral-100) 50%,
+        var(--tk-dlite-primitive-color-yellow-100) 100%
+      );
 }
 
 .stack {
-    padding-bottom: var(--spacer-xxl);
+    padding-bottom: var(--spacer-l);
 }
