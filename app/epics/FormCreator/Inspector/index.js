@@ -1,8 +1,10 @@
+import { useTranslation } from 'next-i18next';
 import PropTypes from 'prop-types';
 
 import styles from './index.module.css';
 
 function Inspector({ block, onChange, onClose }) {
+  const { t } = useTranslation('common');
   if (!block) return null;
 
   const {
@@ -20,8 +22,8 @@ function Inspector({ block, onChange, onClose }) {
     <div className={styles.inspector}>
       <div className={styles.head}>
         <div>
-          <div className={styles.eyebrow}>EDITING</div>
-          <div className={styles.title}>Block properties</div>
+          <div className={styles.eyebrow}>{t('inspector_editing')}</div>
+          <div className={styles.title}>{t('inspector_block_props')}</div>
         </div>
         <button
           type="button"
@@ -38,7 +40,7 @@ function Inspector({ block, onChange, onClose }) {
         {/* Label */}
         <div className={styles.field}>
           <label className={styles.fieldLabel} htmlFor="inspector-label">
-            Label
+            {t('inspector_label')}
           </label>
           <input
             id="inspector-label"
@@ -51,7 +53,7 @@ function Inspector({ block, onChange, onClose }) {
 
         {/* formikKey — read-only mono */}
         <div className={styles.field}>
-          <div className={styles.fieldLabel}>formikKey</div>
+          <div className={styles.fieldLabel}>{t('inspector_formik_key')}</div>
           <div
             className={styles.monoField}
             data-testid="inspector-formik-key"
@@ -64,19 +66,19 @@ function Inspector({ block, onChange, onClose }) {
         <div className={styles.toggles}>
           <Toggle
             id="toggle-required"
-            label="Required"
+            label={t('inspector_required')}
             checked={required}
             onChange={(v) => update({ required: v })}
           />
           <Toggle
             id="toggle-allow-other"
-            label='Allow "Other" with text'
+            label={t('inspector_allow_other')}
             checked={allowOther}
             onChange={(v) => update({ allowOther: v })}
           />
           <Toggle
             id="toggle-multi-select"
-            label="Multi-select"
+            label={t('inspector_multi_select')}
             checked={multiSelect}
             onChange={(v) => update({ multiSelect: v })}
           />
@@ -86,7 +88,7 @@ function Inspector({ block, onChange, onClose }) {
         {options.length > 0 && (
           <div>
             <div className={styles.sectionHead}>
-              <span>Options</span>
+              <span>{t('inspector_options')}</span>
               <span>{options.length} items</span>
             </div>
             <div className={styles.options}>
@@ -109,9 +111,7 @@ function Inspector({ block, onChange, onClose }) {
 
         {/* Hint */}
         <div className={styles.hint} data-testid="inspector-hint">
-          <strong>Schema-aware.</strong> Publishing this block to Collect
-          generates the <code>textKey</code> automatically. No manual
-          underscores.
+          <strong>{t('inspector_schema_hint')}</strong>
         </div>
       </div>
     </div>

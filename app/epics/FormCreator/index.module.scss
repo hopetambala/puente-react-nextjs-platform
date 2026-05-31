@@ -3,6 +3,17 @@
   color: rgb(61,127,252);
   transform: scale(.99);
 }
+
+.canvasGrid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: var(--spacer-l);
+  align-items: start;
+}
+
+.canvasMain {
+  min-width: 0;
+}
 .input {
   width: 50%;
   background: var(--color-input-bg);

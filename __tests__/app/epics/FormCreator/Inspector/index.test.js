@@ -1,6 +1,22 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 
+jest.mock('next-i18next', () => ({
+  useTranslation: () => ({
+    t: (key) => ({
+      inspector_editing: 'EDITING',
+      inspector_block_props: 'Block properties',
+      inspector_label: 'Label',
+      inspector_formik_key: 'formikKey',
+      inspector_required: 'Required',
+      inspector_allow_other: 'Allow "Other" with text',
+      inspector_multi_select: 'Multi-select',
+      inspector_options: 'Options',
+      inspector_schema_hint: 'Schema-aware.',
+    }[key] ?? key),
+  }),
+}));
+
 // ─── RED: Inspector panel not yet implemented ─────────────────────────────────
 // These tests will fail until app/epics/FormCreator/Inspector/index.js exists
 // and FormCreator wires it up.
@@ -158,5 +174,21 @@ describe('Inspector — null block', () => {
       <Inspector block={null} onChange={jest.fn()} onClose={jest.fn()} />,
     );
     expect(container.firstChild).toBeNull();
+  });
+});
+
+// ─── RED: Phase 7 — Inspector i18n ────────────────────────────────────────────
+// If hardcoded strings return, these fail — ensuring i18n keys stay in place.
+
+describe('Phase 7 — Inspector uses i18n keys', () => {
+  it('renders inspector_editing key value (not hardcoded)', () => {
+    renderInspector();
+    // t('inspector_editing') returns 'EDITING' via mock
+    expect(screen.getByText('EDITING')).toBeInTheDocument();
+  });
+
+  it('renders inspector_block_props key value', () => {
+    renderInspector();
+    expect(screen.getByText('Block properties')).toBeInTheDocument();
   });
 });

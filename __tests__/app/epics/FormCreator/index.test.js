@@ -22,6 +22,8 @@ jest.mock('app/impacto-design-system', () => ({
     </div>
   ),
   EmptyState: ({ message }) => <p data-testid="empty-state">{message}</p>,
+  PageHeader: ({ title }) => <div data-testid="page-header"><h1>{title}</h1></div>,
+  Toast: ({ message }) => message ? <div data-testid="toast">{message}</div> : null,
 }));
 
 // Heavy sub-components — render nothing; only the epic's own logic is under test
@@ -351,5 +353,21 @@ describe('Inspector — block selection', () => {
       fe.click(screen.getByTestId('inspector-close'));
     });
     expect(screen.getByTestId('empty-state')).toBeInTheDocument();
+  });
+});
+
+// ─── RED: Phase 5 — no MUI, uses PageHeader ───────────────────────────────────
+// If MUI imports are added back, the MUI class check will fail here before
+// any deploy.
+
+describe('Phase 5 — No MUI, PageHeader rendered', () => {
+  it('renders a PageHeader', () => {
+    render(<FormCreator context={makeContext()} user={mockUser} />);
+    expect(screen.getByTestId('page-header')).toBeInTheDocument();
+  });
+
+  it('does not render any element with a MuiGrid class', () => {
+    const { container } = render(<FormCreator context={makeContext()} user={mockUser} />);
+    expect(container.querySelector('[class*="MuiGrid"]')).not.toBeInTheDocument();
   });
 });
