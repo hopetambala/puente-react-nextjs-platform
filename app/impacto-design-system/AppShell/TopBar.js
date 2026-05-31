@@ -1,4 +1,5 @@
 import { retrieveCurrentUserAsyncFunction } from 'app/modules/user';
+import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 
@@ -15,6 +16,7 @@ function initials(user) {
 
 export default function TopBar({ breadcrumb, topBarActions }) {
   const [user, setUser] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     const user = retrieveCurrentUserAsyncFunction();
@@ -35,7 +37,14 @@ export default function TopBar({ breadcrumb, topBarActions }) {
       </div>
       <div className={styles.topbarActions}>
         {topBarActions}
-        <div className={styles.avatar}>{initials(user)}</div>
+        <button
+          type="button"
+          className={styles.avatar}
+          aria-label="Account settings"
+          onClick={() => router.push('/account/management')}
+        >
+          {initials(user)}
+        </button>
       </div>
     </header>
   );

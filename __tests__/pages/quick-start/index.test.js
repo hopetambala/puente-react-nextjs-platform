@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 
 const mockFind = jest.fn().mockResolvedValue([]);
 const mockCount = jest.fn().mockResolvedValue(0);
+const mockDistinct = jest.fn().mockResolvedValue([]);
 const mockQueryChain = {
   descending: jest.fn().mockReturnThis(),
   limit: jest.fn().mockReturnThis(),
@@ -10,6 +11,7 @@ const mockQueryChain = {
   equalTo: jest.fn().mockReturnThis(),
   find: mockFind,
   count: mockCount,
+  distinct: mockDistinct,
 };
 
 let capturedQueryClasses = [];
@@ -40,6 +42,8 @@ jest.mock('next-i18next', () => ({
         dashboard_good_morning: opts ? `Good morning, ${opts.name}.` : 'Good morning.',
         dashboard_sub: "Here's what's moving.",
         dashboard_new_form: '+ New form',
+        stat_active_surveyors_meta: 'Last 7 days',
+        stat_households_meta: 'in territory',
       };
       return map[key] ?? key;
     },
@@ -47,7 +51,9 @@ jest.mock('next-i18next', () => ({
 }));
 
 jest.mock('app/modules/user', () => ({
-  retrieveCurrentUserAsyncFunction: jest.fn(() => null),
+  retrieveCurrentUserAsyncFunction: jest.fn(() => ({
+    get: (key) => ({ firstName: 'Hope', organization: 'TestOrg' }[key] ?? null),
+  })),
 }));
 
 jest.mock('next-i18next/serverSideTranslations', () => ({
@@ -76,6 +82,7 @@ beforeEach(() => {
   capturedQueryClasses = [];
   mockFind.mockResolvedValue([]);
   mockCount.mockResolvedValue(0);
+  mockDistinct.mockResolvedValue([]);
 });
 
 // ─── RED: activity panel removal ─────────────────────────────────────────────
@@ -213,5 +220,38 @@ describe('Real data wiring', () => {
     render(<Dashboard />);
     await waitFor(() => expect(mockFind).toHaveBeenCalled());
     expect(mockQueryChain.equalTo).toHaveBeenCalledWith('active', 'true');
+  });
+});
+
+// ─── RED: Phase 2 — org-scoped real stats ────────────────────────────────────
+// These fail until all 3 stat queries use equalTo('surveyingOrganization', org)
+// and Active Surveyors uses distinct('surveyingUser').
+
+describe('Phase 2 — Org-scoped stats', () => {
+  it('scopes Records Today query to org via surveyingOrganization', async () => {
+    render(<Dashboard />);
+    await waitFor(() => expect(mockCount).toHaveBeenCalled());
+    expect(mockQueryChain.equalTo).toHaveBeenCalledWith('surveyingOrganization', 'TestOrg');
+  });
+
+  it('calls distinct("surveyingUser") for Active Surveyors', async () => {
+    render(<Dashboard />);
+    await waitFor(() => expect(mockDistinct).toHaveBeenCalled());
+    expect(mockDistinct).toHaveBeenCalledWith('surveyingUser');
+  });
+
+  it('shows Active Surveyors count (not "–") when distinct returns array', async () => {
+    mockDistinct.mockResolvedValue(['alice', 'bob', 'carol']);
+    render(<Dashboard />);
+    await waitFor(() => expect(screen.getByText('3')).toBeInTheDocument());
+  });
+
+  it('shows Households count (not "–") when count resolves', async () => {
+    mockCount.mockResolvedValue(99);
+    render(<Dashboard />);
+    await waitFor(() => {
+      const values = screen.getAllByText('99');
+      expect(values.length).toBeGreaterThan(0);
+    });
   });
 });

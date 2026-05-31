@@ -1,15 +1,15 @@
 import '@testing-library/jest-dom';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+
+jest.mock('next/router', () => ({
+  useRouter: jest.fn(() => ({ push: jest.fn() })),
+}));
 
 jest.mock('app/modules/user', () => ({
   retrieveCurrentUserAsyncFunction: jest.fn(() => null),
 }));
 
-jest.mock('app/services/parse', () => ({
-  __esModule: true,
-  default: { initialize: jest.fn() },
-}));
-
+const { useRouter } = require('next/router');
 const { retrieveCurrentUserAsyncFunction } = require('app/modules/user');
 const TopBar = require('app/impacto-design-system/AppShell/TopBar').default;
 
@@ -82,5 +82,23 @@ describe('Avatar — with user', () => {
     await waitFor(() => {
       expect(screen.getByText('H')).toBeInTheDocument();
     });
+  });
+});
+
+// ─── RED: Phase 3 — TopBar avatar navigation ─────────────────────────────────
+// Clicking the avatar must navigate to /account/management.
+
+describe('Phase 3 — Avatar navigation', () => {
+  it('avatar has aria-label="Account settings"', () => {
+    render(<TopBar breadcrumb={['Dashboard']} />);
+    expect(screen.getByRole('button', { name: 'Account settings' })).toBeInTheDocument();
+  });
+
+  it('clicking avatar calls router.push("/account/management")', () => {
+    const push = jest.fn();
+    useRouter.mockReturnValue({ push });
+    render(<TopBar breadcrumb={['Dashboard']} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Account settings' }));
+    expect(push).toHaveBeenCalledWith('/account/management');
   });
 });

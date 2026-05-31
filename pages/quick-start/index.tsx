@@ -30,34 +30,59 @@ export default function Dashboard() {
   const { t } = useTranslation('common');
 
   const [firstName, setFirstName] = useState('');
+  const [org, setOrg] = useState('');
   const [activityLoading, setActivityLoading] = useState(true);
   const [activityItems, setActivityItems] = useState<{ time: string; text: string }[]>([]);
   const [formsLoading, setFormsLoading] = useState(true);
   const [forms, setForms] = useState<{ name: string; count: number; active: boolean }[]>([]);
   const [recordsToday, setRecordsToday] = useState<number | null>(null);
+  const [activeSurveyors, setActiveSurveyors] = useState<number | null>(null);
+  const [households, setHouseholds] = useState<number | null>(null);
 
   useEffect(() => {
     const user = retrieveCurrentUserAsyncFunction();
     if (user) {
       setFirstName(user.get('firstName') || user.get('username') || '');
+      setOrg(user.get('organization') || '');
     }
   }, []);
 
   useEffect(() => {
-    async function fetchRecordsToday() {
+    if (!org) return;
+    async function fetchStats() {
       try {
         const midnight = new Date();
         midnight.setHours(0, 0, 0, 0);
-        const query = new Parse.Query('SurveyData');
-        query.greaterThanOrEqualTo('createdAt', midnight);
-        const n = await query.count();
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+        // Records today
+        const recordsQuery = new Parse.Query('SurveyData');
+        recordsQuery.equalTo('surveyingOrganization', org);
+        recordsQuery.greaterThanOrEqualTo('createdAt', midnight);
+        const n = await recordsQuery.count();
         setRecordsToday(n);
+
+        // Active surveyors (last 7 days)
+        const surveyorsQuery = new Parse.Query('SurveyData');
+        surveyorsQuery.equalTo('surveyingOrganization', org);
+        surveyorsQuery.greaterThanOrEqualTo('createdAt', sevenDaysAgo);
+        const surveyorList = await surveyorsQuery.distinct('surveyingUser');
+        setActiveSurveyors(surveyorList.length);
+
+        // Households (total org count as proxy)
+        const householdsQuery = new Parse.Query('SurveyData');
+        householdsQuery.equalTo('surveyingOrganization', org);
+        const h = await householdsQuery.count();
+        setHouseholds(h);
       } catch {
         setRecordsToday(0);
+        setActiveSurveyors(0);
+        setHouseholds(0);
       }
     }
-    fetchRecordsToday();
-  }, []);
+    fetchStats();
+  }, [org]);
 
   useEffect(() => {
     // TODO: wire to statsService.aggregateStats when endpoint is available
@@ -143,17 +168,21 @@ export default function Dashboard() {
 
           <div className={styles.statCard}>
             <span className={styles.statLabel}>{t('stat_active_surveyors')}</span>
-            <span className={styles.statValue}>–</span>
+            <span className={styles.statValue}>
+              {activeSurveyors === null ? '–' : activeSurveyors}
+            </span>
             <div className={styles.statMeta}>
               <span className={styles.pulse} />
-              <span>No live data</span>
+              <span>{t('stat_active_surveyors_meta')}</span>
             </div>
           </div>
 
           <div className={styles.statCard}>
             <span className={styles.statLabel}>{t('stat_households')}</span>
-            <span className={styles.statValue}>–</span>
-            <div className={styles.statMeta}>of – in territory</div>
+            <span className={styles.statValue}>
+              {households === null ? '–' : households}
+            </span>
+            <div className={styles.statMeta}>{t('stat_households_meta')}</div>
             <div className={styles.progressTrack}>
               <div className={styles.progressFill} />
             </div>
