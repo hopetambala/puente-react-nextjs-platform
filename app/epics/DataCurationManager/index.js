@@ -1,4 +1,4 @@
-import { Button, FormInput, Modal } from 'app/impacto-design-system';
+import { Button } from 'app/impacto-design-system';
 import { retrieveCurrentUserAsyncFunction } from 'app/modules/user';
 import { useTranslation } from 'next-i18next';
 import { Parse } from 'parse';
@@ -21,6 +21,7 @@ export function detectDuplicates(records) {
   const dups = new Set();
   records.forEach((r) => {
     const hid = r.get('householdId');
+    if (!hid) return; // skip records without a household ID — they'd all share the same key
     const day = r.createdAt ? r.createdAt.toISOString().slice(0, 10) : 'unknown';
     const key = `${hid}__${day}`;
     if (seen[key]) {
@@ -126,7 +127,6 @@ export default function DataCurationManager() {
               key={r.id}
               className={styles.row}
               onClick={() => openEdit(r)}
-              style={{ cursor: 'pointer' }}
             >
               <td>{r.get('surveyingUser') || '—'}</td>
               <td>{r.createdAt ? r.createdAt.toLocaleDateString() : '—'}</td>
@@ -140,26 +140,37 @@ export default function DataCurationManager() {
         </tbody>
       </table>
 
-      {/* Edit modal */}
-      <Modal
-        isOpen={!!selectedRecord}
-        onClose={() => setSelectedRecord(null)}
-        title={t('data_curation_edit')}
-      >
-        <div className={styles.modalForm}>
-          {KEY_FIELDS.map((f) => (
-            <FormInput
-              key={f}
-              label={f}
-              value={editFields[f] || ''}
-              onChange={(e) => setEditFields((prev) => ({ ...prev, [f]: e.target.value }))}
+      {/* Edit panel — shown inline when a record is selected */}
+      {selectedRecord && (
+        <div className={styles.editPanel}>
+          <div className={styles.editPanelHeader}>
+            <span className={styles.editPanelTitle}>{t('data_curation_edit')}</span>
+            <Button text="✕" onClick={() => setSelectedRecord(null)} />
+          </div>
+          <div className={styles.editForm}>
+            {KEY_FIELDS.map((f) => (
+              <div key={f} className={styles.editField}>
+                <label className={styles.editLabel} htmlFor={`edit-${f}`}>{f}</label>
+                <input
+                  id={`edit-${f}`}
+                  className={styles.editInput}
+                  value={editFields[f] || ''}
+                  onChange={(e) => setEditFields((prev) => ({ ...prev, [f]: e.target.value }))}
+                />
+              </div>
+            ))}
+          </div>
+          <div className={styles.editActions}>
+            <Button
+              text={t('data_curation_save')}
+              intent="primary"
+              onClick={handleSave}
+              isDisabled={saving}
             />
-          ))}
-          <Button onClick={handleSave} disabled={saving}>
-            {t('data_curation_save')}
-          </Button>
+            <Button text="Cancel" onClick={() => setSelectedRecord(null)} />
+          </div>
         </div>
-      </Modal>
+      )}
     </div>
   );
 }

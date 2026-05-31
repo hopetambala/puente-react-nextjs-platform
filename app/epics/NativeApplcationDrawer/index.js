@@ -12,7 +12,7 @@ const NativeApplicationDrawer = ({ formItems, isOpen, onClose }) => {
       className={`${styles.drawer} ${isOpen ? styles.drawerOpen : ''}`}
     >
       <div className={styles.drawerHeader}>
-        <Button onClick={onClose}>Close</Button>
+        <Button text="Close" onClick={onClose} />
       </div>
       <div className={styles.drawerBody}>
         <NativeApp formItems={formItems} />

@@ -41,20 +41,8 @@ jest.mock('parse', () => ({
 jest.mock('app/impacto-design-system', () => ({
   AppShell: ({ children }) => <div data-testid="appshell">{children}</div>,
   PageHeader: ({ title }) => <h1>{title}</h1>,
-  Modal: ({ isOpen, onClose, children, title }) => isOpen ? (
-    <div data-testid="modal" role="dialog" aria-label={title}>
-      <button type="button" onClick={onClose} aria-label="close">×</button>
-      {children}
-    </div>
-  ) : null,
-  FormInput: ({ label, value, onChange }) => (
-    <label>
-      {label}
-      <input value={value} onChange={onChange} aria-label={label} />
-    </label>
-  ),
-  Button: ({ children, onClick, type }) => (
-    <button type={type || 'button'} onClick={onClick}>{children}</button>
+  Button: ({ text, onClick, isDisabled }) => (
+    <button type="button" onClick={onClick} disabled={isDisabled}>{text}</button>
   ),
 }));
 
@@ -190,13 +178,21 @@ describe('Records table', () => {
   });
 });
 
-describe('Edit modal', () => {
-  it('opens modal on row click', async () => {
+describe('Edit panel', () => {
+  it('opens edit panel on row click showing field inputs', async () => {
     mockFind.mockResolvedValue([makeRecord()]);
     render(<DataCurationManager />);
     await waitFor(() => screen.getByText('alice'));
     fireEvent.click(screen.getByText('alice').closest('tr'));
-    await waitFor(() => expect(screen.getByTestId('modal')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByLabelText('fname')).toBeInTheDocument());
+  });
+
+  it('pre-fills inputs with current field values', async () => {
+    mockFind.mockResolvedValue([makeRecord()]);
+    render(<DataCurationManager />);
+    await waitFor(() => screen.getByText('alice'));
+    fireEvent.click(screen.getByText('alice').closest('tr'));
+    await waitFor(() => expect(screen.getByLabelText('fname')).toHaveValue('Hope'));
   });
 
   it('calls record.set and record.save on Save', async () => {
@@ -204,8 +200,18 @@ describe('Edit modal', () => {
     render(<DataCurationManager />);
     await waitFor(() => screen.getByText('alice'));
     fireEvent.click(screen.getByText('alice').closest('tr'));
-    await waitFor(() => screen.getByTestId('modal'));
+    await waitFor(() => screen.getByLabelText('fname'));
     fireEvent.click(screen.getByText('Save'));
     await waitFor(() => expect(mockSave).toHaveBeenCalled());
+  });
+
+  it('closes edit panel on Cancel', async () => {
+    mockFind.mockResolvedValue([makeRecord()]);
+    render(<DataCurationManager />);
+    await waitFor(() => screen.getByText('alice'));
+    fireEvent.click(screen.getByText('alice').closest('tr'));
+    await waitFor(() => screen.getByLabelText('fname'));
+    fireEvent.click(screen.getByText('Cancel'));
+    expect(screen.queryByLabelText('fname')).not.toBeInTheDocument();
   });
 });

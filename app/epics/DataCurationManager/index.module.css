@@ -44,6 +44,10 @@
   color: var(--tk-dlite-semantic-color-text-primary);
 }
 
+.row {
+  cursor: pointer;
+}
+
 .row:hover td {
   background: var(--tk-dlite-semantic-color-surface-hovered);
 }
@@ -68,9 +72,70 @@
   color: var(--tk-dlite-semantic-color-text-primary);
 }
 
-.modalForm {
+.editPanel {
+  background: var(--tk-dlite-semantic-color-surface-base);
+  border: 1px solid var(--tk-dlite-semantic-color-action-primary);
+  border-radius: var(--border-radius-m);
+  padding: var(--spacer-l);
   display: flex;
   flex-direction: column;
   gap: var(--spacer-m);
-  padding: var(--spacer-l);
+}
+
+.editPanelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.editPanelTitle {
+  font-family: var(--font-family-heading);
+  font-size: 13px;
+  font-weight: var(--font-weight-bold);
+  color: var(--tk-dlite-semantic-color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.editForm {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacer-m);
+}
+
+.editField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-xs);
+}
+
+.editLabel {
+  font-family: var(--font-family-heading);
+  font-size: 11px;
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--tk-dlite-semantic-color-text-secondary);
+}
+
+.editInput {
+  height: var(--input-height);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-s);
+  padding: 0 var(--spacer-s);
+  font-family: var(--font-family);
+  font-size: 13px;
+  color: var(--color-text);
+  background: var(--color-input-bg);
+  outline: none;
+}
+
+.editInput:focus-visible {
+  border-color: var(--tk-dlite-semantic-color-action-primary);
+  box-shadow: var(--focus-glow);
+}
+
+.editActions {
+  display: flex;
+  gap: var(--spacer-s);
 }

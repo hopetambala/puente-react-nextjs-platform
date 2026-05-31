@@ -249,7 +249,7 @@ function FormCreator({ context, user }) {
 
   return (
     <div>
-      {submission && <Toast message="Success!" />}
+      {submission && <Toast text="Success!" />}
       <NativeApplicationDrawer
         isOpen={previewOpen}
         onClose={() => setPreviewOpen(false)}
