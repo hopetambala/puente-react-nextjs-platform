@@ -1,5 +1,5 @@
 import {
-  Button, Card, Page, Text,
+    Button, Text,
 } from 'app/impacto-design-system';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -27,9 +27,15 @@ function Verify() {
   }, [userId]);
 
   return (
-    <Page>
-      <div className={styles.paper}>
-        <Card padding="extraLarge">
+    <div className={styles.auth}>
+      <div className={styles.left} data-testid="auth-brand">
+        <div className={styles.leftBrand}>
+          <div className={styles.leftBrandMark}>P</div>
+          <span className={styles.leftBrandName}>Puente</span>
+        </div>
+      </div>
+      <div className={styles.right} data-testid="auth-form">
+        <div className={styles.card}>
           <Text text={status} element="h1" className={styles.stack} />
           {status === 'Verified'
             && (
@@ -39,9 +45,9 @@ function Verify() {
               isFullWidth
             />
             )}
-        </Card>
+        </div>
       </div>
-    </Page>
+    </div>
   );
 }
 

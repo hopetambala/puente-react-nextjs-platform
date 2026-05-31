@@ -1,14 +1,59 @@
+.auth {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+}
+
+.left {
+  background: var(--tk-dlite-semantic-color-text-primary);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 32px;
+}
+
+.leftBrand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.leftBrandMark {
+  width: 28px;
+  height: 28px;
+  background: var(--tk-dlite-primitive-color-yellow-200);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.leftBrandName {
+  color: #fff;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  background: var(--tk-dlite-semantic-color-background);
+}
+
 .paper {
-    max-width: 640px;
-    margin: var(--spacer-xxl) auto;
-    padding: 0 var(--spacer-m);
+  width: 100%;
+  max-width: 480px;
 }
 
 .stack {
-    padding-bottom: var(--spacer-l);
+  padding-bottom: var(--spacer-l);
 }
 
-.errorText{
-    color: var(--tk-dlite-semantic-color-feedback-danger);
-    font-size: var(--font-size-small);
+.errorText {
+  color: var(--tk-dlite-semantic-color-feedback-danger);
+  font-size: var(--font-size-small);
 }
