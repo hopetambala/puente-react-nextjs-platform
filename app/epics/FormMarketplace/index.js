@@ -1,4 +1,4 @@
-import { CardAlt, Spinner } from 'app/impacto-design-system';
+import { CardAlt, EmptyState, Spinner } from 'app/impacto-design-system';
 import { useEffect, useState } from 'react';
 
 import retrieveAllFormSpecs from './_data';
@@ -33,8 +33,6 @@ const FormMarketplace = ({ context, router }) => {
 
   return (
     <div className={styles.formMarketplace}>
-      <h1>Form Marketplace</h1>
-      <h2>Most Popular Forms</h2>
       {loading ? (
         <div className={styles.loadingState}>
           <Spinner />
@@ -56,7 +54,7 @@ const FormMarketplace = ({ context, router }) => {
           ))}
         </div>
       ) : (
-        <p className={styles.emptyState}>No forms available yet.</p>
+        <EmptyState message="No forms available yet." />
       )}
     </div>
   );

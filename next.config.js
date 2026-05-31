@@ -1,33 +1,13 @@
 const path = require('path');
 const withImages = require('next-images');
+const { i18n } = require('./next-i18next.config');
 
 module.exports = withImages({
+  i18n,
   sassOptions: {
     includePaths: [path.join(__dirname, 'styles')],
   },
-});
-
-module.exports = {
   async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/account/login',
-        permanent: true,
-      },
-    ];
+    return [];
   },
-  // async headers() {
-  //   return [
-  //     {
-  //       source: "/:path*",
-  //       headers: [
-  //         {
-  //           key: "Content-Security-Policy",
-  //           value: "upgrade-insecure-requests",
-  //         },
-  //       ],
-  //     },
-  //   ];
-  // },
-};
+});

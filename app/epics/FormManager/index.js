@@ -1,9 +1,11 @@
+import { EmptyState, Panel, SegmentedControl } from 'app/impacto-design-system';
 import { retrieveCustomData } from 'app/modules/cloud-code';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { isArray } from 'underscore';
 
 import GridTable from './Grid';
 import styles from './index.module.scss';
+import RecordsTable from './RecordsTable';
 import Table from './Table';
 
 const puenteConfig = [
@@ -25,13 +27,30 @@ const puenteConfig = [
   },
 ];
 
-const FormManager = ({ context, router, user }) => {
+const VIEW_OPTIONS = [
+  { value: 'table', label: 'Table' },
+  { value: 'grid', label: 'Grid' },
+];
+
+function FormManager({ context, router, user }) {
   const [workflowData, setWorkflowData] = useState({});
   const [noWorkflowData, setNoWorkflowData] = useState([]);
-  const [listView, setListView] = useState(true);
+  const [listView, setListView] = useState('table');
   const [workflows, setWorkflows] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedForm, setSelectedForm] = useState(null);
 
   const organization = user?.organization || '';
+
+  const filteredWorkflowData = useMemo(() => {
+    if (!searchTerm.trim()) return workflowData;
+    const term = searchTerm.toLowerCase();
+    return Object.fromEntries(
+      Object.entries(workflowData)
+        .map(([wf, forms]) => [wf, forms.filter((f) => f.name.toLowerCase().includes(term))])
+        .filter(([, forms]) => forms.length > 0),
+    );
+  }, [workflowData, searchTerm]);
 
   useEffect(() => {
     refreshWorkflowData();
@@ -85,65 +104,107 @@ const FormManager = ({ context, router, user }) => {
 
   return (
     <div className={styles.formManager}>
-      <div className={styles.section}>
-        <h2>Puente Forms</h2>
-        <div className={styles.tableWrap}>
-          <Table
-            data={puenteConfig}
-            retrieveCustomData={retrieveCustomData}
-            passDataToFormCreator={passDataToFormCreator}
-            organization={organization}
-            puenteForm
-          />
+      {/* ── Drill-in view: records for a selected form ── */}
+      {selectedForm ? (
+        <div>
+          <div className={styles.filterStrip}>
+            <button
+              type="button"
+              className={styles.backBtn}
+              onClick={() => setSelectedForm(null)}
+              aria-label="Back to form catalog"
+            >
+              ← Back
+            </button>
+          </div>
+          <RecordsTable form={selectedForm} />
         </div>
-      </div>
-
-      <div className={styles.section}>
-        <h2>Custom Forms</h2>
-        {Object.keys(workflowData).length > 0 ? (
-          Object.keys(workflowData).map((key) => (
-            <div key={key}>
-              <h3>{key}</h3>
-              <div className={styles.tableWrap}>
-                {listView ? (
-                  <Table
-                    data={workflowData[key]}
-                    retrieveCustomData={retrieveCustomData}
-                    passDataToFormCreator={passDataToFormCreator}
-                    organization={organization}
-                  />
-                ) : (
-                  <GridTable
-                    data={workflowData[key]}
-                    retrieveCustomData={retrieveCustomData}
-                    passDataToFormCreator={passDataToFormCreator}
-                    organization={organization}
-                    workflows={workflows}
-                  />
-                )}
+      ) : (
+        <>
+          {/* ── Catalog view ── */}
+          <div className={styles.filterStrip}>
+            <div className={styles.filterLeft}>
+              <button
+                type="button"
+                className={styles.createFormBtn}
+                onClick={() => router.push('/forms/form-creator')}
+              >
+                + Create form
+              </button>
+              <div className={styles.search}>
+                <span className={styles.searchIcon}>⌕</span>
+                <input
+                  type="text"
+                  placeholder="Search forms…"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className={styles.searchInput}
+                />
               </div>
             </div>
-          ))
-        ) : (
-          <p className={styles.emptyState}>No custom forms yet.</p>
-        )}
-      </div>
-
-      {noWorkflowData && noWorkflowData.length > 0 && (
-        <div className={styles.section}>
-          <h2>No Workflow Assigned</h2>
-          <div className={styles.tableWrap}>
-            <Table
-              data={noWorkflowData}
-              retrieveCustomData={retrieveCustomData}
-              passDataToFormCreator={passDataToFormCreator}
-              organization={organization}
-            />
+            <div className={styles.filterRight}>
+              <SegmentedControl options={VIEW_OPTIONS} value={listView} onChange={setListView} />
+            </div>
           </div>
-        </div>
+          <div className={styles.section}>
+            <Panel title="Puente Forms">
+              <Table
+                data={puenteConfig}
+                retrieveCustomData={retrieveCustomData}
+                passDataToFormCreator={passDataToFormCreator}
+                organization={organization}
+                onSelectForm={setSelectedForm}
+                puenteForm
+              />
+            </Panel>
+          </div>
+
+          <div className={styles.section}>
+            <div className={styles.sectionLabel}>Custom Forms</div>
+            {Object.keys(filteredWorkflowData).length > 0 ? (
+              Object.keys(filteredWorkflowData).map((key) => (
+                <Panel key={key} title={key} noPadding>
+                  {listView === 'table' ? (
+                    <Table
+                      data={filteredWorkflowData[key]}
+                      retrieveCustomData={retrieveCustomData}
+                      passDataToFormCreator={passDataToFormCreator}
+                      organization={organization}
+                      onSelectForm={setSelectedForm}
+                    />
+                  ) : (
+                    <GridTable
+                      data={filteredWorkflowData[key]}
+                      retrieveCustomData={retrieveCustomData}
+                      passDataToFormCreator={passDataToFormCreator}
+                      organization={organization}
+                      workflows={workflows}
+                    />
+                  )}
+                </Panel>
+              ))
+            ) : (
+              <EmptyState message="No custom forms yet." />
+            )}
+          </div>
+
+          {noWorkflowData && noWorkflowData.length > 0 && (
+            <div className={styles.section}>
+              <Panel title="No Workflow Assigned" noPadding>
+                <Table
+                  data={noWorkflowData}
+                  retrieveCustomData={retrieveCustomData}
+                  passDataToFormCreator={passDataToFormCreator}
+                  organization={organization}
+                  onSelectForm={setSelectedForm}
+                />
+              </Panel>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
-};
+}
 
 export default FormManager;

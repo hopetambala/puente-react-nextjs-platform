@@ -1,4 +1,4 @@
-import { Button, Modal } from 'app/impacto-design-system';
+import { Badge, Button, Modal } from 'app/impacto-design-system';
 import { updateObject } from 'app/modules/cloud-code';
 import { useState } from 'react';
 
@@ -72,6 +72,7 @@ const FormManagerTable = ({
               <th style={{ width: 40 }} />
               <th>Name</th>
               <th>Description</th>
+              <th>Status</th>
               <th>Created</th>
               <th>Updated</th>
               <th>Actions</th>
@@ -86,6 +87,7 @@ const FormManagerTable = ({
               >
                 <td>{row.name}</td>
                 <td>{row.description || '—'}</td>
+                <td><Badge variant="green">Active</Badge></td>
                 <td>{row.createdAt ? new Date(row.createdAt).toLocaleDateString() : '—'}</td>
                 <td>{row.updatedAt ? new Date(row.updatedAt).toLocaleDateString() : '—'}</td>
                 <td>

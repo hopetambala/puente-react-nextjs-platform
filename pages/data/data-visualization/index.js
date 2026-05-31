@@ -1,19 +1,27 @@
-import { Card, Page } from 'app/impacto-design-system';
+import { AppShell, EmptyState, PageHeader, Panel, RadioGroup, SegmentedControl } from 'app/impacto-design-system';
 import { BarChart } from 'app/impacto-design-system/visualizations';
 import { useEffect, useState } from 'react';
 
 import { environmentalHealthRecord } from '../../../app/modules/django-etl';
 import styles from './css/dashboard.module.css';
 
-const filters = {
-  'Type of water you drink': 'typeofwaterdoyoudrink',
-  'Years in Community': 'yearslivedinthecommunity',
-  'Clinic Access': 'clinicaccess_v2',
-  'Floor Material': 'floormaterial',
-};
+const CHART_TYPES = [
+  { value: 'bar', label: 'Bar' },
+  { value: 'stacked', label: 'Stacked' },
+  { value: 'line', label: 'Line' },
+];
+
+const options = [
+  { value: 'typeofwaterdoyoudrink', label: 'Type of water you drink', subLabel: 'typeofwaterdoyoudrink' },
+  { value: 'yearslivedinthecommunity', label: 'Years in Community', subLabel: 'yearslivedinthecommunity' },
+  { value: 'clinicaccess_v2', label: 'Clinic Access', subLabel: 'clinicaccess_v2' },
+  { value: 'floormaterial', label: 'Floor Material', subLabel: 'floormaterial' },
+];
+
 function Forms() {
   const [data, setData] = useState([]);
   const [key, setKey] = useState();
+  const [chartType, setChartType] = useState('bar');
 
   const dashboardClasses = [styles.dashboard, 'impacto-card'].join(' ');
 
@@ -33,27 +41,50 @@ function Forms() {
   }, [key]);
 
   return (
-    <Page header footer>
-      <h1>Quick Insights</h1>
+    <AppShell breadcrumb={['Data', 'Quick Insights']}>
+      <PageHeader title="Quick Insights" />
       <div className={dashboardClasses}>
         <div className={styles.dimensions}>
-          <h2>Dimensions</h2>
-          {Object.keys(filters).map((filter) => (
-            <Card onClick={() => setKey(filters[filter])}>
-              {filter}
-            </Card>
-          ))}
-        </div>
-        <div className={styles.filters}>
-          <h2>Filters</h2>
-          <div>{Object.keys(filters).filter((k) => filters[k] === key)[0]}</div>
+          <Panel title="Dimensions">
+            <RadioGroup options={options} value={key || ''} onChange={setKey} />
+          </Panel>
         </div>
         <div className={styles.content}>
-          {data.length > 0 && <BarChart data={data} indexBy={key} />}
+          <Panel
+            title="Chart"
+            action={(
+              <SegmentedControl
+                options={CHART_TYPES}
+                value={chartType}
+                onChange={setChartType}
+              />
+            )}
+          >
+            {!key && <EmptyState message="Select a dimension to view chart." />}
+            {key && data.length > 0 && (
+              <BarChart
+                data={data}
+                indexBy={key}
+                groupMode={chartType === 'stacked' ? 'stacked' : 'grouped'}
+              />
+            )}
+            {key && data.length === 0 && (
+              <EmptyState message="No data for the selected dimension." />
+            )}
+          </Panel>
         </div>
       </div>
-    </Page>
+    </AppShell>
   );
 }
 
 export default Forms;
+
+export function getServerSideProps() {
+  return {
+    redirect: {
+      destination: '/data/data-curation',
+      permanent: true,
+    },
+  };
+}

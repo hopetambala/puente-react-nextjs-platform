@@ -27,6 +27,7 @@ function FormInput(props) {
       InputLabelProps={{
         className: required ? styles['required-label'] : '',
         required: required || false,
+        shrink: true,
       }}
       error={isError}
       helperText={errMsg}

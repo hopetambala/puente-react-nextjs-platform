@@ -21,12 +21,21 @@ import CssBaseline from '@material-ui/core/CssBaseline'
 import { ThemeProvider } from '@material-ui/core/styles'
 import theme from 'app/modules/theme'
 import { parseUserValue } from 'app/modules/user'
-import { AppWrapper } from 'app/store'; // import based on where you put it
+import parseService from 'app/services/parse'
+import { AppWrapper } from 'app/store'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
+import { appWithTranslation } from 'next-i18next'
 import PropTypes from 'prop-types'
 import { useEffect, useState } from 'react'
 import { ToastContainer } from 'react-toastify'
+
+// Initialize Parse once at module load time (client-side only) so every
+// component — including AppShell children that useEffect before parents — can
+// safely call Parse APIs without hitting "Parse.initialize not called".
+if (typeof window !== 'undefined') {
+  parseService.initialize()
+}
 
 function App(props) {
   const { Component, pageProps } = props
@@ -116,7 +125,7 @@ function App(props) {
   )
 }
 
-export default App
+export default appWithTranslation(App)
 
 App.propTypes = {
   Component: PropTypes.elementType.isRequired,

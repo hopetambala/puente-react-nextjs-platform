@@ -17,6 +17,7 @@ out/
 
 # misc
 .DS_Store
+_design_handoff_puente_manage_redesign/
 
 # debug
 npm-debug.log*

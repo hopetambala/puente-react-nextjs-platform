@@ -1,0 +1,31 @@
+.root {
+  display: inline-flex;
+  background: var(--tk-dlite-semantic-color-background);
+  border-radius: var(--border-radius-m);
+  padding: 3px;
+  border: 1px solid var(--tk-dlite-semantic-color-border);
+  gap: 2px;
+}
+
+.btn {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-family-heading);
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  border-radius: calc(var(--border-radius-m) - 3px);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  transition: background 0.1s ease, color 0.1s ease;
+}
+
+.btn:hover {
+  color: var(--tk-dlite-semantic-color-text-primary);
+}
+
+.active {
+  background: var(--tk-dlite-semantic-color-surface-base);
+  color: var(--tk-dlite-semantic-color-text-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}

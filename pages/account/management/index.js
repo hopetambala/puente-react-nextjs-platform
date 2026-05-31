@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */ // TODO: upgrade to latest eslint tooling
 
 import { yupResolver } from '@hookform/resolvers'
-import { Button, Card, Page, Spinner, Stack, Text } from 'app/impacto-design-system'
+import { AppShell, Button, Card, PageHeader, Spinner, Stack } from 'app/impacto-design-system'
 import {
     retrieveSignInFunction,
     retrieveUserByObjectId,
@@ -73,7 +73,8 @@ function Management(props) {
   }
 
   return (
-    <Page header footer>
+    <AppShell breadcrumb={['Settings']}>
+      <PageHeader title="Account Settings" sub="Manage your profile, credentials, and account preferences." />
       <div className={styles.paper}>
         {loading ? (
           <div className={styles.loadingState}>
@@ -81,11 +82,6 @@ function Management(props) {
           </div>
         ) : (
         <Card padding="extraLarge">
-          <Text text="PUENTE" element="h1" className={styles.stack} />
-          <Stack isVertical className={styles.stack}>
-            <Text text="Account Details" element="h2" />
-          </Stack>
-          <Text text="Account Active" element="h6" />
           <FormProvider {...methods}>
             <form>
               <Stack isVertical spacing="large" className={styles.stack} fill>
@@ -121,7 +117,7 @@ function Management(props) {
         </Card>
         )}
       </div>
-    </Page>
+    </AppShell>
   )
 }
 

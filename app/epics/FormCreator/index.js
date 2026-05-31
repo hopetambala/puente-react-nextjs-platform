@@ -1,16 +1,12 @@
 import {
-  Chip,
-  Grid,
-  Input,
-  MenuItem,
-  NoSsr,
-  Select,
-  Snackbar,
-  TextField,
+    Grid,
+    NoSsr,
+    Snackbar
 } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
 import {
-  Button, Card, Stack, Text,
+    Button,
+    EmptyState, Panel, Stack, Text
 } from 'app/impacto-design-system';
 import { postObjectsToClass, updateObject } from 'app/modules/cloud-code';
 import { useCallback, useEffect, useState } from 'react';
@@ -22,6 +18,7 @@ import { copy, reorder } from './_utils';
 import FormBlocks from './FormBlocks';
 import FormTemplate from './FormTemplate';
 import styles from './index.module.scss';
+import Inspector from './Inspector';
 
 const COLLECTION = [
   {
@@ -93,6 +90,8 @@ const FormCreator = ({ context, user }) => {
   // const [workflowTypes] = useState(["Puente", "Assets", "Marketplace"]);
   // const [workflowNames, setWorkflowNames] = useState([]);
   // const [newWorkflowValue, setNewWorkflowValue] = useState("");
+
+  const [selectedBlock, setSelectedBlock] = useState(null);
 
   const [previewOpen, setPreviewOpen] = useState();
   const [submissionType, setSubmissionType] = useState('');
@@ -223,6 +222,13 @@ const FormCreator = ({ context, user }) => {
     const newArray = [...formItems];
     newArray.splice(elementsIndex, 1);
     setFormItems(newArray);
+  };
+
+  const updateBlock = (updatedBlock) => {
+    setFormItems((prev) =>
+      prev.map((item) => (item.id === updatedBlock.id ? updatedBlock : item)),
+    );
+    setSelectedBlock(updatedBlock);
   };
 
   const onDragEnd = useCallback(
@@ -356,22 +362,28 @@ const FormCreator = ({ context, user }) => {
                     formItems={formItems}
                     setFormItems={setFormItems}
                     removeValue={removeValue}
+                    onSelectBlock={setSelectedBlock}
+                    selectedBlockId={selectedBlock?.id}
                   />
                 </Stack>
               </Stack>
             </Grid>
             <Grid item xs={4}>
               <div className={styles.blocksSidebar}>
-              <Card>
-                <div>
-                  <Text
-                    element="h2"
-                    text="Building Blocks"
-                    className={styles.header}
-                  />
-                </div>
-                <FormBlocks items={COLLECTION} />
-              </Card>
+                <Panel title="Blocks">
+                  <FormBlocks items={COLLECTION} />
+                </Panel>
+                <Panel title="Inspector">
+                  {selectedBlock ? (
+                    <Inspector
+                      block={selectedBlock}
+                      onChange={updateBlock}
+                      onClose={() => setSelectedBlock(null)}
+                    />
+                  ) : (
+                    <EmptyState message="Select a block to edit." />
+                  )}
+                </Panel>
               </div>
             </Grid>
           </Grid>

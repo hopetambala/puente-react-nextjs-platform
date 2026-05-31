@@ -1,10 +1,8 @@
 import FormMarketplace from 'app/epics/FormMarketplace';
-import { Page } from 'app/impacto-design-system';
+import { AppShell, PageHeader } from 'app/impacto-design-system';
 import { parseUserValue } from 'app/modules/user';
 import { useGlobalState } from 'app/store';
 import { useRouter } from 'next/router';
-
-import styles from './index.module.scss';
 
 export default function Marketplace() {
   const { contextManagment } = useGlobalState();
@@ -12,19 +10,13 @@ export default function Marketplace() {
   const user = parseUserValue();
 
   return (
-    <Page
-      header
-      footer
-    >
-      <main className={styles.formMarketplace}>
-        <div className={styles.container}>
-          <FormMarketplace
-            router={router}
-            context={contextManagment}
-            user={user}
-          />
-        </div>
-      </main>
-    </Page>
+    <AppShell breadcrumb={['Forms', 'Marketplace']}>
+      <PageHeader title="Form Marketplace" sub="Browse and duplicate community data collection forms." />
+      <FormMarketplace
+        router={router}
+        context={contextManagment}
+        user={user}
+      />
+    </AppShell>
   );
 }

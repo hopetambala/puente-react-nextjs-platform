@@ -1,0 +1,1738 @@
+[
+  {
+    "className": "_Session",
+    "fields": {
+      "objectId": {
+        "type": "String"
+      },
+      "createdAt": {
+        "type": "Date"
+      },
+      "updatedAt": {
+        "type": "Date"
+      },
+      "ACL": {
+        "type": "ACL"
+      },
+      "restricted": {
+        "type": "Boolean"
+      },
+      "user": {
+        "type": "Pointer",
+        "targetClass": "_User"
+      },
+      "installationId": {
+        "type": "String"
+      },
+      "sessionToken": {
+        "type": "String"
+      },
+      "expiresAt": {
+        "type": "Date"
+      },
+      "createdWith": {
+        "type": "Object"
+      }
+    },
+    "classLevelPermissions": {
+      "find": {
+        "*": true
+      },
+      "count": {
+        "*": true
+      },
+      "get": {
+        "*": true
+      },
+      "create": {
+        "*": true
+      },
+      "update": {
+        "*": true
+      },
+      "delete": {
+        "*": true
+      },
+      "addField": {
+        "*": true
+      },
+      "protectedFields": {
+        "*": []
+      }
+    },
+    "indexes": {
+      "_id_": {
+        "_id": 1
+      }
+    }
+  },
+  {
+    "className": "EvaluationMedical",
+    "fields": {
+      "objectId": {
+        "type": "String"
+      },
+      "createdAt": {
+        "type": "Date"
+      },
+      "updatedAt": {
+        "type": "Date"
+      },
+      "ACL": {
+        "type": "ACL"
+      },
+      "location": {
+        "type": "GeoPoint"
+      },
+      "chronic_condition_hypertension": {
+        "type": "String"
+      },
+      "chronic_condition_diabetes": {
+        "type": "String"
+      },
+      "chronic_condition_other": {
+        "type": "String"
+      },
+      "seen_doctor": {
+        "type": "String"
+      },
+      "received_treatment_notes": {
+        "type": "String"
+      },
+      "received_treatment_description": {
+        "type": "String"
+      },
+      "part_of_body": {
+        "type": "String"
+      },
+      "part_of_body_description": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      },
+      "trauma_induced": {
+        "type": "String"
+      },
+      "condition_progression": {
+        "type": "String"
+      },
+      "notes": {
+        "type": "String"
+      },
+      "AssessmentandEvaluation": {
+        "type": "String"
+      },
+      "AssessmentandEvaluation_Surgical": {
+        "type": "String"
+      },
+      "AssessmentandEvaluation_Surgical_Guess": {
+        "type": "String"
+      },
+      "planOfAction": {
+        "type": "String"
+      },
+      "immediate_follow_up": {
+        "type": "String"
+      },
+      "surveyingUser": {
+        "type": "String"
+      },
+      "surveyingOrganization": {
+        "type": "String"
+      },
+      "client": {
+        "type": "Pointer",
+        "targetClass": "SurveyData"
+      },
+      "idPhoto": {
+        "type": "File"
+      },
+      "appVersion": {
+        "type": "String"
+      },
+      "parseUser": {
+        "type": "Pointer",
+        "targetClass": "_User"
+      },
+      "phoneOS": {
+        "type": "String"
+      }
+    },
+    "classLevelPermissions": {
+      "find": {
+        "*": true
+      },
+      "count": {
+        "*": true
+      },
+      "get": {
+        "*": true
+      },
+      "create": {
+        "*": true
+      },
+      "update": {
+        "*": true
+      },
+      "delete": {
+        "*": true
+      },
+      "addField": {
+        "*": true
+      },
+      "protectedFields": {
+        "*": []
+      }
+    },
+    "indexes": {
+      "_id_": {
+        "_id": 1
+      }
+    }
+  },
+  {
+    "className": "SurveyData",
+    "fields": {
+      "objectId": {
+        "type": "String"
+      },
+      "createdAt": {
+        "type": "Date"
+      },
+      "updatedAt": {
+        "type": "Date"
+      },
+      "ACL": {
+        "type": "ACL"
+      },
+      "location": {
+        "type": "GeoPoint"
+      },
+      "signature": {
+        "type": "File"
+      },
+      "fname": {
+        "type": "String"
+      },
+      "lname": {
+        "type": "String"
+      },
+      "relationship": {
+        "type": "String"
+      },
+      "dob": {
+        "type": "String"
+      },
+      "latitude": {
+        "type": "Number"
+      },
+      "longitude": {
+        "type": "Number"
+      },
+      "surveyingUser": {
+        "type": "String"
+      },
+      "surveyingOrganization": {
+        "type": "String"
+      },
+      "nickname": {
+        "type": "String"
+      },
+      "sex": {
+        "type": "String"
+      },
+      "telephoneNumber": {
+        "type": "String"
+      },
+      "marriageStatus": {
+        "type": "String"
+      },
+      "occupation": {
+        "type": "String"
+      },
+      "educationLevel": {
+        "type": "String"
+      },
+      "communityname": {
+        "type": "String"
+      },
+      "city": {
+        "type": "String"
+      },
+      "province": {
+        "type": "String"
+      },
+      "insuranceNumber": {
+        "type": "String"
+      },
+      "insuranceProvider": {
+        "type": "String"
+      },
+      "clinicProvider": {
+        "type": "String"
+      },
+      "cedulaNumber": {
+        "type": "String"
+      },
+      "memberofthefollowingorganizations": {
+        "type": "Array"
+      },
+      "relationship_id": {
+        "type": "String"
+      },
+      "otherOrganizationsYouKnow": {
+        "type": "Array"
+      },
+      "numberofIndividualsLivingintheHouse": {
+        "type": "String"
+      },
+      "numberofChildrenLivinginHouseUndertheAgeof5": {
+        "type": "String"
+      },
+      "yearsLivedinthecommunity": {
+        "type": "String"
+      },
+      "waterAccess": {
+        "type": "String"
+      },
+      "trashDisposalLocation": {
+        "type": "String"
+      },
+      "picture": {
+        "type": "File"
+      },
+      "height": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      },
+      "substance": {
+        "type": "String"
+      },
+      "AssessmentandEvaluationSurgical": {
+        "type": "String"
+      },
+      "chronic_condition_hypertension": {
+        "type": "String"
+      },
+      "majorEvents": {
+        "type": "String"
+      },
+      "familyRelationships": {
+        "type": "String"
+      },
+      "test": {
+        "type": "String"
+      },
+      "altitude": {
+        "type": "Number"
+      },
+      "householdId": {
+        "type": "String"
+      },
+      "familyhistory": {
+        "type": "Array"
+      },
+      "yearsLivedinThisHouse": {
+        "type": "String"
+      },
+      "age": {
+        "type": "String"
+      },
+      "appVersion": {
+        "type": "String"
+      },
+      "surveyingUserObjectId": {
+        "type": "String"
+      },
+      "parseUser": {
+        "type": "Pointer",
+        "targetClass": "_User"
+      },
+      "identificationPhoto": {
+        "type": "String"
+      },
+      "searchIndex": {
+        "type": "Array"
+      },
+      "phoneOS": {
+        "type": "String"
+      },
+      "fullTextSearchIndex": {
+        "type": "String"
+      },
+      "subcounty": {
+        "type": "String"
+      },
+      "region": {
+        "type": "String"
+      },
+      "country": {
+        "type": "String"
+      },
+      "objectIdOffline": {
+        "type": "String"
+      },
+      "householdObjectIdOffline": {
+        "type": "String"
+      },
+      "householdClient": {
+        "type": "Pointer",
+        "targetClass": "Household"
+      },
+      "photoFile": {
+        "type": "String"
+      },
+      "editedAt": {
+        "type": "Date"
+      },
+      "editedBy": {
+        "type": "String"
+      }
+    },
+    "classLevelPermissions": {
+      "find": {
+        "*": true
+      },
+      "count": {
+        "*": true
+      },
+      "get": {
+        "*": true
+      },
+      "create": {
+        "*": true
+      },
+      "update": {
+        "*": true
+      },
+      "delete": {
+        "*": true
+      },
+      "addField": {
+        "*": true
+      },
+      "protectedFields": {
+        "*": []
+      }
+    },
+    "indexes": {
+      "_id_": {
+        "_id": 1
+      },
+      "location_2d": {
+        "location": "2d"
+      },
+      "objectIdOffline_1": {
+        "objectIdOffline": 1
+      }
+    }
+  },
+  {
+    "className": "Allergies",
+    "fields": {
+      "objectId": {
+        "type": "String"
+      },
+      "createdAt": {
+        "type": "Date"
+      },
+      "updatedAt": {
+        "type": "Date"
+      },
+      "ACL": {
+        "type": "ACL"
+      },
+      "location": {
+        "type": "GeoPoint"
+      },
+      "substance": {
+        "type": "String"
+      },
+      "reaction": {
+        "type": "String"
+      },
+      "category": {
+        "type": "String"
+      },
+      "severity": {
+        "type": "String"
+      },
+      "informationsource": {
+        "type": "String"
+      },
+      "onset": {
+        "type": "String"
+      },
+      "comments": {
+        "type": "String"
+      },
+      "client": {
+        "type": "Pointer",
+        "targetClass": "SurveyData"
+      }
+    },
+    "classLevelPermissions": {
+      "find": {
+        "*": true
+      },
+      "count": {
+        "*": true
+      },
+      "get": {
+        "*": true
+      },
+      "create": {
+        "*": true
+      },
+      "update": {
+        "*": true
+      },
+      "delete": {
+        "*": true
+      },
+      "addField": {
+        "*": true
+      },
+      "protectedFields": {
+        "*": []
+      }
+    },
+    "indexes": {
+      "_id_": {
+        "_id": 1
+      }
+    }
+  },
+  {
+    "className": "FormResults",
+    "fields": {
+      "objectId": {
+        "type": "String"
+      },
+      "createdAt": {
+        "type": "Date"
+      },
+      "updatedAt": {
+        "type": "Date"
+      },
+      "ACL": {
+        "type": "ACL"
+      },
+      "fields": {
+        "type": "Array"
+      },
+      "title": {
+        "type": "String"
+      },
+      "description": {
+        "type": "String"
+      },
+      "formSpecificationsId": {
+        "type": "String"
+      },
+      "client": {
+        "type": "Pointer",
+        "targetClass": "SurveyData"
+      },
+      "surveyingUser": {
+        "type": "String"
+      },
+      "surveyingOrganization": {
+        "type": "String"
+      },
+      "parseUser": {
+        "type": "Pointer",
+        "targetClass": "_User"
+      },
+      "parseParentClassObjectIdOffline": {
+        "type": "String"
+      },
+      "appVersion": {
+        "type": "String"
+      },
+      "phoneOS": {
+        "type": "String"
+      }
+    },
+    "classLevelPermissions": {
+      "find": {
+        "*": true
+      },
+      "count": {
+        "*": true
+      },
+      "get": {
+        "*": true
+      },
+      "create": {
+        "*": true
+      },
+      "update": {
+        "*": true
+      },
+      "delete": {
+        "*": true
+      },
+      "addField": {
+        "*": true
+      },
+      "protectedFields": {
+        "*": []
+      }
+    },
+    "indexes": {
+      "_id_": {
+        "_id": 1
+      }
+    }
+  },
+  {
+    "className": "_User",
+    "fields": {
+      "objectId": {
+        "type": "String"
+      },
+      "createdAt": {
+        "type": "Date"
+      },
+      "updatedAt": {
+        "type": "Date"
+      },
+      "ACL": {
+        "type": "ACL"
+      },
+      "username": {
+        "type": "String"
+      },
+      "password": {
+        "type": "String"
+      },
+      "email": {
+        "type": "String"
+      },
+      "emailVerified": {
+        "type": "Boolean"
+      },
+      "authData": {
+        "type": "Object"
+      },
+      "firstname": {
+        "type": "String"
+      },
+      "lastname": {
+        "type": "String"
+      },
+      "organization": {
+        "type": "String"
+      },
+      "role": {
+        "type": "String"
+      },
+      "adminVerified": {
+        "type": "Boolean"
+      },
+      "phonenumber": {
+        "type": "String"
+      },
+      "expoPushToken": {
+        "type": "String"
+      },
+      "active": {
+        "type": "Boolean"
+      }
+    },
+    "classLevelPermissions": {
+      "find": {
+        "*": true
+      },
+      "count": {
+        "*": true
+      },
+      "get": {
+        "*": true
+      },
+      "create": {
+        "*": true
+      },
+      "update": {
+        "*": true
+      },
+      "delete": {
+        "*": true
+      },
+      "addField": {
+        "*": true
+      },
+      "protectedFields": {
+        "*": []
+      }
+    },
+    "indexes": {
+      "_id_": {
+        "_id": 1
+      },
+      "username_1": {
+        "username": 1
+      },
+      "email_1": {
+        "email": 1
+      },
+      "case_insensitive_email": {
+        "email": 1
+      },
+      "case_insensitive_username": {
+        "username": 1
+      },
+      "_updated_at_-1__id_-1": {
+        "_updated_at": -1,
+        "_id": -1
+      }
+    }
+  },
+  {
+    "className": "FormAssetResults",
+    "fields": {
+      "objectId": {
+        "type": "String"
+      },
+      "createdAt": {
+        "type": "Date"
+      },
+      "updatedAt": {
+        "type": "Date"
+      },
+      "ACL": {
+        "type": "ACL"
+      },
+      "fields": {
+        "type": "Array"
+      },
+      "title": {
+        "type": "String"
+      },
+      "description": {
+        "type": "String"
+      },
+      "formSpecificationsId": {
+        "type": "String"
+      },
+      "surveyingOrganization": {
+        "type": "String"
+      },
+      "client": {
+        "type": "Pointer",
+        "targetClass": "Assets"
+      },
+      "surveyingUser": {
+        "type": "String"
+      },
+      "appVersion": {
+        "type": "String"
+      },
+      "parseUser": {
+        "type": "Pointer",
+        "targetClass": "_User"
+      },
+      "phoneOS": {
+        "type": "String"
+      },
+      "parseParentClassObjectIdOffline": {
+        "type": "String"
+      }
+    },
+    "classLevelPermissions": {
+      "find": {
+        "*": true
+      },
+      "count": {
+        "*": true
+      },
+      "get": {
+        "*": true
+      },
+      "create": {
+        "*": true
+      },
+      "update": {
+        "*": true
+      },
+      "delete": {
+        "*": true
+      },
+      "addField": {
+        "*": true
+      },
+      "protectedFields": {
+        "*": []
+      }
+    },
+    "indexes": {
+      "_id_": {
+        "_id": 1
+      }
+    }
+  },
+  {
+    "className": "HistoryMedical",
+    "fields": {
+      "objectId": {
+        "type": "String"
+      },
+      "createdAt": {
+        "type": "Date"
+      },
+      "updatedAt": {
+        "type": "Date"
+      },
+      "ACL": {
+        "type": "ACL"
+      },
+      "location": {
+        "type": "GeoPoint"
+      },
+      "majorEvents": {
+        "type": "String"
+      },
+      "surgeryWhatKind": {
+        "type": "String"
+      },
+      "medicalIllnesses": {
+        "type": "String"
+      },
+      "whenDiagnosed": {
+        "type": "String"
+      },
+      "whatDoctorDoyousee": {
+        "type": "String"
+      },
+      "treatment": {
+        "type": "String"
+      },
+      "familyhistory": {
+        "type": "String"
+      },
+      "preventativeCare": {
+        "type": "String"
+      },
+      "client": {
+        "type": "Pointer",
+        "targetClass": "SurveyData"
+      },
+      "latitude": {
+        "type": "Number"
+      },
+      "longitude": {
+        "type": "Number"
+      }
+    },
+    "classLevelPermissions": {
+      "find": {
+        "*": true
+      },
+      "count": {
+        "*": true
+      },
+      "get": {
+        "*": true
+      },
+      "create": {
+        "*": true
+      },
+      "update": {
+        "*": true
+      },
+      "delete": {
+        "*": true
+      },
+      "addField": {
+        "*": true
+      },
+      "protectedFields": {
+        "*": []
+      }
+    },
+    "indexes": {
+      "_id_": {
+        "_id": 1
+      }
+    }
+  },
+  {
+    "className": "Household",
+    "fields": {
+      "objectId": {
+        "type": "String"
+      },
+      "createdAt": {
+        "type": "Date"
+      },
+      "updatedAt": {
+        "type": "Date"
+      },
+      "ACL": {
+        "type": "ACL"
+      },
+      "location": {
+        "type": "GeoPoint"
+      },
+      "latitude": {
+        "type": "Number"
+      },
+      "longitude": {
+        "type": "Number"
+      },
+      "relationship": {
+        "type": "String"
+      },
+      "client": {
+        "type": "Pointer",
+        "targetClass": "Household"
+      },
+      "surveyingUser": {
+        "type": "String"
+      },
+      "surveyingOrganization": {
+        "type": "String"
+      },
+      "appVersion": {
+        "type": "String"
+      },
+      "parseUser": {
+        "type": "String"
+      },
+      "phoneOS": {
+        "type": "String"
+      },
+      "objectIdOffline": {
+        "type": "String"
+      }
+    },
+    "classLevelPermissions": {
+      "find": {
+        "*": true
+      },
+      "count": {
+        "*": true
+      },
+      "get": {
+        "*": true
+      },
+      "create": {
+        "*": true
+      },
+      "update": {
+        "*": true
+      },
+      "delete": {
+        "*": true
+      },
+      "addField": {
+        "*": true
+      },
+      "protectedFields": {
+        "*": []
+      }
+    },
+    "indexes": {
+      "_id_": {
+        "_id": 1
+      }
+    }
+  },
+  {
+    "className": "Assets",
+    "fields": {
+      "objectId": {
+        "type": "String"
+      },
+      "createdAt": {
+        "type": "Date"
+      },
+      "updatedAt": {
+        "type": "Date"
+      },
+      "ACL": {
+        "type": "ACL"
+      },
+      "location": {
+        "type": "GeoPoint"
+      },
+      "picture": {
+        "type": "File"
+      },
+      "signature": {
+        "type": "File"
+      },
+      "Name": {
+        "type": "String"
+      },
+      "City": {
+        "type": "String"
+      },
+      "Province": {
+        "type": "String"
+      },
+      "relatedPeople": {
+        "type": "Array"
+      },
+      "surveyingOrganization": {
+        "type": "String"
+      },
+      "latitude": {
+        "type": "Number"
+      },
+      "longitude": {
+        "type": "Number"
+      },
+      "altitude": {
+        "type": "Number"
+      },
+      "name": {
+        "type": "String"
+      },
+      "communityName": {
+        "type": "String"
+      },
+      "city": {
+        "type": "String"
+      },
+      "province": {
+        "type": "String"
+      },
+      "country": {
+        "type": "String"
+      },
+      "surveyingUser": {
+        "type": "String"
+      },
+      "appVersion": {
+        "type": "String"
+      },
+      "parseUser": {
+        "type": "Pointer",
+        "targetClass": "_User"
+      },
+      "communityname": {
+        "type": "String"
+      },
+      "phoneOS": {
+        "type": "String"
+      },
+      "objectIdOffline": {
+        "type": "String"
+      }
+    },
+    "classLevelPermissions": {
+      "find": {
+        "*": true
+      },
+      "count": {
+        "*": true
+      },
+      "get": {
+        "*": true
+      },
+      "create": {
+        "*": true
+      },
+      "update": {
+        "*": true
+      },
+      "delete": {
+        "*": true
+      },
+      "addField": {
+        "*": true
+      },
+      "protectedFields": {
+        "*": []
+      }
+    },
+    "indexes": {
+      "_id_": {
+        "_id": 1
+      }
+    }
+  },
+  {
+    "className": "EvaluationSurgical",
+    "fields": {
+      "objectId": {
+        "type": "String"
+      },
+      "createdAt": {
+        "type": "Date"
+      },
+      "updatedAt": {
+        "type": "Date"
+      },
+      "ACL": {
+        "type": "ACL"
+      },
+      "location": {
+        "type": "GeoPoint"
+      },
+      "surveyingUser": {
+        "type": "String"
+      },
+      "surveyingOrganization": {
+        "type": "String"
+      },
+      "AssessmentandEvaluation": {
+        "type": "String"
+      },
+      "planOfAction": {
+        "type": "String"
+      },
+      "notes": {
+        "type": "String"
+      },
+      "client": {
+        "type": "Pointer",
+        "targetClass": "SurveyData"
+      },
+      "AssessmentandEvaluationSurgical": {
+        "type": "String"
+      }
+    },
+    "classLevelPermissions": {
+      "find": {
+        "*": true
+      },
+      "count": {
+        "*": true
+      },
+      "get": {
+        "*": true
+      },
+      "create": {
+        "*": true
+      },
+      "update": {
+        "*": true
+      },
+      "delete": {
+        "*": true
+      },
+      "addField": {
+        "*": true
+      },
+      "protectedFields": {
+        "*": []
+      }
+    },
+    "indexes": {
+      "_id_": {
+        "_id": 1
+      }
+    }
+  },
+  {
+    "className": "_Role",
+    "fields": {
+      "objectId": {
+        "type": "String"
+      },
+      "createdAt": {
+        "type": "Date"
+      },
+      "updatedAt": {
+        "type": "Date"
+      },
+      "ACL": {
+        "type": "ACL"
+      },
+      "name": {
+        "type": "String"
+      },
+      "users": {
+        "type": "Relation",
+        "targetClass": "_User"
+      },
+      "roles": {
+        "type": "Relation",
+        "targetClass": "_Role"
+      }
+    },
+    "classLevelPermissions": {
+      "find": {
+        "*": true
+      },
+      "count": {
+        "*": true
+      },
+      "get": {
+        "*": true
+      },
+      "create": {
+        "*": true
+      },
+      "update": {
+        "*": true
+      },
+      "delete": {
+        "*": true
+      },
+      "addField": {
+        "*": true
+      },
+      "protectedFields": {
+        "*": []
+      }
+    },
+    "indexes": {
+      "_id_": {
+        "_id": 1
+      },
+      "name_1": {
+        "name": 1
+      }
+    }
+  },
+  {
+    "className": "Vitals",
+    "fields": {
+      "objectId": {
+        "type": "String"
+      },
+      "createdAt": {
+        "type": "Date"
+      },
+      "updatedAt": {
+        "type": "Date"
+      },
+      "ACL": {
+        "type": "ACL"
+      },
+      "location": {
+        "type": "GeoPoint"
+      },
+      "height": {
+        "type": "String"
+      },
+      "weight": {
+        "type": "String"
+      },
+      "bmi": {
+        "type": "String"
+      },
+      "temp": {
+        "type": "String"
+      },
+      "pulse": {
+        "type": "String"
+      },
+      "respRate": {
+        "type": "String"
+      },
+      "bloodPressure": {
+        "type": "String"
+      },
+      "bloodOxygen": {
+        "type": "String"
+      },
+      "bloodSugar": {
+        "type": "String"
+      },
+      "painLevels": {
+        "type": "String"
+      },
+      "hemoglobinLevels": {
+        "type": "String"
+      },
+      "client": {
+        "type": "Pointer",
+        "targetClass": "SurveyData"
+      },
+      "hemoglobinA1c": {
+        "type": "String"
+      },
+      "surveyingUser": {
+        "type": "String"
+      },
+      "surveyingOrganization": {
+        "type": "String"
+      },
+      "appVersion": {
+        "type": "String"
+      },
+      "parseUser": {
+        "type": "Pointer",
+        "targetClass": "_User"
+      },
+      "envPhoto": {
+        "type": "File"
+      },
+      "longitude": {
+        "type": "Number"
+      },
+      "latitude": {
+        "type": "Number"
+      },
+      "phoneOS": {
+        "type": "String"
+      }
+    },
+    "classLevelPermissions": {
+      "find": {
+        "*": true
+      },
+      "count": {
+        "*": true
+      },
+      "get": {
+        "*": true
+      },
+      "create": {
+        "*": true
+      },
+      "update": {
+        "*": true
+      },
+      "delete": {
+        "*": true
+      },
+      "addField": {
+        "*": true
+      },
+      "protectedFields": {
+        "*": []
+      }
+    },
+    "indexes": {
+      "_id_": {
+        "_id": 1
+      }
+    }
+  },
+  {
+    "className": "message",
+    "fields": {
+      "objectId": {
+        "type": "String"
+      },
+      "createdAt": {
+        "type": "Date"
+      },
+      "updatedAt": {
+        "type": "Date"
+      },
+      "ACL": {
+        "type": "ACL"
+      }
+    },
+    "classLevelPermissions": {
+      "find": {
+        "*": true
+      },
+      "count": {
+        "*": true
+      },
+      "get": {
+        "*": true
+      },
+      "create": {
+        "*": true
+      },
+      "update": {
+        "*": true
+      },
+      "delete": {
+        "*": true
+      },
+      "addField": {
+        "*": true
+      },
+      "protectedFields": {
+        "*": []
+      }
+    }
+  },
+  {
+    "className": "HistoryEnvironmentalHealth",
+    "fields": {
+      "objectId": {
+        "type": "String"
+      },
+      "createdAt": {
+        "type": "Date"
+      },
+      "updatedAt": {
+        "type": "Date"
+      },
+      "ACL": {
+        "type": "ACL"
+      },
+      "location": {
+        "type": "GeoPoint"
+      },
+      "yearsLivedinthecommunity": {
+        "type": "String"
+      },
+      "yearsLivedinThisHouse": {
+        "type": "String"
+      },
+      "waterAccess": {
+        "type": "String"
+      },
+      "typeofWaterdoyoudrink": {
+        "type": "String"
+      },
+      "bathroomAccess": {
+        "type": "String"
+      },
+      "latrineAccess": {
+        "type": "String"
+      },
+      "clinicAccess": {
+        "type": "String"
+      },
+      "conditionoFloorinyourhouse": {
+        "type": "String"
+      },
+      "conditionoRoofinyourhouse": {
+        "type": "String"
+      },
+      "stoveType": {
+        "type": "String"
+      },
+      "medicalproblemswheredoyougo": {
+        "type": "String"
+      },
+      "dentalproblemswheredoyougo": {
+        "type": "String"
+      },
+      "biggestproblemofcommunity": {
+        "type": "String"
+      },
+      "timesperweektrashcollected": {
+        "type": "String"
+      },
+      "wheretrashleftbetweenpickups": {
+        "type": "String"
+      },
+      "numberofIndividualsLivingintheHouse": {
+        "type": "String"
+      },
+      "numberofChildrenLivinginHouseUndertheAgeof5": {
+        "type": "String"
+      },
+      "houseownership": {
+        "type": "String"
+      },
+      "client": {
+        "type": "Pointer",
+        "targetClass": "SurveyData"
+      },
+      "picture": {
+        "type": "File"
+      },
+      "surveyingUser": {
+        "type": "String"
+      },
+      "surveyingOrganization": {
+        "type": "String"
+      },
+      "govAssistance": {
+        "type": "String"
+      },
+      "foodSecurity": {
+        "type": "String"
+      },
+      "electricityAccess": {
+        "type": "String"
+      },
+      "houseMaterial": {
+        "type": "String"
+      },
+      "typicallyWashHands": {
+        "type": "Array"
+      },
+      "typesExcerciseDone": {
+        "type": "Array"
+      },
+      "symptoms": {
+        "type": "Array"
+      },
+      "availabilityDays": {
+        "type": "Array"
+      },
+      "availabilityTimes": {
+        "type": "Array"
+      },
+      "soapHandwashing": {
+        "type": "String"
+      },
+      "properHandwashing": {
+        "type": "String"
+      },
+      "brushTeeth": {
+        "type": "String"
+      },
+      "toothbrushSupplies": {
+        "type": "String"
+      },
+      "toothbrushQuestions": {
+        "type": "String"
+      },
+      "typicalDiet": {
+        "type": "String"
+      },
+      "tortillasPerDay": {
+        "type": "String"
+      },
+      "oftenExcercise": {
+        "type": "String"
+      },
+      "oftenExcerciseRecommended": {
+        "type": "String"
+      },
+      "diagnosedAmenia": {
+        "type": "String"
+      },
+      "vitaminsPastYear": {
+        "type": "String"
+      },
+      "prematureDeliveryHistory": {
+        "type": "String"
+      },
+      "wormInfection": {
+        "type": "String"
+      },
+      "albendazole": {
+        "type": "String"
+      },
+      "albendazoleLastDose": {
+        "type": "String"
+      },
+      "diagnosedAmeniaFamily": {
+        "type": "String"
+      },
+      "whereRreceiveWater": {
+        "type": "String"
+      },
+      "diagnosedDiabetes": {
+        "type": "String"
+      },
+      "diagnosedDiabetesFamily": {
+        "type": "String"
+      },
+      "concernedDiabetes": {
+        "type": "String"
+      },
+      "greatestHealthQuestion": {
+        "type": "String"
+      },
+      "barriersBeingHealthy": {
+        "type": "String"
+      },
+      "topicsImproveHealth": {
+        "type": "String"
+      },
+      "interestedParticipation": {
+        "type": "String"
+      },
+      "notes": {
+        "type": "String"
+      },
+      "Image_piccker": {
+        "type": "File"
+      },
+      "appVersion": {
+        "type": "String"
+      },
+      "biggestproblemofcommunity_v2": {
+        "type": "Array"
+      },
+      "phoneOS": {
+        "type": "String"
+      },
+      "parseUser": {
+        "type": "Pointer",
+        "targetClass": "_User"
+      },
+      "numberofChildrenLivinginHouseUndertheAgeof5_v2": {
+        "type": "Array"
+      },
+      "bathroomAccess_v2": {
+        "type": "Array"
+      },
+      "clinicAccess_v2": {
+        "type": "Array"
+      },
+      "dentalAccess": {
+        "type": "String"
+      },
+      "parseParentClassObjectIdOffline": {
+        "type": "String"
+      }
+    },
+    "classLevelPermissions": {
+      "find": {
+        "*": true
+      },
+      "count": {
+        "*": true
+      },
+      "get": {
+        "*": true
+      },
+      "create": {
+        "*": true
+      },
+      "update": {
+        "*": true
+      },
+      "delete": {
+        "*": true
+      },
+      "addField": {
+        "*": true
+      },
+      "protectedFields": {
+        "*": []
+      }
+    },
+    "indexes": {
+      "_id_": {
+        "_id": 1
+      }
+    }
+  },
+  {
+    "className": "Prescriptions",
+    "fields": {
+      "objectId": {
+        "type": "String"
+      },
+      "createdAt": {
+        "type": "Date"
+      },
+      "updatedAt": {
+        "type": "Date"
+      },
+      "ACL": {
+        "type": "ACL"
+      },
+      "name": {
+        "type": "String"
+      },
+      "client": {
+        "type": "Pointer",
+        "targetClass": "SurveyData"
+      }
+    },
+    "classLevelPermissions": {
+      "find": {
+        "*": true
+      },
+      "count": {
+        "*": true
+      },
+      "get": {
+        "*": true
+      },
+      "create": {
+        "*": true
+      },
+      "update": {
+        "*": true
+      },
+      "delete": {
+        "*": true
+      },
+      "addField": {
+        "*": true
+      },
+      "protectedFields": {
+        "*": []
+      }
+    },
+    "indexes": {
+      "_id_": {
+        "_id": 1
+      }
+    }
+  },
+  {
+    "className": "FormSpecificationsV2",
+    "fields": {
+      "objectId": {
+        "type": "String"
+      },
+      "createdAt": {
+        "type": "Date"
+      },
+      "updatedAt": {
+        "type": "Date"
+      },
+      "ACL": {
+        "type": "ACL"
+      },
+      "fields": {
+        "type": "Array"
+      },
+      "organizations": {
+        "type": "Array"
+      },
+      "name": {
+        "type": "String"
+      },
+      "description": {
+        "type": "String"
+      },
+      "class": {
+        "type": "String"
+      },
+      "typeOfForm": {
+        "type": "Array"
+      },
+      "location": {
+        "type": "GeoPoint"
+      },
+      "customForm": {
+        "type": "Boolean"
+      },
+      "workflows": {
+        "type": "Array"
+      },
+      "active": {
+        "type": "String"
+      }
+    },
+    "classLevelPermissions": {
+      "find": {
+        "*": true
+      },
+      "count": {
+        "*": true
+      },
+      "get": {
+        "*": true
+      },
+      "create": {
+        "*": true
+      },
+      "update": {
+        "*": true
+      },
+      "delete": {
+        "*": true
+      },
+      "addField": {
+        "*": true
+      },
+      "protectedFields": {
+        "*": []
+      }
+    },
+    "indexes": {
+      "_id_": {
+        "_id": 1
+      }
+    }
+  }
+]

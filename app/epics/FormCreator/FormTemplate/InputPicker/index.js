@@ -11,6 +11,7 @@ const PaperInputPicker = (props) => {
     item,
     formItems, setFormItems,
     removeValue,
+    onSelectBlock,
   } = props;
 
   return (
@@ -19,6 +20,7 @@ const PaperInputPicker = (props) => {
       {...provided.dragHandleProps}
       ref={innerRef}
       className={styles.block}
+      onClick={() => onSelectBlock && onSelectBlock(item)}
     >
       <Input
         item={item}

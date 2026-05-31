@@ -2,8 +2,9 @@
   /* TYPOGRAPHY — dlite brand typefaces
   /* =============================================================== */
 
-  /* dlite: Plus Jakarta Sans for headings, Source Serif 4 for body */
-  --font-family: var(--tk-dlite-semantic-typography-font-body), 'Roboto', helvetica, sans-serif;
+  /* F-08: Plus Jakarta Sans everywhere in-app. The dlite body token resolves to
+     Source Serif 4 (editorial/marketing use only), so we bypass it here. */
+  --font-family: 'Plus Jakarta Sans', 'Roboto', helvetica, sans-serif;
   --font-family-heading: var(--tk-dlite-semantic-typography-font-heading), 'Plus Jakarta Sans', 'Roboto', sans-serif;
   --font-family-mono: var(--tk-dlite-semantic-typography-font-mono), 'Source Code Pro', monospace;
   --font-weight-regular: var(--tk-dlite-primitive-fontWeight-regular, 400);

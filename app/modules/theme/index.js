@@ -19,7 +19,7 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: '"Source Serif 4", Roboto, Helvetica, Arial, sans-serif',
+    fontFamily: '"Plus Jakarta Sans", Roboto, Helvetica, Arial, sans-serif',
     h1: { fontFamily: '"Plus Jakarta Sans", Roboto, sans-serif', fontWeight: 700, letterSpacing: '-0.02em' },
     h2: { fontFamily: '"Plus Jakarta Sans", Roboto, sans-serif', fontWeight: 600, letterSpacing: '-0.02em' },
     h3: { fontFamily: '"Plus Jakarta Sans", Roboto, sans-serif', fontWeight: 600, letterSpacing: '-0.02em' },
