@@ -36,6 +36,11 @@ jest.mock('app/impacto-design-system', () => ({
   EmptyState: ({ message }) => <div data-testid="empty-state">{message}</div>,
 }));
 
+jest.mock('app/epics/DataCurationManager', () => ({
+  __esModule: true,
+  default: () => <div data-testid="data-curation-manager" />,
+}));
+
 const DataCuration = require('pages/data/data-curation/index').default;
 
 describe('DataCuration page', () => {

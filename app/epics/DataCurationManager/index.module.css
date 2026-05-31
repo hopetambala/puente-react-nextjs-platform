@@ -1,0 +1,76 @@
+.manager {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-l);
+}
+
+.loading {
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  padding: var(--spacer-l);
+}
+
+.summaryBar {
+  display: flex;
+  gap: var(--spacer-l);
+  padding: var(--spacer-m) var(--spacer-l);
+  background: var(--tk-dlite-semantic-color-surface-base);
+  border: 1px solid var(--tk-dlite-semantic-color-border);
+  border-radius: var(--border-radius-m);
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  color: var(--tk-dlite-semantic-color-text-primary);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+}
+
+.table th {
+  text-align: left;
+  padding: var(--spacer-s) var(--spacer-m);
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  border-bottom: 1px solid var(--tk-dlite-semantic-color-border);
+}
+
+.table td {
+  padding: var(--spacer-s) var(--spacer-m);
+  border-bottom: 1px solid var(--tk-dlite-semantic-color-border);
+  color: var(--tk-dlite-semantic-color-text-primary);
+}
+
+.row:hover td {
+  background: var(--tk-dlite-semantic-color-surface-hovered);
+}
+
+.chipDup,
+.chipAnomaly {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--border-radius-s);
+  font-size: 11px;
+  font-weight: var(--font-weight-bold);
+  margin-right: 4px;
+}
+
+.chipDup {
+  background: var(--tk-dlite-primitive-color-yellow-200);
+  color: var(--tk-dlite-semantic-color-text-primary);
+}
+
+.chipAnomaly {
+  background: var(--tk-dlite-primitive-color-red-200, #fde8e8);
+  color: var(--tk-dlite-semantic-color-text-primary);
+}
+
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-m);
+  padding: var(--spacer-l);
+}
