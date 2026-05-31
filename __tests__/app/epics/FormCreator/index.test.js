@@ -22,7 +22,7 @@ jest.mock('app/impacto-design-system', () => ({
     </div>
   ),
   EmptyState: ({ message }) => <p data-testid="empty-state">{message}</p>,
-  PageHeader: ({ title }) => <div data-testid="page-header"><h1>{title}</h1></div>,
+  PageHeader: ({ title, actions }) => <div data-testid="page-header"><h1>{title}</h1>{actions}</div>,
   Toast: ({ message }) => message ? <div data-testid="toast">{message}</div> : null,
 }));
 

@@ -10,6 +10,7 @@ import Icon from './icon';
 import Link from './Link';
 import Modal from './modal';
 import SegmentedControl from './segmented-control';
+import Skeleton from './skeleton';
 import Spinner from './spinner';
 import Stack from './stack';
 import Table from './table';
@@ -36,6 +37,7 @@ export {
   Panel,
   RadioGroup,
   SegmentedControl,
+  Skeleton,
   Spinner,
   Stack,
   Table,

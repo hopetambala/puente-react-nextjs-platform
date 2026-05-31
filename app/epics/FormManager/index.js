@@ -1,4 +1,4 @@
-import { EmptyState, Panel, SegmentedControl } from 'app/impacto-design-system';
+import { EmptyState, Panel, SegmentedControl, Skeleton } from 'app/impacto-design-system';
 import { retrieveCustomData } from 'app/modules/cloud-code';
 import { useEffect, useMemo, useState } from 'react';
 import { isArray } from 'underscore';
@@ -38,6 +38,7 @@ function FormManager({ context, router, user }) {
   const [listView, setListView] = useState('table');
   const [workflows, setWorkflows] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
   const [selectedForm, setSelectedForm] = useState(null);
 
   const organization = user?.organization || '';
@@ -57,6 +58,7 @@ function FormManager({ context, router, user }) {
   }, []);
 
   const refreshWorkflowData = async () => {
+    setLoading(true);
     retrieveCustomData(organization).then((records) => {
       const tableDataByCategory = {};
       records.forEach((record) => {
@@ -87,6 +89,7 @@ function FormManager({ context, router, user }) {
       setWorkflows(Object.keys(tableDataByCategory));
       delete tableDataByCategory.Puente;
       setWorkflowData(tableDataByCategory);
+      setLoading(false);
     });
   };
 
@@ -146,8 +149,23 @@ function FormManager({ context, router, user }) {
               <SegmentedControl options={VIEW_OPTIONS} value={listView} onChange={setListView} />
             </div>
           </div>
+          {loading && (
+            <div className={styles.section}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: 'var(--spacer-m)' }}>
+                {[55, 70, 40, 60].map((w, i) => (
+                  // eslint-disable-next-line react/no-array-index-key
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <Skeleton width={`${w}%`} height={14} />
+                    <Skeleton width={60} height={22} style={{ borderRadius: 6 }} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {!loading && (
+          <>
           <div className={styles.section}>
-            <Panel title="Puente Forms">
+            <Panel title="Puente Forms" noPadding>
               <Table
                 data={puenteConfig}
                 retrieveCustomData={retrieveCustomData}
@@ -200,6 +218,8 @@ function FormManager({ context, router, user }) {
                 />
               </Panel>
             </div>
+          )}
+          </>
           )}
         </>
       )}

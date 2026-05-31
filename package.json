@@ -75,6 +75,7 @@
     "yup": "^0.29.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@storybook/addon-essentials": "^7.6.13",
     "@storybook/addon-interactions": "^7.6.13",
     "@storybook/addon-links": "^7.6.13",

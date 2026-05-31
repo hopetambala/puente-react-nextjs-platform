@@ -3,11 +3,13 @@
 import { yupResolver } from '@hookform/resolvers'
 import { AppShell, Button, Card, PageHeader, Spinner, Stack } from 'app/impacto-design-system'
 import {
+    retrieveCurrentUserAsyncFunction,
     retrieveSignInFunction,
     retrieveUserByObjectId,
     updateUser,
 } from 'app/modules/user'
 import { useRouter } from 'next/router'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import * as yup from 'yup'
@@ -127,15 +129,17 @@ function ManagementWrapper() {
   const [userId, setUserID] = useState()
   const { objectId } = router.query
 
-  const retrieveUser = async () => {
-    const { attributes: retrievedUser } = await retrieveUserByObjectId(objectId)
-    return retrievedUser
-  }
-
   useEffect(() => {
     const retrieveAccountDetails = async () => {
-      const retrievedUser = await retrieveUser()
-      setUserID(objectId)
+      // Use URL param objectId if present, otherwise fall back to current user
+      let targetId = objectId
+      if (!targetId) {
+        const currentUser = retrieveCurrentUserAsyncFunction()
+        if (!currentUser) return
+        targetId = currentUser.id
+      }
+      const { attributes: retrievedUser } = await retrieveUserByObjectId(targetId)
+      setUserID(targetId)
       setUser({
         'First Name': retrievedUser.firstname,
         'Last Name': retrievedUser.lastname,
@@ -145,11 +149,14 @@ function ManagementWrapper() {
         Password: '',
       })
     }
-    if (!objectId) return
     retrieveAccountDetails()
   }, [objectId])
 
   return <Management user={user} userId={userId} router={router} loading={!user} />
+}
+
+export async function getStaticProps({ locale }) {
+  return { props: { ...(await serverSideTranslations(locale, ['common'])) } }
 }
 
 export default ManagementWrapper

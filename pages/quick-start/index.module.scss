@@ -4,6 +4,17 @@
   gap: 28px;
 }
 
+/* skeleton row layout — shimmer comes from the Skeleton component */
+.skeletonRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--tk-dlite-semantic-color-border);
+
+  &:last-child { border-bottom: none; }
+}
+
 /* stat strip */
 .statStrip {
   display: grid;

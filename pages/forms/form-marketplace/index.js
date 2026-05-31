@@ -3,6 +3,11 @@ import { AppShell, PageHeader } from 'app/impacto-design-system';
 import { parseUserValue } from 'app/modules/user';
 import { useGlobalState } from 'app/store';
 import { useRouter } from 'next/router';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
+export async function getStaticProps({ locale }) {
+  return { props: { ...(await serverSideTranslations(locale, ['common'])) } };
+}
 
 export default function Marketplace() {
   const { contextManagment } = useGlobalState();

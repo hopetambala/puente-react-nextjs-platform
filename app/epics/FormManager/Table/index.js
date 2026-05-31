@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import CSVButton from './CSVButton';
 import ExpandableTableRow from './ExpandableTableRow';
+import styles from './index.module.scss';
 
 const FormManagerTable = ({
   data,
@@ -66,16 +67,17 @@ const FormManagerTable = ({
         action={handleRemove}
       />
       {data !== undefined ? (
-        <table>
+        <div style={{ overflowX: 'auto' }}>
+        <table className={styles.table} style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th style={{ width: 40 }} />
+              <th style={{ width: 32 }} />
               <th>Name</th>
               <th>Description</th>
-              <th>Status</th>
-              <th>Created</th>
-              <th>Updated</th>
-              <th>Actions</th>
+              <th style={{ width: 72, whiteSpace: 'nowrap' }}>Status</th>
+              <th style={{ width: 90, whiteSpace: 'nowrap' }}>Created</th>
+              <th style={{ width: 90, whiteSpace: 'nowrap' }}>Updated</th>
+              <th style={{ width: 120, textAlign: 'right', whiteSpace: 'nowrap' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -90,8 +92,8 @@ const FormManagerTable = ({
                 <td><Badge variant="green">Active</Badge></td>
                 <td>{row.createdAt ? new Date(row.createdAt).toLocaleDateString() : '—'}</td>
                 <td>{row.updatedAt ? new Date(row.updatedAt).toLocaleDateString() : '—'}</td>
-                <td>
-                  <div style={{ display: 'flex', gap: 'var(--spacer-xs)', justifyContent: 'flex-end' }}>
+                <td style={{ textAlign: 'right' }}>
+                  <div style={{ display: 'inline-flex', gap: 'var(--spacer-xs)' }}>
                     {!puenteForm && (
                       <>
                         <Button
@@ -119,6 +121,7 @@ const FormManagerTable = ({
             ))}
           </tbody>
         </table>
+        </div>
       ) : (
         <p style={{ textAlign: 'center', padding: 'var(--spacer-l)', color: 'var(--color-text-secondary)' }}>No data available.</p>
       )}

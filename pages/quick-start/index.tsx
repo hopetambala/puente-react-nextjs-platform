@@ -1,4 +1,4 @@
-import { AppShell, Badge, PageHeader } from 'app/impacto-design-system';
+import { AppShell, Badge, PageHeader, Skeleton } from 'app/impacto-design-system';
 import { retrieveCurrentUserAsyncFunction } from 'app/modules/user';
 import Link from 'next/link';
 import { useTranslation } from 'next-i18next';
@@ -150,9 +150,9 @@ export default function Dashboard() {
         <div className={styles.statStrip}>
           <div className={styles.statCard}>
             <span className={styles.statLabel}>{t('stat_records_today')}</span>
-            <span className={styles.statValue}>
-              {recordsToday === null ? '–' : recordsToday}
-            </span>
+            {recordsToday === null
+              ? <Skeleton width={48} height={28} style={{ margin: '2px 0' }} />
+              : <span className={styles.statValue}>{recordsToday}</span>}
             <div className={styles.sparkline}>
               {/* eslint-disable react/no-array-index-key */}
               {SPARKBAR_HEIGHTS.map((h, i) => (
@@ -168,21 +168,25 @@ export default function Dashboard() {
 
           <div className={styles.statCard}>
             <span className={styles.statLabel}>{t('stat_active_surveyors')}</span>
-            <span className={styles.statValue}>
-              {activeSurveyors === null ? '–' : activeSurveyors}
-            </span>
+            {activeSurveyors === null
+              ? <Skeleton width={48} height={28} style={{ margin: '2px 0' }} />
+              : <span className={styles.statValue}>{activeSurveyors}</span>}
             <div className={styles.statMeta}>
               <span className={styles.pulse} />
-              <span>{t('stat_active_surveyors_meta')}</span>
+              {activeSurveyors === null
+                ? <Skeleton width={80} height={12} style={{ marginTop: 6 }} />
+                : <span>{t('stat_active_surveyors_meta')}</span>}
             </div>
           </div>
 
           <div className={styles.statCard}>
             <span className={styles.statLabel}>{t('stat_households')}</span>
-            <span className={styles.statValue}>
-              {households === null ? '–' : households}
-            </span>
-            <div className={styles.statMeta}>{t('stat_households_meta')}</div>
+            {households === null
+              ? <Skeleton width={48} height={28} style={{ margin: '2px 0' }} />
+              : <span className={styles.statValue}>{households}</span>}
+            {households === null
+              ? <Skeleton width={80} height={12} style={{ marginTop: 6 }} />
+              : <div className={styles.statMeta}>{t('stat_households_meta')}</div>}
             <div className={styles.progressTrack}>
               <div className={styles.progressFill} />
             </div>
@@ -197,8 +201,16 @@ export default function Dashboard() {
               <span className={styles.panelTitle}>{t('field_activity')}</span>
             </div>
             {activityLoading && (
-              <div className={styles.spinnerWrap}>
-                <span className={styles.statLabel}>Loading…</span>
+              <div className={styles.activityList}>
+                {/* eslint-disable react/no-array-index-key */}
+                {[100, 75, 88, 60, 92].map((w, i) => (
+                  <div key={i} className={styles.skeletonRow}>
+                    <Skeleton width={40} height={11} />
+                    <span className={styles.activityDot} />
+                    <Skeleton width={`${w}%`} height={13} />
+                  </div>
+                ))}
+                {/* eslint-enable react/no-array-index-key */}
               </div>
             )}
             {!activityLoading && activityItems.length === 0 && (
@@ -229,8 +241,15 @@ export default function Dashboard() {
             {/* eslint-enable jsx-a11y/anchor-is-valid */}
             </div>
             {formsLoading && (
-              <div className={styles.spinnerWrap}>
-                <span className={styles.statLabel}>Loading…</span>
+              <div className={styles.formList}>
+                {/* eslint-disable react/no-array-index-key */}
+                {[65, 80, 50].map((w, i) => (
+                  <div key={i} className={styles.skeletonRow}>
+                    <Skeleton width={8} height={8} style={{ borderRadius: '50%' }} />
+                    <Skeleton width={`${w}%`} height={13} />
+                  </div>
+                ))}
+                {/* eslint-enable react/no-array-index-key */}
               </div>
             )}
             {!formsLoading && forms.length === 0 && (

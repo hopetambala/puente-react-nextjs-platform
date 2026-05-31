@@ -249,37 +249,26 @@ function FormCreator({ context, user }) {
 
   return (
     <div>
-      <Toast message={submission ? 'Success!' : null} />
+      {submission && <Toast message="Success!" />}
       <NativeApplicationDrawer
         isOpen={previewOpen}
         onClose={() => setPreviewOpen(false)}
         formItems={formItems}
       />
-      <div style={{ paddingBottom: 'var(--spacer-xxl)' }}>
-        <PageHeader title="Form Creator" />
-      </div>
+      <PageHeader
+        title="Form Creator"
+        actions={
+          <div style={{ display: 'flex', gap: 'var(--spacer-s)', alignItems: 'center' }}>
+            <Button text="Reset form" intent="danger" onClick={clearForm} />
+            <Button text="Preview form" onClick={() => setPreviewOpen(!previewOpen)} />
+            <Button text="Publish" intent="primary" onClick={submitCustomForm} isLoading={submission} />
+          </div>
+        }
+      />
       <DragDropContext onDragEnd={onDragEnd}>
         <div className={styles.canvasGrid}>
           <div className={styles.canvasMain}>
             <Stack isVertical spacing="medium">
-                <Stack spacing="large">
-                  <Button
-                    text="Reset form"
-                    intent="danger"
-                    onClick={clearForm}
-                  />
-                  <Button
-                    text="Preview form"
-                    onClick={() => setPreviewOpen(!previewOpen)}
-                  />
-
-                  <Button
-                    text="Publish"
-                    intent="primary"
-                    onClick={submitCustomForm}
-                    isLoading={submission}
-                  />
-                </Stack>
                 <Text text={submissionType} />
                 <Stack isVertical spacing="small">
                   <Text element="h3" text="Type of custom form" />
@@ -326,7 +315,7 @@ function FormCreator({ context, user }) {
                     selectedBlockId={selectedBlock?.id}
                   />
                 </Stack>
-              </Stack>
+            </Stack>
           </div>
           <div className={styles.blocksSidebar}>
             <Panel title="Blocks">
