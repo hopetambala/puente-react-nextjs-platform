@@ -145,7 +145,7 @@ function FormManager({ context, router, user }) {
                 />
               </div>
             </div>
-            <div className={styles.filterRight}>
+            <div className="cl-dlite-flex-shrink-0">
               <SegmentedControl options={VIEW_OPTIONS} value={listView} onChange={setListView} />
             </div>
           </div>

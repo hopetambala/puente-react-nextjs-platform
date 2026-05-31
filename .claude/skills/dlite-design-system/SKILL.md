@@ -144,9 +144,15 @@ CSS by hand.
 <div className="cl-dlite-flex cl-dlite-items-center cl-dlite-justify-between">…</div>
 ```
 
-A `*.module.scss` rule that does nothing but `display:flex; align-items:center`
-(or any other plain mapping of the table above) is a custom reimplementation of
-a utility that already exists — replace it with the class.
+A `*.module.scss` rule that does **nothing but** layout primitives
+(`display:flex; align-items:center`, etc.) is a custom reimplementation of
+utilities that already exist — delete the rule and put the `cl-dlite-*` classes
+on the element. The scanner only flags these *fully-convertible* rules (with a
+single-class selector). It deliberately **does not** flag mixed rules where
+layout sits alongside `gap`/`padding`/`color`: dlite ships no `gap` utility, so
+those rules must keep a module block regardless, and splitting them across a
+`className` string and the module just fragments the styling. Leave mixed rules
+as a single module rule.
 
 ---
 

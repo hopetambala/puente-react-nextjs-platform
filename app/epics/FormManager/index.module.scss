@@ -23,10 +23,6 @@
   min-width: 0;
 }
 
-.filterRight {
-  flex-shrink: 0;
-}
-
 .search {
   display: flex;
   align-items: center;
@@ -106,7 +102,7 @@
   font-family: var(--font-family);
   font-size: 13px;
   font-weight: var(--font-weight-emphasis);
-  color: #ffffff;
+  color: var(--tk-dlite-primitive-color-white);
   cursor: pointer;
   white-space: nowrap;
 

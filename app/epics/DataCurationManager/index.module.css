@@ -51,11 +51,11 @@
 .chipDup,
 .chipAnomaly {
   display: inline-block;
-  padding: 2px 8px;
+  padding: var(--tk-dlite-semantic-spacing-xxs) var(--tk-dlite-semantic-spacing-sm);
   border-radius: var(--border-radius-s);
   font-size: 11px;
   font-weight: var(--font-weight-bold);
-  margin-right: 4px;
+  margin-right: var(--tk-dlite-semantic-spacing-xs);
 }
 
 .chipDup {

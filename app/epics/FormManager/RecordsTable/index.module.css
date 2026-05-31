@@ -7,7 +7,7 @@
   display: flex;
   border-bottom: 2px solid var(--tk-dlite-semantic-color-border-default);
   padding-bottom: var(--spacer-xs);
-  margin-bottom: 2px;
+  margin-bottom: var(--tk-dlite-semantic-spacing-xxs);
 }
 
 .tableRow {

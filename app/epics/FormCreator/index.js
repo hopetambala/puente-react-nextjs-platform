@@ -1,6 +1,6 @@
 import {
     Button,
-    EmptyState, PageHeader, Panel, Stack, Text, Toast
+    EmptyState, PageHeader, Panel, Toast
 } from 'app/impacto-design-system';
 import { postObjectsToClass, updateObject } from 'app/modules/cloud-code';
 import { useCallback, useEffect, useState } from 'react';
@@ -258,7 +258,7 @@ function FormCreator({ context, user }) {
       <PageHeader
         title="Form Creator"
         actions={
-          <div style={{ display: 'flex', gap: 'var(--spacer-s)', alignItems: 'center' }}>
+          <div className={styles.headerActions}>
             <Button text="Reset form" intent="danger" onClick={clearForm} />
             <Button text="Preview form" onClick={() => setPreviewOpen(!previewOpen)} />
             <Button text="Publish" intent="primary" onClick={submitCustomForm} isLoading={submission} />
@@ -268,54 +268,58 @@ function FormCreator({ context, user }) {
       <DragDropContext onDragEnd={onDragEnd}>
         <div className={styles.canvasGrid}>
           <div className={styles.canvasMain}>
-            <Stack isVertical spacing="medium">
-                <Text text={submissionType} />
-                <Stack isVertical spacing="small">
-                  <Text element="h3" text="Type of custom form" />
-                  <select
-                    name="formType"
-                    value={formTypeNames[0]}
-                    onChange={handleFormTypesChange}
-                    className={styles.select}
-                  >
-                    <option value="Custom">Custom</option>
-                    <option value="Assets">Assets</option>
-                  </select>
-                  <Text element="h3" text="Form Name" />
-                  <input
-                    value={formName}
-                    onChange={(e) => setFormName(e.target.value)}
-                    type="text"
-                    placeholder="Give your form a detailed name"
-                    className={styles.input}
-                  />
-                  <Text element="h3" text="Form Description" />
-                  <input
-                    value={formDescription}
-                    onChange={(e) => setFormDescription(e.target.value)}
-                    type="text"
-                    placeholder="Describe how this form will be used"
-                    className={styles.input}
-                  />
-                </Stack>
-                <Stack isVertical>
-                  <div
-                    style={{
-                      paddingTop: 'var(--spacer-s)',
-                      paddingBottom: 'var(--spacer-m)',
-                    }}
-                  >
-                    <Text element="h3" text="Form Builder" />
-                  </div>
-                  <FormTemplate
-                    formItems={formItems}
-                    setFormItems={setFormItems}
-                    removeValue={removeValue}
-                    onSelectBlock={setSelectedBlock}
-                    selectedBlockId={selectedBlock?.id}
-                  />
-                </Stack>
-            </Stack>
+            {/* Form settings card */}
+            <div className={styles.settingsCard}>
+              <div className={styles.fieldGroup}>
+                <label className={styles.fieldLabel} htmlFor="formType">Type of form</label>
+                <select
+                  id="formType"
+                  name="formType"
+                  value={formTypeNames[0]}
+                  onChange={handleFormTypesChange}
+                  className={styles.select}
+                >
+                  <option value="Custom">Custom</option>
+                  <option value="Assets">Assets</option>
+                </select>
+              </div>
+
+              <div className={styles.fieldGroup}>
+                <label className={styles.fieldLabel} htmlFor="formName">Form name</label>
+                <input
+                  id="formName"
+                  value={formName}
+                  onChange={(e) => setFormName(e.target.value)}
+                  type="text"
+                  placeholder="Give your form a detailed name"
+                  className={styles.input}
+                />
+              </div>
+
+              <div className={styles.fieldGroup}>
+                <label className={styles.fieldLabel} htmlFor="formDescription">Description</label>
+                <input
+                  id="formDescription"
+                  value={formDescription}
+                  onChange={(e) => setFormDescription(e.target.value)}
+                  type="text"
+                  placeholder="Describe how this form will be used"
+                  className={styles.input}
+                />
+              </div>
+            </div>
+
+            {/* Form builder canvas */}
+            <div className={styles.builderSection}>
+              <span className={styles.builderLabel}>Form builder</span>
+              <FormTemplate
+                formItems={formItems}
+                setFormItems={setFormItems}
+                removeValue={removeValue}
+                onSelectBlock={setSelectedBlock}
+                selectedBlockId={selectedBlock?.id}
+              />
+            </div>
           </div>
           <div className={styles.blocksSidebar}>
             <Panel title="Blocks">

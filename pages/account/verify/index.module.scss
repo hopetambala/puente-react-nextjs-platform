@@ -8,13 +8,13 @@
   background: var(--tk-dlite-semantic-color-text-primary);
   display: flex;
   flex-direction: column;
-  padding: 32px;
+  padding: var(--tk-dlite-semantic-spacing-xl);
 }
 
 .leftBrand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--tk-dlite-semantic-spacing-sm);
 }
 
 .leftBrandMark {
@@ -30,7 +30,7 @@
 }
 
 .leftBrandName {
-  color: #fff;
+  color: var(--tk-dlite-primitive-color-white);
   font-weight: 600;
   font-size: 15px;
 }
@@ -39,7 +39,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 32px;
+  padding: var(--tk-dlite-semantic-spacing-xl);
   background: var(--tk-dlite-semantic-color-background);
 }
 

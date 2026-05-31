@@ -272,7 +272,7 @@ export default function Homepage() {
               </div>
             </div>
 
-            <div className={styles.phoneIllustration}>
+            <div className="cl-dlite-flex cl-dlite-justify-center">
               <div className={styles.phoneLarge}>
                 <div className={styles.phoneLargeTitle}>Home</div>
                 <div className={styles.phoneLargeWelcome}>Welcome back, Yolanda</div>

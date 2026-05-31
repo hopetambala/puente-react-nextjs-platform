@@ -73,6 +73,7 @@ jest.mock('app/impacto-design-system', () => ({
     </div>
   ),
   Badge: ({ children, variant }) => <span data-testid={`badge-${variant}`}>{children}</span>,
+  Skeleton: ({ width, height }) => <span data-testid="skeleton" style={{ width, height }} />,
 }));
 
 const Dashboard = require('pages/quick-start/index').default;

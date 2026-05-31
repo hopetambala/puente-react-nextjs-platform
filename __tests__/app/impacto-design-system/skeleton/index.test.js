@@ -4,9 +4,9 @@ import { render, screen } from '@testing-library/react';
 import Skeleton from 'app/impacto-design-system/skeleton';
 
 describe('Skeleton', () => {
-  it('renders a hidden span with the shimmer class', () => {
-    render(<Skeleton width={100} height={16} />);
-    const el = screen.getByRole('presentation', { hidden: true });
+  it('renders a hidden span with aria-hidden', () => {
+    const { container } = render(<Skeleton width={100} height={16} />);
+    const el = container.querySelector('span');
     expect(el.tagName).toBe('SPAN');
     expect(el).toHaveAttribute('aria-hidden', 'true');
   });
