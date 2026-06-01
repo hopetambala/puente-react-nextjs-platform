@@ -1,0 +1,75 @@
+.filterStrip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--tk-dlite-semantic-spacing-md);
+  padding: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-md);
+  background: var(--tk-dlite-semantic-color-surface-base);
+  border: 1px solid var(--tk-dlite-semantic-color-border);
+  border-radius: var(--tk-dlite-semantic-border-radius-md);
+}
+
+.filterLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--tk-dlite-semantic-spacing-sm);
+  flex: 1;
+  min-width: 0;
+}
+
+.filterRight {
+  display: flex;
+  align-items: center;
+  gap: var(--tk-dlite-semantic-spacing-sm);
+  flex-shrink: 0;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: var(--tk-dlite-semantic-spacing-xs);
+  background: var(--tk-dlite-semantic-color-background);
+  border: 1px solid var(--tk-dlite-semantic-color-border);
+  border-radius: var(--tk-dlite-semantic-border-radius-sm);
+  padding: 0 var(--tk-dlite-semantic-spacing-sm);
+  height: 32px;
+  min-width: 220px;
+}
+
+.searchIcon {
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.searchInput {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--font-family);
+  font-size: 13px;
+  color: var(--tk-dlite-semantic-color-text-primary);
+  width: 100%;
+}
+
+.searchInput::placeholder {
+  color: var(--tk-dlite-semantic-color-text-secondary);
+}
+
+.filterSelect {
+  height: 32px;
+  border: 1px solid var(--tk-dlite-semantic-color-border);
+  border-radius: var(--tk-dlite-semantic-border-radius-sm);
+  background: var(--tk-dlite-semantic-color-surface-base);
+  font-family: var(--font-family);
+  font-size: 13px;
+  color: var(--tk-dlite-semantic-color-text-primary);
+  padding: 0 var(--tk-dlite-semantic-spacing-sm);
+  cursor: pointer;
+  outline: none;
+}
+
+.filterSelect:focus-visible {
+  border-color: var(--tk-dlite-semantic-color-action-primary);
+  box-shadow: var(--focus-glow);
+}

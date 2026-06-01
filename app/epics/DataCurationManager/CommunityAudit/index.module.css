@@ -1,0 +1,38 @@
+.empty {
+  font-family: var(--font-family);
+  font-size: 13px;
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  margin: 0;
+}
+
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tk-dlite-semantic-spacing-md);
+}
+
+.group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--tk-dlite-semantic-spacing-md);
+  padding: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-md);
+  border: 1px solid var(--tk-dlite-semantic-color-border);
+  border-radius: var(--tk-dlite-semantic-border-radius-sm);
+}
+
+.variants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--tk-dlite-semantic-spacing-md);
+}
+
+.variant {
+  display: flex;
+  align-items: center;
+  gap: var(--tk-dlite-semantic-spacing-xs);
+  font-family: var(--font-family);
+  font-size: 13px;
+  color: var(--tk-dlite-semantic-color-text-primary);
+  cursor: pointer;
+}

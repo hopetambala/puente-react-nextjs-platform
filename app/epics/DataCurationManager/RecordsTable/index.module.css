@@ -1,0 +1,106 @@
+.tableWrap {
+  background: var(--tk-dlite-semantic-color-surface-base);
+  border: 1px solid var(--tk-dlite-semantic-color-border);
+  border-radius: var(--tk-dlite-semantic-border-radius-md);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  font-family: var(--font-family-heading);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  padding: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-md);
+  border-bottom: 1px solid var(--tk-dlite-semantic-color-border);
+  background: var(--tk-dlite-semantic-color-background);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-md);
+  border-bottom: 1px solid var(--tk-dlite-semantic-color-border);
+  font-size: 13px;
+  color: var(--tk-dlite-semantic-color-text-primary);
+  vertical-align: middle;
+}
+
+.row {
+  cursor: pointer;
+}
+
+.row:hover td {
+  background: var(--tk-dlite-primitive-color-neutral-100);
+}
+
+.nameCell {
+  font-weight: 500;
+}
+
+.completenessCell {
+  min-width: 120px;
+}
+
+.barTrack {
+  height: 6px;
+  background: var(--tk-dlite-semantic-color-border);
+  border-radius: var(--tk-dlite-semantic-border-radius-full);
+  overflow: hidden;
+  width: 100px;
+}
+
+.barFill {
+  height: 100%;
+  border-radius: var(--tk-dlite-semantic-border-radius-full);
+}
+
+.barHigh {
+  background: var(--tk-dlite-primitive-color-green-500);
+}
+
+.barMid {
+  background: var(--tk-dlite-primitive-color-yellow-500);
+}
+
+.barLow {
+  background: var(--tk-dlite-primitive-color-red-500);
+}
+
+.flags {
+  display: flex;
+  align-items: center;
+  gap: var(--tk-dlite-semantic-spacing-xs);
+}
+
+.dupChip {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-md);
+  border-top: 1px solid var(--tk-dlite-semantic-color-border);
+}
+
+.pageInfo {
+  font-size: 12px;
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  font-family: var(--font-family-mono);
+}
+
+.pageButtons {
+  display: flex;
+  gap: var(--tk-dlite-semantic-spacing-sm);
+}

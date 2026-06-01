@@ -25,10 +25,20 @@ const mockSave = jest.fn().mockResolvedValue({});
 const mockSet = jest.fn();
 const mockFind = jest.fn().mockResolvedValue([]);
 
+const mockCount = jest.fn().mockResolvedValue(0);
+const mockDistinct = jest.fn().mockResolvedValue([]);
+
 const mockQueryChain = {
   equalTo: jest.fn().mockReturnThis(),
+  select: jest.fn().mockReturnThis(),
   limit: jest.fn().mockReturnThis(),
+  skip: jest.fn().mockReturnThis(),
+  descending: jest.fn().mockReturnThis(),
+  greaterThanOrEqualTo: jest.fn().mockReturnThis(),
+  lessThanOrEqualTo: jest.fn().mockReturnThis(),
   find: mockFind,
+  count: mockCount,
+  distinct: mockDistinct,
 };
 
 jest.mock('parse', () => ({
@@ -44,16 +54,31 @@ jest.mock('app/impacto-design-system', () => ({
   Button: ({ text, onClick, isDisabled }) => (
     <button type="button" onClick={onClick} disabled={isDisabled}>{text}</button>
   ),
+  Skeleton: ({ width, height }) => <span data-testid="skeleton" style={{ width, height }} />,
 }));
+
+// Sub-components are unit-tested in their own files; mock them here as sentinels
+// so the orchestrator test focuses on orchestration (summary counts, fetch wiring).
+jest.mock('app/epics/DataCurationManager/SourceSelector', () => () => <div data-testid="source-selector" />);
+jest.mock('app/epics/DataCurationManager/FilterBar', () => () => <div data-testid="filter-bar" />);
+jest.mock('app/epics/DataCurationManager/RecordsTable', () => ({ records }) => (
+  <div data-testid="records-table">{records.length} rows</div>
+));
+jest.mock('app/epics/DataCurationManager/RecordInspector', () => () => <div data-testid="record-inspector" />);
+jest.mock('app/epics/DataCurationManager/DuplicateResolver', () => () => <div data-testid="duplicate-resolver" />);
+jest.mock('app/epics/DataCurationManager/CommunityAudit', () => () => <div data-testid="community-audit" />);
 
 function makeRecord(overrides = {}) {
   const data = {
     objectId: 'r1',
     fname: 'Hope',
     lname: 'Tambala',
+    dob: '01/01/1990',
+    sex: 'female',
     householdId: 'HH01',
     surveyingUser: 'alice',
     communityname: 'Nsanje',
+    telephoneNumber: '265999',
     createdAt: new Date('2026-06-01T10:00:00Z'),
     ...overrides,
   };
@@ -71,25 +96,79 @@ const DataCurationManager = require('app/epics/DataCurationManager').default;
 beforeEach(() => {
   jest.clearAllMocks();
   mockFind.mockResolvedValue([]);
+  mockCount.mockResolvedValue(0);
+  mockDistinct.mockResolvedValue([]);
 });
 
 // ─── Pure function tests ──────────────────────────────────────────────────────
 
-describe('computeCompleteness', () => {
-  const { computeCompleteness } = require('app/epics/DataCurationManager');
+describe('computeSurveyCompleteness (8-field)', () => {
+  const { computeSurveyCompleteness } = require('app/epics/DataCurationManager');
 
-  it('returns 100 when all 5 key fields are present', () => {
-    expect(computeCompleteness(makeRecord())).toBe(100);
+  it('returns 100 when all 8 key fields are present', () => {
+    expect(computeSurveyCompleteness(makeRecord())).toBe(100);
   });
 
-  it('returns 0 when all 5 key fields are empty', () => {
-    const r = makeRecord({ fname: '', lname: '', householdId: '', surveyingUser: '', communityname: '' });
-    expect(computeCompleteness(r)).toBe(0);
+  it('returns 0 when all 8 key fields are empty', () => {
+    const r = makeRecord({ fname: '', lname: '', dob: '', sex: '', householdId: '', surveyingUser: '', communityname: '', telephoneNumber: '' });
+    expect(computeSurveyCompleteness(r)).toBe(0);
   });
 
-  it('returns 60 when 3 of 5 fields are present', () => {
-    const r = makeRecord({ householdId: '', surveyingUser: '' });
-    expect(computeCompleteness(r)).toBe(60);
+  it('returns 75 when 6 of 8 fields are present', () => {
+    const r = makeRecord({ dob: '', sex: '' });
+    expect(computeSurveyCompleteness(r)).toBe(75);
+  });
+});
+
+describe('computeFormResultsCompleteness', () => {
+  const { computeFormResultsCompleteness } = require('app/epics/DataCurationManager');
+
+  const mockFormDef = {
+    get: (k) => ({
+      fields: [
+        { formikKey: 'water_source' },
+        { formikKey: 'floor_material' },
+      ],
+    }[k]),
+  };
+
+  it('returns meta:100 when all 4 metadata fields present', () => {
+    const r = makeRecord();
+    r.get = (k) => ({
+      surveyingUser: 'alice',
+      surveyingOrganization: 'TestOrg',
+      client: { id: 'hh1' },
+      createdAt: new Date(),
+      fields: [{ title: 'water_source', answer: 'Well' }, { title: 'floor_material', answer: 'Dirt' }],
+    }[k]);
+    const { meta } = computeFormResultsCompleteness(r, mockFormDef);
+    expect(meta).toBe(100);
+  });
+
+  it('returns fields:50 when only 1 of 2 expected fields answered', () => {
+    const r = makeRecord();
+    r.get = (k) => ({
+      surveyingUser: 'alice',
+      surveyingOrganization: 'TestOrg',
+      client: { id: 'hh1' },
+      createdAt: new Date(),
+      fields: [{ title: 'water_source', answer: 'Well' }],
+    }[k]);
+    const { fields } = computeFormResultsCompleteness(r, mockFormDef);
+    expect(fields).toBe(50);
+  });
+
+  it('returns overall < 60 when most fields missing', () => {
+    const r = makeRecord();
+    r.get = (k) => ({
+      surveyingUser: null,
+      surveyingOrganization: null,
+      client: null,
+      createdAt: null,
+      fields: [],
+    }[k]);
+    const { overall } = computeFormResultsCompleteness(r, mockFormDef);
+    expect(overall).toBeLessThan(60);
   });
 });
 
@@ -120,8 +199,8 @@ describe('flagAnomalies', () => {
   const { flagAnomalies } = require('app/epics/DataCurationManager');
 
   it('flags record with completeness < 60', () => {
-    const r = makeRecord({ objectId: 'r1', fname: '', lname: '', householdId: '', surveyingUser: '' });
-    // communityname present = 1/5 = 20%
+    // 1 of 8 fields (only communityname) = 12%
+    const r = makeRecord({ objectId: 'r1', fname: '', lname: '', dob: '', sex: '', householdId: '', surveyingUser: '', telephoneNumber: '' });
     const anomalies = flagAnomalies([r]);
     expect(anomalies.has('r1')).toBe(true);
   });
@@ -133,11 +212,12 @@ describe('flagAnomalies', () => {
   });
 });
 
-// ─── Component tests ──────────────────────────────────────────────────────────
+// ─── Orchestration tests ──────────────────────────────────────────────────────
 
 describe('Summary bar', () => {
-  it('shows record count', async () => {
+  it('shows record count after fetch', async () => {
     mockFind.mockResolvedValue([makeRecord()]);
+    mockCount.mockResolvedValue(1);
     render(<DataCurationManager />);
     await waitFor(() => expect(screen.getByText(/1.*records/i)).toBeInTheDocument());
   });
@@ -159,59 +239,33 @@ describe('Summary bar', () => {
   });
 
   it('shows anomaly count', async () => {
-    const r = makeRecord({ objectId: 'r1', fname: '', lname: '', householdId: '', surveyingUser: '' });
+    const r = makeRecord({ objectId: 'r1', fname: '', lname: '', dob: '', sex: '', householdId: '', surveyingUser: '', telephoneNumber: '' });
     mockFind.mockResolvedValue([r]);
     render(<DataCurationManager />);
     await waitFor(() => expect(screen.getByText(/1.*anomalies/i)).toBeInTheDocument());
   });
 });
 
-describe('Records table', () => {
-  it('renders table with Surveyor, Submitted, Completeness columns', async () => {
-    mockFind.mockResolvedValue([makeRecord()]);
+describe('Orchestration', () => {
+  it('renders SourceSelector, FilterBar, RecordsTable and CommunityAudit', async () => {
     render(<DataCurationManager />);
     await waitFor(() => {
-      expect(screen.getByText('Surveyor')).toBeInTheDocument();
-      expect(screen.getByText('Submitted')).toBeInTheDocument();
-      expect(screen.getByText('Completeness')).toBeInTheDocument();
+      expect(screen.getByTestId('source-selector')).toBeInTheDocument();
+      expect(screen.getByTestId('filter-bar')).toBeInTheDocument();
+      expect(screen.getByTestId('records-table')).toBeInTheDocument();
+      expect(screen.getByTestId('community-audit')).toBeInTheDocument();
     });
   });
-});
 
-describe('Edit panel', () => {
-  it('opens edit panel on row click showing field inputs', async () => {
+  it('scopes the Parse query to the user organization', async () => {
     mockFind.mockResolvedValue([makeRecord()]);
     render(<DataCurationManager />);
-    await waitFor(() => screen.getByText('alice'));
-    fireEvent.click(screen.getByText('alice').closest('tr'));
-    await waitFor(() => expect(screen.getByLabelText('fname')).toBeInTheDocument());
+    await waitFor(() => expect(mockQueryChain.equalTo).toHaveBeenCalledWith('surveyingOrganization', 'TestOrg'));
   });
 
-  it('pre-fills inputs with current field values', async () => {
-    mockFind.mockResolvedValue([makeRecord()]);
+  it('passes fetched records to RecordsTable', async () => {
+    mockFind.mockResolvedValue([makeRecord(), makeRecord({ objectId: 'r2' })]);
     render(<DataCurationManager />);
-    await waitFor(() => screen.getByText('alice'));
-    fireEvent.click(screen.getByText('alice').closest('tr'));
-    await waitFor(() => expect(screen.getByLabelText('fname')).toHaveValue('Hope'));
-  });
-
-  it('calls record.set and record.save on Save', async () => {
-    mockFind.mockResolvedValue([makeRecord()]);
-    render(<DataCurationManager />);
-    await waitFor(() => screen.getByText('alice'));
-    fireEvent.click(screen.getByText('alice').closest('tr'));
-    await waitFor(() => screen.getByLabelText('fname'));
-    fireEvent.click(screen.getByText('Save'));
-    await waitFor(() => expect(mockSave).toHaveBeenCalled());
-  });
-
-  it('closes edit panel on Cancel', async () => {
-    mockFind.mockResolvedValue([makeRecord()]);
-    render(<DataCurationManager />);
-    await waitFor(() => screen.getByText('alice'));
-    fireEvent.click(screen.getByText('alice').closest('tr'));
-    await waitFor(() => screen.getByLabelText('fname'));
-    fireEvent.click(screen.getByText('Cancel'));
-    expect(screen.queryByLabelText('fname')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText('2 rows')).toBeInTheDocument());
   });
 });
