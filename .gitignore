@@ -31,3 +31,6 @@ yarn-error.log*
 
 # virtual env
 nextenv/
+
+# Auto-generated visual-qa screenshots (regenerable; not versioned)
+.claude/screenshots/

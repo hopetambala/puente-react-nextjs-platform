@@ -6,7 +6,7 @@ const CHART_BARS = [40, 65, 30, 80, 55, 90, 45, 70, 35, 60];
 
 const PILLAR_MANAGE_FEATURES = ['Form Creator', 'Form Manager', 'Form Marketplace', 'Consent & GDPR'];
 const PILLAR_COLLECT_FEATURES = ['Offline-first data collection', 'Household geolocation', 'Supplementary configs', 'GDPR consent capture'];
-const PILLAR_ANALYZE_FEATURES = ['Quick Insights charts', 'Dimension + filter controls', 'CSV export', 'Same formikKey contract as Collect'];
+const PILLAR_CURATE_FEATURES = ['Duplicate detection & merge', 'Completeness scoring', 'Community-name auditing', 'Inline record editing & CSV export'];
 
 const MODULES = [
   { platform: 'Manage · Web', mobile: false, title: 'Form Creator', desc: 'Drag & drop blocks — headers, inputs, selects, geolocation, loops — into surveys field workers can run on Collect.', link: '/forms/form-creator', linkLabel: 'Open Form Creator →' },
@@ -14,7 +14,7 @@ const MODULES = [
   { platform: 'Manage · Web', mobile: false, title: 'Marketplace', desc: 'Community-published form templates — medical evaluation, vitals, environmental health — install in one click.', link: '/forms/form-marketplace', linkLabel: 'Browse marketplace →' },
   { platform: 'Collect · Mobile', mobile: true, title: 'Data Collection', desc: 'Identification forms, supplementary configs, GDPR consent — all queued locally and synced when online.', link: '#', linkLabel: 'Get the app →' },
   { platform: 'Collect · Mobile', mobile: true, title: 'Find Records', desc: 'Search and edit existing household records in the field — same data model as the web side.', link: '#', linkLabel: 'See how it works →' },
-  { platform: 'Manage · Web', mobile: false, title: 'Data Visualization', desc: 'Choose a dimension, pick a filter, get a chart. Powered by Nivo and your form\'s own keys.', link: '/data/data-curation', linkLabel: 'Open Quick Insights →' },
+  { platform: 'Manage · Web', mobile: false, title: 'Data Curation', desc: 'Find duplicates, score completeness, audit community names and fix records inline before the data is used — then export it clean.', link: '/data/data-curation', linkLabel: 'Open Data Curation →' },
 ];
 
 const COMPANION_FEATURES = [
@@ -93,8 +93,8 @@ export default function Homepage() {
                     <div className={styles.previewChromeDot} />
                     <div className={styles.previewChromeDot} />
                   </div>
-                  <div className={styles.previewTitle}>Manage · Quick Insights</div>
-                  <div className={styles.previewH3}>Environmental health, Q1</div>
+                  <div className={styles.previewTitle}>Manage · Data Curation</div>
+                  <div className={styles.previewH3}>Environmental health · record review</div>
                   <div className={styles.previewStats}>
                     {[['1,284', 'Records'], ['62%', 'Treated water'], ['14', 'Surveyors']].map(([num, label]) => (
                       <div key={label} className={styles.previewStat}>
@@ -187,16 +187,17 @@ export default function Homepage() {
             </div>
 
             <div className={styles.pillar}>
-              <div className={styles.pillarNum}>03 / Analyze</div>
-              <div className={`${styles.pillarIcon} ${styles.pillarIconAnalyze}`}>A</div>
-              <div className={styles.pillarTitle}>The decision-maker</div>
+              <div className={styles.pillarNum}>03 / Curate</div>
+              <div className={`${styles.pillarIcon} ${styles.pillarIconAnalyze}`}>D</div>
+              <div className={styles.pillarTitle}>The data steward</div>
               <div className={styles.pillarPlatform}>Back in Manage · Web</div>
               <p className={styles.pillarBody}>
-                Filters the data, chooses a dimension, exports a chart — and routes the
-                findings to whoever can act on them.
+                Reviews what came back from the field — merges duplicates, fixes gaps,
+                standardizes community names — then exports a clean dataset whoever can
+                act on it.
               </p>
               <ul className={styles.pillarFeatures}>
-                {PILLAR_ANALYZE_FEATURES.map((f) => <li key={f} className={styles.pillarFeature}>{f}</li>)}
+                {PILLAR_CURATE_FEATURES.map((f) => <li key={f} className={styles.pillarFeature}>{f}</li>)}
               </ul>
             </div>
           </div>
