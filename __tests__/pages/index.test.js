@@ -18,4 +18,9 @@ describe('Landing page — highlights Data Curation', () => {
     expect(screen.queryByText(/Data Visualization/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Quick Insights/i)).not.toBeInTheDocument();
   });
+
+  it('uses no em dashes in copy (they read as AI-generated)', () => {
+    const { container } = render(<Homepage />);
+    expect(container.textContent).not.toMatch(/—/);
+  });
 });

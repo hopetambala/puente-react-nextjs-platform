@@ -9,26 +9,26 @@ const PILLAR_COLLECT_FEATURES = ['Offline-first data collection', 'Household geo
 const PILLAR_CURATE_FEATURES = ['Duplicate detection & merge', 'Completeness scoring', 'Community-name auditing', 'Inline record editing & CSV export'];
 
 const MODULES = [
-  { platform: 'Manage · Web', mobile: false, title: 'Form Creator', desc: 'Drag & drop blocks — headers, inputs, selects, geolocation, loops — into surveys field workers can run on Collect.', link: '/forms/form-creator', linkLabel: 'Open Form Creator →' },
+  { platform: 'Manage · Web', mobile: false, title: 'Form Creator', desc: 'Drag & drop blocks like headers, inputs, selects, geolocation and loops into surveys field workers can run on Collect.', link: '/forms/form-creator', linkLabel: 'Open Form Creator →' },
   { platform: 'Manage · Web', mobile: false, title: 'Form Manager', desc: 'Browse submitted records as cards or tables. Drill in, expand rows, export to CSV.', link: '/forms/form-manager', linkLabel: 'Open Form Manager →' },
-  { platform: 'Manage · Web', mobile: false, title: 'Marketplace', desc: 'Community-published form templates — medical evaluation, vitals, environmental health — install in one click.', link: '/forms/form-marketplace', linkLabel: 'Browse marketplace →' },
-  { platform: 'Collect · Mobile', mobile: true, title: 'Data Collection', desc: 'Identification forms, supplementary configs, GDPR consent — all queued locally and synced when online.', link: '#', linkLabel: 'Get the app →' },
-  { platform: 'Collect · Mobile', mobile: true, title: 'Find Records', desc: 'Search and edit existing household records in the field — same data model as the web side.', link: '#', linkLabel: 'See how it works →' },
-  { platform: 'Manage · Web', mobile: false, title: 'Data Curation', desc: 'Find duplicates, score completeness, audit community names and fix records inline before the data is used — then export it clean.', link: '/data/data-curation', linkLabel: 'Open Data Curation →' },
+  { platform: 'Manage · Web', mobile: false, title: 'Marketplace', desc: 'Community-published form templates for medical evaluation, vitals and environmental health. Install in one click.', link: '/forms/form-marketplace', linkLabel: 'Browse marketplace →' },
+  { platform: 'Collect · Mobile', mobile: true, title: 'Data Collection', desc: 'Identification forms, supplementary configs and GDPR consent, all queued locally and synced when online.', link: '#', linkLabel: 'Get the app →' },
+  { platform: 'Collect · Mobile', mobile: true, title: 'Find Records', desc: 'Search and edit existing household records in the field, on the same data model as the web side.', link: '#', linkLabel: 'See how it works →' },
+  { platform: 'Manage · Web', mobile: false, title: 'Data Curation', desc: 'Find duplicates, score completeness, audit community names and fix records inline before the data is used, then export it clean.', link: '/data/data-curation', linkLabel: 'Open Data Curation →' },
 ];
 
 const COMPANION_FEATURES = [
   { icon: '⌁', title: 'Offline by default', desc: 'Records, households & forms all cached on device. Queue syncs on reconnect.' },
-  { icon: '⏚', title: 'Configurable forms', desc: 'Forms designed in Manage publish straight to phones — no rebuild.' },
+  { icon: '⏚', title: 'Configurable forms', desc: 'Forms designed in Manage publish straight to phones, no rebuild needed.' },
   { icon: '◉', title: 'Geolocation + Assets', desc: 'Pin households, link them to records, view on a map back on the web.' },
   { icon: '⛨', title: 'Consent on record', desc: 'GDPR consent captured at every household. Exportable for audit, deletable on request.' },
 ];
 
 const USE_CASES = [
-  { tag: 'Health', title: 'Community medical clinics', desc: 'Triage forms, vitals, follow-up records — synced from mobile clinics in remote areas.', colorClass: 'useCaseBlue' },
+  { tag: 'Health', title: 'Community medical clinics', desc: 'Triage forms, vitals and follow-up records, synced from mobile clinics in remote areas.', colorClass: 'useCaseBlue' },
   { tag: 'Environment', title: 'Water & sanitation surveys', desc: 'Household-level WaSH data: water source, treatment, sanitation infrastructure.', colorClass: 'useCaseYellow' },
-  { tag: 'Disaster response', title: 'Rapid needs assessment', desc: 'Asset mapping & damage triage right after a hurricane — no signal required.', colorClass: 'useCaseGreen' },
-  { tag: 'Custom', title: 'Your program', desc: 'Any field-collected dataset — design the form, publish to mobile, ship the insights.', colorClass: null },
+  { tag: 'Disaster response', title: 'Rapid needs assessment', desc: 'Asset mapping & damage triage right after a hurricane, no signal required.', colorClass: 'useCaseGreen' },
+  { tag: 'Custom', title: 'Your program', desc: 'Any field-collected dataset: design the form, publish to mobile, ship the insights.', colorClass: null },
 ];
 
 export async function getStaticProps() {
@@ -192,9 +192,9 @@ export default function Homepage() {
               <div className={styles.pillarTitle}>The data steward</div>
               <div className={styles.pillarPlatform}>Back in Manage · Web</div>
               <p className={styles.pillarBody}>
-                Reviews what came back from the field — merges duplicates, fixes gaps,
-                standardizes community names — then exports a clean dataset whoever can
-                act on it.
+                Reviews what came back from the field, merges duplicates, fixes gaps
+                and standardizes community names, then exports a clean dataset for
+                whoever can act on it.
               </p>
               <ul className={styles.pillarFeatures}>
                 {PILLAR_CURATE_FEATURES.map((f) => <li key={f} className={styles.pillarFeature}>{f}</li>)}
@@ -211,7 +211,7 @@ export default function Homepage() {
             <h2>Every part of the platform <em>is built around the field worker.</em></h2>
             <p>
               Designed to feel coherent whether you&apos;re at a desk in San Juan or on a moto
-              outside Las Matas — because it&apos;s the same team using both.
+              outside Las Matas, because it&apos;s the same team using both.
             </p>
           </div>
           <div className={styles.modulesGrid}>

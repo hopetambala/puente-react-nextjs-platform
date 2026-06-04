@@ -61,7 +61,7 @@ function Login() {
             the records were already in San Juan.
           </p>
           <div className={styles.quoteAttr}>
-            — Yolanda M. Program manager, jornada médica, Las Matas
+            Yolanda M., program manager, jornada médica, Las Matas
           </div>
         </div>
 
