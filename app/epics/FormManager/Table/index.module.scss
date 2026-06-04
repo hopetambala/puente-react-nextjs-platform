@@ -1,3 +1,47 @@
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Column sizing — keep dates/status/actions compact so name & description
+   get the room. width:1% + nowrap shrinks the actions column to its content. */
+.colCaret { width: 40px; }
+.colStatus { width: 80px; white-space: nowrap; }
+.colDate { width: 96px; white-space: nowrap; }
+.colActions { width: 1%; text-align: right; white-space: nowrap; }
+
+.nameCell {
+  min-width: 200px;
+  font-weight: var(--font-weight-emphasis);
+}
+
+/* Long descriptions truncate with an ellipsis instead of wrapping to 4 lines;
+   the full text stays available via the cell's title attribute. */
+.descCell {
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text-secondary);
+}
+
+.actions {
+  display: inline-flex;
+  gap: var(--spacer-xs);
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+
+.empty {
+  text-align: center;
+  padding: var(--spacer-l);
+  color: var(--color-text-secondary);
+}
+
 .table th {
   text-align: left;
   font-family: var(--font-family-heading);

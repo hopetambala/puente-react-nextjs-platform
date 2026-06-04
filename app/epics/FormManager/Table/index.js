@@ -68,17 +68,16 @@ const FormManagerTable = ({
         action={handleRemove}
       />
       {data !== undefined ? (
-        <div style={{ overflowX: 'auto' }}>
-        <table className={styles.table} style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div className={styles.tableWrap}>
+        <table className={styles.table}>
           <thead>
             <tr>
-              <th style={{ width: 32 }} />
+              <th className={styles.colCaret} aria-label="Expand" />
               <th>Name</th>
               <th>Description</th>
-              <th style={{ width: 72, whiteSpace: 'nowrap' }}>Status</th>
-              <th style={{ width: 90, whiteSpace: 'nowrap' }}>Created</th>
-              <th style={{ width: 90, whiteSpace: 'nowrap' }}>Updated</th>
-              <th style={{ width: 120, textAlign: 'right', whiteSpace: 'nowrap' }}>Actions</th>
+              <th className={styles.colStatus}>Status</th>
+              <th className={styles.colDate}>Updated</th>
+              <th className={styles.colActions}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -88,7 +87,7 @@ const FormManagerTable = ({
                 key={row.name}
                 surveyingOrganization={organization}
               >
-                <td>
+                <td className={styles.nameCell}>
                   {onSelectForm ? (
                     <button
                       type="button"
@@ -101,19 +100,21 @@ const FormManagerTable = ({
                     row.name
                   )}
                 </td>
-                <td>{row.description || '—'}</td>
+                <td>
+                  <div className={styles.descCell} title={row.description || ''}>
+                    {row.description || '—'}
+                  </div>
+                </td>
                 <td><Badge variant="green">Active</Badge></td>
-                <td>{row.createdAt ? new Date(row.createdAt).toLocaleDateString() : '—'}</td>
-                <td>{row.updatedAt ? new Date(row.updatedAt).toLocaleDateString() : '—'}</td>
-                <td style={{ textAlign: 'right' }}>
-                  <div style={{ display: 'inline-flex', gap: 'var(--spacer-xs)' }}>
+                <td className={styles.colDate}>{row.updatedAt ? new Date(row.updatedAt).toLocaleDateString() : '—'}</td>
+                <td className={styles.colActions}>
+                  <div className={styles.actions}>
                     {!puenteForm && (
                       <>
                         <Button
-                          text="Delete"
-                          intent="danger"
+                          text="Edit"
                           isSmall
-                          onClick={() => handleModal(row)}
+                          onClick={() => handleEdit(row)}
                         />
                         <Button
                           text="Duplicate"
@@ -121,9 +122,10 @@ const FormManagerTable = ({
                           onClick={() => handleDuplicate(row)}
                         />
                         <Button
-                          text="Edit"
+                          text="Delete"
+                          intent="danger"
                           isSmall
-                          onClick={() => handleEdit(row)}
+                          onClick={() => handleModal(row)}
                         />
                       </>
                     )}
@@ -136,7 +138,7 @@ const FormManagerTable = ({
         </table>
         </div>
       ) : (
-        <p style={{ textAlign: 'center', padding: 'var(--spacer-l)', color: 'var(--color-text-secondary)' }}>No data available.</p>
+        <p className={styles.empty}>No data available.</p>
       )}
     </>
   );

@@ -47,9 +47,8 @@
   "dashboard_good_morning": "Bom dia, {{name}}.",
   "dashboard_sub": "Eis o que está a acontecer.",
   "dashboard_new_form": "+ Novo formulário",
-  "stat_records_today": "Records today",
+  "stat_records": "Records",
   "stat_active_surveyors": "Active surveyors",
-  "stat_households": "Households surveyed",
   "field_activity": "Field activity",
   "your_forms": "Your forms",
   "sign_in_to": "Sign in to",
@@ -80,6 +79,5 @@
   "data_curation_anomalies": "anomalias",
   "data_curation_edit": "Editar",
   "data_curation_save": "Guardar",
-  "stat_active_surveyors_meta": "Last 7 days",
-  "stat_households_meta": "in territory"
+  "stat_window_30d": "Last 30 days"
 }

@@ -53,8 +53,6 @@ jest.mock('app/epics/FormManager/Table', () =>
   ))
 );
 
-jest.mock('app/epics/FormManager/Grid', () =>
-  jest.fn(() => <div data-testid="grid" />));
 
 // RecordsTable is tested in its own suite — stub it here
 jest.mock('app/epics/FormManager/RecordsTable', () =>
@@ -121,11 +119,21 @@ describe('Workflow grouping', () => {
     await waitFor(() => expect(screen.getByText('WaSH')).toBeInTheDocument());
   });
 
-  it('shows "No Workflow Assigned" for forms with no workflows', async () => {
-    renderManager([makeForm({ workflows: [] })]);
-    await waitFor(() =>
-      expect(screen.getByText('No Workflow Assigned')).toBeInTheDocument(),
-    );
+  it('groups ungrouped forms under "Custom forms" (no jargon) when there are no workflows', async () => {
+    renderManager([makeForm({ name: 'Lone Form', workflows: [] })]);
+    await waitFor(() => expect(screen.getByText('Lone Form')).toBeInTheDocument());
+    expect(screen.getByText('Custom forms')).toBeInTheDocument();
+    expect(screen.queryByText('No Workflow Assigned')).not.toBeInTheDocument();
+  });
+
+  it('labels ungrouped forms "Other forms" when workflow groups also exist', async () => {
+    renderManager([
+      makeForm({ objectId: 'a', name: 'WaSH Form', workflows: ['WaSH'] }),
+      makeForm({ objectId: 'b', name: 'Loose Form', workflows: [] }),
+    ]);
+    await waitFor(() => expect(screen.getByText('WaSH')).toBeInTheDocument());
+    expect(screen.getByText('Other forms')).toBeInTheDocument();
+    expect(screen.queryByText('No Workflow Assigned')).not.toBeInTheDocument();
   });
 
   it('shows "No custom forms yet." when no active custom forms exist', async () => {
@@ -133,6 +141,20 @@ describe('Workflow grouping', () => {
     await waitFor(() =>
       expect(screen.getByText('No custom forms yet.')).toBeInTheDocument(),
     );
+  });
+
+  // ─── RED: no-workflow custom forms must count as custom forms ────────────────
+  // Regression: when every custom form has no workflow assigned, the "Custom
+  // Forms" section wrongly showed "No custom forms yet." even though forms exist.
+  // (Real Test org: all FormSpecificationsV2 have workflows: [].)
+  it('does NOT show "No custom forms yet." when only no-workflow forms exist', async () => {
+    renderManager([
+      makeForm({ objectId: 'nw1', name: 'Practice Form', workflows: [] }),
+      makeForm({ objectId: 'nw2', name: 'Documentacion', workflows: undefined }),
+    ]);
+    await waitFor(() => expect(screen.getByText('Practice Form')).toBeInTheDocument());
+    expect(screen.getByText('Documentacion')).toBeInTheDocument();
+    expect(screen.queryByText('No custom forms yet.')).not.toBeInTheDocument();
   });
 });
 
@@ -198,16 +220,15 @@ describe('Edit routing', () => {
   });
 });
 
-// ─── RED: SegmentedControl view toggle ───────────────────────────────────────
-// If the Table/Grid toggle is removed, users lose the ability to switch views —
-// caught before the UI regression reaches production.
+// ─── Grid view removed ───────────────────────────────────────────────────────
+// The Grid view was never built out, so the Table/Grid toggle was removed.
 
-describe('View toggle', () => {
-  it('renders a SegmentedControl with Table and Grid options', async () => {
+describe('View toggle removed', () => {
+  it('does not render a Table/Grid view toggle', async () => {
     renderManager([makeForm({ workflows: ['WaSH'] })]);
     await waitFor(() => screen.getByText('WaSH'));
-    expect(screen.getByRole('button', { name: 'Table' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Grid' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Grid' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Table' })).not.toBeInTheDocument();
   });
 });
 
@@ -296,6 +317,39 @@ describe('Drill-in — records view', () => {
       expect(screen.queryByTestId('records-table')).not.toBeInTheDocument(),
     );
     expect(screen.getAllByTestId('table').length).toBeGreaterThan(0);
+  });
+});
+
+// ─── RED: Org guard ──────────────────────────────────────────────────────────
+// If retrieveCustomData is called with an empty string, the Parse query returns
+// every org's data — a data-isolation bug. The component must skip the fetch
+// when organization is falsy and retry once a real org is available.
+
+describe('Org guard', () => {
+  it('does NOT call retrieveCustomData when user.organization is an empty string', async () => {
+    retrieveCustomData.mockResolvedValue([]);
+    render(
+      <FormManager context={mockContext} router={mockRouter} user={{ organization: '' }} />,
+    );
+    // Give async effects a chance to settle, then assert silence.
+    await waitFor(() => expect(retrieveCustomData).not.toHaveBeenCalled());
+  });
+
+  it('calls retrieveCustomData with the real org once user.organization is populated', async () => {
+    retrieveCustomData.mockResolvedValue([]);
+    const { rerender } = render(
+      <FormManager context={mockContext} router={mockRouter} user={{ organization: '' }} />,
+    );
+    // Initially empty — no fetch expected yet.
+    expect(retrieveCustomData).not.toHaveBeenCalled();
+
+    // Simulate the auth layer resolving the org.
+    rerender(
+      <FormManager context={mockContext} router={mockRouter} user={{ organization: 'real-org' }} />,
+    );
+    await waitFor(() =>
+      expect(retrieveCustomData).toHaveBeenCalledWith('real-org'),
+    );
   });
 });
 

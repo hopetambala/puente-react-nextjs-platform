@@ -18,7 +18,7 @@
 /* stat strip */
 .statStrip {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--tk-dlite-semantic-spacing-md);
 }
 
@@ -83,21 +83,6 @@
   background: var(--tk-dlite-semantic-color-action-primary);
 }
 
-.progressTrack {
-  height: 4px;
-  background: var(--tk-dlite-semantic-color-border);
-  border-radius: 2px;
-  margin-top: var(--tk-dlite-semantic-spacing-sm);
-  overflow: hidden;
-}
-
-.progressFill {
-  height: 100%;
-  width: 0%;
-  background: var(--tk-dlite-semantic-color-action-primary);
-  border-radius: 2px;
-}
-
 /* two-column body */
 .body {
   display: grid;
@@ -126,6 +111,8 @@
   display: flex;
   flex-direction: column;
   gap: 0;
+  max-height: 420px;
+  overflow-y: auto;
 }
 
 .activityRow {
@@ -145,7 +132,8 @@
   font-size: 11px;
   color: var(--tk-dlite-semantic-color-text-secondary);
   flex-shrink: 0;
-  min-width: 80px;
+  min-width: 92px;
+  white-space: nowrap;
 }
 
 .activityDot {

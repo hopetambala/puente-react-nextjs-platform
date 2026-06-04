@@ -22,8 +22,11 @@ function formatDate(d: Date): string {
   return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 }
 
-function formatTime(d: Date): string {
-  return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+function formatWhen(d: Date): string {
+  // Date + time so rows from different days read in the right order.
+  return d.toLocaleString('en-US', {
+    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false,
+  });
 }
 
 export default function Dashboard() {
@@ -32,17 +35,16 @@ export default function Dashboard() {
   const [firstName, setFirstName] = useState('');
   const [org, setOrg] = useState('');
   const [activityLoading, setActivityLoading] = useState(true);
-  const [activityItems, setActivityItems] = useState<{ time: string; text: string }[]>([]);
+  const [activityItems, setActivityItems] = useState<{ when: string; text: string }[]>([]);
   const [formsLoading, setFormsLoading] = useState(true);
   const [forms, setForms] = useState<{ name: string; count: number; active: boolean }[]>([]);
-  const [recordsToday, setRecordsToday] = useState<number | null>(null);
+  const [recordsLast30, setRecordsLast30] = useState<number | null>(null);
   const [activeSurveyors, setActiveSurveyors] = useState<number | null>(null);
-  const [households, setHouseholds] = useState<number | null>(null);
 
   useEffect(() => {
     const user = retrieveCurrentUserAsyncFunction();
     if (user) {
-      setFirstName(user.get('firstName') || user.get('username') || '');
+      setFirstName(user.get('firstname') || user.get('username') || '');
       setOrg(user.get('organization') || '');
     }
   }, []);
@@ -51,51 +53,53 @@ export default function Dashboard() {
     if (!org) return;
     async function fetchStats() {
       try {
-        const midnight = new Date();
-        midnight.setHours(0, 0, 0, 0);
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-        // Records today
+        // Records (org-wide, last 30 days)
         const recordsQuery = new Parse.Query('SurveyData');
         recordsQuery.equalTo('surveyingOrganization', org);
-        recordsQuery.greaterThanOrEqualTo('createdAt', midnight);
+        recordsQuery.greaterThanOrEqualTo('createdAt', thirtyDaysAgo);
         const n = await recordsQuery.count();
-        setRecordsToday(n);
+        setRecordsLast30(n);
 
-        // Active surveyors (last 7 days)
+        // Active surveyors (org-wide, last 30 days). The browser SDK can't use
+        // the Master Key, so distinct() is unavailable — sample records and
+        // reduce to a distinct set of surveyors client-side.
         const surveyorsQuery = new Parse.Query('SurveyData');
         surveyorsQuery.equalTo('surveyingOrganization', org);
-        surveyorsQuery.greaterThanOrEqualTo('createdAt', sevenDaysAgo);
-        const surveyorList = await surveyorsQuery.distinct('surveyingUser');
-        setActiveSurveyors(surveyorList.length);
-
-        // Households (total org count as proxy)
-        const householdsQuery = new Parse.Query('SurveyData');
-        householdsQuery.equalTo('surveyingOrganization', org);
-        const h = await householdsQuery.count();
-        setHouseholds(h);
+        surveyorsQuery.greaterThanOrEqualTo('createdAt', thirtyDaysAgo);
+        surveyorsQuery.select('surveyingUser');
+        surveyorsQuery.limit(1000);
+        const surveyorRecords = await surveyorsQuery.find();
+        const uniqueSurveyors = new Set(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          surveyorRecords.map((r: any) => r.get('surveyingUser')).filter(Boolean),
+        );
+        setActiveSurveyors(uniqueSurveyors.size);
       } catch {
-        setRecordsToday(0);
+        setRecordsLast30(0);
         setActiveSurveyors(0);
-        setHouseholds(0);
       }
     }
     fetchStats();
   }, [org]);
 
   useEffect(() => {
-    // TODO: wire to statsService.aggregateStats when endpoint is available
+    if (!org) return;
     async function fetchActivity() {
       try {
-        const SurveyData = Parse.Object.extend('SurveyData');
-        const query = new Parse.Query(SurveyData);
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const query = new Parse.Query('SurveyData');
+        query.equalTo('surveyingOrganization', org);
+        query.greaterThanOrEqualTo('createdAt', thirtyDaysAgo);
         query.descending('createdAt');
-        query.limit(10);
+        query.limit(200);
         const results = await query.find();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const items = results.map((r: any) => ({
-          time: formatTime(r.createdAt),
+          when: formatWhen(r.createdAt),
           text: `${r.get('surveyingUser') || 'Someone'} submitted a record`,
         }));
         setActivityItems(items);
@@ -106,13 +110,14 @@ export default function Dashboard() {
       }
     }
     fetchActivity();
-  }, []);
+  }, [org]);
 
   useEffect(() => {
-    // TODO: wire to statsService.aggregateStats when endpoint is available
+    if (!org) return;
     async function fetchForms() {
       try {
         const query = new Parse.Query('FormSpecificationsV2');
+        query.equalTo('organizations', org);
         query.equalTo('active', 'true');
         query.descending('updatedAt');
         query.limit(8);
@@ -131,7 +136,7 @@ export default function Dashboard() {
       }
     }
     fetchForms();
-  }, []);
+  }, [org]);
 
   const today = formatDate(new Date());
 
@@ -149,10 +154,15 @@ export default function Dashboard() {
         {/* stat strip */}
         <div className={styles.statStrip}>
           <div className={styles.statCard}>
-            <span className={styles.statLabel}>{t('stat_records_today')}</span>
-            {recordsToday === null
+            <span className={styles.statLabel}>{t('stat_records')}</span>
+            {recordsLast30 === null
               ? <Skeleton width={48} height={28} style={{ margin: '2px 0' }} />
-              : <span className={styles.statValue}>{recordsToday}</span>}
+              : <span className={styles.statValue}>{recordsLast30}</span>}
+            <div className={styles.statMeta}>
+              {recordsLast30 === null
+                ? <Skeleton width={80} height={12} style={{ marginTop: 6 }} />
+                : <span>{t('stat_window_30d')}</span>}
+            </div>
             <div className={styles.sparkline}>
               {/* eslint-disable react/no-array-index-key */}
               {SPARKBAR_HEIGHTS.map((h, i) => (
@@ -175,20 +185,7 @@ export default function Dashboard() {
               <span className={styles.pulse} />
               {activeSurveyors === null
                 ? <Skeleton width={80} height={12} style={{ marginTop: 6 }} />
-                : <span>{t('stat_active_surveyors_meta')}</span>}
-            </div>
-          </div>
-
-          <div className={styles.statCard}>
-            <span className={styles.statLabel}>{t('stat_households')}</span>
-            {households === null
-              ? <Skeleton width={48} height={28} style={{ margin: '2px 0' }} />
-              : <span className={styles.statValue}>{households}</span>}
-            {households === null
-              ? <Skeleton width={80} height={12} style={{ marginTop: 6 }} />
-              : <div className={styles.statMeta}>{t('stat_households_meta')}</div>}
-            <div className={styles.progressTrack}>
-              <div className={styles.progressFill} />
+                : <span>{t('stat_window_30d')}</span>}
             </div>
           </div>
         </div>
@@ -221,7 +218,7 @@ export default function Dashboard() {
                 {activityItems.map((item, i) => (
                   // eslint-disable-next-line react/no-array-index-key
                   <div key={i} className={styles.activityRow}>
-                    <span className={styles.activityTime}>{item.time}</span>
+                    <span className={styles.activityTime}>{item.when}</span>
                     <span className={styles.activityDot} />
                     <span className={styles.activityText}>{item.text}</span>
                   </div>

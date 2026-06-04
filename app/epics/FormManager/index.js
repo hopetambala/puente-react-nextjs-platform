@@ -1,9 +1,8 @@
-import { EmptyState, Panel, SegmentedControl, Skeleton } from 'app/impacto-design-system';
+import { EmptyState, Panel, Skeleton } from 'app/impacto-design-system';
 import { retrieveCustomData } from 'app/modules/cloud-code';
 import { useEffect, useMemo, useState } from 'react';
 import { isArray } from 'underscore';
 
-import GridTable from './Grid';
 import styles from './index.module.scss';
 import RecordsTable from './RecordsTable';
 import Table from './Table';
@@ -27,16 +26,9 @@ const puenteConfig = [
   },
 ];
 
-const VIEW_OPTIONS = [
-  { value: 'table', label: 'Table' },
-  { value: 'grid', label: 'Grid' },
-];
-
 function FormManager({ context, router, user }) {
   const [workflowData, setWorkflowData] = useState({});
   const [noWorkflowData, setNoWorkflowData] = useState([]);
-  const [listView, setListView] = useState('table');
-  const [workflows, setWorkflows] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [selectedForm, setSelectedForm] = useState(null);
@@ -53,9 +45,19 @@ function FormManager({ context, router, user }) {
     );
   }, [workflowData, searchTerm]);
 
+  // Custom forms with no workflow assigned are still custom forms — they belong
+  // in the Custom Forms section, not a separate orphan panel. Same search filter.
+  const filteredNoWorkflowData = useMemo(() => {
+    const list = noWorkflowData || [];
+    if (!searchTerm.trim()) return list;
+    const term = searchTerm.toLowerCase();
+    return list.filter((f) => f.name.toLowerCase().includes(term));
+  }, [noWorkflowData, searchTerm]);
+
   useEffect(() => {
+    if (!organization) return;
     refreshWorkflowData();
-  }, []);
+  }, [organization]);
 
   const refreshWorkflowData = async () => {
     setLoading(true);
@@ -86,7 +88,6 @@ function FormManager({ context, router, user }) {
       });
       setNoWorkflowData(tableDataByCategory['No Workflow Assigned']);
       delete tableDataByCategory['No Workflow Assigned'];
-      setWorkflows(Object.keys(tableDataByCategory));
       delete tableDataByCategory.Puente;
       setWorkflowData(tableDataByCategory);
       setLoading(false);
@@ -145,9 +146,6 @@ function FormManager({ context, router, user }) {
                 />
               </div>
             </div>
-            <div className="cl-dlite-flex-shrink-0">
-              <SegmentedControl options={VIEW_OPTIONS} value={listView} onChange={setListView} />
-            </div>
           </div>
           {loading && (
             <div className={styles.section}>
@@ -178,11 +176,10 @@ function FormManager({ context, router, user }) {
           </div>
 
           <div className={styles.section}>
-            <div className={styles.sectionLabel}>Custom Forms</div>
-            {Object.keys(filteredWorkflowData).length > 0 ? (
-              Object.keys(filteredWorkflowData).map((key) => (
-                <Panel key={key} title={key} noPadding>
-                  {listView === 'table' ? (
+            {(Object.keys(filteredWorkflowData).length > 0 || filteredNoWorkflowData.length > 0) ? (
+              <>
+                {Object.keys(filteredWorkflowData).map((key) => (
+                  <Panel key={key} title={key} noPadding>
                     <Table
                       data={filteredWorkflowData[key]}
                       retrieveCustomData={retrieveCustomData}
@@ -190,35 +187,27 @@ function FormManager({ context, router, user }) {
                       organization={organization}
                       onSelectForm={setSelectedForm}
                     />
-                  ) : (
-                    <GridTable
-                      data={filteredWorkflowData[key]}
+                  </Panel>
+                ))}
+                {filteredNoWorkflowData.length > 0 && (
+                  <Panel
+                    title={Object.keys(filteredWorkflowData).length > 0 ? 'Other forms' : 'Custom forms'}
+                    noPadding
+                  >
+                    <Table
+                      data={filteredNoWorkflowData}
                       retrieveCustomData={retrieveCustomData}
                       passDataToFormCreator={passDataToFormCreator}
                       organization={organization}
-                      workflows={workflows}
+                      onSelectForm={setSelectedForm}
                     />
-                  )}
-                </Panel>
-              ))
+                  </Panel>
+                )}
+              </>
             ) : (
               <EmptyState message="No custom forms yet." />
             )}
           </div>
-
-          {noWorkflowData && noWorkflowData.length > 0 && (
-            <div className={styles.section}>
-              <Panel title="No Workflow Assigned" noPadding>
-                <Table
-                  data={noWorkflowData}
-                  retrieveCustomData={retrieveCustomData}
-                  passDataToFormCreator={passDataToFormCreator}
-                  organization={organization}
-                  onSelectForm={setSelectedForm}
-                />
-              </Panel>
-            </div>
-          )}
           </>
           )}
         </>

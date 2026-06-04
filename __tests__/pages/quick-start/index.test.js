@@ -1,30 +1,49 @@
 import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
 
-const mockFind = jest.fn().mockResolvedValue([]);
-const mockCount = jest.fn().mockResolvedValue(0);
-const mockDistinct = jest.fn().mockResolvedValue([]);
-const mockQueryChain = {
-  descending: jest.fn().mockReturnThis(),
-  limit: jest.fn().mockReturnThis(),
-  greaterThanOrEqualTo: jest.fn().mockReturnThis(),
-  equalTo: jest.fn().mockReturnThis(),
-  find: mockFind,
-  count: mockCount,
-  distinct: mockDistinct,
-};
-
-let capturedQueryClasses = [];
+// Per-query mock: each Parse.Query() returns its own recorder, and find()
+// resolves by content (class + whether select() was used) so tests don't depend
+// on the order effects fire in.
+let mockQueryInstances = [];
+let mockRecordsCount = 0;
+let mockActivityData = [];
+let mockFormsData = [];
+let mockSurveyorsData = [];
 
 jest.mock('parse', () => ({
   Parse: {
-    Object: { extend: jest.fn(() => ({})) },
+    Object: { extend: jest.fn((cls) => cls) },
     Query: jest.fn((cls) => {
-      capturedQueryClasses.push(cls);
-      return mockQueryChain;
+      const inst = {
+        cls,
+        _select: null,
+        descending: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        equalTo: jest.fn().mockReturnThis(),
+        greaterThanOrEqualTo: jest.fn().mockReturnThis(),
+        select: jest.fn(function select(f) { this._select = f; return this; }),
+        count: jest.fn(() => Promise.resolve(mockRecordsCount)),
+        distinct: jest.fn(() => Promise.resolve([])),
+        find: jest.fn(function find() {
+          if (this.cls === 'FormSpecificationsV2') return Promise.resolve(mockFormsData);
+          if (this._select === 'surveyingUser') return Promise.resolve(mockSurveyorsData);
+          return Promise.resolve(mockActivityData);
+        }),
+      };
+      mockQueryInstances.push(inst);
+      return inst;
     }),
   },
 }));
+
+const surveyDataQueries = () => mockQueryInstances.filter((q) => q.cls === 'SurveyData');
+const recordsQuery = () => surveyDataQueries().find((q) => q.count.mock.calls.length > 0);
+const surveyorsQuery = () => surveyDataQueries().find((q) => q.select.mock.calls.length > 0);
+const activityQuery = () => surveyDataQueries().find(
+  (q) => q.descending.mock.calls.length > 0 && q.select.mock.calls.length === 0,
+);
+const formsQuery = () => mockQueryInstances.find((q) => q.cls === 'FormSpecificationsV2');
+const daysAgo = (d) => Math.round((Date.now() - d.getTime()) / 86400000);
 
 jest.mock('next/router', () => ({
   useRouter: () => ({ push: jest.fn(), pathname: '/quick-start' }),
@@ -34,16 +53,14 @@ jest.mock('next-i18next', () => ({
   useTranslation: () => ({
     t: (key, opts) => {
       const map = {
-        stat_records_today: 'Records today',
+        stat_records: 'Records',
         stat_active_surveyors: 'Active surveyors',
-        stat_households: 'Households surveyed',
+        stat_window_30d: 'Last 30 days',
         field_activity: 'Field activity',
         your_forms: 'Your forms',
         dashboard_good_morning: opts ? `Good morning, ${opts.name}.` : 'Good morning.',
         dashboard_sub: "Here's what's moving.",
         dashboard_new_form: '+ New form',
-        stat_active_surveyors_meta: 'Last 7 days',
-        stat_households_meta: 'in territory',
       };
       return map[key] ?? key;
     },
@@ -51,8 +68,9 @@ jest.mock('next-i18next', () => ({
 }));
 
 jest.mock('app/modules/user', () => ({
+  // Parse stores the name as `firstname` (lowercase) — see registration/account.
   retrieveCurrentUserAsyncFunction: jest.fn(() => ({
-    get: (key) => ({ firstName: 'Hope', organization: 'TestOrg' }[key] ?? null),
+    get: (key) => ({ firstname: 'Hope', organization: 'TestOrg' }[key] ?? null),
   })),
 }));
 
@@ -80,15 +98,12 @@ const Dashboard = require('pages/quick-start/index').default;
 
 beforeEach(() => {
   jest.clearAllMocks();
-  capturedQueryClasses = [];
-  mockFind.mockResolvedValue([]);
-  mockCount.mockResolvedValue(0);
-  mockDistinct.mockResolvedValue([]);
+  mockQueryInstances = [];
+  mockRecordsCount = 0;
+  mockActivityData = [];
+  mockFormsData = [];
+  mockSurveyorsData = [];
 });
-
-// ─── RED: activity panel removal ─────────────────────────────────────────────
-// If the "Field activity" panel is removed or its heading key changes, the
-// panel test fails before any deploy — catching silent UI regressions.
 
 describe('Shell', () => {
   it('renders AppShell with Dashboard breadcrumb', async () => {
@@ -100,159 +115,182 @@ describe('Shell', () => {
   });
 });
 
+describe('Greeting', () => {
+  // Reads the Parse `firstname` attribute — not camelCase `firstName`, which
+  // silently left the greeting nameless for real users.
+  it('greets the user by their firstname', async () => {
+    render(<Dashboard />);
+    await waitFor(() => {
+      expect(screen.getByText('Good morning, Hope.')).toBeInTheDocument();
+    });
+  });
+});
+
 describe('Stat strip', () => {
-  it('renders Records today label', async () => {
+  it('renders the "Records" label over a 30-day window (not "Records this month")', async () => {
     render(<Dashboard />);
-    await waitFor(() => {
-      expect(screen.getByText('Records today')).toBeInTheDocument();
-    });
+    await waitFor(() => expect(screen.getByText('Records')).toBeInTheDocument());
+    expect(screen.queryByText('Records this month')).not.toBeInTheDocument();
+    expect(screen.queryByText('Records today')).not.toBeInTheDocument();
   });
 
-  it('renders Active surveyors label', async () => {
+  it('shows a "Last 30 days" meta on both stat cards', async () => {
     render(<Dashboard />);
-    await waitFor(() => {
-      expect(screen.getByText('Active surveyors')).toBeInTheDocument();
-    });
+    await waitFor(() => expect(screen.getByText('Active surveyors')).toBeInTheDocument());
+    expect(screen.getAllByText('Last 30 days').length).toBe(2);
+    expect(screen.queryByText('Last 7 days')).not.toBeInTheDocument();
   });
 
-  it('renders Households surveyed label', async () => {
+  it('does NOT render the Households card', async () => {
     render(<Dashboard />);
-    await waitFor(() => {
-      expect(screen.getByText('Households surveyed')).toBeInTheDocument();
-    });
+    await waitFor(() => expect(screen.getByText('Active surveyors')).toBeInTheDocument());
+    expect(screen.queryByText('Households surveyed')).not.toBeInTheDocument();
+    expect(screen.queryByText('in territory')).not.toBeInTheDocument();
+  });
+});
+
+describe('Metric windows — everything over the last 30 days', () => {
+  it('queries records from ~30 days ago (not the start of the month)', async () => {
+    render(<Dashboard />);
+    await waitFor(() => expect(recordsQuery()).toBeTruthy());
+    const dates = recordsQuery().greaterThanOrEqualTo.mock.calls
+      .filter(([f]) => f === 'createdAt').map(([, d]) => d);
+    expect(dates.some((d) => daysAgo(d) >= 29 && daysAgo(d) <= 31)).toBe(true);
+  });
+
+  it('queries active surveyors from ~30 days ago', async () => {
+    render(<Dashboard />);
+    await waitFor(() => expect(surveyorsQuery()).toBeTruthy());
+    const dates = surveyorsQuery().greaterThanOrEqualTo.mock.calls
+      .filter(([f]) => f === 'createdAt').map(([, d]) => d);
+    expect(dates.some((d) => daysAgo(d) >= 29 && daysAgo(d) <= 31)).toBe(true);
+  });
+
+  it('queries field activity from ~30 days ago', async () => {
+    render(<Dashboard />);
+    await waitFor(() => expect(activityQuery()).toBeTruthy());
+    const dates = activityQuery().greaterThanOrEqualTo.mock.calls
+      .filter(([f]) => f === 'createdAt').map(([, d]) => d);
+    expect(dates.some((d) => daysAgo(d) >= 29 && daysAgo(d) <= 31)).toBe(true);
+  });
+});
+
+describe('Org scoping — everything across the org, not just the user', () => {
+  it('scopes the records query to the org', async () => {
+    render(<Dashboard />);
+    await waitFor(() => expect(recordsQuery()).toBeTruthy());
+    expect(recordsQuery().equalTo).toHaveBeenCalledWith('surveyingOrganization', 'TestOrg');
+  });
+
+  it('scopes the active-surveyors query to the org', async () => {
+    render(<Dashboard />);
+    await waitFor(() => expect(surveyorsQuery()).toBeTruthy());
+    expect(surveyorsQuery().equalTo).toHaveBeenCalledWith('surveyingOrganization', 'TestOrg');
+  });
+
+  it('scopes the field-activity query to the org', async () => {
+    render(<Dashboard />);
+    await waitFor(() => expect(activityQuery()).toBeTruthy());
+    expect(activityQuery().equalTo).toHaveBeenCalledWith('surveyingOrganization', 'TestOrg');
+  });
+
+  it('scopes the forms query to the org via organizations', async () => {
+    render(<Dashboard />);
+    await waitFor(() => expect(formsQuery()).toBeTruthy());
+    expect(formsQuery().equalTo).toHaveBeenCalledWith('organizations', 'TestOrg');
   });
 });
 
 describe('Panels', () => {
   it('renders Field activity panel heading', async () => {
     render(<Dashboard />);
-    await waitFor(() => {
-      expect(screen.getByText('Field activity')).toBeInTheDocument();
-    });
+    await waitFor(() => expect(screen.getByText('Field activity')).toBeInTheDocument());
   });
 
   it('renders Your forms panel heading', async () => {
     render(<Dashboard />);
-    await waitFor(() => {
-      expect(screen.getByText('Your forms')).toBeInTheDocument();
-    });
+    await waitFor(() => expect(screen.getByText('Your forms')).toBeInTheDocument());
   });
 });
 
 describe('Empty states', () => {
-  it('shows "No recent submissions." when query returns empty array', async () => {
-    mockFind.mockResolvedValue([]);
+  it('shows "No recent submissions." when activity is empty', async () => {
     render(<Dashboard />);
-    await waitFor(() => {
-      expect(screen.getByText('No recent submissions.')).toBeInTheDocument();
-    });
+    await waitFor(() => expect(screen.getByText('No recent submissions.')).toBeInTheDocument());
   });
 
-  it('shows "No forms yet." when forms query returns empty array', async () => {
-    mockFind.mockResolvedValue([]);
+  it('shows "No forms yet." when forms are empty', async () => {
     render(<Dashboard />);
-    await waitFor(() => {
-      expect(screen.getByText('No forms yet.')).toBeInTheDocument();
-    });
+    await waitFor(() => expect(screen.getByText('No forms yet.')).toBeInTheDocument());
   });
 });
 
-describe('Data states', () => {
-  it('renders activity record text when query resolves with a record', async () => {
-    const mockRecord = {
-      createdAt: new Date('2026-05-18T10:30:00Z'),
+describe('Activity feed', () => {
+  it('renders activity record text', async () => {
+    mockActivityData = [{
+      createdAt: new Date(2026, 4, 18, 10, 30),
       get: (key) => ({ surveyingUser: 'Yolanda' }[key]),
-    };
-    // First call = activity, second = forms
-    mockFind
-      .mockResolvedValueOnce([mockRecord])
-      .mockResolvedValueOnce([]);
+    }];
     render(<Dashboard />);
-    await waitFor(() => {
-      expect(screen.getByText('Yolanda submitted a record')).toBeInTheDocument();
-    });
+    await waitFor(() => expect(screen.getByText('Yolanda submitted a record')).toBeInTheDocument());
   });
 
-  it('renders form name when forms query resolves with a form', async () => {
-    const mockForm = {
-      get: (key) => ({
-        name: 'WaSH Survey',
-        active: 'true',
-      }[key]),
-    };
-    mockFind
-      .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([mockForm]);
+  it('shows the date (not just the time) so rows read in order', async () => {
+    mockActivityData = [{
+      createdAt: new Date(2026, 4, 18, 10, 30), // May 18, 2026 (local)
+      get: (key) => ({ surveyingUser: 'Yolanda' }[key]),
+    }];
     render(<Dashboard />);
-    await waitFor(() => {
-      expect(screen.getByText('WaSH Survey')).toBeInTheDocument();
-    });
+    await waitFor(() => expect(screen.getByText(/May\s*18/)).toBeInTheDocument());
   });
 });
 
-// ─── RED: real data queries ───────────────────────────────────────────────────
-// These fail until the source uses FormSpecificationsV2 and a count query.
-
-describe('Real data wiring', () => {
-  it('queries FormSpecificationsV2 (not the old Form class)', async () => {
+describe('Forms panel', () => {
+  it('renders form name when forms query resolves with a form', async () => {
+    mockFormsData = [{ get: (key) => ({ name: 'WaSH Survey', active: 'true' }[key]) }];
     render(<Dashboard />);
-    await waitFor(() => expect(mockFind).toHaveBeenCalled());
-    expect(capturedQueryClasses).toContain('FormSpecificationsV2');
-    expect(capturedQueryClasses).not.toContain('Form');
+    await waitFor(() => expect(screen.getByText('WaSH Survey')).toBeInTheDocument());
   });
 
-  it('shows the real records-today count instead of \'–\' when count > 0', async () => {
-    mockCount.mockResolvedValue(42);
+  it('filters forms to active only', async () => {
+    render(<Dashboard />);
+    await waitFor(() => expect(formsQuery()).toBeTruthy());
+    expect(formsQuery().equalTo).toHaveBeenCalledWith('active', 'true');
+  });
+});
+
+describe('Stat values', () => {
+  it('shows the real records count', async () => {
+    mockRecordsCount = 42;
     render(<Dashboard />);
     await waitFor(() => expect(screen.getByText('42')).toBeInTheDocument());
   });
 
-  it('shows 0 for records today when count returns 0', async () => {
-    mockCount.mockResolvedValue(0);
+  it('counts distinct surveyors from sampled records (find + select, no distinct)', async () => {
+    const surveyor = (u) => ({ get: (k) => (k === 'surveyingUser' ? u : undefined) });
+    mockSurveyorsData = [surveyor('alice'), surveyor('bob'), surveyor('alice')];
     render(<Dashboard />);
-    await waitFor(() => {
-      // 0 should appear, not '–'
-      const statValue = screen.getAllByText('0');
-      expect(statValue.length).toBeGreaterThan(0);
-    });
-  });
-
-  it('filters forms query to active forms only', async () => {
-    render(<Dashboard />);
-    await waitFor(() => expect(mockFind).toHaveBeenCalled());
-    expect(mockQueryChain.equalTo).toHaveBeenCalledWith('active', 'true');
+    await waitFor(() => expect(screen.getByText('2')).toBeInTheDocument());
+    expect(mockQueryInstances.every((q) => q.distinct.mock.calls.length === 0)).toBe(true);
   });
 });
 
-// ─── RED: Phase 2 — org-scoped real stats ────────────────────────────────────
-// These fail until all 3 stat queries use equalTo('surveyingOrganization', org)
-// and Active Surveyors uses distinct('surveyingUser').
+describe('Dashboard stat copy (eng locale)', () => {
+  // eslint-disable-next-line global-require
+  const eng = require('public/locales/eng/common.json');
 
-describe('Phase 2 — Org-scoped stats', () => {
-  it('scopes Records Today query to org via surveyingOrganization', async () => {
-    render(<Dashboard />);
-    await waitFor(() => expect(mockCount).toHaveBeenCalled());
-    expect(mockQueryChain.equalTo).toHaveBeenCalledWith('surveyingOrganization', 'TestOrg');
+  it('uses "Records" and drops the old month/today keys', () => {
+    expect(eng.stat_records).toBe('Records');
+    expect(eng.stat_records_month).toBeUndefined();
+    expect(eng.stat_records_today).toBeUndefined();
   });
 
-  it('calls distinct("surveyingUser") for Active Surveyors', async () => {
-    render(<Dashboard />);
-    await waitFor(() => expect(mockDistinct).toHaveBeenCalled());
-    expect(mockDistinct).toHaveBeenCalledWith('surveyingUser');
+  it('uses a shared "Last 30 days" window key', () => {
+    expect(eng.stat_window_30d).toBe('Last 30 days');
   });
 
-  it('shows Active Surveyors count (not "–") when distinct returns array', async () => {
-    mockDistinct.mockResolvedValue(['alice', 'bob', 'carol']);
-    render(<Dashboard />);
-    await waitFor(() => expect(screen.getByText('3')).toBeInTheDocument());
-  });
-
-  it('shows Households count (not "–") when count resolves', async () => {
-    mockCount.mockResolvedValue(99);
-    render(<Dashboard />);
-    await waitFor(() => {
-      const values = screen.getAllByText('99');
-      expect(values.length).toBeGreaterThan(0);
-    });
+  it('removes the Households stat keys', () => {
+    expect(eng.stat_households).toBeUndefined();
+    expect(eng.stat_households_meta).toBeUndefined();
   });
 });
