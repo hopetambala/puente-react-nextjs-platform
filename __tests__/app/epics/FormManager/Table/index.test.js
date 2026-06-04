@@ -113,6 +113,26 @@ describe('Actions — Puente forms', () => {
   });
 });
 
+describe('Drill-in to records', () => {
+  // Clicking a form's name must call onSelectForm(row) so the parent can open
+  // the RecordsTable drill-in view. Without this wiring that view is unreachable.
+  it('calls onSelectForm with the row when the form name is clicked', async () => {
+    const onSelectForm = jest.fn();
+    const row = makeRow({ name: 'WaSH Survey' });
+    render(
+      <FormManagerTable
+        data={[row]}
+        retrieveCustomData={mockFns.retrieveCustomData}
+        passDataToFormCreator={mockFns.passDataToFormCreator}
+        organization="test-org"
+        onSelectForm={onSelectForm}
+      />,
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'WaSH Survey' }));
+    expect(onSelectForm).toHaveBeenCalledWith(row);
+  });
+});
+
 describe('Delete modal', () => {
   it('shows confirmation modal when Delete is clicked', async () => {
     renderTable([makeRow()]);

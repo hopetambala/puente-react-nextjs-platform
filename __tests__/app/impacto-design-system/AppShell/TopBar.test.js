@@ -64,9 +64,11 @@ describe('Avatar — no user', () => {
 });
 
 describe('Avatar — with user', () => {
-  it('shows initials from firstName and lastName', async () => {
+  // Parse stores name attributes as `firstname`/`lastname` (see registration and
+  // account management), so the avatar must read those keys — not camelCase.
+  it('shows initials from firstname and lastname', async () => {
     retrieveCurrentUserAsyncFunction.mockReturnValue({
-      get: (key) => ({ firstName: 'Hope', lastName: 'Tambala' }[key]),
+      get: (key) => ({ firstname: 'Hope', lastname: 'Tambala' }[key]),
     });
     render(<TopBar breadcrumb={['Dashboard']} />);
     await waitFor(() => {
@@ -74,9 +76,9 @@ describe('Avatar — with user', () => {
     });
   });
 
-  it('shows first-letter-only when only firstName is available', async () => {
+  it('shows first-letter-only when only firstname is available', async () => {
     retrieveCurrentUserAsyncFunction.mockReturnValue({
-      get: (key) => ({ firstName: 'Hope', lastName: undefined }[key]),
+      get: (key) => ({ firstname: 'Hope', lastname: undefined }[key]),
     });
     render(<TopBar breadcrumb={['Dashboard']} />);
     await waitFor(() => {

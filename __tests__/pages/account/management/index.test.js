@@ -6,11 +6,15 @@ import { render, screen, waitFor } from '@testing-library/react';
 // wrong title AND wrong component pattern. PageHeader should be used, and the
 // title should describe the page ("Account Settings"), not the brand name.
 
+const mockPush = jest.fn();
+let mockQuery = { objectId: 'user-123' };
+
 jest.mock('next/router', () => ({
-  useRouter: () => ({ query: { objectId: 'user-123' }, push: jest.fn() }),
+  useRouter: () => ({ query: mockQuery, push: mockPush }),
 }));
 
 jest.mock('app/modules/user', () => ({
+  retrieveCurrentUserAsyncFunction: jest.fn(() => ({ id: 'user-123' })),
   retrieveSignInFunction: jest.fn().mockResolvedValue({}),
   retrieveUserByObjectId: jest.fn().mockResolvedValue({
     attributes: {
@@ -45,7 +49,26 @@ jest.mock('app/impacto-design-system', () => ({
   Text: ({ text, element: El = 'span' }) => <El>{text}</El>,
 }));
 
+const { retrieveCurrentUserAsyncFunction } = require('app/modules/user');
 const ManagementWrapper = require('pages/account/management/index').default;
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockQuery = { objectId: 'user-123' };
+  retrieveCurrentUserAsyncFunction.mockReturnValue({ id: 'user-123' });
+});
+
+describe('Unauthenticated access', () => {
+  // /account/management is a public route in _app.js. When opened with no
+  // objectId param AND no signed-in user, the page must redirect to login
+  // instead of spinning forever.
+  it('redirects to /account/login when there is no objectId and no current user', async () => {
+    mockQuery = {};
+    retrieveCurrentUserAsyncFunction.mockReturnValue(null);
+    render(<ManagementWrapper />);
+    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/account/login'));
+  });
+});
 
 describe('PageHeader', () => {
   it('renders via PageHeader component (not raw h1 "PUENTE")', async () => {

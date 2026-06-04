@@ -12,6 +12,7 @@ const FormManagerTable = ({
   passDataToFormCreator,
   organization,
   puenteForm,
+  onSelectForm,
 }) => {
   const [open, setOpen] = useState(false);
   const [selectedForm, setSelectedForm] = useState();
@@ -87,7 +88,19 @@ const FormManagerTable = ({
                 key={row.name}
                 surveyingOrganization={organization}
               >
-                <td>{row.name}</td>
+                <td>
+                  {onSelectForm ? (
+                    <button
+                      type="button"
+                      className={styles.nameLink}
+                      onClick={() => onSelectForm(row)}
+                    >
+                      {row.name}
+                    </button>
+                  ) : (
+                    row.name
+                  )}
+                </td>
                 <td>{row.description || '—'}</td>
                 <td><Badge variant="green">Active</Badge></td>
                 <td>{row.createdAt ? new Date(row.createdAt).toLocaleDateString() : '—'}</td>

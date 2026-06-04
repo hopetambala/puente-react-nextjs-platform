@@ -7,8 +7,8 @@ import styles from './AppShell.module.css';
 
 function initials(user) {
   if (!user) return '?';
-  const first = user.get ? user.get('firstName') : user.firstName;
-  const last = user.get ? user.get('lastName') : user.lastName;
+  const first = user.get ? user.get('firstname') : user.firstname;
+  const last = user.get ? user.get('lastname') : user.lastname;
   if (first && last) return `${first[0]}${last[0]}`.toUpperCase();
   if (first) return first[0].toUpperCase();
   return '?';

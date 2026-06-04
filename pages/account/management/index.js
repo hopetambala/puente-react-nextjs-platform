@@ -135,7 +135,12 @@ function ManagementWrapper() {
       let targetId = objectId
       if (!targetId) {
         const currentUser = retrieveCurrentUserAsyncFunction()
-        if (!currentUser) return
+        if (!currentUser) {
+          // Public route opened with no objectId and no signed-in user — send to
+          // login instead of spinning forever.
+          router.push('/account/login')
+          return
+        }
         targetId = currentUser.id
       }
       const { attributes: retrievedUser } = await retrieveUserByObjectId(targetId)
