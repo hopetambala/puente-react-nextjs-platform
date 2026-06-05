@@ -107,3 +107,65 @@ describe('RecordsTable — FormResults columns', () => {
     expect(screen.getByText('Fields %')).toBeInTheDocument();
   });
 });
+
+describe('RecordsTable — FormResults completeness', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  // Form definition with 2 expected fields
+  const mockFormDef = {
+    get: (k) => ({
+      fields: [
+        { formikKey: 'water_source', label: 'Water Source', fieldType: 'input' },
+        { formikKey: 'floor_material', label: 'Floor Material', fieldType: 'input' },
+      ],
+    }[k]),
+  };
+
+  // Record with 1 of 2 fields answered, surveyingUser + surveyingOrganization present, no client, has createdAt
+  function makeFormRecord() {
+    const data = {
+      surveyingUser: 'alice',
+      surveyingOrganization: 'TestOrg',
+      client: null,
+      fields: [{ title: 'water_source', answer: 'Well' }],
+    };
+    return {
+      id: 'fr1',
+      get: (k) => data[k],
+      createdAt: new Date('2026-06-01'),
+    };
+  }
+
+  it('shows a percentage (not "—") in the Metadata % cell for FormResults rows', () => {
+    render(
+      <RecordsTable
+        {...defaultProps}
+        source="form-results:form1"
+        records={[makeFormRecord()]}
+        formDefinition={mockFormDef}
+      />
+    );
+    // At least one percentage should appear; the hardcoded "—" cells should be gone
+    const pctCells = screen.getAllByText(/\d+%/);
+    expect(pctCells.length).toBeGreaterThan(0);
+    // The "—" placeholder that currently exists for completeness cells must not be present
+    // (only the name cell or surveyor cell may legitimately show "—" for other fields)
+    const dashCells = screen.queryAllByText('—');
+    // All "—" in the completeness columns (Metadata % and Fields %) must be replaced by %
+    // We verify that no cell with aria-label matching completeness shows "—"
+    expect(screen.queryByRole('cell', { name: '—' })).not.toBeInTheDocument();
+  });
+
+  it('shows a percentage in the Fields % cell for FormResults rows', () => {
+    render(
+      <RecordsTable
+        {...defaultProps}
+        source="form-results:form1"
+        records={[makeFormRecord()]}
+        formDefinition={mockFormDef}
+      />
+    );
+    // 1 of 2 fields answered → 50%
+    expect(screen.getByText('50%')).toBeInTheDocument();
+  });
+});

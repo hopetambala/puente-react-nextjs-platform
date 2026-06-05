@@ -4,6 +4,10 @@
   gap: var(--tk-dlite-semantic-spacing-lg);
 }
 
+.viewTabs {
+  margin-bottom: var(--tk-dlite-semantic-spacing-md);
+}
+
 .summaryBar {
   display: flex;
   gap: var(--tk-dlite-semantic-spacing-lg);

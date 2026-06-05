@@ -16,8 +16,8 @@ export default function SourceSelector({ source, org, onChange }) {
   useEffect(() => {
     if (!org) return;
     const q = new Parse.Query('FormSpecificationsV2');
-    q.equalTo('surveyingOrganization', org);
-    q.equalTo('active', 'true');
+    q.equalTo('organizations', org);
+    q.notEqualTo('active', 'false');
     q.find()
       .then((forms) => setCustomForms(forms.map((f) => ({
         value: `form-results:${f.id}`,

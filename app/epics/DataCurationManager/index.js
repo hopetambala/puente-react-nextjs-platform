@@ -1,4 +1,4 @@
-import { Button, Skeleton } from 'app/impacto-design-system';
+import { Button, Skeleton, SegmentedControl } from 'app/impacto-design-system';
 import { retrieveCurrentUserAsyncFunction } from 'app/modules/user';
 import { useTranslation } from 'next-i18next';
 import { Parse } from 'parse';
@@ -33,7 +33,7 @@ const FORM_RESULT_META_FIELDS = ['surveyingUser', 'surveyingOrganization', 'clie
 export function computeFormResultsCompleteness(record, formDefinition) {
   const answered = new Set((record.get('fields') || []).map((f) => f.title));
   const expected = (formDefinition?.get('fields') || []).map((f) => f.formikKey).filter(Boolean);
-  const metaScore = FORM_RESULT_META_FIELDS.filter((f) => !!record.get(f)).length / FORM_RESULT_META_FIELDS.length;
+  const metaScore = FORM_RESULT_META_FIELDS.filter((f) => !!(f === 'createdAt' ? (record.createdAt || record.get(f)) : record.get(f))).length / FORM_RESULT_META_FIELDS.length;
   const fieldScore = expected.length > 0
     ? expected.filter((k) => answered.has(k)).length / expected.length
     : 1;
@@ -93,6 +93,7 @@ function resolveParseClass(source) {
 export default function DataCurationManager() {
   const { t } = useTranslation('common');
 
+  const [view, setView] = useState('records');
   const [source, setSource] = useState('survey-data');
   const [formDefinition, setFormDefinition] = useState(null);
   const [filters, setFilters] = useState({
@@ -217,76 +218,92 @@ export default function DataCurationManager() {
 
   return (
     <div className={styles.manager}>
-      {/* Source selector */}
-      <SourceSelector source={source} org={org} onChange={handleSourceChange} />
-
-      {/* Summary bar */}
-      <div className={styles.summaryBar}>
-        {loading ? (
-          <>
-            <Skeleton width={80} height={14} />
-            <Skeleton width={100} height={14} />
-            <Skeleton width={80} height={14} />
-            <Skeleton width={90} height={14} />
-          </>
-        ) : (
-          <>
-            <span>{records.length} {t('data_curation_records')}</span>
-            <span>{avgCompleteness}% {t('data_curation_avg')}</span>
-            <span>{dups.size} {t('data_curation_dups')}</span>
-            <span>{anomalies.size} {t('data_curation_anomalies')}</span>
-          </>
-        )}
+      <div className={styles.viewTabs}>
+        <SegmentedControl
+          options={[
+            { label: 'Records', value: 'records' },
+            { label: 'Community Audit', value: 'community-audit' },
+          ]}
+          value={view}
+          onChange={setView}
+        />
       </div>
 
-      {/* Filter bar */}
-      <FilterBar
-        surveyors={surveyors}
-        communities={communities}
-        onFilterChange={handleFilterChange}
-        loading={loading}
-      />
+      {view === 'records' && (
+        <>
+          {/* Source selector */}
+          <SourceSelector source={source} org={org} onChange={handleSourceChange} />
 
-      {/* Main content: DuplicateResolver or RecordsTable */}
-      <div className="cl-dlite-relative">
-        {duplicateGroup ? (
-          <DuplicateResolver
-            recordA={duplicateGroup.a}
-            recordB={duplicateGroup.b}
-            onResolved={() => { setDuplicateGroup(null); refetch(); }}
-          />
-        ) : (
-          <RecordsTable
-            source={source}
-            records={visibleRecords}
-            total={total}
-            page={page}
-            dups={dups}
-            anomalies={anomalies}
-            onSelectRecord={setSelectedRecord}
-            onPageChange={setPage}
-            onDuplicateGroup={handleDuplicateGroup}
+          {/* Summary bar */}
+          <div className={styles.summaryBar}>
+            {loading ? (
+              <>
+                <Skeleton width={80} height={14} />
+                <Skeleton width={100} height={14} />
+                <Skeleton width={80} height={14} />
+                <Skeleton width={90} height={14} />
+              </>
+            ) : (
+              <>
+                <span>{records.length} {t('data_curation_records')}</span>
+                <span>{avgCompleteness}% {t('data_curation_avg')}</span>
+                <span>{dups.size} {t('data_curation_dups')}</span>
+                <span>{anomalies.size} {t('data_curation_anomalies')}</span>
+              </>
+            )}
+          </div>
+
+          {/* Filter bar */}
+          <FilterBar
+            surveyors={surveyors}
+            communities={communities}
+            onFilterChange={handleFilterChange}
             loading={loading}
           />
-        )}
 
-        {/* Record inspector slide-in */}
-        {selectedRecord && (
-          <RecordInspector
-            record={selectedRecord}
-            source={source}
-            formDefinition={formDefinition}
-            onClose={() => setSelectedRecord(null)}
-            onSaved={(updated) => {
-              setRecords((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
-              setSelectedRecord(null);
-            }}
-          />
-        )}
-      </div>
+          {/* Main content: DuplicateResolver or RecordsTable */}
+          <div className="cl-dlite-relative">
+            {duplicateGroup ? (
+              <DuplicateResolver
+                recordA={duplicateGroup.a}
+                recordB={duplicateGroup.b}
+                onResolved={() => { setDuplicateGroup(null); refetch(); }}
+              />
+            ) : (
+              <RecordsTable
+                source={source}
+                records={visibleRecords}
+                total={total}
+                page={page}
+                dups={dups}
+                anomalies={anomalies}
+                onSelectRecord={setSelectedRecord}
+                onPageChange={setPage}
+                onDuplicateGroup={handleDuplicateGroup}
+                loading={loading}
+                formDefinition={formDefinition}
+              />
+            )}
+
+            {/* Record inspector slide-in */}
+            {selectedRecord && (
+              <RecordInspector
+                record={selectedRecord}
+                source={source}
+                formDefinition={formDefinition}
+                onClose={() => setSelectedRecord(null)}
+                onSaved={(updated) => {
+                  setRecords((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
+                  setSelectedRecord(null);
+                }}
+              />
+            )}
+          </div>
+        </>
+      )}
 
       {/* Community audit panel */}
-      <CommunityAudit org={org} />
+      {view === 'community-audit' && <CommunityAudit org={org} />}
     </div>
   );
 }

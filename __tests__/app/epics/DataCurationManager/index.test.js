@@ -55,6 +55,20 @@ jest.mock('app/impacto-design-system', () => ({
     <button type="button" onClick={onClick} disabled={isDisabled}>{text}</button>
   ),
   Skeleton: ({ width, height }) => <span data-testid="skeleton" style={{ width, height }} />,
+  SegmentedControl: ({ options, value, onChange }) => (
+    <div data-testid="view-tabs">
+      {options.map((o) => (
+        <button
+          key={o.value}
+          type="button"
+          aria-pressed={value === o.value}
+          onClick={() => onChange(o.value)}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  ),
 }));
 
 // Sub-components are unit-tested in their own files; mock them here as sentinels
@@ -247,13 +261,13 @@ describe('Summary bar', () => {
 });
 
 describe('Orchestration', () => {
-  it('renders SourceSelector, FilterBar, RecordsTable and CommunityAudit', async () => {
+  it('renders SourceSelector, FilterBar, RecordsTable but NOT CommunityAudit in the default Records view', async () => {
     render(<DataCurationManager />);
     await waitFor(() => {
       expect(screen.getByTestId('source-selector')).toBeInTheDocument();
       expect(screen.getByTestId('filter-bar')).toBeInTheDocument();
       expect(screen.getByTestId('records-table')).toBeInTheDocument();
-      expect(screen.getByTestId('community-audit')).toBeInTheDocument();
+      expect(screen.queryByTestId('community-audit')).not.toBeInTheDocument();
     });
   });
 
@@ -267,5 +281,44 @@ describe('Orchestration', () => {
     mockFind.mockResolvedValue([makeRecord(), makeRecord({ objectId: 'r2' })]);
     render(<DataCurationManager />);
     await waitFor(() => expect(screen.getByText('2 rows')).toBeInTheDocument());
+  });
+});
+
+describe('View tabs', () => {
+  it('renders a Records tab and a Community Audit tab', async () => {
+    render(<DataCurationManager />);
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /records/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /community audit/i })).toBeInTheDocument();
+    });
+  });
+
+  it('shows the records view (FilterBar + RecordsTable) by default', async () => {
+    render(<DataCurationManager />);
+    await waitFor(() => {
+      expect(screen.getByTestId('filter-bar')).toBeInTheDocument();
+      expect(screen.getByTestId('records-table')).toBeInTheDocument();
+      expect(screen.queryByTestId('community-audit')).not.toBeInTheDocument();
+    });
+  });
+
+  it('switches to Community Audit view when the Community Audit tab is clicked', async () => {
+    render(<DataCurationManager />);
+    await waitFor(() => screen.getByRole('button', { name: /community audit/i }));
+    fireEvent.click(screen.getByRole('button', { name: /community audit/i }));
+    await waitFor(() => {
+      expect(screen.getByTestId('community-audit')).toBeInTheDocument();
+      expect(screen.queryByTestId('records-table')).not.toBeInTheDocument();
+    });
+  });
+
+  it('hides FilterBar and RecordsTable when Community Audit is active', async () => {
+    render(<DataCurationManager />);
+    await waitFor(() => screen.getByRole('button', { name: /community audit/i }));
+    fireEvent.click(screen.getByRole('button', { name: /community audit/i }));
+    await waitFor(() => {
+      expect(screen.queryByTestId('filter-bar')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('records-table')).not.toBeInTheDocument();
+    });
   });
 });

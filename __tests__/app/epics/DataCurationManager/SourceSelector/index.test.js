@@ -12,6 +12,7 @@ jest.mock('parse', () => ({
   Parse: {
     Query: jest.fn(() => ({
       equalTo: jest.fn().mockReturnThis(),
+      notEqualTo: jest.fn().mockReturnThis(),
       find: mockFormsFindFn,
     })),
     Object: { extend: jest.fn(() => ({})) },
@@ -79,5 +80,28 @@ describe('SourceSelector', () => {
 
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'eval-medical' } });
     expect(mockOnChange).toHaveBeenCalledWith('eval-medical');
+  });
+
+  it('shows forms where active field is null/unset (not filtered out by strict equality)', async () => {
+    // form with no active field set — like a freshly created form from FormCreator
+    const mockForm = { id: 'form-null-active', get: (k) => ({ name: 'New Form', active: null }[k]) };
+    mockFormsFindFn.mockResolvedValue([mockForm]);
+
+    render(<SourceSelector source="survey-data" org="TestOrg" onChange={mockOnChange} />);
+    await waitFor(() => expect(screen.getByText('New Form')).toBeInTheDocument());
+
+    const { Parse } = require('parse');
+    const queryInstance = Parse.Query.mock.results[0].value;
+    // Must use notEqualTo('active', 'false') so that null/unset forms are included
+    expect(queryInstance.notEqualTo).toHaveBeenCalledWith('active', 'false');
+  });
+
+  it('queries FormSpecificationsV2 by the "organizations" field (not surveyingOrganization)', async () => {
+    render(<SourceSelector source="survey-data" org="TestOrg" onChange={mockOnChange} />);
+    await waitFor(() => expect(mockFormsFindFn).toHaveBeenCalled());
+    // The equalTo mock is on the shared query chain — check it was called with 'organizations'
+    const { Parse } = require('parse');
+    const queryInstance = Parse.Query.mock.results[0].value;
+    expect(queryInstance.equalTo).toHaveBeenCalledWith('organizations', 'TestOrg');
   });
 });

@@ -1,4 +1,4 @@
-import { Button, Toast } from 'app/impacto-design-system';
+import { Button, Modal, Toast } from 'app/impacto-design-system';
 import { useMemo, useState } from 'react';
 
 import styles from './index.module.css';
@@ -71,7 +71,11 @@ function FieldRow({ field, value, onChange }) {
           value={value}
           onChange={(e) => onChange(field.key, e.target.value)}
         >
-          {field.options.map((o) => <option key={o} value={o}>{o || '—'}</option>)}
+          {field.options.map((o) => {
+          const val = typeof o === 'object' ? (o.value || o.label || '') : o;
+          const lbl = typeof o === 'object' ? (o.label || o.value || '—') : (o || '—');
+          return <option key={val} value={val}>{lbl}</option>;
+        })}
         </select>
       ) : (
         <input
@@ -89,6 +93,8 @@ export default function RecordInspector({ record, source, formDefinition, onClos
   const isFormResults = source.startsWith('form-results:');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(false);
+  const [dirty, setDirty] = useState(false);
+  const [discardOpen, setDiscardOpen] = useState(false);
 
   // Build initial edit state
   const initial = useMemo(() => {
@@ -106,7 +112,10 @@ export default function RecordInspector({ record, source, formDefinition, onClos
 
   const [edits, setEdits] = useState(initial);
 
-  const handleChange = (key, value) => setEdits((prev) => ({ ...prev, [key]: value }));
+  const handleChange = (key, value) => {
+    setEdits((prev) => ({ ...prev, [key]: value }));
+    setDirty(true);
+  };
 
   async function handleSave() {
     setSaving(true);
@@ -125,6 +134,7 @@ export default function RecordInspector({ record, source, formDefinition, onClos
       }
       await record.save();
       onSaved(record);
+      setDirty(false);
     } catch {
       setError(true);
     } finally {
@@ -134,9 +144,18 @@ export default function RecordInspector({ record, source, formDefinition, onClos
 
   const formFields = isFormResults ? (formDefinition?.get('fields') || []) : [];
 
+  function toFieldDescriptor(f) {
+    return {
+      key: f.formikKey,
+      label: f.label || f.formikKey,
+      type: f.fieldType === 'select' ? 'select' : undefined,
+      options: f.fieldType === 'select' ? ['', ...(f.options || [])] : undefined,
+    };
+  }
+
   return (
     <>
-      <button type="button" className={styles.overlay} aria-label="Close inspector overlay" onClick={onClose} />
+      <button type="button" className={styles.overlay} aria-label="Close inspector overlay" onClick={dirty ? () => setDiscardOpen(true) : onClose} />
       <aside className={styles.panel}>
         <header className={styles.header}>
           <span className={styles.title}>
@@ -144,7 +163,7 @@ export default function RecordInspector({ record, source, formDefinition, onClos
               ? (record.get('title') || 'Form Record')
               : `${record.get('fname') || ''} ${record.get('lname') || ''}`.trim() || 'Record'}
           </span>
-          <button type="button" className={styles.closeBtn} aria-label="Close" onClick={onClose}>✕</button>
+          <button type="button" className={styles.closeBtn} aria-label="Close" onClick={dirty ? () => setDiscardOpen(true) : onClose}>✕</button>
         </header>
 
         <div className={styles.body}>
@@ -165,7 +184,7 @@ export default function RecordInspector({ record, source, formDefinition, onClos
                 {formFields.map((f) => (
                   <FieldRow
                     key={f.formikKey}
-                    field={{ key: f.formikKey, label: f.label || f.formikKey, type: f.fieldType === 'select' ? 'select' : undefined, options: f.fieldType === 'select' ? [''] : undefined }}
+                    field={toFieldDescriptor(f)}
                     value={edits[f.formikKey] ?? ''}
                     onChange={handleChange}
                   />
@@ -192,8 +211,17 @@ export default function RecordInspector({ record, source, formDefinition, onClos
         <footer className={styles.footer}>
           <Button text={saving ? 'Saving…' : 'Save'} intent="primary" onClick={handleSave} isDisabled={saving} />
           <Button text="Cancel" onClick={onClose} />
+          {dirty && <span className={styles.unsavedWarning}>Unsaved changes</span>}
         </footer>
       </aside>
+      <Modal
+        open={discardOpen}
+        handleClose={() => setDiscardOpen(false)}
+        text="Discard unsaved changes?"
+        actionText="Discard"
+        intent="danger"
+        action={() => { setDiscardOpen(false); onClose(); }}
+      />
     </>
   );
 }

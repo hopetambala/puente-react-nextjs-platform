@@ -1,5 +1,6 @@
 import { Badge, Button, Skeleton } from 'app/impacto-design-system';
 
+import { computeFormResultsCompleteness } from '../index';
 import styles from './index.module.css';
 
 const PAGE_SIZE = 50;
@@ -48,9 +49,19 @@ function completeness(record) {
   return Math.round((filled.length / FIELDS.length) * 100);
 }
 
+function FormResultsCompleteness({ record, formDefinition }) {
+  const s = computeFormResultsCompleteness(record, formDefinition);
+  return (
+    <>
+      <td>{s.meta}%</td>
+      <td>{s.fields}%</td>
+    </>
+  );
+}
+
 export default function RecordsTable({
   source, records, total, page, dups, anomalies,
-  onSelectRecord, onPageChange, onDuplicateGroup, loading,
+  onSelectRecord, onPageChange, onDuplicateGroup, loading, formDefinition,
 }) {
   const isFormResults = source.startsWith('form-results:');
   const from = total === 0 ? 0 : page * PAGE_SIZE + 1;
@@ -96,10 +107,7 @@ export default function RecordsTable({
               <td>{r.get('surveyingUser') || '—'}</td>
               <td>{r.createdAt ? r.createdAt.toLocaleDateString() : '—'}</td>
               {isFormResults ? (
-                <>
-                  <td>—</td>
-                  <td>—</td>
-                </>
+                <FormResultsCompleteness record={r} formDefinition={formDefinition} />
               ) : (
                 <td className={styles.completenessCell}>
                   <CompletenessBar pct={completeness(r)} />
