@@ -21,6 +21,25 @@ jest.mock('parse', () => ({
 
 jest.mock('app/services/parse', () => ({ initialize: jest.fn() }));
 
+jest.mock('react-select', () => ({ options, value, onChange, inputId, placeholder }) => (
+  <select
+    data-testid="source-select"
+    id={inputId}
+    value={value?.value ?? ''}
+    onChange={(e) => {
+      const flat = options.flatMap((g) => g.options ?? [g]);
+      onChange(flat.find((o) => o.value === e.target.value));
+    }}
+  >
+    <option value="" disabled>{placeholder}</option>
+    {options.map((group) =>
+      group.options
+        ? group.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)
+        : <option key={group.value} value={group.value}>{group.label}</option>
+    )}
+  </select>
+));
+
 // Import after mocks
 const SourceSelector = require('app/epics/DataCurationManager/SourceSelector').default;
 
@@ -103,5 +122,19 @@ describe('SourceSelector', () => {
     const { Parse } = require('parse');
     const queryInstance = Parse.Query.mock.results[0].value;
     expect(queryInstance.equalTo).toHaveBeenCalledWith('organizations', 'TestOrg');
+  });
+
+  it('renders system record options alongside custom form options in one control', async () => {
+    const mockForm = { id: 'form1', get: (k) => ({ name: 'WaSH Survey' }[k]) };
+    mockFormsFindFn.mockResolvedValue([mockForm]);
+
+    render(<SourceSelector source="survey-data" org="TestOrg" onChange={mockOnChange} />);
+
+    await waitFor(() => {
+      const select = screen.getByTestId('source-select');
+      const values = Array.from(select.options).map((o) => o.value);
+      expect(values).toContain('survey-data');
+      expect(values).toContain('form-results:form1');
+    });
   });
 });
