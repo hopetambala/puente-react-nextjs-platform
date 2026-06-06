@@ -30,7 +30,7 @@ function FormManager({ context, router, user }) {
   const [workflowData, setWorkflowData] = useState({});
   const [noWorkflowData, setNoWorkflowData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [selectedForm, setSelectedForm] = useState(null);
 
   const organization = user?.organization || '';
@@ -59,29 +59,23 @@ function FormManager({ context, router, user }) {
     refreshWorkflowData();
   }, [organization]);
 
+  const appendToCategory = (map, key, record) => {
+    // eslint-disable-next-line no-param-reassign
+    map[key] = key in map ? map[key].concat([record]) : [record];
+  };
+
   const refreshWorkflowData = async () => {
     setLoading(true);
-    retrieveCustomData(organization).then((records) => {
+    try {
+      const records = await retrieveCustomData(organization);
       const tableDataByCategory = {};
       records.forEach((record) => {
         if (record.active !== 'false') {
           if (!isArray(record.workflows) || record.workflows.length < 1) {
-            if ('No Workflow Assigned' in tableDataByCategory) {
-              tableDataByCategory['No Workflow Assigned'] = tableDataByCategory[
-                'No Workflow Assigned'
-              ].concat([record]);
-            } else {
-              tableDataByCategory['No Workflow Assigned'] = [record];
-            }
+            appendToCategory(tableDataByCategory, 'No Workflow Assigned', record);
           } else if (isArray(record.workflows)) {
             record.workflows.forEach((workflow) => {
-              if (workflow in tableDataByCategory) {
-                tableDataByCategory[workflow] = tableDataByCategory[
-                  workflow
-                ].concat([record]);
-              } else {
-                tableDataByCategory[workflow] = [record];
-              }
+              appendToCategory(tableDataByCategory, workflow, record);
             });
           }
         }
@@ -90,8 +84,11 @@ function FormManager({ context, router, user }) {
       delete tableDataByCategory['No Workflow Assigned'];
       delete tableDataByCategory.Puente;
       setWorkflowData(tableDataByCategory);
+    } catch {
+      // network / parse error — loading flag is cleared in finally; content remains visible
+    } finally {
       setLoading(false);
-    });
+    }
   };
 
   const passDataToFormCreator = (action, data) => {
@@ -149,12 +146,12 @@ function FormManager({ context, router, user }) {
           </div>
           {loading && (
             <div className={styles.section}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: 'var(--spacer-m)' }}>
+              <div className={styles.skeletonList}>
                 {[55, 70, 40, 60].map((w, i) => (
                   // eslint-disable-next-line react/no-array-index-key
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div key={i} className={styles.skeletonRow}>
                     <Skeleton width={`${w}%`} height={14} />
-                    <Skeleton width={60} height={22} style={{ borderRadius: 6 }} />
+                    <Skeleton width={60} height={22} style={{ borderRadius: 'var(--tk-dlite-semantic-border-radius-sm)' }} />
                   </div>
                 ))}
               </div>
