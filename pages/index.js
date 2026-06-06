@@ -364,8 +364,8 @@ export default function Homepage() {
                 Puente
               </div>
               <p className={styles.footerTagline}>
-                Humanitarian data collection platform.
-                Open-source, MIT-licensed, built by and for grassroots organizations.
+                Humanitarian data management platform.
+                Source-available, BSL-licensed, built by and for grassroots organizations.
               </p>
             </div>
             <div>
@@ -437,7 +437,7 @@ export default function Homepage() {
               </ul>
             </div>
           </div>
-          <div className={styles.footerBottom}>© 2026 Puente · MIT License</div>
+          <div className={styles.footerBottom}>© 2026 Puente · BSL 1.1 License</div>
         </div>
       </footer>
     </div>

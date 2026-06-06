@@ -2,6 +2,7 @@
   "name": "puente-react-platform",
   "version": "0.1.2",
   "private": true,
+  "license": "BUSL-1.1",
   "author": {
     "name": "Hope Tambala",
     "email": "hope@puente-dr.org",

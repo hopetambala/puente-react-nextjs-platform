@@ -7,9 +7,9 @@ import {
 import { retrieveSignInFunction } from 'app/modules/user';
 import parseService from 'app/services/parse';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -68,7 +68,7 @@ function Login() {
         <div className={styles.leftFooter}>
           <span>v0.1.2</span>
           <span>·</span>
-          <span>Open source · MIT</span>
+          <span>Source available · BSL 1.1</span>
         </div>
       </div>
 
