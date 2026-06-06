@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [Unreleased]
+
+### Features
+
+* **AppShell:** Complete redesign of main application shell with new navigation architecture
+* **Design System:** Implement dlite design token system across all UI components
+* **Dashboard:** Add org-scoped real statistics for active surveyors, households, and daily records
+* **Form Manager:** Refactor with new RecordsTable pagination and drill-in capabilities
+* **Form Creator:** Migrate from Material-UI to design system components with CSS Modules
+* **Data Curation:** New data quality and record editing interface with completeness metrics
+* **TopBar:** Add avatar navigation to account management page
+* **Footer:** Update footer links with real destinations (Collect app, GitHub repos, org website)
+* **i18n:** Implement next-i18next for multi-language support across 6 locales
+* **Inspector Panel:** Complete form creator inspector UI with option management and schema editing
+
+### Bug Fixes
+
+* Fix footer links from placeholder `#` to real URLs
+* Remove hardcoded English strings in Form Creator Inspector
+* Fix active route detection in AppShell for form creator pages
+
+### Infrastructure
+
+* Add 230+ Jest tests across 26 test suites for new components and features
+* Implement strict TDD workflow (red-green-refactor) for all new behavior
+* Upgrade Next.js Pages Router integration with redesigned navigation
+* Remove Material-UI dependencies from new UI components
+
 ### [0.1.2](https://github.com/hopetambala/puente-react-nextjs-platform/compare/v0.1.1...v0.1.2) (2022-04-13)
 
 
