@@ -245,6 +245,19 @@ describe('Activity feed', () => {
   });
 });
 
+describe('Sparkline', () => {
+  it('does not render a static sparkline chart', async () => {
+    mockRecordsCount = 5;
+    mockActivityData = [];
+    mockFormsData = [];
+    mockSurveyorsData = [];
+    const { container } = render(<Dashboard />);
+    await waitFor(() => expect(screen.getByText('Records')).toBeInTheDocument());
+    expect(container.querySelector('.sparkline')).not.toBeInTheDocument();
+    expect(container.querySelector('.bar')).not.toBeInTheDocument();
+  });
+});
+
 describe('Forms panel', () => {
   it('renders form name when forms query resolves with a form', async () => {
     mockFormsData = [{ get: (key) => ({ name: 'WaSH Survey', active: 'true' }[key]) }];
@@ -256,6 +269,15 @@ describe('Forms panel', () => {
     render(<Dashboard />);
     await waitFor(() => expect(formsQuery()).toBeTruthy());
     expect(formsQuery().equalTo).toHaveBeenCalledWith('active', 'true');
+  });
+
+  it('does not display a count number next to each form name', async () => {
+    mockRecordsCount = 5;
+    mockFormsData = [{ get: (key) => ({ name: 'Test Form', active: 'true' }[key]) }];
+    render(<Dashboard />);
+    await waitFor(() => expect(screen.getByText('Test Form')).toBeInTheDocument());
+    const formRow = screen.getByText('Test Form').closest('.formRow');
+    expect(formRow.querySelector('.formCount')).not.toBeInTheDocument();
   });
 });
 

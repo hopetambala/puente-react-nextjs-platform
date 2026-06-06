@@ -140,7 +140,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--hex-yellow-200);
+  background: var(--tk-dlite-primitive-color-yellow-200);
   margin-left: auto;
   flex-shrink: 0;
   animation: pulse 2s ease-in-out infinite;

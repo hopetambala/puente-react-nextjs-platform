@@ -16,7 +16,6 @@ const FORM_DOT_COLORS = [
   'var(--tk-dlite-primitive-color-orange-500)',
 ];
 
-const SPARKBAR_HEIGHTS = [20, 35, 15, 50, 30, 45, 100];
 
 function formatDate(d: Date): string {
   return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
@@ -37,7 +36,7 @@ export default function Dashboard() {
   const [activityLoading, setActivityLoading] = useState(true);
   const [activityItems, setActivityItems] = useState<{ when: string; text: string }[]>([]);
   const [formsLoading, setFormsLoading] = useState(true);
-  const [forms, setForms] = useState<{ name: string; count: number; active: boolean }[]>([]);
+  const [forms, setForms] = useState<{ name: string; active: boolean }[]>([]);
   const [recordsLast30, setRecordsLast30] = useState<number | null>(null);
   const [activeSurveyors, setActiveSurveyors] = useState<number | null>(null);
 
@@ -95,7 +94,7 @@ export default function Dashboard() {
         query.equalTo('surveyingOrganization', org);
         query.greaterThanOrEqualTo('createdAt', thirtyDaysAgo);
         query.descending('createdAt');
-        query.limit(200);
+        query.limit(50);
         const results = await query.find();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const items = results.map((r: any) => ({
@@ -125,7 +124,6 @@ export default function Dashboard() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const items = results.map((r: any) => ({
           name: r.get('name') || 'Untitled form',
-          count: 0,
           active: r.get('active') === 'true',
         }));
         setForms(items);
@@ -163,17 +161,7 @@ export default function Dashboard() {
                 ? <Skeleton width={80} height={12} style={{ marginTop: 6 }} />
                 : <span>{t('stat_window_30d')}</span>}
             </div>
-            <div className={styles.sparkline}>
-              {/* eslint-disable react/no-array-index-key */}
-              {SPARKBAR_HEIGHTS.map((h, i) => (
-                <div
-                  key={i}
-                  className={`${styles.bar}${i === SPARKBAR_HEIGHTS.length - 1 ? ` ${styles.barActive}` : ''}`}
-                  style={{ height: `${h}%` }}
-                />
-              ))}
-              {/* eslint-enable react/no-array-index-key */}
-            </div>
+
           </div>
 
           <div className={styles.statCard}>
@@ -262,7 +250,6 @@ export default function Dashboard() {
                       style={{ background: FORM_DOT_COLORS[i % FORM_DOT_COLORS.length] }}
                     />
                     <span className={styles.formName}>{form.name}</span>
-                    <span className={styles.formCount}>{form.count}</span>
                     {form.active && <Badge variant="yellow">Field-active</Badge>}
                   </div>
                 ))}

@@ -1,5 +1,6 @@
 import { retrieveSignOutFunction } from 'app/modules/user';
 import { useTranslation } from 'next-i18next';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
 
@@ -49,32 +50,29 @@ export default function Sidebar({ activeRoute, orgName }) {
           <div key={group.key} className={styles.navGroup}>
             <div className={styles.navGroupTitle}>{group.labelKey}</div>
             {group.items.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                className={`${styles.navItem} ${activeRoute === item.id ? styles.navItemActive : ''}`}
-                onClick={() => item.href !== '#' && router.push(item.href)}
-              >
-                <span className={styles.navIcon}>{item.icon}</span>
-                <span>{t(item.labelKey)}</span>
-                {item.live && (
-                  <span className={styles.navPulse} title="Surveyors active in field" />
-                )}
-              </button>
+              <Link key={item.id} href={item.href} passHref>
+                <a
+                  className={`${styles.navItem} ${activeRoute === item.id ? styles.navItemActive : ''}`}
+                >
+                  <span className={styles.navIcon}>{item.icon}</span>
+                  <span>{t(item.labelKey)}</span>
+                  {item.live && (
+                    <span className={styles.navPulse} title="Surveyors active in field" />
+                  )}
+                </a>
+              </Link>
             ))}
           </div>
         ))}
       </nav>
 
       <div className={styles.navBottom}>
-        <button
-          type="button"
-          className={styles.navItem}
-          onClick={() => router.push('/account/management')}
-        >
-          <span className={styles.navIcon}>◉</span>
-          <span>{t('nav_account')}</span>
-        </button>
+        <Link href="/account/management" passHref>
+          <a className={styles.navItem}>
+            <span className={styles.navIcon}>◉</span>
+            <span>{t('nav_account')}</span>
+          </a>
+        </Link>
         <button
           type="button"
           className={`${styles.navItem} ${styles.navDanger}`}

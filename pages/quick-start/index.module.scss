@@ -64,25 +64,6 @@
   flex-shrink: 0;
 }
 
-.sparkline {
-  display: flex;
-  align-items: flex-end;
-  gap: 3px;
-  height: 32px;
-  margin-top: var(--tk-dlite-semantic-spacing-sm);
-}
-
-.bar {
-  flex: 1;
-  border-radius: 2px 2px 0 0;
-  background: var(--tk-dlite-semantic-color-border);
-  min-height: 4px;
-}
-
-.barActive {
-  background: var(--tk-dlite-semantic-color-action-primary);
-}
-
 /* two-column body */
 .body {
   display: grid;
@@ -190,12 +171,6 @@
   font-weight: 500;
   color: var(--tk-dlite-semantic-color-text-primary);
   font-family: var(--font-family-heading);
-}
-
-.formCount {
-  font-size: 12px;
-  color: var(--tk-dlite-semantic-color-text-secondary);
-  font-family: var(--font-family-mono);
 }
 
 .panelLink {

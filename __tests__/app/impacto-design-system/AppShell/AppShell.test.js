@@ -5,6 +5,13 @@ jest.mock('next/router', () => ({
   useRouter: jest.fn(() => ({ pathname: '/quick-start', push: jest.fn() })),
 }));
 
+jest.mock('next/link', () => {
+  const React = require('react');
+  return function MockLink({ href, children }) {
+    return React.cloneElement(React.Children.only(children), { href });
+  };
+});
+
 jest.mock('next-i18next', () => ({
   useTranslation: () => ({
     t: (key) => ({
@@ -58,50 +65,48 @@ function renderShell(pathname) {
 describe('Route → active nav item', () => {
   it('/quick-start highlights Dashboard', () => {
     renderShell('/quick-start');
-    const btn = screen.getByText('Dashboard').closest('button');
+    const btn = screen.getByText('Dashboard').closest('a');
     expect(btn.className).toMatch('navItemActive');
   });
 
   it('/forms/form-manager highlights Form Manager', () => {
     renderShell('/forms/form-manager');
-    const btn = screen.getByText('Form Manager').closest('button');
+    const btn = screen.getByText('Form Manager').closest('a');
     expect(btn.className).toMatch('navItemActive');
   });
 
   it('/forms/form-marketplace highlights Marketplace (not Form Manager)', () => {
     renderShell('/forms/form-marketplace');
-    const marketplace = screen.getByText('Marketplace').closest('button');
-    const forms = screen.getByText('Form Manager').closest('button');
+    const marketplace = screen.getByText('Marketplace').closest('a');
+    const forms = screen.getByText('Form Manager').closest('a');
     expect(marketplace.className).toMatch('navItemActive');
     expect(forms.className).not.toMatch('navItemActive');
   });
 
   it('/data/data-curation highlights Data', () => {
     renderShell('/data/data-curation');
-    const btn = screen.getByText('Data').closest('button');
+    const btn = screen.getByText('Data').closest('a');
     expect(btn.className).toMatch('navItemActive');
   });
 
   it('/account/management highlights Settings', () => {
     renderShell('/account/management');
-    const btn = screen.getByText('Settings').closest('button');
+    const btn = screen.getByText('Settings').closest('a');
     expect(btn.className).toMatch('navItemActive');
   });
 
   it('unknown path defaults to Dashboard active', () => {
     renderShell('/some/unknown/path');
-    const btn = screen.getByText('Dashboard').closest('button');
+    const btn = screen.getByText('Dashboard').closest('a');
     expect(btn.className).toMatch('navItemActive');
   });
 });
 
 describe('Nav click routing', () => {
   it('clicking Data navigates to /data/data-curation', () => {
-    const push = jest.fn();
-    useRouter.mockReturnValue({ pathname: '/quick-start', push });
     render(<AppShell breadcrumb={['Test']}><div /></AppShell>);
-    fireEvent.click(screen.getByText('Data').closest('button'));
-    expect(push).toHaveBeenCalledWith('/data/data-curation');
+    const link = screen.getByText('Data').closest('a');
+    expect(link).toHaveAttribute('href', '/data/data-curation');
   });
 });
 
@@ -134,6 +139,25 @@ describe('Render', () => {
   });
 });
 
+// ─── RED: Sidebar org name ───────────────────────────────────────────────────
+
+describe('Sidebar org name', () => {
+  it("shows the user's organization name in the sidebar", async () => {
+    const { retrieveCurrentUserAsyncFunction } = require('app/modules/user');
+    retrieveCurrentUserAsyncFunction.mockResolvedValueOnce({
+      get: (key) => ({ organization: 'TestOrg' }[key] ?? null),
+    });
+
+    const { waitFor } = require('@testing-library/react');
+    setPathname('/quick-start');
+    render(<AppShell breadcrumb={['Test']}><div /></AppShell>);
+
+    await waitFor(() => {
+      expect(screen.getByText('TestOrg')).toBeInTheDocument();
+    });
+  });
+});
+
 // ─── RED: Phase 1 — dead links removed + Form Creator added ──────────────────
 
 describe('Phase 1 — Navigation Fixes', () => {
@@ -163,16 +187,14 @@ describe('Phase 1 — Navigation Fixes', () => {
   });
 
   it('clicking Form Creator navigates to /forms/form-creator', () => {
-    const push = jest.fn();
-    useRouter.mockReturnValue({ pathname: '/quick-start', push });
     render(<AppShell breadcrumb={['Test']}><div /></AppShell>);
-    fireEvent.click(screen.getByText('Form Creator').closest('button'));
-    expect(push).toHaveBeenCalledWith('/forms/form-creator');
+    const link = screen.getByText('Form Creator').closest('a');
+    expect(link).toHaveAttribute('href', '/forms/form-creator');
   });
 
   it('/forms/form-creator highlights Form Creator in the nav', () => {
     renderShell('/forms/form-creator');
-    const btn = screen.getByText('Form Creator').closest('button');
+    const btn = screen.getByText('Form Creator').closest('a');
     expect(btn.className).toMatch('navItemActive');
   });
 
@@ -180,5 +202,18 @@ describe('Phase 1 — Navigation Fixes', () => {
     renderShell('/quick-start');
     expect(screen.queryByText('Forms')).not.toBeInTheDocument();
     expect(screen.getByText('Form Manager')).toBeInTheDocument();
+  });
+});
+
+// ─── RED: Nav accessibility ───────────────────────────────────────────────────
+
+describe('Nav accessibility', () => {
+  it('nav items render as anchor links, not buttons', () => {
+    renderShell('/quick-start');
+    const dashboardLink = screen.getByText('Dashboard').closest('a');
+    expect(dashboardLink).toBeInTheDocument();
+    expect(dashboardLink.tagName).toBe('A');
+    // The Dashboard nav item should NOT be a button
+    expect(screen.getByText('Dashboard').closest('button')).toBeNull();
   });
 });

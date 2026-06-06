@@ -1,5 +1,7 @@
+import { retrieveCurrentUserAsyncFunction } from 'app/modules/user';
 import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
+import { useLayoutEffect, useState } from 'react';
 
 import styles from './AppShell.module.css';
 import Sidebar from './Sidebar';
@@ -20,10 +22,19 @@ export default function AppShell({
 }) {
   const { pathname } = useRouter();
   const activeRoute = deriveActiveRoute(pathname);
+  const [orgName, setOrgName] = useState(null);
+
+  useLayoutEffect(() => {
+    const fetchUser = async () => {
+      const user = await retrieveCurrentUserAsyncFunction();
+      if (user) setOrgName(user.get('organization') || null);
+    };
+    fetchUser();
+  }, []);
 
   return (
     <div className={styles.shell}>
-      <Sidebar activeRoute={activeRoute} />
+      <Sidebar activeRoute={activeRoute} orgName={orgName} />
       <div className={styles.main}>
         <TopBar breadcrumb={breadcrumb} topBarActions={topBarActions} />
         <div className={fullBleed ? styles.pageFullBleed : styles.page}>

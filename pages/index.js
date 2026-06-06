@@ -371,27 +371,68 @@ export default function Homepage() {
             <div>
               <h5 className={styles.footerColTitle}>Product</h5>
               <ul className={styles.footerLinks}>
-                {['Manage', 'Collect', 'dlite tokens', 'Storybook'].map((l) => (
-                  // eslint-disable-next-line jsx-a11y/anchor-is-valid
-                  <li key={l}><a href="#" className={styles.footerLink}>{l}</a></li>
+                {[
+                  { label: 'Collect', href: 'https://apps.apple.com/us/app/puente-collect/id1362371696' },
+                  { label: 'dlite tokens', href: 'https://github.com/nicholasgalante1997/style-dictionary-dlite-tokens' },
+                ].map((link) => (
+                  <li key={link.label}>
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.footerLink}
+                    >
+                      {link.label}
+                    </a>
+                  </li>
                 ))}
               </ul>
             </div>
             <div>
               <h5 className={styles.footerColTitle}>Resources</h5>
               <ul className={styles.footerLinks}>
-                {['Documentation', 'Changelog', 'Contributing'].map((l) => (
-                  // eslint-disable-next-line jsx-a11y/anchor-is-valid
-                  <li key={l}><a href="#" className={styles.footerLink}>{l}</a></li>
+                {[
+                  { label: 'Documentation', href: 'https://github.com/hopetambala/puente-react-nextjs-platform' },
+                  { label: 'Changelog', href: 'https://github.com/hopetambala/puente-react-nextjs-platform/blob/main/CHANGELOG.md' },
+                  { label: 'Contributing', href: 'https://github.com/hopetambala/puente-react-nextjs-platform/blob/main/CONTRIBUTING.md' },
+                ].map((link) => (
+                  <li key={link.label}>
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.footerLink}
+                    >
+                      {link.label}
+                    </a>
+                  </li>
                 ))}
               </ul>
             </div>
             <div>
               <h5 className={styles.footerColTitle}>Organization</h5>
               <ul className={styles.footerLinks}>
-                {['puente-dr.org', 'GitHub', 'Contact'].map((l) => (
-                  // eslint-disable-next-line jsx-a11y/anchor-is-valid
-                  <li key={l}><a href="#" className={styles.footerLink}>{l}</a></li>
+                {[
+                  { label: 'puente-dr.org', href: 'https://www.puente-dr.org/', external: true },
+                  { label: 'GitHub', href: 'https://github.com/hopetambala/puente-react-nextjs-platform', external: true },
+                  { label: 'Contact', href: 'mailto:info@puente-dr.org', external: false },
+                ].map((link) => (
+                  <li key={link.label}>
+                    {link.external !== false ? (
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.footerLink}
+                      >
+                        {link.label}
+                      </a>
+                    ) : (
+                      <a href={link.href} className={styles.footerLink}>
+                        {link.label}
+                      </a>
+                    )}
+                  </li>
                 ))}
               </ul>
             </div>
