@@ -13,6 +13,11 @@ jest.mock('app/modules/user', () => ({
   parseUserValue: jest.fn(() => ({ organization: 'test-org' })),
 }));
 
+jest.mock('app/modules/user/useCurrentUser', () => ({
+  __esModule: true,
+  default: jest.fn(() => ({ organization: 'hook-org' })),
+}));
+
 jest.mock('app/store', () => ({
   useGlobalState: jest.fn(() => ({
     contextManagment: { addPropToStore: jest.fn(), store: {} },
@@ -63,5 +68,16 @@ describe('Content', () => {
   it('renders the FormManager epic sub-component', () => {
     render(<Manager />);
     expect(screen.getByTestId('form-manager-epic')).toBeInTheDocument();
+  });
+});
+
+describe('Reactive user', () => {
+  it('passes the user from useCurrentUser to the FormManager epic', () => {
+    render(<Manager />);
+    const FormManager = require('app/epics/FormManager');
+    expect(FormManager).toHaveBeenCalledWith(
+      expect.objectContaining({ user: expect.objectContaining({ organization: 'hook-org' }) }),
+      expect.anything(),
+    );
   });
 });

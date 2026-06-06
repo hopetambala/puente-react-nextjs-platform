@@ -1,6 +1,6 @@
 import FormManager from 'app/epics/FormManager';
 import { AppShell, PageHeader } from 'app/impacto-design-system';
-import { parseUserValue } from 'app/modules/user';
+import useCurrentUser from 'app/modules/user/useCurrentUser';
 import { useGlobalState } from 'app/store';
 import { useRouter } from 'next/router';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -13,7 +13,7 @@ export async function getStaticProps({ locale }) {
 export default function Manager() {
   const { contextManagment } = useGlobalState();
   const router = useRouter();
-  const user = parseUserValue();
+  const user = useCurrentUser();
 
   return (
     <AppShell breadcrumb={['Forms', 'Form Manager']}>

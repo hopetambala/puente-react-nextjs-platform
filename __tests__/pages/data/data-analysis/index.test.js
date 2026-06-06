@@ -9,6 +9,11 @@ jest.mock('app/modules/user', () => ({
   parseUserValue: jest.fn(() => null),
 }));
 
+jest.mock('app/modules/user/useCurrentUser', () => ({
+  __esModule: true,
+  default: jest.fn(() => ({ organization: 'hook-org' })),
+}));
+
 jest.mock('app/epics/DataAnalyticsManager', () =>
   jest.fn(() => <div data-testid="data-analytics-manager" />));
 
@@ -51,5 +56,16 @@ describe('Content', () => {
   it('renders the DataAnalyticsManager sub-component', () => {
     render(<DataAnalysis />);
     expect(screen.getByTestId('data-analytics-manager')).toBeInTheDocument();
+  });
+});
+
+describe('Reactive user', () => {
+  it('passes the user from useCurrentUser to the DataAnalyticsManager epic', () => {
+    render(<DataAnalysis />);
+    const DataAnalyticsManager = require('app/epics/DataAnalyticsManager');
+    expect(DataAnalyticsManager).toHaveBeenCalledWith(
+      expect.objectContaining({ user: expect.objectContaining({ organization: 'hook-org' }) }),
+      expect.anything(),
+    );
   });
 });
