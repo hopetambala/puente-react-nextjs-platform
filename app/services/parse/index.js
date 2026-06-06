@@ -1,9 +1,12 @@
 import { Parse } from 'parse';
 
+let initialized = false;
+
 const initialize = () => {
+  if (initialized) return;
   Parse.initialize(process.env.NEXT_PUBLIC_parseAppId, process.env.NEXT_PUBLIC_parseJavascriptKey);
   Parse.serverURL = process.env.NEXT_PUBLIC_parseServerUrl;
-    console.log(`Initialize Parse with App ID: ${process.env.NEXT_PUBLIC_parseAppId}, Javascript Key: ${process.env.NEXT_PUBLIC_parseJavascriptKey}`); // eslint-disable-line
+  initialized = true;
 };
 
 const parseService = {

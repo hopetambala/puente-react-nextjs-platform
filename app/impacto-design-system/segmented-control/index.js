@@ -11,7 +11,7 @@ const SegmentedControl = ({ options, value, onChange }) => (
         key={opt.value}
         type="button"
         className={classNames(styles.btn, { [styles.active]: opt.value === value })}
-        onClick={() => onChange(opt.value)}
+        onClick={() => onChange?.(opt.value)}
       >
         {opt.label}
       </button>

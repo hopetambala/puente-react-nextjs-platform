@@ -56,4 +56,22 @@ describe('Interaction', () => {
     await userEvent.click(screen.getByText('Table'));
     expect(onChange).toHaveBeenCalledWith('table');
   });
+
+  it('does not throw when onChange is not provided and a button is clicked', async () => {
+    // Suppress the expected React error boundary console.error noise
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    render(<SegmentedControl options={OPTIONS} value="table" />);
+
+    let caughtError = null;
+    try {
+      await userEvent.click(screen.getByText('Cards'));
+    } catch (err) {
+      caughtError = err;
+    }
+
+    spy.mockRestore();
+
+    expect(caughtError).toBeNull();
+  });
 });

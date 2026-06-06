@@ -13,7 +13,7 @@ const RadioGroup = ({ options, value, onChange }) => (
           key={opt.value}
           type="button"
           className={classNames(styles.item, { [styles.active]: active })}
-          onClick={() => onChange(opt.value)}
+          onClick={() => onChange?.(opt.value)}
         >
           <span className={classNames(styles.radio, { [styles.radioChecked]: active })} />
           <span className={styles.labels}>

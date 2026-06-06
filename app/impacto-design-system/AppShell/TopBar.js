@@ -27,7 +27,7 @@ export default function TopBar({ breadcrumb, topBarActions }) {
     <header className={styles.topbar}>
       <div className={styles.breadcrumb}>
         {breadcrumb.map((crumb, i) => (
-          <React.Fragment key={crumb}>
+          <React.Fragment key={`${i}-${crumb}`}>
             <span className={i === breadcrumb.length - 1 ? styles.crumbCurrent : ''}>
               {crumb}
             </span>

@@ -62,4 +62,15 @@ describe('Interaction', () => {
     await userEvent.click(screen.getByText('Floor material'));
     expect(onChange).toHaveBeenCalledWith('floor_material');
   });
+
+  it('does not throw when onChange is not provided and a button is clicked', async () => {
+    render(<RadioGroup options={OPTIONS} value="water_type" />);
+    let caughtError = null;
+    try {
+      await userEvent.click(screen.getByText('Floor material'));
+    } catch (err) {
+      caughtError = err;
+    }
+    expect(caughtError).toBeNull();
+  });
 });

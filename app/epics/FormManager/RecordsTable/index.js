@@ -89,8 +89,8 @@ function RecordsTable({ form }) {
           const recordId = record.id;
           const household = record.get('household') || '—';
           const surveyor = record.get('surveyingUser') || '—';
-          const submitted = record.get('createdAt')
-            ? new Date(record.get('createdAt')).toLocaleDateString()
+          const submitted = record.createdAt
+            ? record.createdAt.toLocaleDateString()
             : '—';
           const syncStatus = record.get('syncStatus') || 'synced';
           const waterSource = record.get('waterSource') || '—';

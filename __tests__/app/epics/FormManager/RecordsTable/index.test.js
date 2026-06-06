@@ -227,6 +227,41 @@ describe('RecordsTable — empty state', () => {
   });
 });
 
+// ─── Submitted date — bug: record.get('createdAt') vs record.createdAt ────────
+
+describe('RecordsTable — submitted date', () => {
+  it('shows a formatted submitted date from record.createdAt', async () => {
+    // createdAt is a direct property on the Parse object, NOT in the .get() map
+    const record = {
+      id: 'EH-300',
+      createdAt: new Date('2025-05-14'),
+      get: (key) => ({
+        household: 'Sabana Yegua · Block 1',
+        surveyingUser: 'Ana R.',
+        syncStatus: 'synced',
+        waterSource: 'Tap',
+      })[key],
+    };
+
+    Parse.Query._mockFind.mockResolvedValue([record]);
+    Parse.Query.mockImplementation(() => ({
+      equalTo: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockReturnThis(),
+      skip: jest.fn().mockReturnThis(),
+      count: jest.fn().mockResolvedValue(1),
+      find: Parse.Query._mockFind,
+    }));
+
+    renderTable();
+
+    await waitFor(() =>
+      expect(
+        screen.getByText(new Date('2025-05-14').toLocaleDateString()),
+      ).toBeInTheDocument(),
+    );
+  });
+});
+
 // ─── Pagination ────────────────────────────────────────────────────────────────
 
 describe('RecordsTable — pagination', () => {
