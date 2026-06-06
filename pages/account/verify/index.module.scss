@@ -1,15 +1,51 @@
-.paper {
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background:
-      linear-gradient(
-        135deg,
-        var(--tk-dlite-primitive-color-blue-100) 0%,
-        var(--tk-dlite-primitive-color-neutral-100) 50%,
-        var(--tk-dlite-primitive-color-yellow-100) 100%
-      );
+.auth {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+}
+
+.left {
+  background: var(--tk-dlite-semantic-color-text-primary);
+  display: flex;
+  flex-direction: column;
+  padding: var(--tk-dlite-semantic-spacing-xl);
+}
+
+.leftBrand {
+  display: flex;
+  align-items: center;
+  gap: var(--tk-dlite-semantic-spacing-sm);
+}
+
+.leftBrandMark {
+  width: 28px;
+  height: 28px;
+  background: var(--tk-dlite-primitive-color-yellow-200);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.leftBrandName {
+  color: var(--tk-dlite-primitive-color-white);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--tk-dlite-semantic-spacing-xl);
+  background: var(--tk-dlite-semantic-color-background);
+}
+
+.card {
+  width: 100%;
+  max-width: 480px;
 }
 
 .stack {

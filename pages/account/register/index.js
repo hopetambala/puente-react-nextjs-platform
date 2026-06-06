@@ -1,11 +1,10 @@
 import { yupResolver } from '@hookform/resolvers';
 import {
-  Button,
-  Card,
-  FormInput,
-  Page, Stack,
-  Text,
-  Toast,
+    Button,
+    FormInput,
+    Stack,
+    Text,
+    Toast,
 } from 'app/impacto-design-system';
 import { retrieveSignUpFunction } from 'app/modules/user';
 import { useRouter } from 'next/router';
@@ -47,9 +46,18 @@ function Register() {
   };
 
   return (
-    <Page>
-      <div className={styles.paper}>
-        <Card padding="extraLarge">
+    <div className={styles.auth}>
+      {/* ── left column: brand ── */}
+      <div className={styles.left} data-testid="auth-brand">
+        <div className={styles.leftBrand}>
+          <div className={styles.leftBrandMark}>P</div>
+          <span className={styles.leftBrandName}>Puente</span>
+        </div>
+      </div>
+
+      {/* ── right column: form ── */}
+      <div className={styles.right} data-testid="auth-form">
+        <div className={styles.card}>
           <Stack isVertical spacing="medium">
             <Text text="Create an account" element="h2" />
             <Text text="Required fields have an asterisk: *" element="p" />
@@ -127,9 +135,9 @@ function Register() {
               isFullWidth
             />
           </Stack>
-        </Card>
+        </div>
       </div>
-    </Page>
+    </div>
   );
 }
 

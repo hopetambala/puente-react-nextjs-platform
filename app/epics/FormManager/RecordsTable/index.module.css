@@ -1,0 +1,116 @@
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tableHead {
+  display: flex;
+  border-bottom: 2px solid var(--tk-dlite-semantic-color-border-default);
+  padding-bottom: var(--spacer-xs);
+  margin-bottom: var(--tk-dlite-semantic-spacing-xxs);
+}
+
+.tableRow {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--tk-dlite-semantic-color-border-default);
+  padding: var(--spacer-xs) 0;
+}
+
+.tableRow:last-child {
+  border-bottom: none;
+}
+
+.cell {
+  flex: 1;
+  font-size: var(--font-size-body);
+  color: var(--tk-dlite-semantic-color-text-primary);
+  padding: 0 var(--spacer-xs);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cellHead {
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-emphasis);
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-label);
+}
+
+.cellCheck {
+  flex: 0 0 32px;
+}
+
+.cellId {
+  flex: 0 0 96px;
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-small);
+}
+
+.cellSurveyor {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-xs);
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--tk-dlite-primitive-color-blue-200);
+  color: var(--tk-dlite-semantic-color-text-primary);
+  font-size: 10px;
+  font-weight: var(--font-weight-emphasis);
+  flex-shrink: 0;
+}
+
+.cellMenu {
+  flex: 0 0 32px;
+  text-align: center;
+  cursor: pointer;
+  color: var(--tk-dlite-semantic-color-text-secondary);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacer-s) 0;
+  font-size: var(--font-size-small);
+  color: var(--tk-dlite-semantic-color-text-secondary);
+}
+
+.pageButtons {
+  display: flex;
+  gap: var(--spacer-xs);
+}
+
+.pageBtn {
+  padding: var(--spacer-xs) var(--spacer-s);
+  background: none;
+  border: 1px solid var(--tk-dlite-semantic-color-border-default);
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  font-size: var(--font-size-small);
+  color: var(--tk-dlite-semantic-color-text-primary);
+}
+
+.pageBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pageBtn:hover:not(:disabled) {
+  background: var(--tk-dlite-semantic-color-surface-hovered);
+}
+
+.spinnerWrap {
+  display: flex;
+  justify-content: center;
+  padding: var(--spacer-xl);
+}

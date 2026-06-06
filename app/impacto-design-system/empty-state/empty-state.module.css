@@ -1,0 +1,21 @@
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacer-xxl) var(--spacer-l);
+  gap: var(--spacer-xs);
+}
+
+.message {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  text-align: center;
+}
+
+.sub {
+  font-size: 11px;
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  text-align: center;
+}

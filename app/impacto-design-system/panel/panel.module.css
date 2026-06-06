@@ -1,0 +1,30 @@
+.panel {
+  background: var(--tk-dlite-semantic-color-surface-base);
+  border: 1px solid var(--tk-dlite-semantic-color-border);
+  border-radius: var(--radius-m);
+  overflow: hidden;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacer-sm) var(--spacer-m);
+  border-bottom: 1px solid var(--tk-dlite-semantic-color-border);
+}
+
+.panelTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--tk-dlite-semantic-color-text-primary);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.panelBody {
+  padding: var(--spacer-m);
+}
+
+.panelBodyNoPadding {
+  padding: 0;
+}

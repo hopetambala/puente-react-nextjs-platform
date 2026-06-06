@@ -1,59 +1,17 @@
-import { Card, Page } from 'app/impacto-design-system';
-import { BarChart } from 'app/impacto-design-system/visualizations';
-import { useEffect, useState } from 'react';
-
-import { environmentalHealthRecord } from '../../../app/modules/django-etl';
-import styles from './css/dashboard.module.css';
-
-const filters = {
-  'Type of water you drink': 'typeofwaterdoyoudrink',
-  'Years in Community': 'yearslivedinthecommunity',
-  'Clinic Access': 'clinicaccess_v2',
-  'Floor Material': 'floormaterial',
-};
-function Forms() {
-  const [data, setData] = useState([]);
-  const [key, setKey] = useState();
-
-  const dashboardClasses = [styles.dashboard, 'impacto-card'].join(' ');
-
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!key) return;
-      const serverData = await environmentalHealthRecord.retrieve(
-        'environmentalhealthbronze/get_count/',
-        JSON.stringify({ fields: [key] }),
-      );
-
-      setData(
-        serverData.filter((obj) => Object.values(obj).every((value) => value !== null)),
-      );
-    };
-    fetchData().catch(console.error); //eslint-disable-line
-  }, [key]);
-
-  return (
-    <Page header footer>
-      <h1>Quick Insights</h1>
-      <div className={dashboardClasses}>
-        <div className={styles.dimensions}>
-          <h2>Dimensions</h2>
-          {Object.keys(filters).map((filter) => (
-            <Card onClick={() => setKey(filters[filter])}>
-              {filter}
-            </Card>
-          ))}
-        </div>
-        <div className={styles.filters}>
-          <h2>Filters</h2>
-          <div>{Object.keys(filters).filter((k) => filters[k] === key)[0]}</div>
-        </div>
-        <div className={styles.content}>
-          {data.length > 0 && <BarChart data={data} indexBy={key} />}
-        </div>
-      </div>
-    </Page>
-  );
+// Retired in the redesign — this route now permanently redirects to the Data
+// Curation page via getServerSideProps. The previous "Quick Insights" UI was
+// unreachable behind the redirect, so it has been removed rather than maintained
+// as dead code. Next.js still requires a default-exported component on every
+// page; it never renders because the server-side redirect runs first.
+export default function DataVisualizationRedirect() {
+  return null;
 }
 
-export default Forms;
+export function getServerSideProps() {
+  return {
+    redirect: {
+      destination: '/data/data-curation',
+      permanent: true,
+    },
+  };
+}

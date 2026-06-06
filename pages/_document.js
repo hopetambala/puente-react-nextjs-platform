@@ -12,11 +12,11 @@ export default class MyDocument extends Document {
         <Head>
           {/* PWA primary color */}
           <meta name="theme-color" content={theme.palette.primary.main} />
-          {/* dlite brand typefaces: Plus Jakarta Sans (headings) + Source Serif 4 (body) */}
+          {/* dlite brand typefaces: Plus Jakarta Sans (body + headings in-app) · Source Serif 4 (marketing/editorial only) · Source Code Pro (mono) */}
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
           <link
-            href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,500;1,400;1,500&family=Source+Code+Pro:wght@400;500;600&family=Roboto:wght@300;400;500;700&display=swap"
             rel="stylesheet"
           />
         </Head>

@@ -1,16 +1,6 @@
 import {
-  Chip,
-  Grid,
-  Input,
-  MenuItem,
-  NoSsr,
-  Select,
-  Snackbar,
-  TextField,
-} from '@material-ui/core';
-import { Alert } from '@material-ui/lab';
-import {
-  Button, Card, Stack, Text,
+    Button,
+    EmptyState, PageHeader, Panel, Toast
 } from 'app/impacto-design-system';
 import { postObjectsToClass, updateObject } from 'app/modules/cloud-code';
 import { useCallback, useEffect, useState } from 'react';
@@ -22,6 +12,7 @@ import { copy, reorder } from './_utils';
 import FormBlocks from './FormBlocks';
 import FormTemplate from './FormTemplate';
 import styles from './index.module.scss';
+import Inspector from './Inspector';
 
 const COLLECTION = [
   {
@@ -83,7 +74,7 @@ const COLLECTION = [
   // },
 ];
 
-const FormCreator = ({ context, user }) => {
+function FormCreator({ context, user }) {
   const [formName, setFormName] = useState('');
   const [formDescription, setFormDescription] = useState('');
   const [formItems, setFormItems] = useState([]);
@@ -93,6 +84,8 @@ const FormCreator = ({ context, user }) => {
   // const [workflowTypes] = useState(["Puente", "Assets", "Marketplace"]);
   // const [workflowNames, setWorkflowNames] = useState([]);
   // const [newWorkflowValue, setNewWorkflowValue] = useState("");
+
+  const [selectedBlock, setSelectedBlock] = useState(null);
 
   const [previewOpen, setPreviewOpen] = useState();
   const [submissionType, setSubmissionType] = useState('');
@@ -225,6 +218,13 @@ const FormCreator = ({ context, user }) => {
     setFormItems(newArray);
   };
 
+  const updateBlock = (updatedBlock) => {
+    setFormItems((prev) =>
+      prev.map((item) => (item.id === updatedBlock.id ? updatedBlock : item)),
+    );
+    setSelectedBlock(updatedBlock);
+  };
+
   const onDragEnd = useCallback(
     (result) => {
       const { source, destination } = result;
@@ -249,137 +249,99 @@ const FormCreator = ({ context, user }) => {
 
   return (
     <div>
-      <NoSsr>
-        <Snackbar open={submission} autoHideDuration={6000}>
-          <Alert variant="filled" severity="success">
-            Success!
-          </Alert>
-        </Snackbar>
-        <NativeApplicationDrawer
-          isOpen={previewOpen}
-          onClose={() => setPreviewOpen(false)}
-          formItems={formItems}
-        />
-        <div style={{ paddingBottom: 'var(--spacer-xxl)' }}>
-          <Text element="h1" text="Form Creator" />
-        </div>
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Grid spacing={2} container>
-            <Grid item xs={8}>
-              <Stack isVertical spacing="medium">
-                <Stack spacing="large">
-                  <Button
-                    text="Reset form"
-                    intent="danger"
-                    onClick={clearForm}
-                  />
-                  <Button
-                    text="Preview form"
-                    onClick={() => setPreviewOpen(!previewOpen)}
-                  />
-
-                  <Button
-                    text="Publish"
-                    intent="primary"
-                    onClick={submitCustomForm}
-                    isLoading={submission}
-                  />
-                </Stack>
-                <Text text={submissionType} />
-                <Stack isVertical spacing="small">
-                  <Text element="h3" text="Type of custom form" />
-                  <select
-                    name="formType"
-                    value={formTypeNames[0]}
-                    onChange={handleFormTypesChange}
-                    className={styles.select}
-                  >
-                    <option value="Custom">Custom</option>
-                    <option value="Assets">Assets</option>
-                  </select>
-                  {/* <Text element="h2" text="Workflows" />
-                <Text element="h3" text="Your Workflows" />
-                <Select
-                  labelId="mutiple-chip-organization"
-                  id="mutiple-chip"
-                  multiple
-                  value={workflowNames}
-                  onChange={handleWorkflowChange}
-                  input={<Input id="select-multiple-chip" />}
-                  renderValue={(selected) => (
-                    <div>
-                      {selected.map((value) => (
-                        <Chip key={value} label={value} />
-                      ))}
-                    </div>
-                  )}
+      {submission && <Toast text="Success!" />}
+      <NativeApplicationDrawer
+        isOpen={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        formItems={formItems}
+      />
+      <PageHeader
+        title="Form Creator"
+        actions={
+          <div className={styles.headerActions}>
+            <Button text="Reset form" intent="danger" onClick={clearForm} />
+            <Button text="Preview form" onClick={() => setPreviewOpen(!previewOpen)} />
+            <Button text="Publish" intent="primary" onClick={submitCustomForm} isLoading={submission} />
+          </div>
+        }
+      />
+      <DragDropContext onDragEnd={onDragEnd}>
+        <div className={styles.canvasGrid}>
+          <div className={styles.canvasMain}>
+            {/* Form settings card */}
+            <div className={styles.settingsCard}>
+              <div className={styles.fieldGroup}>
+                <label className={styles.fieldLabel} htmlFor="formType">Type of form</label>
+                <select
+                  id="formType"
+                  name="formType"
+                  value={formTypeNames[0]}
+                  onChange={handleFormTypesChange}
+                  className={styles.select}
                 >
-                  {workflowTypes.map((workflowType) => (
-                    <MenuItem key={workflowType} value={workflowType}>
-                      {workflowType}
-                    </MenuItem>
-                  ))}
-                </Select>
-                <Text element="h3" text="Add New Workflow" />
-                <TextField
-                  id="new-workflow"
-                  label="New Workflow"
-                  onChange={(event) => handleTextChange(event)}
-                /> */}
-                  <Text element="h3" text="Form Name" />
-                  <input
-                    value={formName}
-                    onChange={(e) => setFormName(e.target.value)}
-                    type="text"
-                    placeholder="Give your form a detailed name"
-                    className={styles.input}
-                  />
-                  <Text element="h3" text="Form Description" />
-                  <input
-                    value={formDescription}
-                    onChange={(e) => setFormDescription(e.target.value)}
-                    type="text"
-                    placeholder="Describe how this form will be used"
-                    className={styles.input}
-                  />
-                </Stack>
-                <Stack isVertical>
-                  <div
-                    style={{
-                      paddingTop: 'var(--spacer-s)',
-                      paddingBottom: 'var(--spacer-m)',
-                    }}
-                  >
-                    <Text element="h3" text="Form Builder" />
-                  </div>
-                  <FormTemplate
-                    formItems={formItems}
-                    setFormItems={setFormItems}
-                    removeValue={removeValue}
-                  />
-                </Stack>
-              </Stack>
-            </Grid>
-            <Grid item xs={4}>
-              <div className={styles.blocksSidebar}>
-              <Card>
-                <div>
-                  <Text
-                    element="h2"
-                    text="Building Blocks"
-                    className={styles.header}
-                  />
-                </div>
-                <FormBlocks items={COLLECTION} />
-              </Card>
+                  <option value="Custom">Custom</option>
+                  <option value="Assets">Assets</option>
+                </select>
               </div>
-            </Grid>
-          </Grid>
-        </DragDropContext>
-      </NoSsr>
+
+              <div className={styles.fieldGroup}>
+                <label className={styles.fieldLabel} htmlFor="formName">Form name</label>
+                <input
+                  id="formName"
+                  value={formName}
+                  onChange={(e) => setFormName(e.target.value)}
+                  type="text"
+                  placeholder="Give your form a detailed name"
+                  className={styles.input}
+                />
+              </div>
+
+              <div className={styles.fieldGroup}>
+                <label className={styles.fieldLabel} htmlFor="formDescription">Description</label>
+                <input
+                  id="formDescription"
+                  value={formDescription}
+                  onChange={(e) => setFormDescription(e.target.value)}
+                  type="text"
+                  placeholder="Describe how this form will be used"
+                  className={styles.input}
+                />
+              </div>
+            </div>
+
+            {/* Form builder canvas */}
+            <div className={styles.builderSection}>
+              <span className={styles.builderLabel}>Form builder</span>
+              <FormTemplate
+                formItems={formItems}
+                setFormItems={setFormItems}
+                removeValue={removeValue}
+                onSelectBlock={setSelectedBlock}
+                selectedBlockId={selectedBlock?.id}
+              />
+            </div>
+          </div>
+          <div className={styles.blocksSidebar}>
+            <Panel title="Blocks">
+              <FormBlocks items={COLLECTION} />
+            </Panel>
+            <Panel title="Inspector">
+              {selectedBlock ? (
+                <Inspector
+                  block={selectedBlock}
+                  onChange={updateBlock}
+                  onClose={() => setSelectedBlock(null)}
+                />
+              ) : (
+                <EmptyState message="Select a block to edit." />
+              )}
+            </Panel>
+          </div>
+        </div>
+      </DragDropContext>
     </div>
   );
-};
+}
 
 export default FormCreator;
 // https://github.com/atlassian/react-beautiful-dnd/issues/216

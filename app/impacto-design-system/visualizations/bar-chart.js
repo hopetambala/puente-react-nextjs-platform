@@ -1,12 +1,13 @@
 import { ResponsiveBar } from '@nivo/bar';
 
 export const BarChart = ({
-  data, indexBy, minVal = 1, maxVal,
+  data, indexBy, minVal = 1, maxVal, groupMode = 'grouped',
 }) => (
   <ResponsiveBar
     data={data}
     keys={['count_of_unique_values']}
     indexBy={indexBy}
+    groupMode={groupMode}
     margin={{
       top: 50,
       right: 130,

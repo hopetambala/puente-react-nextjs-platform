@@ -1,0 +1,23 @@
+.manager {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tk-dlite-semantic-spacing-lg);
+}
+
+.viewTabs {
+  margin-bottom: var(--tk-dlite-semantic-spacing-md);
+}
+
+.summaryBar {
+  display: flex;
+  gap: var(--tk-dlite-semantic-spacing-lg);
+  padding: var(--tk-dlite-semantic-spacing-md) var(--tk-dlite-semantic-spacing-lg);
+  background: var(--tk-dlite-semantic-color-surface-base);
+  border: 1px solid var(--tk-dlite-semantic-color-border);
+  border-radius: var(--tk-dlite-semantic-border-radius-md);
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--tk-dlite-semantic-color-text-primary);
+}
+

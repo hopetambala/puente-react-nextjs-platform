@@ -2,6 +2,7 @@
   "name": "puente-react-platform",
   "version": "0.1.2",
   "private": true,
+  "license": "BUSL-1.1",
   "author": {
     "name": "Hope Tambala",
     "email": "hope@puente-dr.org",
@@ -11,6 +12,8 @@
     "Hope Tambala <hope@puente-dr.org>"
   ],
   "scripts": {
+    "test": "jest --watchAll=false",
+    "test:watch": "jest --watch",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -73,6 +76,7 @@
     "yup": "^0.29.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@storybook/addon-essentials": "^7.6.13",
     "@storybook/addon-interactions": "^7.6.13",
     "@storybook/addon-links": "^7.6.13",
@@ -81,6 +85,9 @@
     "@storybook/nextjs": "^7.6.13",
     "@storybook/react": "^7.6.13",
     "@storybook/test": "^7.6.13",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^12",
+    "@testing-library/user-event": "^14",
     "@types/node": "20.12.5",
     "@types/react": "18.2.74",
     "eslint": "8.57.0",
@@ -93,6 +100,8 @@
     "eslint-plugin-react-hooks": "4.6.0",
     "eslint-plugin-simple-import-sort": "12.0.0",
     "eslint-plugin-storybook": "^0.8.0",
+    "jest": "^30.4.2",
+    "jest-environment-jsdom": "^30.4.1",
     "standard-version": "9.1.0",
     "storybook": "^7.6.13",
     "typescript": "^5.4.4",

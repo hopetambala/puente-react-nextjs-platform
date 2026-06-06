@@ -1,9 +1,10 @@
-import { Button, Modal } from 'app/impacto-design-system';
+import { Badge, Button, Modal } from 'app/impacto-design-system';
 import { updateObject } from 'app/modules/cloud-code';
 import { useState } from 'react';
 
 import CSVButton from './CSVButton';
 import ExpandableTableRow from './ExpandableTableRow';
+import styles from './index.module.scss';
 
 const FormManagerTable = ({
   data,
@@ -11,6 +12,7 @@ const FormManagerTable = ({
   passDataToFormCreator,
   organization,
   puenteForm,
+  onSelectForm,
 }) => {
   const [open, setOpen] = useState(false);
   const [selectedForm, setSelectedForm] = useState();
@@ -66,15 +68,16 @@ const FormManagerTable = ({
         action={handleRemove}
       />
       {data !== undefined ? (
-        <table>
+        <div className={styles.tableWrap}>
+        <table className={styles.table}>
           <thead>
             <tr>
-              <th style={{ width: 40 }} />
+              <th className={styles.colCaret} aria-label="Expand" />
               <th>Name</th>
               <th>Description</th>
-              <th>Created</th>
-              <th>Updated</th>
-              <th>Actions</th>
+              <th className={styles.colStatus}>Status</th>
+              <th className={styles.colDate}>Updated</th>
+              <th className={styles.colActions}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -84,19 +87,34 @@ const FormManagerTable = ({
                 key={row.name}
                 surveyingOrganization={organization}
               >
-                <td>{row.name}</td>
-                <td>{row.description || '—'}</td>
-                <td>{row.createdAt ? new Date(row.createdAt).toLocaleDateString() : '—'}</td>
-                <td>{row.updatedAt ? new Date(row.updatedAt).toLocaleDateString() : '—'}</td>
+                <td className={styles.nameCell}>
+                  {onSelectForm ? (
+                    <button
+                      type="button"
+                      className={styles.nameLink}
+                      onClick={() => onSelectForm(row)}
+                    >
+                      {row.name}
+                    </button>
+                  ) : (
+                    row.name
+                  )}
+                </td>
                 <td>
-                  <div style={{ display: 'flex', gap: 'var(--spacer-xs)', justifyContent: 'flex-end' }}>
+                  <div className={styles.descCell} title={row.description || ''}>
+                    {row.description || '—'}
+                  </div>
+                </td>
+                <td><Badge variant="green">Active</Badge></td>
+                <td className={styles.colDate}>{row.updatedAt ? new Date(row.updatedAt).toLocaleDateString() : '—'}</td>
+                <td className={styles.colActions}>
+                  <div className={styles.actions}>
                     {!puenteForm && (
                       <>
                         <Button
-                          text="Delete"
-                          intent="danger"
+                          text="Edit"
                           isSmall
-                          onClick={() => handleModal(row)}
+                          onClick={() => handleEdit(row)}
                         />
                         <Button
                           text="Duplicate"
@@ -104,9 +122,10 @@ const FormManagerTable = ({
                           onClick={() => handleDuplicate(row)}
                         />
                         <Button
-                          text="Edit"
+                          text="Delete"
+                          intent="danger"
                           isSmall
-                          onClick={() => handleEdit(row)}
+                          onClick={() => handleModal(row)}
                         />
                       </>
                     )}
@@ -117,8 +136,9 @@ const FormManagerTable = ({
             ))}
           </tbody>
         </table>
+        </div>
       ) : (
-        <p style={{ textAlign: 'center', padding: 'var(--spacer-l)', color: 'var(--color-text-secondary)' }}>No data available.</p>
+        <p className={styles.empty}>No data available.</p>
       )}
     </>
   );

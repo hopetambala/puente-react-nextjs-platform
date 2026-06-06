@@ -245,7 +245,6 @@ const Select = (props) => {
                   />
                   {option.text === false && (
                     <Button
-                      style={{ color: 'blue' }}
                       onClick={() => editTextOption(option.id, true)}
                       text="Add Text Question When Selected"
                     />
@@ -262,7 +261,7 @@ const Select = (props) => {
                         onChange={(e) => editOption(e, item.id, 'textQuestion')}
                       />
                       <Button
-                        style={{ color: 'red' }}
+                        intent="danger"
                         onClick={() => editTextOption(option.id, false)}
                         text="Remove Text Question When Selected"
                       />

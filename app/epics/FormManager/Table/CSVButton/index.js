@@ -63,9 +63,9 @@ export default function CSVButtonWrapper({ form, surveyingOrganization }) {
 
   return (
     <Button
-      intent="primary"
+      isSmall
       isLoading={loading}
-      text={loading ? 'Loading' : 'Download'}
+      text={loading ? 'Loading…' : 'Export'}
       onClick={fetchData}
     />
   );

@@ -1,93 +1,128 @@
-# Contributing to Puente Analytics
+# Contributing to Puente Manage
 
-Do you want to help us make awesome open-source software for humanitarian work?
- 
-Awesome! Here are instructions to get you started.
+Hey! Thanks for wanting to contribute. This is a real platform for real humanitarian work, so let's keep things simple, intentional, and high-quality.
 
-## Contribution guidelines
+## Quick Setup
 
-### Pull requests are always welcome
+```bash
+git clone https://github.com/hopetambala/puente-react-nextjs-platform.git
+cd puente-react-nextjs-platform
+yarn install
+yarn dev  # runs on http://localhost:3000
+```
 
-We are always thrilled to receive pull requests, and we do our best to
-process them as fast as possible. Not sure if that typo is worth a pull
-request? Do it! We will appreciate it.
+Need to run tests? `yarn test`. Need to build? `yarn build`. That's it.
 
-If your pull request is not accepted on the first try, don't be
-discouraged! If there's a problem with the implementation, we'll make sure to provide feedback.
+## The Rule: TDD First
 
-### Create issues...
+**Non-negotiable:** Write the failing test **before** you write any implementation code. Every single time.
 
-Any significant improvement should be documented as [a github
-issue](https://github.com/hopetambala/puente-react-nextjs-platform/issues) before anybody
-starts working on it.
+1. Write a failing test (RED) — confirm it fails for the right reason
+2. Write minimum code to make it pass (GREEN)
+3. Improve it while keeping tests green (REFACTOR)
 
-### ...but check for existing issues first!
+This applies to features, bug fixes, components, hooks — everything. A change that lands without a test that was seen failing first is not done. Period.
 
-Please take a moment to check that an issue doesn't already exist
-documenting your bug report or improvement proposal. If it does, it
-never hurts to add a quick "+1" or "I have this problem too". This will
-help prioritize the most common problems and requests.
+Why? Because it keeps the codebase reliable and prevents regressions in a collaborative environment.
 
-### Conventions
+## Branching & Commits
 
-Fork the repo and make changes on your fork in a feature branch.
+Fork, create a branch, work on your thing. Use conventional commits so the changelog stays useful:
 
-Make sure you include relevant updates or additions to documentation and
-tests when creating or modifying features.
+```
+feat: add avatar navigation to TopBar
+fix: footer links now point to real URLs
+test: add coverage for DataCurationManager
+```
 
-Pull requests descriptions should be as clear as possible and include a
-reference to all the issues that they address.
+When you fix or close an issue, reference it:
 
-Code review comments may be added to your pull request. Discuss, then make the
-suggested modifications and push additional commits to your feature branch. Be
-sure to post a comment after pushing. The new commits will show up in the pull
-request automatically, but the reviewers will not be notified unless you
-comment.
+```
+Fixes #123
+```
 
-Before the pull request is merged, make sure that you squash your commits into
-logical units of work using `git rebase -i` and `git push -f`. After every
-commit the test suite should be passing. Include documentation changes in the
-same commit so that a revert would remove all traces of the feature or fix.
+## Code Quality
 
-Commits that fix or close an issue should include a reference like `Closes #XXX`
-or `Fixes #XXX`, which will automatically close the issue when merged.
+### CSS & Styling
 
-Add your name to the AUTHORS file, but make sure the list is sorted and your
-name and email address match your git configuration. The AUTHORS file is
-regenerated occasionally from the git commit history, so a mismatch may result
-in your changes being overwritten.
+**Use dlite design tokens.** No magic hex colors, no inline `style={{}}`, no random px spacing.
 
-## Decision process
+```css
+/* ✅ do this */
+color: var(--tk-dlite-semantic-color-text-primary);
+background: var(--tk-dlite-primitive-color-yellow-200);
 
-### How are decisions made?
+/* ❌ don't do this */
+color: #1e1d1a;
+background: rgb(240, 200, 100);
+```
 
-Short answer: with pull requests to the Puente Analytics repository.
+Use CSS Modules (`*.module.scss`). That's it.
 
-All decisions affecting Puente Analytics follow the same 3 steps:
+### Imports
 
-* Step 1: Open a pull request. Anyone can do this.
+Simple rule: external imports first (alphabetical), then relative imports.
 
-* Step 2: Discuss the pull request. Anyone can do this.
+```js
+import Link from 'next/link';
+import { useTranslation } from 'next-i18next';
+import { useEffect } from 'react';
 
-* Step 3: Accept or refuse a pull request. A maintainer does this.
+import styles from './index.module.scss';
+```
 
+Run `npx eslint --fix <file>` if you're unsure — the auto-fixer is the source of truth.
 
-### How can I become a maintainer?
+### Headings
 
-* Step 1: learn the code inside out
-* Step 2: make yourself useful by contributing code, bugfixes, support etc.
+No raw `<h1>` or `<h2>` tags outside of the `<PageHeader>` component. Use `<PageHeader title="..." />` for page-level headings. Use Panel titles or `.sectionLabel` for sections. This keeps heading hierarchy consistent.
 
-Don't forget: being a maintainer is a time investment. Make sure you will have time to make yourself available.
-You don't have to be a maintainer to make a difference on our project!
+### Testing
 
-### What are a maintainer's responsibility?
+Put tests in `__tests__/<source path>.test.js` — same structure as the source. Mock all external dependencies. That's the contract.
 
-It is every maintainer's responsibility to:
+## Before You Push
 
-* 1) Deliver prompt feedback and decisions on pull requests.
-* 2) Be available to anyone with questions, bug reports, criticism etc. on Puente's Analytics dashboard.
+```bash
+yarn test    # all tests pass
+yarn build   # zero errors, no warnings
+```
 
-### How is this process changed?
+If it doesn't build clean, don't push it.
 
-Just like everything else: by making a pull request :D
+## Pull Request
+
+- Describe what changed and why
+- Reference the issue it fixes: `Fixes #123`
+- Make sure your branch is up to date with `redesign`
+- Be ready to discuss feedback
+
+That's it. Merge happens when we're all happy.
+
+## The Stack
+
+- **Framework:** Next.js 12 (Pages Router)
+- **Database:** Parse
+- **Components:** Design system exported from `app/impacto-design-system/index.js`
+- **Styling:** CSS Modules + dlite design tokens (no Material-UI in new code)
+- **Testing:** Jest + React Testing Library
+- **i18n:** next-i18next across 6 locales
+
+## Project Structure
+
+```
+app/epics/                    # Feature-level UI (FormCreator, FormManager, etc.)
+app/impacto-design-system/    # Reusable design components
+pages/                        # Routes
+__tests__/                    # Tests (mirrors pages/ + app/)
+public/locales/               # Translations (6 languages)
+```
+
+## One More Thing
+
+If you're adding text the user will see, add it to all 6 locale files: `public/locales/{eng,ara,deu,ind,prt,zho}/common.json`. Use the `useTranslation('common')` hook. No hardcoded English strings.
+
+---
+
+Questions? Check the [README](README.md) or open an issue. Thanks for contributing.
 

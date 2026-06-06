@@ -1,29 +1,113 @@
 .dragging {
   font-size: 16px;
-  color: rgb(61,127,252);
+  color: var(--tk-dlite-semantic-color-action-primary);
   transform: scale(.99);
 }
+
+.canvasGrid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: var(--spacer-l);
+  align-items: start;
+  padding-top: var(--spacer-l);
+}
+
+.canvasMain {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-l);
+}
+
+/* settings card — type, name, description */
+.settingsCard {
+  background: var(--tk-dlite-semantic-color-surface-base);
+  border: 1px solid var(--tk-dlite-semantic-color-border);
+  border-radius: var(--border-radius-m);
+  padding: var(--spacer-l);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-m);
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-xs);
+}
+
+.fieldLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  font-family: var(--font-family-heading);
+}
+
 .input {
-  width: 50%;
+  width: 100%;
   background: var(--color-input-bg);
   border-radius: var(--border-radius-m);
   height: var(--input-height);
   border: 1px solid var(--color-border);
-  padding: var(--spacer-xs);
-}
+  padding: 0 var(--spacer-s);
+  font-family: var(--font-family);
+  font-size: 13px;
+  color: var(--color-text);
+  outline: none;
+  transition: border-color 0.15s ease;
 
-.input:focus-visible {
-  border: 1px solid var(--color-puente-blue);
+  &::placeholder {
+    color: var(--tk-dlite-semantic-color-text-secondary);
+  }
+
+  &:focus-visible {
+    border-color: var(--tk-dlite-semantic-color-action-primary);
+    box-shadow: var(--focus-glow);
+  }
 }
 
 .select {
-  width: 25%;
-    padding: var(--spacer-xs);
+  width: 100%;
+  height: var(--input-height);
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-m);
+  padding: 0 var(--spacer-s);
+  font-family: var(--font-family);
+  font-size: 13px;
+  color: var(--color-text);
+}
+
+/* builder section */
+.builderSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-m);
+}
+
+.builderLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  font-family: var(--font-family-heading);
+}
+
+.headerActions {
+  display: flex;
+  gap: var(--tk-dlite-semantic-spacing-sm);
+  align-items: center;
 }
 
 .blocksSidebar {
   position: sticky;
-  top: var(--spacer-m);
-  max-height: calc(100vh - var(--spacer-xl));
+  top: calc(var(--header-height) + var(--spacer-l));
+  max-height: calc(100vh - var(--header-height) - var(--spacer-xl));
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-m);
 }

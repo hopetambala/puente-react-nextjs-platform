@@ -41,7 +41,6 @@ const Copyable = (props) => {
                             arrow
                           >
                             <IconButton
-                              style={{ backgroundColor: 'transparent' }}
                               className={styles.infoIcon}
                             >
                               <InfoOutlined />

@@ -1,11 +1,11 @@
 /* eslint-disable react/prop-types */ // TODO: upgrade to latest eslint tooling
 
 import { yupResolver } from '@hookform/resolvers'
-import { Button, Card, Page, Stack, Text } from 'app/impacto-design-system'
+import { Button, Stack, Text } from 'app/impacto-design-system'
 import {
-  retrieveSignInFunction,
-  retrieveUserByObjectId,
-  updateUser,
+    retrieveSignInFunction,
+    retrieveUserByObjectId,
+    updateUser,
 } from 'app/modules/user'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -55,9 +55,15 @@ function Reset(props) {
   }
 
   return (
-    <Page>
-      <div className={styles.paper}>
-        <Card padding="extraLarge">
+    <div className={styles.auth}>
+      <div className={styles.left} data-testid="auth-brand">
+        <div className={styles.leftBrand}>
+          <div className={styles.leftBrandMark}>P</div>
+          <span className={styles.leftBrandName}>Puente</span>
+        </div>
+      </div>
+      <div className={styles.right} data-testid="auth-form">
+        <div className={styles.paper}>
           <Text text="PUENTE" element="h1" className={styles.stack} />
           <Stack isVertical className={styles.stack}>
             <Text text="Account Details" element="h2" />
@@ -87,9 +93,9 @@ function Reset(props) {
               </Stack>
             </form>
           </FormProvider>
-        </Card>
+        </div>
       </div>
-    </Page>
+    </div>
   )
 }
 
@@ -97,7 +103,6 @@ function ResetWrapper() {
   const router = useRouter()
   const { objectId: userId } = router.query
   const [user, setUser] = useState()
-  window.localStorage.clear()
   useEffect(() => {
     // http://localhost:3000/account/reset?objectId=AyplFWVebA
     const retrieveAccountDetails = async () => {
