@@ -11,10 +11,8 @@ jest.mock('app/modules/user', () => {
   const subject = new BehaviorSubject(null);
   return {
     __esModule: true,
-    default: {
-      parseUser: () => subject.asObservable(),
-      parseUserValue: () => subject.value,
-    },
+    parseUser: () => subject.asObservable(),
+    parseUserValue: () => subject.value,
     __subject: subject, // exposed so tests can drive new emissions
   };
 });

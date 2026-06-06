@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import userModule from 'app/modules/user';
+import { parseUser, parseUserValue } from 'app/modules/user';
 
 export default function useCurrentUser() {
-  const [user, setUser] = useState(() => userModule.parseUserValue());
+  const [user, setUser] = useState(() => parseUserValue());
 
   useEffect(() => {
-    const sub = userModule.parseUser().subscribe(setUser);
+    const sub = parseUser().subscribe(setUser);
     return () => sub.unsubscribe();
   }, []);
 
