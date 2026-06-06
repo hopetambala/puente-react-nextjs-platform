@@ -160,3 +160,16 @@
   align-items: center;
   gap: var(--spacer-s);
 }
+
+.skeletonList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacer-sm);
+  padding: var(--spacer-m);
+}
+
+.skeletonRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-sm);
+}

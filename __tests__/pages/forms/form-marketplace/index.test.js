@@ -11,6 +11,10 @@ jest.mock('app/store', () => ({
   useGlobalState: () => ({ contextManagment: { addPropToStore: jest.fn(), store: {} } }),
 }));
 jest.mock('app/modules/user', () => ({ parseUserValue: () => ({ organization: 'test-org' }) }));
+jest.mock('app/modules/user/useCurrentUser', () => ({
+  __esModule: true,
+  default: jest.fn(() => ({ organization: 'hook-org' })),
+}));
 jest.mock('app/epics/FormMarketplace', () => jest.fn(() => <div data-testid="marketplace-epic" />));
 jest.mock('app/impacto-design-system', () => ({
   AppShell: ({ children }) => <div>{children}</div>,
@@ -40,5 +44,16 @@ describe('Epic rendered', () => {
   it('renders the FormMarketplace epic below the header', () => {
     render(<Marketplace />);
     expect(screen.getByTestId('marketplace-epic')).toBeInTheDocument();
+  });
+});
+
+describe('Reactive user', () => {
+  it('passes the user from useCurrentUser to the FormMarketplace epic', () => {
+    render(<Marketplace />);
+    const FormMarketplace = require('app/epics/FormMarketplace');
+    expect(FormMarketplace).toHaveBeenCalledWith(
+      expect.objectContaining({ user: expect.objectContaining({ organization: 'hook-org' }) }),
+      expect.anything(),
+    );
   });
 });

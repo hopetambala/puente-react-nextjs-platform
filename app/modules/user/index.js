@@ -14,8 +14,9 @@ const retrieveSignUpFunction = async (params, type) => {
     if (restParamsData) signupParams.restParams = restParamsData;
     Parse.Cloud.run('signup', signupParams).then((user) => {
     console.log(`User registered successful ${user}`); // eslint-disable-line
-      userSubject.next(user);
-      localStorage.setItem('user', JSON.stringify(user));
+      const userJSON = user.toJSON();
+      userSubject.next(userJSON);
+      localStorage.setItem('user', JSON.stringify(userJSON));
       resolve(user);
     }, (error) => {
       reject(error);
@@ -30,8 +31,9 @@ const retrieveSignInFunction = async (username, password) => {
   // sign in with either phonenumber (username) or email handled with logIn
     Parse.User.logIn(String(username), String(password)).then((user) => {
     console.log(`User logged in successful with username: ${user.get('username')}`); // eslint-disable-line
-      userSubject.next(user);
-      localStorage.setItem('user', JSON.stringify(user));
+      const userJSON = user.toJSON();
+      userSubject.next(userJSON);
+      localStorage.setItem('user', JSON.stringify(userJSON));
       resolve(user);
     }, (error) => {
       console.log(`Error: ${error.code} ${error.message}`); // eslint-disable-line

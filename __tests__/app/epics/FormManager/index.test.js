@@ -353,6 +353,38 @@ describe('Org guard', () => {
   });
 });
 
+// ─── RED: Loading resolves ────────────────────────────────────────────────────
+// Bug 1: When organization is empty the effect guard returns early without ever
+//   calling setLoading(false), so the skeleton shows forever.
+// Bug 2: When retrieveCustomData rejects, the .then() never runs so
+//   setLoading(false) is never called and the skeleton shows forever.
+// Both tests assert that real content (the Puente Forms panel — only rendered
+// when !loading) eventually becomes visible.
+
+describe('Loading resolves', () => {
+  it('shows content (not a skeleton) when organization is empty', async () => {
+    retrieveCustomData.mockResolvedValue([]);
+    render(
+      <FormManager context={mockContext} router={mockRouter} user={{ organization: '' }} />,
+    );
+    await waitFor(
+      () => expect(screen.getByText('Puente Forms')).toBeInTheDocument(),
+      { timeout: 3000 },
+    );
+  });
+
+  it('shows content (not a skeleton) when retrieveCustomData rejects', async () => {
+    retrieveCustomData.mockRejectedValue(new Error('fetch failed'));
+    render(
+      <FormManager context={mockContext} router={mockRouter} user={{ organization: 'test-org' }} />,
+    );
+    await waitFor(
+      () => expect(screen.getByText('Puente Forms')).toBeInTheDocument(),
+      { timeout: 3000 },
+    );
+  });
+});
+
 // ─── RED: Phase 1 — + Create form CTA ────────────────────────────────────────
 // If the + Create form button is removed from the catalog, users lose the
 // primary entry point to Form Creator — caught before discoverability regresses.
