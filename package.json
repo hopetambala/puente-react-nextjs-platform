@@ -13,6 +13,7 @@
   ],
   "scripts": {
     "test": "jest --watchAll=false",
+    "test:integration": "jest --config jest.integration.config.js",
     "test:watch": "jest --watch",
     "dev": "next dev",
     "build": "next build",
@@ -102,6 +103,8 @@
     "eslint-plugin-storybook": "^0.8.0",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
+    "mongodb-memory-server": "^11.2.0",
+    "parse-server": "^9.9.0",
     "standard-version": "9.1.0",
     "storybook": "^7.6.13",
     "typescript": "^5.4.4",
