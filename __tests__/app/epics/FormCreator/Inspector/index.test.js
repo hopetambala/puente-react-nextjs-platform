@@ -166,6 +166,29 @@ describe('Inspector — Other chip', () => {
   });
 });
 
+// ─── Bug: options rendered as objects produce "[object Object]" ───────────────
+
+describe('Inspector — options as objects', () => {
+  it('renders each option label and never renders "[object Object]"', () => {
+    const blockWithObjectOptions = {
+      ...baseBlock,
+      options: [
+        {
+          id: 'opt-1',
+          label: 'River',
+          value: 'River',
+          text: false,
+          textQuestion: '',
+          textKey: '',
+        },
+      ],
+    };
+    const { container } = renderInspector(blockWithObjectOptions);
+    expect(screen.getByText('River')).toBeInTheDocument();
+    expect(container.textContent).not.toContain('[object Object]');
+  });
+});
+
 // ─── null block (no selection) ────────────────────────────────────────────────
 
 describe('Inspector — null block', () => {

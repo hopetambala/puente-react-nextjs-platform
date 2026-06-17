@@ -18,6 +18,51 @@ jest.mock('app/epics/FormCreator/FormTemplate/InputPicker/Select/index.module.sc
 
 const Select = require('app/epics/FormCreator/FormTemplate/InputPicker/Select').default;
 
+// This describe block MUST stay first in the file.
+// React's ownerHasKeyUseWarning map deduplicates key-prop warnings by component
+// name. Once any test renders Select with a key-less list item (including the
+// single default option created by useState), subsequent renders of Select will
+// never trigger console.error for missing keys again. Running this test first
+// ensures the spy captures the very first emission of the warning.
+describe('option key props', () => {
+  let consoleErrorSpy;
+
+  beforeEach(() => {
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    consoleErrorSpy.mockRestore();
+  });
+
+  it('does not log a React key-prop warning when rendering multiple options', () => {
+    const mockSetFormItems = jest.fn();
+    const optA = { id: 'opt-a', label: 'Yes', value: 'Yes', text: false, textQuestion: '', textKey: '' };
+    const optB = { id: 'opt-b', label: 'No', value: 'No', text: false, textQuestion: '', textKey: '' };
+    const item = { id: 'item-1', fieldType: 'select', label: 'Q', formikKey: 'q', active: true, options: [optA, optB] };
+
+    render(
+      <Select
+        item={item}
+        formItems={[item]}
+        setFormItems={mockSetFormItems}
+        removeValue={jest.fn()}
+      />
+    );
+
+    expect(screen.getByText('Option 1')).toBeInTheDocument();
+    expect(screen.getByText('Option 2')).toBeInTheDocument();
+
+    const keyWarningCalls = consoleErrorSpy.mock.calls.filter(
+      (args) => typeof args[0] === 'string' && (
+        args[0].includes('Each child in a list') || args[0].includes('key')
+      )
+    );
+
+    expect(keyWarningCalls).toHaveLength(0);
+  });
+});
+
 describe('activeInput stale closure', () => {
   afterEach(() => {
     // Reset to no-op so other tests are not affected

@@ -157,7 +157,7 @@ const Select = (props) => {
           />
           <div>
             {options.map((option, index) => (
-              <div>
+              <div key={option.id}>
                 <h5>{`Option ${index + 1}`}</h5>
                 <Stack spacing="small">
                   <input
@@ -231,7 +231,7 @@ const Select = (props) => {
           />
           <div>
             {options.map((option, index) => (
-              <div>
+              <div key={option.id}>
                 <h5>{`Option ${index + 1}`}</h5>
                 <Stack spacing="small">
                   <input

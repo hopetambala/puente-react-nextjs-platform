@@ -9,4 +9,8 @@ module.exports = createJestConfig({
     '^@testing-library/react$':
       '<rootDir>/__test-utils__/testing-library-react-shim.js',
   },
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '<rootDir>/__tests__/integration/',
+  ],
 });
