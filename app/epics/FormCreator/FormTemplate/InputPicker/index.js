@@ -17,11 +17,17 @@ const PaperInputPicker = (props) => {
   return (
     <div
       {...provided.draggableProps}
-      {...provided.dragHandleProps}
       ref={innerRef}
       className={styles.block}
       onClick={() => onSelectBlock && onSelectBlock(item)}
     >
+      <div
+        data-testid="drag-handle"
+        className={styles.dragHandle}
+        aria-label="Drag to reorder"
+        onClick={(e) => e.stopPropagation()}
+        {...provided.dragHandleProps}
+      >⠿</div>
       <Input
         item={item}
         formItems={formItems}

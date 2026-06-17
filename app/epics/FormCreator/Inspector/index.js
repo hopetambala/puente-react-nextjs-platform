@@ -1,6 +1,7 @@
 import { useTranslation } from 'next-i18next';
 import PropTypes from 'prop-types';
 
+import { toFormikKey } from '../_utils';
 import styles from './index.module.css';
 
 function Inspector({ block, onChange, onClose }) {
@@ -47,7 +48,10 @@ function Inspector({ block, onChange, onClose }) {
             type="text"
             className={styles.textInput}
             value={label}
-            onChange={(e) => update({ label: e.target.value })}
+            onChange={(e) => {
+              const newLabel = e.target.value;
+              update({ label: newLabel, formikKey: toFormikKey(newLabel) });
+            }}
           />
         </div>
 

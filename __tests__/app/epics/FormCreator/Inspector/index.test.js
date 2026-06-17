@@ -177,6 +177,35 @@ describe('Inspector — null block', () => {
   });
 });
 
+// ─── RED: label edit recalculates formikKey ───────────────────────────────────
+
+describe('label edit recalculates formikKey', () => {
+  it('calls onChange with both label and a freshly-stripped formikKey when the label input changes', () => {
+    const mockOnChange = jest.fn();
+    const block = {
+      id: 'b1',
+      fieldType: 'input',
+      label: 'Old label',
+      formikKey: 'oldlabel',
+      required: false,
+      allowOther: false,
+      multiSelect: false,
+      options: [],
+    };
+    render(<Inspector block={block} onChange={mockOnChange} onClose={jest.fn()} />);
+
+    const labelInput = screen.getByLabelText('Label');
+    fireEvent.change(labelInput, { target: { value: 'New label!' } });
+
+    expect(mockOnChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        label: 'New label!',
+        formikKey: 'New label',
+      }),
+    );
+  });
+});
+
 // ─── RED: Phase 7 — Inspector i18n ────────────────────────────────────────────
 // If hardcoded strings return, these fail — ensuring i18n keys stay in place.
 

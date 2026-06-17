@@ -3,6 +3,13 @@ import { v4 as uuid } from 'uuid';
 
 import styles from '../index.module.scss';
 
+/**
+ * Strips characters that are illegal in a Formik field key.
+ * Removes punctuation/symbols and underscores so the derived key is a plain
+ * word string safe to use as an object property in Formik values.
+ */
+const toFormikKey = (label) => label.replace(/[`~!@#$%^&*()+=|}[{'";:?.>,<\\|\]/]+|_/g, '');
+
 // This method is needed for rendering clones of draggables
 const getRenderItem = (items) => function getRenderItemSecond(provided, snapshot, rubric) {
   const item = items[rubric.source.index];
@@ -32,4 +39,4 @@ const copy = (source, destination, droppableSource, droppableDestination) => {
   return destination;
 };
 
-export { copy, getRenderItem, reorder };
+export { copy, getRenderItem, reorder, toFormikKey };

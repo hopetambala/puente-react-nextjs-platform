@@ -1,6 +1,7 @@
 import { Button, Text } from 'app/impacto-design-system';
 import { useEffect, useState } from 'react';
 
+import { toFormikKey } from 'app/epics/FormCreator/_utils';
 import ActiveInput from '../Utils';
 import styles from './index.module.scss';
 
@@ -13,13 +14,15 @@ const Input = (props) => {
   const [activeInput, setActiveInput] = useState(item.active !== undefined ? item.active : true);
 
   useEffect(() => {
-    const elementsIndex = formItems.findIndex((element) => element.id === item.id);
-    const newArray = [...formItems];
-    newArray[elementsIndex] = {
-      ...newArray[elementsIndex],
-      active: activeInput,
-    };
-    setFormItems(newArray);
+    setFormItems((prev) => {
+      const elementsIndex = prev.findIndex((element) => element.id === item.id);
+      const newArray = [...prev];
+      newArray[elementsIndex] = {
+        ...newArray[elementsIndex],
+        active: activeInput,
+      };
+      return newArray;
+    });
   }, [activeInput]);
 
   const setValue = async (event, type) => {
@@ -31,7 +34,7 @@ const Input = (props) => {
       newArray[elementsIndex] = {
         ...newArray[elementsIndex],
         label: value,
-        formikKey: value.replace(/[`~!@#$%^&*()+=|}[{'";:?.>,<\\|\]/]+|_/g, ''),
+        formikKey: toFormikKey(value),
       };
     } else {
       newArray[elementsIndex] = {
