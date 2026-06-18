@@ -1,10 +1,6 @@
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 
-// RED: dragHandleProps are currently spread on the outer block div.
-// The correct behavior is a dedicated drag handle element inside the block
-// that carries dragHandleProps, leaving the outer div free of those attrs.
-
 jest.mock('react-beautiful-dnd', () => ({
   DragDropContext: ({ children }) => <>{children}</>,
   Droppable: ({ children }) => children({ innerRef: () => {}, droppableProps: {}, placeholder: null }, {}),
@@ -66,5 +62,12 @@ describe('drag handle refactor', () => {
   it('outer block still has draggable props', () => {
     const { container } = renderComponent();
     expect(container.firstChild).toHaveAttribute('data-rbd-draggable-id', 'test-item');
+  });
+});
+
+describe('drag handle accessibility', () => {
+  it('drag handle is a button so it is keyboard-focusable and correctly announced by assistive tech', () => {
+    renderComponent();
+    expect(screen.getByRole('button', { name: /drag to reorder/i })).toBeInTheDocument();
   });
 });

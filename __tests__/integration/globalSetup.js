@@ -58,7 +58,8 @@ module.exports = async function globalSetup() {
   // v9: parseServer.app is the Express app with routes at the root level
   const httpServer = http.createServer(parseServer.app);
   await new Promise((resolve, reject) => {
-    httpServer.listen(PORT, '127.0.0.1', (err) => (err ? reject(err) : resolve()));
+    httpServer.once('error', reject);
+    httpServer.listen(PORT, '127.0.0.1', resolve);
   });
 
   await waitForPort(PORT);
