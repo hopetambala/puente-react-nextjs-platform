@@ -5,10 +5,10 @@
  * (started by globalSetup.js).
  *
  * Run with:
- *   yarn jest --config jest.integration.config.js __tests__/integration/user/auth.integration.test.js
+ *   yarn test:integration
  */
 
-const { initParse, Parse } = require('../parseClient');
+const { initParse, Parse } = require('../../../../integration/parseClient');
 
 beforeAll(async () => {
   initParse();

@@ -9,7 +9,7 @@
  *   yarn test:integration
  */
 
-const { initParse, Parse } = require('../parseClient');
+const { initParse, Parse } = require('../../../integration/parseClient');
 
 beforeAll(() => {
   initParse();

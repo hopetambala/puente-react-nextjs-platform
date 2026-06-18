@@ -12,5 +12,6 @@ module.exports = createJestConfig({
   testPathIgnorePatterns: [
     '/node_modules/',
     '<rootDir>/__tests__/integration/',
+    '\\.integration\\.test\\.js$',
   ],
 });
