@@ -1,0 +1,40 @@
+name: Changelog
+
+on:
+  push:
+    branches: [master]
+
+permissions:
+  contents: write
+
+jobs:
+  update-changelog:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+
+      - name: Regenerate CHANGELOG.md
+        run: npx conventional-changelog-cli@5 -p angular -i CHANGELOG.md -s -r 0
+
+      - name: Commit and push changelog if updated
+        run: |
+          if git diff --quiet -- CHANGELOG.md; then
+            echo "No changelog updates detected."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git commit -m "chore(changelog): auto-update [skip ci]"
+          git push

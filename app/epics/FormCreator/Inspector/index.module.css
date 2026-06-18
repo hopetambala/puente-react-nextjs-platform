@@ -1,8 +1,8 @@
 .inspector {
   width: 320px;
   flex-shrink: 0;
-  border-left: 1px solid var(--tk-dlite-semantic-color-border-default);
-  background: var(--tk-dlite-semantic-color-surface-default);
+  border-left: 1px solid var(--tk-dlite-semantic-color-border);
+  background: var(--tk-dlite-semantic-color-surface-base);
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -13,7 +13,7 @@
   align-items: flex-start;
   justify-content: space-between;
   padding: var(--spacer-m) var(--spacer-m) var(--spacer-s);
-  border-bottom: 1px solid var(--tk-dlite-semantic-color-border-default);
+  border-bottom: 1px solid var(--tk-dlite-semantic-color-border);
 }
 
 .eyebrow {
@@ -71,24 +71,24 @@
   font-family: var(--font-family);
   font-size: var(--font-size-body);
   color: var(--tk-dlite-semantic-color-text-primary);
-  background: var(--tk-dlite-semantic-color-surface-default);
-  border: 1px solid var(--tk-dlite-semantic-color-border-default);
-  border-radius: var(--radius-s);
+  background: var(--tk-dlite-semantic-color-surface-base);
+  border: 1px solid var(--tk-dlite-semantic-color-border);
+  border-radius: var(--border-radius-s);
 }
 
 .textInput:focus {
   outline: none;
-  border-color: var(--tk-dlite-semantic-color-border-focused);
+  border-color: var(--tk-dlite-semantic-color-action-primary);
 }
 
 .monoField {
   font-family: var(--font-family-mono);
   font-size: var(--font-size-small);
   color: var(--tk-dlite-semantic-color-text-secondary);
-  background: var(--tk-dlite-semantic-color-surface-sunken);
+  background: var(--hex-neutral-100);
   padding: var(--spacer-xs) var(--spacer-s);
-  border-radius: var(--radius-s);
-  border: 1px solid var(--tk-dlite-semantic-color-border-default);
+  border-radius: var(--border-radius-s);
+  border: 1px solid var(--tk-dlite-semantic-color-border);
 }
 
 .toggles {
@@ -123,7 +123,7 @@
   display: inline-block;
   width: 36px;
   height: 20px;
-  background: var(--tk-dlite-semantic-color-border-default);
+  background: var(--tk-dlite-semantic-color-border);
   border-radius: var(--tk-dlite-semantic-border-radius-full);
   transition: background 0.15s ease;
   flex-shrink: 0;
@@ -137,7 +137,7 @@
   left: 3px;
   width: 14px;
   height: 14px;
-  background: var(--tk-dlite-semantic-color-surface-default);
+  background: var(--tk-dlite-semantic-color-surface-base);
   border-radius: 50%;
   transition: transform 0.15s ease;
 }
@@ -170,11 +170,11 @@
   align-items: center;
   gap: var(--spacer-xs);
   padding: var(--spacer-xs) var(--spacer-s);
-  border-radius: var(--radius-s);
+  border-radius: var(--border-radius-s);
   font-size: var(--font-size-body);
   color: var(--tk-dlite-semantic-color-text-primary);
-  background: var(--tk-dlite-semantic-color-surface-default);
-  border: 1px solid var(--tk-dlite-semantic-color-border-default);
+  background: var(--tk-dlite-semantic-color-surface-base);
+  border: 1px solid var(--tk-dlite-semantic-color-border);
 }
 
 .grip {
@@ -189,7 +189,7 @@
   font-family: var(--font-family-mono);
   font-size: var(--font-size-small);
   padding: var(--tk-dlite-semantic-spacing-xxxs) 6px;
-  border-radius: var(--radius-s);
+  border-radius: var(--border-radius-s);
   background: var(--tk-dlite-primitive-color-yellow-200);
   color: var(--tk-dlite-semantic-color-text-primary);
 }
@@ -198,7 +198,7 @@
   margin-top: auto;
   padding: var(--spacer-s) var(--spacer-m);
   background: var(--tk-dlite-primitive-color-blue-100, #eff6ff);
-  border-radius: var(--radius-s);
+  border-radius: var(--border-radius-s);
   font-size: var(--font-size-small);
   color: var(--tk-dlite-semantic-color-text-secondary);
   line-height: var(--line-height-body);

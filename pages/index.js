@@ -393,8 +393,8 @@ export default function Homepage() {
               <ul className={styles.footerLinks}>
                 {[
                   { label: 'Documentation', href: 'https://github.com/hopetambala/puente-react-nextjs-platform' },
-                  { label: 'Changelog', href: 'https://github.com/hopetambala/puente-react-nextjs-platform/blob/main/CHANGELOG.md' },
-                  { label: 'Contributing', href: 'https://github.com/hopetambala/puente-react-nextjs-platform/blob/main/CONTRIBUTING.md' },
+                  { label: 'Changelog', href: 'https://github.com/hopetambala/puente-react-nextjs-platform/blob/master/CHANGELOG.md' },
+                  { label: 'Contributing', href: 'https://github.com/hopetambala/puente-react-nextjs-platform/blob/master/CONTRIBUTING.md' },
                 ].map((link) => (
                   <li key={link.label}>
                     <a

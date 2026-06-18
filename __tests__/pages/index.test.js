@@ -23,4 +23,13 @@ describe('Landing page — highlights Data Curation', () => {
     const { container } = render(<Homepage />);
     expect(container.textContent).not.toMatch(/—/);
   });
+
+  it('links changelog to the master branch', () => {
+    render(<Homepage />);
+    const changelogLink = screen.getByRole('link', { name: 'Changelog' });
+    expect(changelogLink).toHaveAttribute(
+      'href',
+      'https://github.com/hopetambala/puente-react-nextjs-platform/blob/master/CHANGELOG.md',
+    );
+  });
 });

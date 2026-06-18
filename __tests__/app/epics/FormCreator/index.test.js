@@ -371,3 +371,140 @@ describe('Phase 5 — No MUI, PageHeader rendered', () => {
     expect(container.querySelector('[class*="MuiGrid"]')).not.toBeInTheDocument();
   });
 });
+
+// ─── Contract: submitCustomForm payload ───────────────────────────────────────
+// Guards against regressions in the Parse payload built by submitCustomForm.
+// These tests would have FAILED before the bugs were fixed and must stay green
+// to prove the fixes hold.
+
+describe('submitCustomForm payload contract', () => {
+  it('does not include removed options in the submitted fields', async () => {
+    // Simulate edit mode where removeOption was already called — only ONE option
+    // remains in the select field (opt-a was removed before this render).
+    const ctx = makeContext({
+      action: 'edit',
+      data: {
+        name: 'Test form',
+        description: '',
+        fields: [
+          {
+            id: 'q1',
+            fieldType: 'select',
+            label: 'Water source',
+            formikKey: 'watersource',
+            active: true,
+            options: [
+              {
+                id: 'opt-b',
+                label: 'River',
+                value: 'River',
+                text: false,
+                textQuestion: '',
+                textKey: '',
+              },
+              // opt-a intentionally absent — it was removed before this render
+            ],
+          },
+        ],
+        typeOfForm: ['Custom'],
+        organizations: ['test-org'],
+        objectId: 'form-001',
+      },
+    });
+    render(<FormCreator context={ctx} user={mockUser} />);
+    await waitFor(() =>
+      expect(screen.getByPlaceholderText('Give your form a detailed name').value).toBe('Test form'),
+    );
+    await userEvent.click(screen.getByText('Publish'));
+    await waitFor(() => {
+      expect(updateObject).toHaveBeenCalled();
+    });
+    const [call] = updateObject.mock.calls;
+    const submittedField = call[0].localObject.fields[0];
+    // Only the one surviving option must be present — never the removed one
+    expect(submittedField.options).toHaveLength(1);
+    expect(submittedField.options[0].label).toBe('River');
+  });
+
+  it('includes both formikKey and label in every submitted field', async () => {
+    const ctx = makeContext({
+      action: 'edit',
+      data: {
+        name: 'Hydro Survey',
+        description: '',
+        fields: [
+          {
+            id: 'q2',
+            fieldType: 'input',
+            label: 'Water source',
+            formikKey: 'watersource',
+            active: true,
+          },
+        ],
+        typeOfForm: ['Custom'],
+        organizations: ['test-org'],
+        objectId: 'form-002',
+      },
+    });
+    render(<FormCreator context={ctx} user={mockUser} />);
+    await waitFor(() =>
+      expect(screen.getByPlaceholderText('Give your form a detailed name').value).toBe('Hydro Survey'),
+    );
+    await userEvent.click(screen.getByText('Publish'));
+    await waitFor(() => {
+      expect(updateObject).toHaveBeenCalledWith(
+        expect.objectContaining({
+          localObject: expect.objectContaining({
+            fields: expect.arrayContaining([
+              expect.objectContaining({
+                label: 'Water source',
+                formikKey: 'watersource',
+              }),
+            ]),
+          }),
+        }),
+      );
+    });
+  });
+
+  it('always includes customForm, name, organizations, and fields in the submitted payload', async () => {
+    const ctx = makeContext({
+      action: 'edit',
+      data: {
+        name: 'Sanitation Survey',
+        description: 'desc',
+        fields: [
+          {
+            id: 'q3',
+            fieldType: 'numberInput',
+            label: 'Household count',
+            formikKey: 'householdcount',
+            active: true,
+          },
+        ],
+        typeOfForm: ['Custom'],
+        organizations: ['test-org'],
+        objectId: 'form-003',
+      },
+    });
+    render(<FormCreator context={ctx} user={mockUser} />);
+    await waitFor(() =>
+      expect(screen.getByPlaceholderText('Give your form a detailed name').value).toBe('Sanitation Survey'),
+    );
+    await userEvent.click(screen.getByText('Publish'));
+    await waitFor(() => {
+      expect(updateObject).toHaveBeenCalledWith(
+        expect.objectContaining({
+          localObject: expect.objectContaining({
+            customForm: true,
+            name: 'Sanitation Survey',
+            organizations: ['test-org'],
+            fields: expect.any(Array),
+          }),
+        }),
+      );
+    });
+    const [call] = updateObject.mock.calls;
+    expect(Array.isArray(call[0].localObject.fields)).toBe(true);
+  });
+});

@@ -2,6 +2,7 @@ import { Button, Stack } from 'app/impacto-design-system';
 import React, { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
+import { toFormikKey } from 'app/epics/FormCreator/_utils';
 import ActiveInput from '../Utils';
 import styles from './index.module.scss';
 
@@ -17,14 +18,15 @@ const Select = (props) => {
   const [activeInput, setActiveInput] = useState(item.active !== undefined ? item.active : true);
 
   useEffect(() => {
-    const elementsIndex = formItems.findIndex((element) => element.id === item.id);
-    const newArray = [...formItems];
-    newArray[elementsIndex] = {
-      ...newArray[elementsIndex],
-      // formikKey: `geolocation_${item.id.slice(0, 4)}`,
-      active: activeInput,
-    };
-    setFormItems(newArray);
+    setFormItems((prev) => {
+      const elementsIndex = prev.findIndex((element) => element.id === item.id);
+      const newArray = [...prev];
+      newArray[elementsIndex] = {
+        ...newArray[elementsIndex],
+        active: activeInput,
+      };
+      return newArray;
+    });
   }, [activeInput]);
 
   const populatePreFilledValues = () => {
@@ -41,7 +43,7 @@ const Select = (props) => {
 
   const setValue = async (event) => {
     const { value, id } = event.target;
-    const formikKey = value.replace(/[`~!@#$%^&*()+=|}[{'";:?.>,<\\|\]/]+|_/g, '');
+    const formikKey = toFormikKey(value);
 
     const elementsIndex = formItems.findIndex((element) => element.id === id);
     const newArray = [...formItems];
@@ -79,12 +81,18 @@ const Select = (props) => {
     }]);
   };
 
+  const syncOptionsToFormItems = (updatedOptions, questionId) => {
+    const elementsFormIndex = formItems.findIndex((element) => element.id === questionId);
+    const formArray = [...formItems];
+    formArray[elementsFormIndex] = { ...formArray[elementsFormIndex], options: updatedOptions };
+    setFormItems(formArray);
+  };
+
   const editOption = async (event, questionId, valueToChange) => {
     const { value, id } = event.target;
-    const textKeyValue = value.replace(/[`~!@#$%^&*()+=|}[{'";:?.>,<\\|\]/]+|_/g, '');
+    const textKeyValue = toFormikKey(value);
 
     const elementsFormIndex = formItems.findIndex((element) => element.id === questionId);
-
     const elementsIndex = options.findIndex((element) => element.id === id);
 
     // const textOption = options[elementsIndex].text
@@ -106,19 +114,15 @@ const Select = (props) => {
     }
 
     setOptions(newArray);
-
-    formArray[elementsFormIndex] = {
-      ...formArray[elementsFormIndex],
-      options: newArray,
-    };
-
-    setFormItems(formArray);
+    syncOptionsToFormItems(newArray, questionId);
   };
+
   const removeOption = (id) => {
     const elementsIndex = options.findIndex((element) => element.id === id);
     const newArray = [...options];
     newArray.splice(elementsIndex, 1);
     setOptions(newArray);
+    syncOptionsToFormItems(newArray, item.id);
   };
 
   const editTextOption = (optionId, val) => {
@@ -153,7 +157,7 @@ const Select = (props) => {
           />
           <div>
             {options.map((option, index) => (
-              <div>
+              <div key={option.id}>
                 <h5>{`Option ${index + 1}`}</h5>
                 <Stack spacing="small">
                   <input
@@ -227,7 +231,7 @@ const Select = (props) => {
           />
           <div>
             {options.map((option, index) => (
-              <div>
+              <div key={option.id}>
                 <h5>{`Option ${index + 1}`}</h5>
                 <Stack spacing="small">
                   <input

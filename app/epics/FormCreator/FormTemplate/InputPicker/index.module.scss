@@ -6,3 +6,18 @@
     box-shadow: var(--tk-dlite-semantic-elevation-medium);
     margin: var(--tk-dlite-semantic-spacing-300)
 }
+
+.dragHandle {
+    cursor: grab;
+    opacity: 0.4;
+    padding: var(--tk-dlite-semantic-spacing-100);
+    user-select: none;
+
+    &:hover {
+        opacity: 0.8;
+    }
+
+    &:active {
+        cursor: grabbing;
+    }
+}

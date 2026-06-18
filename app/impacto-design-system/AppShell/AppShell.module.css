@@ -11,7 +11,7 @@
 
 .main {
   display: grid;
-  grid-template-rows: 52px 1fr;
+  grid-template-rows: var(--header-height) 1fr;
   overflow: hidden;
   min-width: 0;
 }
@@ -208,7 +208,7 @@
 }
 
 .pageFullBleed {
-  overflow: hidden;
+  overflow-y: auto;
   height: 100%;
   padding: 0;
 }

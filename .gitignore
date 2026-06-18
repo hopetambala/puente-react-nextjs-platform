@@ -34,3 +34,4 @@ nextenv/
 
 # Auto-generated visual-qa screenshots (regenerable; not versioned)
 .claude/screenshots/
+/logs

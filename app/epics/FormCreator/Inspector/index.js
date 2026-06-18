@@ -1,6 +1,7 @@
 import { useTranslation } from 'next-i18next';
 import PropTypes from 'prop-types';
 
+import { toFormikKey } from '../_utils';
 import styles from './index.module.css';
 
 function Inspector({ block, onChange, onClose }) {
@@ -47,7 +48,10 @@ function Inspector({ block, onChange, onClose }) {
             type="text"
             className={styles.textInput}
             value={label}
-            onChange={(e) => update({ label: e.target.value })}
+            onChange={(e) => {
+              const newLabel = e.target.value;
+              update({ label: newLabel, formikKey: toFormikKey(newLabel) });
+            }}
           />
         </div>
 
@@ -92,12 +96,17 @@ function Inspector({ block, onChange, onClose }) {
               <span>{options.length} items</span>
             </div>
             <div className={styles.options}>
-              {options.map((opt) => (
-                <div key={opt} className={styles.optionRow}>
-                  <span className={styles.grip} aria-hidden="true">⋮⋮</span>
-                  <span>{opt}</span>
-                </div>
-              ))}
+              {options.map((opt) => {
+                const isObj = typeof opt === 'object' && opt !== null;
+                const label = isObj ? opt.label : opt;
+                const key = isObj ? (opt.id ?? opt.label) : opt;
+                return (
+                  <div key={key} className={styles.optionRow}>
+                    <span className={styles.grip} aria-hidden="true">⋮⋮</span>
+                    <span>{label}</span>
+                  </div>
+                );
+              })}
               {allowOther && (
                 <div className={styles.optionRow}>
                   <span className={styles.grip} aria-hidden="true">⋮⋮</span>
@@ -166,7 +175,16 @@ Inspector.propTypes = {
     required: PropTypes.bool,
     allowOther: PropTypes.bool,
     multiSelect: PropTypes.bool,
-    options: PropTypes.arrayOf(PropTypes.string),
+    options: PropTypes.arrayOf(
+      PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.shape({
+          id: PropTypes.string,
+          label: PropTypes.string,
+          value: PropTypes.string,
+        }),
+      ]),
+    ),
   }),
   onChange: PropTypes.func,
   onClose: PropTypes.func,
