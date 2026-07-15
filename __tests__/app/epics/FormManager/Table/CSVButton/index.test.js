@@ -50,4 +50,42 @@ describe('CSVButton — export failure', () => {
     await waitFor(() => expect(window.alert).toHaveBeenCalled());
     expect(window.URL.createObjectURL).not.toHaveBeenCalled();
   });
+
+  it('alerts and clears loading when the fetch resolves to undefined', async () => {
+    SurveyData.getIdRecordByOrganization.mockResolvedValue(undefined);
+
+    render(
+      <CSVButton
+        form={{ objectId: 'form-1', customForm: false, name: 'SurveyData' }}
+        surveyingOrganization="test-org"
+      />,
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Export' }));
+
+    await waitFor(() => expect(window.alert).toHaveBeenCalled());
+    expect(window.URL.createObjectURL).not.toHaveBeenCalled();
+    // loading must be cleared — the button returns to its idle label
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Export' })).toBeInTheDocument());
+  });
+
+  it('alerts and clears loading when the fetch throws synchronously', async () => {
+    SurveyData.getIdRecordByOrganization.mockImplementation(() => {
+      throw new Error('sync boom');
+    });
+
+    render(
+      <CSVButton
+        form={{ objectId: 'form-1', customForm: false, name: 'SurveyData' }}
+        surveyingOrganization="test-org"
+      />,
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Export' }));
+
+    await waitFor(() => expect(window.alert).toHaveBeenCalled());
+    expect(window.URL.createObjectURL).not.toHaveBeenCalled();
+    // loading must be cleared even on a synchronous throw
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Export' })).toBeInTheDocument());
+  });
 });

@@ -1,6 +1,6 @@
 import Button from 'app/impacto-design-system/button';
 import {
-  CustomData, EnvironmentalHealth, EvaluationMedical, SurveyData, Vitals,
+    CustomData, EnvironmentalHealth, EvaluationMedical, SurveyData, Vitals,
 } from 'app/modules/data-export/puente';
 import { useState } from 'react';
 
@@ -40,15 +40,20 @@ export default function CSVButtonWrapper({ form, surveyingOrganization }) {
 
   const fetchData = async () => {
     setLoading(true);
-    const CSVData = await fetchCSVData().catch(() => {
-      setLoading(false);
+    try {
+      const CSVData = await fetchCSVData();
+      if (CSVData === undefined) {
+        alert('No data');
+        return;
+      }
+      const blob = new Blob([CSVData], { type: 'text/csv' });
+      const csvUrl = window.URL.createObjectURL(blob);
+      openWindow(csvUrl, `${name}-${new Date()}.csv`);
+    } catch (error) {
       alert('No data');
-    });
-    if (CSVData === undefined) return;
-    const blob = new Blob([CSVData], { type: 'text/csv' });
-    const csvUrl = window.URL.createObjectURL(blob);
-    openWindow(csvUrl, `${name}-${new Date()}.csv`);
-    setLoading(false);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
