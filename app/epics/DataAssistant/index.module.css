@@ -1,0 +1,157 @@
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 380px;
+  display: flex;
+  flex-direction: column;
+  background: var(--tk-dlite-semantic-color-surface-base);
+  border-left: 1px solid var(--tk-dlite-semantic-color-border);
+  box-shadow: var(--tk-dlite-semantic-elevation-high);
+  z-index: 60;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--tk-dlite-primitive-dimension-4, 16px);
+  border-bottom: 1px solid var(--tk-dlite-semantic-color-border);
+}
+
+.headerTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--tk-dlite-semantic-spacing-sm);
+}
+
+.title {
+  font-weight: 700;
+  color: var(--tk-dlite-semantic-color-text-primary);
+}
+
+.beta {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: var(--tk-dlite-semantic-spacing-xxs) var(--tk-dlite-semantic-spacing-sm);
+  border-radius: var(--tk-dlite-semantic-border-radius-full);
+  background: var(--tk-dlite-primitive-color-yellow-200);
+  color: var(--tk-dlite-semantic-color-text-primary);
+}
+
+.close {
+  border: none;
+  background: none;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--tk-dlite-semantic-color-text-secondary);
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--tk-dlite-semantic-spacing-sm);
+  padding: var(--tk-dlite-semantic-spacing-md);
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tk-dlite-semantic-spacing-sm);
+}
+
+.emptyText {
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  font-size: 14px;
+}
+
+.starter {
+  text-align: left;
+  padding: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-300);
+  border: 1px solid var(--tk-dlite-semantic-color-border);
+  border-radius: var(--tk-dlite-semantic-border-radius-md);
+  background: var(--tk-dlite-semantic-color-background);
+  color: var(--tk-dlite-semantic-color-text-primary);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.starter:hover {
+  border-color: var(--tk-dlite-semantic-color-action-primary);
+}
+
+.userBubble,
+.assistantBubble {
+  max-width: 85%;
+  padding: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-300);
+  border-radius: var(--tk-dlite-semantic-border-radius-lg);
+  font-size: 14px;
+  white-space: pre-wrap;
+  /* Keep prose in the body font, but tabular figures so counts/IDs align. */
+  font-variant-numeric: tabular-nums;
+}
+
+.userBubble {
+  align-self: flex-end;
+  background: var(--tk-dlite-primitive-color-blue-100);
+  color: var(--tk-dlite-semantic-color-text-primary);
+}
+
+.assistantBubble {
+  align-self: flex-start;
+  background: var(--tk-dlite-semantic-color-background);
+  border: 1px solid var(--tk-dlite-semantic-color-border);
+  color: var(--tk-dlite-semantic-color-text-primary);
+}
+
+.toolStatus {
+  align-self: flex-start;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--tk-dlite-semantic-color-text-secondary);
+}
+
+.error {
+  font-size: 13px;
+  color: var(--tk-dlite-primitive-color-red-700);
+  background: var(--tk-dlite-primitive-color-red-100);
+  border-radius: var(--tk-dlite-semantic-border-radius-md);
+  padding: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-300);
+}
+
+.inputRow {
+  display: flex;
+  gap: var(--tk-dlite-semantic-spacing-sm);
+  padding: var(--tk-dlite-semantic-spacing-300) var(--tk-dlite-semantic-spacing-md);
+  border-top: 1px solid var(--tk-dlite-semantic-color-border);
+}
+
+.input {
+  flex: 1;
+  padding: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-300);
+  border: 1px solid var(--tk-dlite-semantic-color-border);
+  border-radius: var(--tk-dlite-semantic-border-radius-md);
+  font-size: 14px;
+  color: var(--tk-dlite-semantic-color-text-primary);
+  background: var(--tk-dlite-semantic-color-surface-base);
+}
+
+.send {
+  padding: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-md);
+  border: none;
+  border-radius: var(--tk-dlite-semantic-border-radius-md);
+  background: var(--tk-dlite-semantic-color-action-primary);
+  color: var(--tk-dlite-semantic-color-surface-base);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.send:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

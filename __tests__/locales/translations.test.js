@@ -32,3 +32,30 @@ describe('Locale translations — redesigned navigation', () => {
     });
   });
 });
+
+// Data assistant drawer strings must exist in every locale so the UI never
+// renders a raw i18n key. (Translated values; English fallback acceptable.)
+const ASSISTANT_KEYS = [
+  'assistant_title',
+  'assistant_beta',
+  'assistant_open',
+  'assistant_close',
+  'assistant_placeholder',
+  'assistant_send',
+  'assistant_empty',
+  'assistant_error',
+  'assistant_tool_searching',
+  'assistant_thinking',
+];
+
+describe('Locale translations — data assistant', () => {
+  Object.entries({ eng, ...LOCALES }).forEach(([code, locale]) => {
+    describe(code, () => {
+      ASSISTANT_KEYS.forEach((key) => {
+        it(`defines ${key}`, () => {
+          expect(locale[key]).toBeTruthy();
+        });
+      });
+    });
+  });
+});

@@ -1,3 +1,4 @@
+import DataAssistant from 'app/epics/DataAssistant';
 import { retrieveCurrentUserAsyncFunction } from 'app/modules/user';
 import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
@@ -23,6 +24,7 @@ export default function AppShell({
   const { pathname } = useRouter();
   const activeRoute = deriveActiveRoute(pathname);
   const [orgName, setOrgName] = useState(null);
+  const [assistantOpen, setAssistantOpen] = useState(false);
 
   useLayoutEffect(() => {
     const fetchUser = async () => {
@@ -36,11 +38,16 @@ export default function AppShell({
     <div className={styles.shell}>
       <Sidebar activeRoute={activeRoute} orgName={orgName} />
       <div className={styles.main}>
-        <TopBar breadcrumb={breadcrumb} topBarActions={topBarActions} />
+        <TopBar
+          breadcrumb={breadcrumb}
+          topBarActions={topBarActions}
+          onAssistantOpen={() => setAssistantOpen(true)}
+        />
         <div className={fullBleed ? styles.pageFullBleed : styles.page}>
           {children}
         </div>
       </div>
+      <DataAssistant open={assistantOpen} onClose={() => setAssistantOpen(false)} />
     </div>
   );
 }
