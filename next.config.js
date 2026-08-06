@@ -7,6 +7,12 @@ module.exports = withImages({
   sassOptions: {
     includePaths: [path.join(__dirname, 'styles')],
   },
+  // 'ai' and '@ai-sdk/openai' are ESM-only packages loaded from the CommonJS
+  // server module server/agent/agent.js via dynamic import. 'loose' lets
+  // webpack resolve ESM externals from CJS contexts (Next's documented fix).
+  experimental: {
+    esmExternals: 'loose',
+  },
   async redirects() {
     return [];
   },

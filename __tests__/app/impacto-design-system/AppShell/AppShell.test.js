@@ -42,6 +42,18 @@ jest.mock('app/services/parse', () => ({
   default: { initialize: jest.fn() },
 }));
 
+jest.mock('app/epics/DataAssistant', () => {
+  function MockDataAssistant({ open, onClose }) {
+    if (!open) return null;
+    return (
+      <div data-testid="data-assistant">
+        <button type="button" data-testid="assistant-close" onClick={onClose}>close</button>
+      </div>
+    );
+  }
+  return { __esModule: true, default: MockDataAssistant };
+});
+
 const { useRouter } = require('next/router');
 const AppShell = require('app/impacto-design-system/AppShell/AppShell').default;
 
@@ -215,5 +227,27 @@ describe('Nav accessibility', () => {
     expect(dashboardLink.tagName).toBe('A');
     // The Dashboard nav item should NOT be a button
     expect(screen.getByText('Dashboard').closest('button')).toBeNull();
+  });
+});
+
+// ─── RED: Data assistant drawer ──────────────────────────────────────────────
+
+describe('Data assistant drawer', () => {
+  it('is closed by default', () => {
+    renderShell('/quick-start');
+    expect(screen.queryByTestId('data-assistant')).not.toBeInTheDocument();
+  });
+
+  it('opens when the Ask Puente button in the top bar is clicked', () => {
+    renderShell('/quick-start');
+    fireEvent.click(screen.getByLabelText('assistant_open'));
+    expect(screen.getByTestId('data-assistant')).toBeInTheDocument();
+  });
+
+  it('closes again via the drawer onClose', () => {
+    renderShell('/quick-start');
+    fireEvent.click(screen.getByLabelText('assistant_open'));
+    fireEvent.click(screen.getByTestId('assistant-close'));
+    expect(screen.queryByTestId('data-assistant')).not.toBeInTheDocument();
   });
 });

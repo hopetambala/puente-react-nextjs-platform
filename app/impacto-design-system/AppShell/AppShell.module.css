@@ -186,7 +186,20 @@
   align-items: center;
   gap: 8px;
 }
+.assistantButton {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--tk-dlite-semantic-color-border);
+  border-radius: 50%;
+  background: var(--tk-dlite-semantic-color-surface-base);
+  color: var(--tk-dlite-semantic-color-action-primary);
+  font-size: 14px;
+  cursor: pointer;
+}
 
+.assistantButton:hover {
+  border-color: var(--tk-dlite-semantic-color-action-primary);
+}
 .avatar {
   width: 30px;
   height: 30px;

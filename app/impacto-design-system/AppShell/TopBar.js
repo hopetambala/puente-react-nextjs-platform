@@ -1,5 +1,6 @@
 import { retrieveCurrentUserAsyncFunction } from 'app/modules/user';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'next-i18next';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 
@@ -14,9 +15,10 @@ function initials(user) {
   return '?';
 }
 
-export default function TopBar({ breadcrumb, topBarActions }) {
+export default function TopBar({ breadcrumb, topBarActions, onAssistantOpen }) {
   const [user, setUser] = useState(null);
   const router = useRouter();
+  const { t } = useTranslation('common');
 
   useEffect(() => {
     const user = retrieveCurrentUserAsyncFunction();
@@ -37,6 +39,16 @@ export default function TopBar({ breadcrumb, topBarActions }) {
       </div>
       <div className={styles.topbarActions}>
         {topBarActions}
+        {onAssistantOpen && (
+          <button
+            type="button"
+            className={styles.assistantButton}
+            aria-label={t('assistant_open')}
+            onClick={onAssistantOpen}
+          >
+            ✦
+          </button>
+        )}
         <button
           type="button"
           className={styles.avatar}
@@ -52,9 +64,11 @@ export default function TopBar({ breadcrumb, topBarActions }) {
 
 TopBar.defaultProps = {
   topBarActions: null,
+  onAssistantOpen: null,
 };
 
 TopBar.propTypes = {
   breadcrumb: PropTypes.arrayOf(PropTypes.string).isRequired,
   topBarActions: PropTypes.node,
+  onAssistantOpen: PropTypes.func,
 };
