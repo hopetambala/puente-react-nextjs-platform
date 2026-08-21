@@ -1,0 +1,35 @@
+/* Provenance strip, organization scale. A band, not a card — so a single
+   bottom rule rather than elevation. Logical properties throughout so the
+   Arabic locale mirrors without a rewrite. */
+.ribbon {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--tk-dlite-semantic-spacing-xs);
+  padding-block: var(--tk-dlite-semantic-spacing-xs);
+  padding-inline: var(--tk-dlite-semantic-spacing-md);
+  background: var(--tk-dlite-semantic-color-surface-raised);
+  border-block-end: 1px solid var(--tk-dlite-semantic-color-border);
+  font-size: var(--tk-dlite-semantic-typography-size-200);
+}
+
+.group {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--tk-dlite-semantic-spacing-xxs);
+}
+
+/* Weight and colour carry the label/value distinction — no size ramp. */
+.label {
+  color: var(--tk-dlite-semantic-color-text-secondary);
+}
+
+.value {
+  color: var(--tk-dlite-semantic-color-text-primary);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.separator {
+  color: var(--tk-dlite-semantic-color-text-tertiary);
+}
