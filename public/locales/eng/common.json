@@ -104,7 +104,6 @@
   "triage_severity_medium": "Fixable",
   "triage_clear": "Nothing needs attention",
   "triage_clear_sub": "Every record that synced passed the quality checks.",
-  "coverage_quiet": "quiet {{count}}d",
   "coverage_synced_days": "synced {{count}}d ago",
   "coverage_sampled": "Figures reduced from the most recent 1,000 records, so communities beyond that are not counted.",
   "coverage_unattributed": "{{count}} records had no community recorded.",
@@ -113,5 +112,10 @@
   "context_records_synced": "Records synced",
   "context_window_24h": "last 24 hours",
   "context_accounts_synced": "Accounts that synced",
-  "context_accounts_note": "sampled from the most recent 1,000 records; counts accounts that synced, not people who collected"
+  "context_accounts_note": "sampled from the most recent 1,000 records; counts accounts that synced, not people who collected",
+  "coverage_quiet_today": "synced today",
+  "coverage_quiet_days": "quiet {{count}}d",
+  "coverage_quiet_months": "quiet {{count}}mo",
+  "coverage_quiet_years": "quiet {{count}}y",
+  "coverage_more": "{{count}} more communities not shown."
 }

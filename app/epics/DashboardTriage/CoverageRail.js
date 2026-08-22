@@ -2,7 +2,7 @@ import { EmptyState, Skeleton } from 'app/impacto-design-system';
 import { useTranslation } from 'next-i18next';
 import PropTypes from 'prop-types';
 
-import { QUIET_DAYS } from './coverage';
+import { formatQuietDuration, QUIET_DAYS } from './coverage';
 import styles from './CoverageRail.module.css';
 
 /**
@@ -21,6 +21,13 @@ import styles from './CoverageRail.module.css';
  * Every "quiet N days" means nobody has HEARD from that community. A phone
  * there may hold newer unsynced work. Sync, not fieldwork.
  */
+/**
+ * Cap on rows shown. Visual QA drove this: with real data the rail rendered 20+
+ * communities, ran off the screen, visually outweighed the queue it is meant to
+ * support, and pushed the context strip below the fold. Six keeps it a rail.
+ */
+export const MAX_ROWS = 6;
+
 export default function CoverageRail({ summary, loading }) {
   const { t } = useTranslation('common');
 
@@ -47,24 +54,37 @@ export default function CoverageRail({ summary, loading }) {
     );
   }
 
+  // Quietest-first ordering means the head of the list IS the finding, so the
+  // colour on these rows is meaningful rather than decorating every row.
+  const shown = communities.slice(0, MAX_ROWS);
+  const hidden = communities.length - shown.length;
+
   return (
     <div>
       <ul className={styles.list}>
-        {communities.map((c) => {
+        {shown.map((c) => {
           const quiet = c.daysQuiet !== null && c.daysQuiet >= QUIET_DAYS;
+          const quietFmt = quiet ? formatQuietDuration(c.daysQuiet) : null;
           return (
             <li key={c.name} className={styles.row} data-testid={`coverage-row-${c.name}`}>
               <span className={styles.name}>{c.name}</span>
               <span className={styles.records}>{c.records}</span>
               <span className={quiet ? styles.quiet : styles.synced}>
-                {quiet
-                  ? t('coverage_quiet', { count: c.daysQuiet })
+                {quietFmt
+                  // Coarsened: day-precision on a multi-year silence is false
+                  // precision and hides the actual finding.
+                  ? t(quietFmt.key, { count: quietFmt.count })
+                  // Under the quiet threshold, days are still meaningful.
                   : t('coverage_synced_days', { count: c.daysQuiet })}
               </span>
             </li>
           );
         })}
       </ul>
+
+      {hidden > 0 && (
+        <p className={styles.more}>{t('coverage_more', { count: hidden })}</p>
+      )}
 
       {(approximate || skippedNoCommunity > 0) && (
         <p className={styles.disclosure}>

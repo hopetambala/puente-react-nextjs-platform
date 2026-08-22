@@ -57,6 +57,42 @@ describe('CoverageRail', () => {
     expect(screen.getByText(/coverage_unattributed/)).toBeInTheDocument();
   });
 
+  it('shows at most six communities so the rail cannot outweigh the queue', () => {
+    const many = Array.from({ length: 20 }, (_, i) => ({
+      name: `C${i}`, records: 1, lastSyncedAt: new Date(), daysQuiet: 100 + i,
+    }));
+    render(<CoverageRail summary={summary({ communities: many })} loading={false} />);
+
+    expect(screen.getAllByTestId(/^coverage-row-/)).toHaveLength(6);
+  });
+
+  it('says how many communities it did not show', () => {
+    const many = Array.from({ length: 20 }, (_, i) => ({
+      name: `C${i}`, records: 1, lastSyncedAt: new Date(), daysQuiet: 100 + i,
+    }));
+    render(<CoverageRail summary={summary({ communities: many })} loading={false} />);
+
+    expect(screen.getByText(/coverage_more.*"count":14/)).toBeInTheDocument();
+  });
+
+  it('does not add a more-note when everything fits', () => {
+    render(<CoverageRail summary={summary()} loading={false} />);
+
+    expect(screen.queryByText(/coverage_more/)).not.toBeInTheDocument();
+  });
+
+  it('coarsens a multi-year silence instead of printing four-digit days', () => {
+    render(<CoverageRail
+      summary={summary({
+        communities: [{ name: 'Old', records: 1, lastSyncedAt: new Date(), daysQuiet: 2072 }],
+      })}
+      loading={false}
+    />);
+
+    expect(screen.getByTestId('coverage-row-Old')).toHaveTextContent(/coverage_quiet_years.*"count":5/);
+    expect(screen.getByTestId('coverage-row-Old')).not.toHaveTextContent(/2072/);
+  });
+
   it('shows an empty state when no community has synced', () => {
     render(<CoverageRail summary={summary({ communities: [] })} loading={false} />);
 

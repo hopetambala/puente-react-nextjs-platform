@@ -65,3 +65,10 @@
   min-height: 40px;
   padding-inline: var(--tk-dlite-semantic-spacing-sm);
 }
+
+.more {
+  margin-block: var(--tk-dlite-semantic-spacing-xs) 0;
+  padding-inline: var(--tk-dlite-semantic-spacing-sm);
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  font-size: var(--tk-dlite-semantic-typography-size-100);
+}

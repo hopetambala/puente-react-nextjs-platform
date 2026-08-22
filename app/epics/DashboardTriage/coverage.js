@@ -67,3 +67,21 @@ export function summarizeCoverage({ records = [], now = new Date(), sampleSize =
     counted: records.length,
   };
 }
+
+/**
+ * Coarsen a silence duration to a scale where the number carries meaning.
+ *
+ * Visual QA caught the reason this exists: real data rendered "quiet 2072d",
+ * which is ~5.7 years expressed to the day. Day-precision at that scale is
+ * false precision — it implies a measurement nobody made and buries the actual
+ * finding (this community has been silent for years).
+ *
+ * Returns { key, count } for the caller to translate; never a formatted string.
+ */
+export function formatQuietDuration(days) {
+  if (days === null || days === undefined) return null;
+  if (days === 0) return { key: 'coverage_quiet_today', count: 0 };
+  if (days < 60) return { key: 'coverage_quiet_days', count: days };
+  if (days < 730) return { key: 'coverage_quiet_months', count: Math.floor(days / 30) };
+  return { key: 'coverage_quiet_years', count: Math.floor(days / 365) };
+}
