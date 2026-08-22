@@ -16,6 +16,15 @@
 
 const DAY_MS = 24 * 3600 * 1000;
 
+/**
+ * Days without a sync before a community reads as "quiet".
+ *
+ * Two weeks, chosen so a normal survey cadence plus a slow sync does not trip
+ * it. This is a display threshold, not a data fact — tune it with a coordinator,
+ * not by intuition.
+ */
+export const QUIET_DAYS = 14;
+
 export function summarizeCoverage({ records = [], now = new Date(), sampleSize = 0 }) {
   const groups = new Map();
   let skippedNoCommunity = 0;
