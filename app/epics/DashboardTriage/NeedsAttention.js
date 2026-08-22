@@ -21,8 +21,16 @@ import styles from './NeedsAttention.module.css';
 
 const SEVERITY_VARIANT = { critical: 'red', high: 'orange', medium: 'yellow' };
 
-export default function NeedsAttention({ rows, loading }) {
+export default function NeedsAttention({ rows, unavailable, loading }) {
   const { t } = useTranslation('common');
+
+  const note = unavailable.length > 0 && (
+    <p className={styles.unavailable} data-testid="triage-unavailable-note">
+      {t('triage_unavailable_intro')}
+      {' '}
+      {unavailable.map((id) => t(`triage_unavailable_${id}`)).join(', ')}
+    </p>
+  );
 
   if (loading) {
     return (
@@ -37,9 +45,18 @@ export default function NeedsAttention({ rows, loading }) {
     );
   }
 
-  // An empty queue is a GOOD outcome on this screen. Say so, rather than
-  // rendering the same grey void as "no data".
+  // An empty queue is a GOOD outcome on this screen — but only if every check
+  // actually ran. An all-clear that might be wrong is worse than no answer, so
+  // a failed check downgrades this to an explicit partial result.
   if (rows.length === 0) {
+    if (unavailable.length > 0) {
+      return (
+        <div data-testid="triage-partial">
+          <EmptyState message={t('triage_partial')} sub={t('triage_partial_sub')} />
+          {note}
+        </div>
+      );
+    }
     return (
       <div data-testid="triage-clear">
         <EmptyState message={t('triage_clear')} sub={t('triage_clear_sub')} />
@@ -48,7 +65,8 @@ export default function NeedsAttention({ rows, loading }) {
   }
 
   return (
-    <ul className={styles.list}>
+    <>
+      <ul className={styles.list}>
       {rows.map((r) => (
         <li key={r.id}>
           {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
@@ -70,11 +88,13 @@ export default function NeedsAttention({ rows, loading }) {
           </Link>
         </li>
       ))}
-    </ul>
+      </ul>
+      {note}
+    </>
   );
 }
 
-NeedsAttention.defaultProps = { rows: [], loading: false };
+NeedsAttention.defaultProps = { rows: [], unavailable: [], loading: false };
 
 NeedsAttention.propTypes = {
   rows: PropTypes.arrayOf(PropTypes.shape({
@@ -85,5 +105,7 @@ NeedsAttention.propTypes = {
     approximate: PropTypes.bool,
     href: PropTypes.string.isRequired,
   })),
+  /** Signal ids whose check could not run — see findUnavailableSignals. */
+  unavailable: PropTypes.arrayOf(PropTypes.string),
   loading: PropTypes.bool,
 };

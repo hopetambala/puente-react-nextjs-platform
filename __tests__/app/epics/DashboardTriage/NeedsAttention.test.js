@@ -72,3 +72,31 @@ describe('NeedsAttention', () => {
     expect(screen.queryByTestId('triage-clear')).not.toBeInTheDocument();
   });
 });
+
+describe('when a check could not run', () => {
+  it('withholds the all-clear, because it might be wrong', () => {
+    render(<NeedsAttention rows={[]} unavailable={['form-drift']} loading={false} />);
+
+    expect(screen.queryByTestId('triage-clear')).not.toBeInTheDocument();
+    expect(screen.getByTestId('triage-partial')).toBeInTheDocument();
+  });
+
+  it('names which check could not run', () => {
+    render(<NeedsAttention rows={[]} unavailable={['form-drift']} loading={false} />);
+
+    expect(screen.getByTestId('triage-partial')).toHaveTextContent(/triage_unavailable_form-drift/);
+  });
+
+  it('still shows the all-clear when every check ran', () => {
+    render(<NeedsAttention rows={[]} unavailable={[]} loading={false} />);
+
+    expect(screen.getByTestId('triage-clear')).toBeInTheDocument();
+  });
+
+  it('notes the failed check alongside real rows too', () => {
+    render(<NeedsAttention rows={[row()]} unavailable={['possible-duplicates']} loading={false} />);
+
+    expect(screen.getByTestId('triage-row-missing-key-fields')).toBeInTheDocument();
+    expect(screen.getByTestId('triage-unavailable-note')).toBeInTheDocument();
+  });
+});

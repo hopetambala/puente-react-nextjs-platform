@@ -77,3 +77,19 @@ export function buildTriageQueue(signals = {}) {
       || b.count - a.count
     ));
 }
+
+/**
+ * Signals whose check could not run.
+ *
+ * `buildTriageQueue` drops both a zero count and a failed load, because neither
+ * is work. But they mean opposite things to a reader: one says "checked, all
+ * good", the other says "no idea". An all-clear that might be wrong is the worst
+ * thing this screen can say, so the caller needs to tell them apart and must
+ * withhold the all-clear when anything here is non-empty.
+ *
+ * Order follows SIGNALS (severity), so the most consequential missing check
+ * reads first.
+ */
+export function findUnavailableSignals(signals = {}) {
+  return SIGNALS.filter((s) => !signals[s.key]).map((s) => s.id);
+}

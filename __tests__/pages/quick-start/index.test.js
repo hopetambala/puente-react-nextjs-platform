@@ -192,6 +192,22 @@ describe('Empty and failure states', () => {
     expect(await screen.findByTestId('triage-clear')).toBeInTheDocument();
   });
 
+  it('withholds the all-clear when a single check failed to run', async () => {
+    mockLoad.mockResolvedValue(payload({
+      signals: {
+        missingKeyFields: { count: 0, exact: true },
+        unresolvedParent: { count: 0, exact: true },
+        possibleDuplicates: null, // query failed
+        possibleFormDrift: { count: 0, exact: false },
+      },
+    }));
+    render(<Dashboard />);
+
+    // A failed check must never look like a passed check on this screen.
+    expect(await screen.findByTestId('triage-partial')).toBeInTheDocument();
+    expect(screen.queryByTestId('triage-clear')).not.toBeInTheDocument();
+  });
+
   it('still renders the page when loading the data fails outright', async () => {
     mockLoad.mockRejectedValue(new Error('offline'));
     render(<Dashboard />);

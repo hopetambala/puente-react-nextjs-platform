@@ -117,5 +117,12 @@
   "coverage_quiet_days": "quiet {{count}}d",
   "coverage_quiet_months": "quiet {{count}}mo",
   "coverage_quiet_years": "quiet {{count}}y",
-  "coverage_more": "{{count}} more communities not shown."
+  "coverage_more": "{{count}} more communities not shown.",
+  "triage_partial": "Nothing found — but not everything could be checked",
+  "triage_partial_sub": "Treat this as incomplete, not as a clean bill of health.",
+  "triage_unavailable_intro": "Could not check:",
+  "triage_unavailable_form-drift": "renamed form fields",
+  "triage_unavailable_unresolved-parent": "unresolved household links",
+  "triage_unavailable_possible-duplicates": "duplicate households",
+  "triage_unavailable_missing-key-fields": "missing key fields"
 }

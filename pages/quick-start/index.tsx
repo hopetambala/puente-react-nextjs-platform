@@ -4,7 +4,7 @@ import { loadDashboardTriage } from 'app/epics/DashboardTriage/loadTriage';
 import NeedsAttention from 'app/epics/DashboardTriage/NeedsAttention';
 import SyncRibbon from 'app/epics/DashboardTriage/SyncRibbon';
 import { summarizeSyncState } from 'app/epics/DashboardTriage/syncState';
-import { buildTriageQueue } from 'app/epics/DashboardTriage/triageQueue';
+import { buildTriageQueue, findUnavailableSignals } from 'app/epics/DashboardTriage/triageQueue';
 import { AppShell } from 'app/impacto-design-system';
 import { retrieveCurrentUserAsyncFunction } from 'app/modules/user';
 import { useTranslation } from 'next-i18next';
@@ -72,6 +72,8 @@ export default function Dashboard() {
 
   const syncState = data ? summarizeSyncState({ ...data.sync, now: new Date() }) : null;
   const queue = data ? buildTriageQueue(data.signals) : [];
+  // A check that could not run must not read as a check that passed.
+  const unavailable = data ? findUnavailableSignals(data.signals) : [];
   const coverage = data
     ? summarizeCoverage({ ...data.coverage, now: new Date() })
     : null;
@@ -83,7 +85,7 @@ export default function Dashboard() {
       <div className={styles.body}>
         <section className={styles.queue}>
           <h2 className={styles.panelTitle}>{t('dashboard_needs_attention')}</h2>
-          <NeedsAttention rows={queue} loading={loading} />
+          <NeedsAttention rows={queue} unavailable={unavailable} loading={loading} />
         </section>
 
         <aside className={styles.rail}>

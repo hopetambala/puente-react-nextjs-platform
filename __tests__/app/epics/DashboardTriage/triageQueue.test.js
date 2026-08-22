@@ -1,4 +1,4 @@
-import { buildTriageQueue } from 'app/epics/DashboardTriage/triageQueue';
+import { buildTriageQueue, findUnavailableSignals } from 'app/epics/DashboardTriage/triageQueue';
 
 const exact = (count) => ({ count, exact: true });
 const sampled = (count) => ({ count, exact: false });
@@ -89,5 +89,28 @@ describe('buildTriageQueue', () => {
     const rows = buildTriageQueue({ ...NONE, missingKeyFields: null });
 
     expect(rows).toEqual([]);
+  });
+});
+
+describe('findUnavailableSignals', () => {
+  // A check that could not run must never be indistinguishable from a check
+  // that ran and found nothing. An all-clear that might be wrong is the worst
+  // thing this screen can say.
+  it('names the signals that failed to load', () => {
+    const ids = findUnavailableSignals({
+      ...NONE,
+      possibleDuplicates: null,
+      possibleFormDrift: null,
+    });
+
+    expect(ids).toEqual(['form-drift', 'possible-duplicates']);
+  });
+
+  it('returns nothing when every check ran', () => {
+    expect(findUnavailableSignals(NONE)).toEqual([]);
+  });
+
+  it('treats a missing key as unavailable, not as zero', () => {
+    expect(findUnavailableSignals({})).toHaveLength(4);
   });
 });
