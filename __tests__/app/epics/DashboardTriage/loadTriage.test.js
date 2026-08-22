@@ -94,6 +94,30 @@ describe('loadDashboardTriage', () => {
     expect(data.coverage.sampleSize).toBe(SAMPLE_SIZE);
   });
 
+  it('derives accounts-that-synced from the SHARED sample, with no extra read', async () => {
+    const rows = [
+      { get: (f) => ({ surveyingUser: 'a@x.org', communityname: 'C' }[f]), createdAt: NOW },
+      { get: (f) => ({ surveyingUser: 'a@x.org', communityname: 'C' }[f]), createdAt: NOW },
+      { get: (f) => ({ surveyingUser: 'b@x.org', communityname: 'C' }[f]), createdAt: NOW },
+    ];
+    const { Parse, instances } = makeParse({ finds: { SurveyData: rows } });
+    const data = await loadDashboardTriage({ Parse, org: 'Puente', now: NOW });
+
+    expect(data.accountsSynced.count).toBe(2);
+    // Sampled, because it is reduced client-side from a capped read.
+    expect(data.accountsSynced.exact).toBe(false);
+    // Still exactly one capped SurveyData read — no dedicated surveyor query.
+    expect(surveyQueries(instances).filter((q) => q._limit === SAMPLE_SIZE)).toHaveLength(1);
+  });
+
+  it('selects surveyingUser on the shared sample so the reduction is possible', async () => {
+    const { Parse, instances } = makeParse();
+    await loadDashboardTriage({ Parse, org: 'Puente', now: NOW });
+
+    const sample = surveyQueries(instances).find((q) => q._limit === SAMPLE_SIZE);
+    expect(sample._select).toEqual(expect.arrayContaining(['surveyingUser']));
+  });
+
   it('marks count-derived signals exact and sample-derived signals not', async () => {
     const { Parse } = makeParse({ counts: { or: 5, SurveyData: 2 } });
     const data = await loadDashboardTriage({ Parse, org: 'Puente', now: NOW });

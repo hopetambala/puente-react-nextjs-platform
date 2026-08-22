@@ -72,7 +72,7 @@ export async function loadDashboardTriage({ Parse, org, now = new Date() }) {
   // 5 — ONE wide sample, two consumers (duplicates + coverage). select() keeps
   // this to 3 fields instead of SurveyData's ~65.
   const sampleQ = scoped('SurveyData');
-  sampleQ.select('communityname', 'householdId', 'createdAt');
+  sampleQ.select('communityname', 'householdId', 'createdAt', 'surveyingUser');
   sampleQ.descending('createdAt');
   sampleQ.limit(SAMPLE_SIZE);
 
@@ -110,7 +110,17 @@ export async function loadDashboardTriage({ Parse, org, now = new Date() }) {
     })),
   });
 
+  // Derived from the SAME sample — the old dashboard spent a dedicated query on
+  // this. It is a lower bound on ACCOUNTS that synced, not people who collected:
+  // surveyingUser records whoever was signed in at sync time, and field phones
+  // are shared. Hence `exact: false` and the "accounts" wording downstream.
+  const accountsSynced = {
+    count: new Set(rows.map((r) => r.get('surveyingUser')).filter(Boolean)).size,
+    exact: false,
+  };
+
   return {
+    accountsSynced,
     sync: {
       lastSyncAt: lastSyncRows && lastSyncRows[0] ? lastSyncRows[0].createdAt : null,
       recordsLast24h: recordsLast24h ?? 0,
