@@ -69,6 +69,9 @@ export default function NeedsAttention({ rows, unavailable, loading }) {
       <ul className={styles.list}>
       {rows.map((r) => (
         <li key={r.id}>
+          {/* Next 12's Link injects href into this anchor at runtime via
+              passHref, so it IS keyboard-navigable — the rule cannot see
+              that and reports a false positive. */}
           {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
           <Link href={r.href} passHref>
             <a className={styles.row} data-testid={`triage-row-${r.id}`}>

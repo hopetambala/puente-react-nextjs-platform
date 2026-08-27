@@ -84,6 +84,17 @@ const SIGNAL_QUERIES = Object.assign(Object.create(null), {
   'missing-key-fields': missingKeyFieldsQuery,
 });
 
+// A filtered view must not present itself as unfiltered: the figures in the
+// summary bar are computed off the narrowed page, so each signal names its own
+// narrowing in prose directly above them. One whole sentence per signal rather
+// than a shared frame with the signal name interpolated in — word order differs
+// by language, and six locales ship. Null-prototype for the same reason as
+// SIGNAL_QUERIES: the key comes off a user-supplied URL.
+const SIGNAL_NOTICE_KEYS = Object.assign(Object.create(null), {
+  'unresolved-parent': 'data_curation_filtered_unresolved-parent',
+  'missing-key-fields': 'data_curation_filtered_missing-key-fields',
+});
+
 function resolveParseClass(source) {
   if (source === 'survey-data') return 'SurveyData';
   if (source === 'eval-medical') return 'EvaluationMedical';
@@ -251,6 +262,11 @@ export default function DataCurationManager() {
         <>
           {/* Source selector */}
           <SourceSelector source={source} org={org} onChange={handleSourceChange} />
+
+          {/* Active signal filter notice — sits directly above the figures it qualifies */}
+          {SIGNAL_NOTICE_KEYS[signal] && (
+            <p className={styles.signalNotice}>{t(SIGNAL_NOTICE_KEYS[signal])}</p>
+          )}
 
           {/* Summary bar */}
           <div className={styles.summaryBar}>
