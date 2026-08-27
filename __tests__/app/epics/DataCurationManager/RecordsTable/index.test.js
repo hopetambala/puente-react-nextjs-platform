@@ -169,3 +169,96 @@ describe('RecordsTable — FormResults completeness', () => {
     expect(screen.getByText('50%')).toBeInTheDocument();
   });
 });
+
+// ─── Extension classes ────────────────────────────────────────────────────────
+//
+// Vitals / EvaluationMedical / HistoryEnvironmentalHealth carry no communityname
+// and none of the 8 SurveyData completeness fields. Community must be read
+// through the included `client` pointer, and completeness scored against the
+// fields the class actually has — otherwise every row read "—" and 13%.
+
+const FULL_VITALS = {
+  bloodPressure: '120/80', pulse: '70', temp: '36.8', weight: '70', height: '170', respRate: '16',
+};
+const FULL_EVAL_MEDICAL = {
+  AssessmentandEvaluation: 'stable', part_of_body: 'knee', duration: '3 months',
+  condition_progression: 'improving', planOfAction: 'physio',
+};
+const FULL_ENV_HEALTH = {
+  houseMaterial: 'block', waterAccess: 'piped', bathroomAccess: 'yes',
+  electricityAccess: 'yes', foodSecurity: 'secure', latrineAccess: 'yes',
+};
+
+function pointerRecord(id, own, clientData) {
+  const client = clientData ? { get: (k) => clientData[k] } : undefined;
+  const data = { surveyingUser: 'alice', ...own, client };
+  return { id, get: (k) => data[k], createdAt: new Date('2026-06-01') };
+}
+
+describe('RecordsTable — community resolves through the client pointer', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it('shows the community from the included client pointer for a vitals row', () => {
+    const rec = pointerRecord('v1', FULL_VITALS, { fname: 'Juan', lname: 'Perez', communityname: 'Sabana Yegua' });
+    render(<RecordsTable {...defaultProps} source="vitals" records={[rec]} />);
+    expect(screen.getByText('Sabana Yegua')).toBeInTheDocument();
+  });
+
+  it('falls back to an em dash when the client pointer carries no community', () => {
+    const rec = pointerRecord('v2', FULL_VITALS, { fname: 'Juan', lname: 'Perez' });
+    render(<RecordsTable {...defaultProps} source="vitals" records={[rec]} />);
+    expect(screen.getByText('—')).toBeInTheDocument();
+  });
+});
+
+describe('RecordsTable — completeness is scored per source', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it('scores a fully populated vitals row 100%', () => {
+    const rec = pointerRecord('v1', FULL_VITALS, { fname: 'Juan', lname: 'Perez' });
+    render(<RecordsTable {...defaultProps} source="vitals" records={[rec]} />);
+    expect(screen.getByLabelText('100% complete')).toBeInTheDocument();
+  });
+
+  it('scores a vitals row with 4 of 6 readings 67%', () => {
+    const partial = { bloodPressure: '120/80', pulse: '70', temp: '36.8', weight: '70' };
+    const rec = pointerRecord('v2', partial, { fname: 'Juan', lname: 'Perez' });
+    render(<RecordsTable {...defaultProps} source="vitals" records={[rec]} />);
+    expect(screen.getByLabelText('67% complete')).toBeInTheDocument();
+  });
+
+  it('scores a fully populated eval-medical row 100%', () => {
+    const rec = pointerRecord('e1', FULL_EVAL_MEDICAL, { fname: 'Juan', lname: 'Perez' });
+    render(<RecordsTable {...defaultProps} source="eval-medical" records={[rec]} />);
+    expect(screen.getByLabelText('100% complete')).toBeInTheDocument();
+  });
+
+  it('scores a fully populated env-health row 100%', () => {
+    const rec = pointerRecord('h1', FULL_ENV_HEALTH, { fname: 'Juan', lname: 'Perez' });
+    render(<RecordsTable {...defaultProps} source="env-health" records={[rec]} />);
+    expect(screen.getByLabelText('100% complete')).toBeInTheDocument();
+  });
+
+  it('still scores a survey-data row against the SurveyData fields', () => {
+    render(<RecordsTable {...defaultProps} />);
+    // makeRecord() populates 4 of the 8 scored fields: fname, lname, communityname, surveyingUser
+    expect(screen.getByLabelText('50% complete')).toBeInTheDocument();
+  });
+});
+
+// resolveParseClass() in ../index falls back to the SurveyData class for any
+// source it doesn't recognise, so such rows really do carry fname/lname. The
+// table must agree with that fallback rather than hunting for a client pointer.
+describe('RecordsTable — unrecognised source follows the SurveyData fallback', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it("reads the person's own name when the source is unrecognised", () => {
+    render(<RecordsTable {...defaultProps} source="not-a-known-source" />);
+    expect(screen.getByText('Hope Tambala')).toBeInTheDocument();
+  });
+
+  it('reads the community off the record itself when the source is unrecognised', () => {
+    render(<RecordsTable {...defaultProps} source="not-a-known-source" />);
+    expect(screen.getByText('Nsanje')).toBeInTheDocument();
+  });
+});

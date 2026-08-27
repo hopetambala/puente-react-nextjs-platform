@@ -36,6 +36,7 @@ const mockQueryChain = {
   descending: jest.fn().mockReturnThis(),
   greaterThanOrEqualTo: jest.fn().mockReturnThis(),
   lessThanOrEqualTo: jest.fn().mockReturnThis(),
+  include: jest.fn().mockReturnThis(),
   find: mockFind,
   count: mockCount,
   distinct: mockDistinct,
@@ -82,7 +83,14 @@ jest.mock('app/epics/DataCurationManager/SourceSelector', () => ({ onChange }) =
     ))}
   </div>
 ));
-jest.mock('app/epics/DataCurationManager/FilterBar', () => () => <div data-testid="filter-bar" />);
+jest.mock('app/epics/DataCurationManager/FilterBar', () => ({ onFilterChange }) => (
+  // Expose onFilterChange so tests can set a filter and assert what survives a
+  // source change.
+  <div data-testid="filter-bar">
+    <button type="button" onClick={() => onFilterChange({ community: 'Nsanje' })}>set community filter</button>
+    <button type="button" onClick={() => onFilterChange({ completeness: 'high' })}>filter to high completeness</button>
+  </div>
+));
 jest.mock('app/epics/DataCurationManager/RecordsTable', () => ({ records }) => (
   <div data-testid="records-table">{records.length} rows</div>
 ));
@@ -371,5 +379,202 @@ describe('Parse class resolution', () => {
   it('queries Vitals for the vitals source', async () => {
     await selectSource('vitals');
     await waitFor(() => expect(MockParse.Query).toHaveBeenCalledWith('Vitals'));
+  });
+});
+
+// ─── Per-source completeness ──────────────────────────────────────────────────
+//
+// SURVEY_COMPLETENESS_FIELDS scores 8 SurveyData fields. Only one of them
+// (surveyingUser) exists on Vitals / EvaluationMedical / HistoryEnvironmentalHealth
+// — those classes reach the person via a `client` pointer. Scoring them with the
+// SurveyData list rated every such record 13% and tripped the <60% anomaly
+// threshold, so the summary bar reported an anomaly count equal to the row count.
+// Each source is scored against the fields its own class actually carries.
+
+function fieldRecord(id, data) {
+  return { id, get: (k) => data[k], createdAt: new Date('2026-06-01T10:00:00Z') };
+}
+
+const FULL_VITALS = {
+  bloodPressure: '120/80', pulse: '70', temp: '36.8', weight: '70', height: '170', respRate: '16',
+};
+const FULL_EVAL_MEDICAL = {
+  AssessmentandEvaluation: 'stable', part_of_body: 'knee', duration: '3 months',
+  condition_progression: 'improving', planOfAction: 'physio',
+};
+const FULL_ENV_HEALTH = {
+  houseMaterial: 'block', waterAccess: 'piped', bathroomAccess: 'yes',
+  electricityAccess: 'yes', foodSecurity: 'secure', latrineAccess: 'yes',
+};
+
+describe('summary bar scores completeness per source', () => {
+  async function renderAtSource(value, records) {
+    mockFind.mockResolvedValue(records);
+    render(<DataCurationManager />);
+    await waitFor(() => screen.getByTestId('source-selector'));
+    fireEvent.click(screen.getByRole('button', { name: `source:${value}` }));
+  }
+
+  it('reports 100% avg completeness for a fully populated vitals record', async () => {
+    await renderAtSource('vitals', [fieldRecord('v1', FULL_VITALS)]);
+    await waitFor(() => expect(screen.getByText(/100%.*avg completeness/i)).toBeInTheDocument());
+  });
+
+  it('reports zero anomalies for a fully populated vitals record', async () => {
+    await renderAtSource('vitals', [fieldRecord('v1', FULL_VITALS)]);
+    await waitFor(() => expect(screen.getByText(/0 anomalies/i)).toBeInTheDocument());
+  });
+
+  it('reports 100% avg completeness for a fully populated eval-medical record', async () => {
+    await renderAtSource('eval-medical', [fieldRecord('e1', FULL_EVAL_MEDICAL)]);
+    await waitFor(() => expect(screen.getByText(/100%.*avg completeness/i)).toBeInTheDocument());
+  });
+
+  it('reports 100% avg completeness for a fully populated env-health record', async () => {
+    await renderAtSource('env-health', [fieldRecord('h1', FULL_ENV_HEALTH)]);
+    await waitFor(() => expect(screen.getByText(/100%.*avg completeness/i)).toBeInTheDocument());
+  });
+
+  it('still scores survey-data against the SurveyData field list', async () => {
+    await renderAtSource('survey-data', [makeRecord()]);
+    await waitFor(() => expect(screen.getByText(/100%.*avg completeness/i)).toBeInTheDocument());
+  });
+});
+
+describe('flagAnomalies (source-aware)', () => {
+  const { flagAnomalies } = require('app/epics/DataCurationManager');
+
+  it('does not flag a fully populated vitals record', () => {
+    expect(flagAnomalies([fieldRecord('v1', FULL_VITALS)], 'vitals').has('v1')).toBe(false);
+  });
+
+  it('flags a vitals record with only one of six readings', () => {
+    expect(flagAnomalies([fieldRecord('v2', { pulse: '70' })], 'vitals').has('v2')).toBe(true);
+  });
+
+  it('defaults to the SurveyData field list when no source is passed', () => {
+    const sparse = makeRecord({ objectId: 'r1', fname: '', lname: '', dob: '', sex: '', householdId: '', surveyingUser: '', telephoneNumber: '' });
+    expect(flagAnomalies([sparse]).has('r1')).toBe(true);
+  });
+});
+
+// ─── Pointer inclusion ────────────────────────────────────────────────────────
+//
+// Vitals / EvaluationMedical / HistoryEnvironmentalHealth / FormResults carry no
+// person or community fields of their own — they point at SurveyData via `client`.
+// Without include(), that pointer arrives unfetched and every read through it
+// returns undefined, so the Name and Community columns rendered "—" on every row.
+
+describe('client pointer inclusion', () => {
+  async function selectSource(value) {
+    render(<DataCurationManager />);
+    await waitFor(() => screen.getByTestId('source-selector'));
+    fireEvent.click(screen.getByRole('button', { name: `source:${value}` }));
+  }
+
+  it('includes the client pointer for vitals', async () => {
+    await selectSource('vitals');
+    await waitFor(() => expect(mockQueryChain.include).toHaveBeenCalledWith('client'));
+  });
+
+  it('includes the client pointer for eval-medical', async () => {
+    await selectSource('eval-medical');
+    await waitFor(() => expect(mockQueryChain.include).toHaveBeenCalledWith('client'));
+  });
+
+  it('includes the client pointer for env-health', async () => {
+    await selectSource('env-health');
+    await waitFor(() => expect(mockQueryChain.include).toHaveBeenCalledWith('client'));
+  });
+
+  it('does not include client for survey-data, where people are the records', async () => {
+    render(<DataCurationManager />);
+    await waitFor(() => expect(mockFind).toHaveBeenCalled());
+    expect(mockQueryChain.include).not.toHaveBeenCalledWith('client');
+  });
+});
+
+// ─── Filter reset on source change ────────────────────────────────────────────
+//
+// communityname exists only on SurveyData. A community filter left over from
+// People Records was still applied after switching to a class that has no such
+// field, which matches zero rows and returns an empty table with no error.
+
+describe('filter reset on source change', () => {
+  it('drops the community filter when the source changes', async () => {
+    render(<DataCurationManager />);
+    await waitFor(() => screen.getByTestId('filter-bar'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'set community filter' }));
+    await waitFor(() => expect(mockQueryChain.equalTo).toHaveBeenCalledWith('communityname', 'Nsanje'));
+
+    mockQueryChain.equalTo.mockClear();
+    fireEvent.click(screen.getByRole('button', { name: 'source:vitals' }));
+
+    await waitFor(() => expect(MockParse.Query).toHaveBeenCalledWith('Vitals'));
+    expect(mockQueryChain.equalTo).not.toHaveBeenCalledWith('communityname', 'Nsanje');
+  });
+})
+;
+
+// The high/low completeness filter runs client-side over the fetched page. It
+// must use the same per-source field list as the displayed score — otherwise a
+// fully populated vitals record reads as "low" and is filtered out of its own
+// source.
+describe('completeness filter is scored per source', () => {
+  it('keeps a fully populated vitals record under the high-completeness filter', async () => {
+    mockFind.mockResolvedValue([fieldRecord('v1', FULL_VITALS)]);
+    render(<DataCurationManager />);
+    await waitFor(() => screen.getByTestId('source-selector'));
+    fireEvent.click(screen.getByRole('button', { name: 'source:vitals' }));
+    await waitFor(() => expect(MockParse.Query).toHaveBeenCalledWith('Vitals'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'filter to high completeness' }));
+    await waitFor(() => expect(screen.getByTestId('records-table')).toHaveTextContent('1 rows'));
+  });
+
+  it('still hides a sparse survey-data record under the high-completeness filter', async () => {
+    const sparse = makeRecord({ objectId: 'r1', dob: '', sex: '', householdId: '', telephoneNumber: '' });
+    mockFind.mockResolvedValue([sparse]);
+    render(<DataCurationManager />);
+    await waitFor(() => screen.getByTestId('filter-bar'));
+    fireEvent.click(screen.getByRole('button', { name: 'filter to high completeness' }));
+    await waitFor(() => expect(screen.getByTestId('records-table')).toHaveTextContent('0 rows'));
+  });
+});
+
+// Custom forms have their own metric (computeFormResultsCompleteness: 30%
+// metadata + 70% answered-vs-expected). The summary bar and anomaly flags must
+// use it too — scoring a FormResults record against the SurveyData field list
+// rates it 13% and flags every row, contradicting the per-row percentages the
+// table shows in the same view.
+describe('form-results records are scored with the FormResults metric', () => {
+  const { flagAnomalies } = require('app/epics/DataCurationManager');
+
+  const formDefinition = {
+    get: (k) => ({ fields: [{ formikKey: 'water_source' }, { formikKey: 'floor_material' }] }[k]),
+  };
+
+  function formResult(id, answers) {
+    const data = {
+      surveyingUser: 'alice',
+      surveyingOrganization: 'TestOrg',
+      client: { id: 'hh1' },
+      fields: answers,
+    };
+    return { id, get: (k) => data[k], createdAt: new Date('2026-06-01T10:00:00Z') };
+  }
+
+  it('does not flag a fully answered form submission', () => {
+    const rec = formResult('f1', [
+      { title: 'water_source', answer: 'Well' },
+      { title: 'floor_material', answer: 'Dirt' },
+    ]);
+    expect(flagAnomalies([rec], 'form-results:abc123', formDefinition).has('f1')).toBe(false);
+  });
+
+  it('flags a form submission with no answers', () => {
+    const rec = formResult('f2', []);
+    expect(flagAnomalies([rec], 'form-results:abc123', formDefinition).has('f2')).toBe(true);
   });
 });
