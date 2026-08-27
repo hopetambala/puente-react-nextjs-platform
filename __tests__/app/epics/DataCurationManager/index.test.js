@@ -73,7 +73,15 @@ jest.mock('app/impacto-design-system', () => ({
 
 // Sub-components are unit-tested in their own files; mock them here as sentinels
 // so the orchestrator test focuses on orchestration (summary counts, fetch wiring).
-jest.mock('app/epics/DataCurationManager/SourceSelector', () => () => <div data-testid="source-selector" />);
+jest.mock('app/epics/DataCurationManager/SourceSelector', () => ({ onChange }) => (
+  // Expose onChange so orchestration tests can switch data source and assert
+  // which Parse class the resulting query is built against.
+  <div data-testid="source-selector">
+    {['survey-data', 'env-health', 'eval-medical', 'vitals'].map((v) => (
+      <button key={v} type="button" onClick={() => onChange(v)}>{`source:${v}`}</button>
+    ))}
+  </div>
+));
 jest.mock('app/epics/DataCurationManager/FilterBar', () => () => <div data-testid="filter-bar" />);
 jest.mock('app/epics/DataCurationManager/RecordsTable', () => ({ records }) => (
   <div data-testid="records-table">{records.length} rows</div>
@@ -106,6 +114,7 @@ function makeRecord(overrides = {}) {
 }
 
 const DataCurationManager = require('app/epics/DataCurationManager').default;
+const { Parse: MockParse } = require('parse');
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -320,5 +329,47 @@ describe('View tabs', () => {
       expect(screen.queryByTestId('filter-bar')).not.toBeInTheDocument();
       expect(screen.queryByTestId('records-table')).not.toBeInTheDocument();
     });
+  });
+});
+
+// ─── Parse class resolution ───────────────────────────────────────────────────
+//
+// Every source in SourceSelector must resolve to a class that actually exists in
+// schema/schema.json. A non-existent class does not error in Parse — it returns
+// zero rows, which reads to a coordinator as "no data collected" rather than
+// "wrong class name". These tests assert the query is built against the real
+// class, so that failure mode cannot come back silently.
+
+describe('Parse class resolution', () => {
+  async function selectSource(value) {
+    render(<DataCurationManager />);
+    await waitFor(() => screen.getByTestId('source-selector'));
+    fireEvent.click(screen.getByRole('button', { name: `source:${value}` }));
+  }
+
+  it('queries HistoryEnvironmentalHealth for the env-health source', async () => {
+    await selectSource('env-health');
+    await waitFor(() => expect(MockParse.Query).toHaveBeenCalledWith('HistoryEnvironmentalHealth'));
+  });
+
+  it('never queries the non-existent EnvironmentalHealth class', async () => {
+    await selectSource('env-health');
+    await waitFor(() => expect(MockParse.Query).toHaveBeenCalledWith('HistoryEnvironmentalHealth'));
+    expect(MockParse.Query).not.toHaveBeenCalledWith('EnvironmentalHealth');
+  });
+
+  it('queries SurveyData for the survey-data source', async () => {
+    await selectSource('survey-data');
+    await waitFor(() => expect(MockParse.Query).toHaveBeenCalledWith('SurveyData'));
+  });
+
+  it('queries EvaluationMedical for the eval-medical source', async () => {
+    await selectSource('eval-medical');
+    await waitFor(() => expect(MockParse.Query).toHaveBeenCalledWith('EvaluationMedical'));
+  });
+
+  it('queries Vitals for the vitals source', async () => {
+    await selectSource('vitals');
+    await waitFor(() => expect(MockParse.Query).toHaveBeenCalledWith('Vitals'));
   });
 });

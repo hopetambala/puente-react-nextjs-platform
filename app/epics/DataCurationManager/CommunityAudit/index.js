@@ -40,7 +40,7 @@ export function groupSimilarNames(names) {
   return groups;
 }
 
-const AUDIT_CLASSES = ['SurveyData', 'EvaluationMedical', 'Vitals', 'EnvironmentalHealth'];
+const AUDIT_CLASSES = ['SurveyData', 'EvaluationMedical', 'Vitals', 'HistoryEnvironmentalHealth'];
 
 export default function CommunityAudit({ org }) {
   const [groups, setGroups] = useState([]);

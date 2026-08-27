@@ -83,7 +83,7 @@ function resolveParseClass(source) {
   if (source === 'survey-data') return 'SurveyData';
   if (source === 'eval-medical') return 'EvaluationMedical';
   if (source === 'vitals') return 'Vitals';
-  if (source === 'env-health') return 'EnvironmentalHealth';
+  if (source === 'env-health') return 'HistoryEnvironmentalHealth';
   if (source.startsWith('form-results:')) return 'FormResults';
   return 'SurveyData';
 }
