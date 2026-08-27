@@ -25,9 +25,12 @@
  */
 const SEVERITY_ORDER = { critical: 0, high: 1, medium: 2 };
 
-// TODO(dashboard): these link to the surface, not a pre-filtered view — the
-// pages don't read filter params yet. Adding `?filter=…` now would be a
-// promise the destination doesn't keep. Wire the params, then narrow these.
+// A row that counted 12 records must land the user on those 12, so curation
+// rows carry their own signal id as `?signal=…` for the destination to filter
+// by — but only where the destination can honour it. A param the destination
+// ignores drops the user on the unfiltered table while looking like it worked,
+// which is worse than promising nothing. TODO(dashboard): form-drift still links
+// to the surface, not the drifted form — Form Creator can't open one yet.
 const SIGNALS = [
   {
     key: 'possibleFormDrift',
@@ -41,13 +44,19 @@ const SIGNALS = [
     id: 'unresolved-parent',
     labelKey: 'triage_unresolved_parent',
     severity: 'high',
-    href: '/data/data-curation',
+    href: '/data/data-curation?signal=unresolved-parent',
   },
   {
     key: 'possibleDuplicates',
     id: 'possible-duplicates',
     labelKey: 'triage_possible_duplicates',
     severity: 'medium',
+    // No param: `missing-key-fields` and `unresolved-parent` have exact
+    // server-side predicates in app/modules/data-quality, but duplicates means
+    // grouping by householdId + day — an aggregation the browser Parse SDK
+    // cannot run without a Master Key (no `distinct`/`aggregate`). Both screens
+    // only approximate it, currently over different windows, so curation could
+    // not honour the filter. Add the param once those windows agree.
     href: '/data/data-curation',
   },
   {
@@ -55,7 +64,7 @@ const SIGNALS = [
     id: 'missing-key-fields',
     labelKey: 'triage_missing_key_fields',
     severity: 'medium',
-    href: '/data/data-curation',
+    href: '/data/data-curation?signal=missing-key-fields',
   },
 ];
 

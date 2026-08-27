@@ -114,3 +114,32 @@ describe('findUnavailableSignals', () => {
     expect(findUnavailableSignals({})).toHaveLength(4);
   });
 });
+
+describe('buildTriageQueue row destinations', () => {
+  // The dashboard is a dispatcher: a row that counted 12 records must land the
+  // user on those 12, not on a table of everything with 12 hidden in it. The
+  // row's own signal id is what the destination filters by.
+  //
+  // But a row may only promise filtering the destination can actually deliver.
+  // A link that carries a param the destination ignores drops the user on the
+  // unfiltered table while looking like it worked, which is worse than a link
+  // that promises nothing. So `possible-duplicates` — which has no exact
+  // predicate, only two differently-scoped approximations — links to the
+  // curation surface bare, and gains its param when the destination can honour
+  // it.
+  it('carries a signal query param only where the destination can honour it', () => {
+    const rows = buildTriageQueue({
+      missingKeyFields: exact(12),
+      unresolvedParent: exact(3),
+      possibleDuplicates: sampled(7),
+      possibleFormDrift: sampled(0),
+    });
+    const hrefById = Object.fromEntries(rows.map((r) => [r.id, r.href]));
+
+    expect(hrefById).toEqual({
+      'missing-key-fields': '/data/data-curation?signal=missing-key-fields',
+      'unresolved-parent': '/data/data-curation?signal=unresolved-parent',
+      'possible-duplicates': '/data/data-curation',
+    });
+  });
+});

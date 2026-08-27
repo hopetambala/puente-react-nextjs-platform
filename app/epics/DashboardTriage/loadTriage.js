@@ -1,4 +1,4 @@
-import { detectDuplicates, SURVEY_COMPLETENESS_FIELDS } from 'app/epics/DataCurationManager';
+import { detectDuplicates, missingKeyFieldsQuery, unresolvedParentQuery } from 'app/modules/data-quality';
 
 import { detectFormDrift } from './formDrift';
 
@@ -11,13 +11,13 @@ import { detectFormDrift } from './formDrift';
  * for (the browser SDK has no Master Key).
  *
  * ── Known cost, stated plainly ──────────────────────────────────────────────
- * This fires 6 reads. That is over the one-round-trip budget for a page load,
+ * This fires 7 reads. That is over the one-round-trip budget for a page load,
  * and it is the deliberate stopgap the design spec allows: the alternative is
  * sampling the queue counts, which would put approximate numbers on the one
  * screen whose entire job is telling you what to trust.
  *
  * They run in `Promise.all`, so wall-clock is the slowest read rather than the
- * sum — but it is still 6 requests on a bad connection.
+ * sum — but it is still 7 requests on a bad connection.
  *
  * TODO(dashboard): replace with a single `dashboardTriage` Cloud Code function
  * in puente-node-cloudcode. Server-side the master key is legitimate, so the
@@ -25,11 +25,9 @@ import { detectFormDrift } from './formDrift';
  * payload arrives in one round-trip. The 30 existing functions (basicQuery,
  * genericQuery, countService) are the idiom to follow.
  *
- * TODO(layering): this imports two pure helpers from the DataCurationManager
- * epic, which drags React and CSS into the module graph. They belong in a
- * shared module. Importing beats duplicating — a second copy of
- * SURVEY_COMPLETENESS_FIELDS would let the dashboard and curation silently
- * disagree about what "missing key fields" means.
+ * Every signal definition it shares with the curation surface — the two count
+ * predicates and the duplicate reduction — comes from app/modules/data-quality,
+ * so this module pulls in no React and no CSS.
  */
 
 /** Cap for the wide sample. Saturating it means the derived figures are partial. */
@@ -57,17 +55,15 @@ export async function loadDashboardTriage({ Parse, org, now = new Date() }) {
   const recent24hQ = scoped('SurveyData');
   recent24hQ.greaterThanOrEqualTo('createdAt', since24h);
 
-  // 3 — records missing at least one key field. Exact, via an OR of
-  // doesNotExist over the same field list curation scores against.
-  const missingQ = Parse.Query.or(
-    ...SURVEY_COMPLETENESS_FIELDS.map((f) => scoped('SurveyData').doesNotExist(f)),
-  );
+  // 3 — records missing at least one key field. Exact. The predicate lives in
+  // app/modules/data-quality so this and the curation surface cannot drift
+  // apart on what "missing" means — notably, both count '' as missing.
+  const missingQ = missingKeyFieldsQuery({ Parse, org });
 
   // 4 — orphans: the offline parent link was minted on the device but never
-  // resolved to a household server-side.
-  const orphanQ = scoped('SurveyData');
-  orphanQ.exists('householdObjectIdOffline');
-  orphanQ.doesNotExist('householdId');
+  // resolved to a household server-side. Same shared predicate the curation
+  // surface filters its ?signal=unresolved-parent page with.
+  const orphanQ = unresolvedParentQuery({ Parse, org });
 
   // 5 — ONE wide sample, two consumers (duplicates + coverage). select() keeps
   // this to 3 fields instead of SurveyData's ~65.

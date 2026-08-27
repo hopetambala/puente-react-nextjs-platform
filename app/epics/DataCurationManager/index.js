@@ -1,5 +1,12 @@
-import { Button, Skeleton, SegmentedControl } from 'app/impacto-design-system';
+import { SegmentedControl, Skeleton } from 'app/impacto-design-system';
+import {
+  detectDuplicates,
+  missingKeyFieldsQuery,
+  SURVEY_COMPLETENESS_FIELDS,
+  unresolvedParentQuery,
+} from 'app/modules/data-quality';
 import { retrieveCurrentUserAsyncFunction } from 'app/modules/user';
+import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { Parse } from 'parse';
 import { useEffect, useState } from 'react';
@@ -7,18 +14,19 @@ import { useEffect, useState } from 'react';
 import CommunityAudit from './CommunityAudit';
 import DuplicateResolver from './DuplicateResolver';
 import FilterBar from './FilterBar';
+import styles from './index.module.css';
 import RecordInspector from './RecordInspector';
 import RecordsTable from './RecordsTable';
 import SourceSelector from './SourceSelector';
-import styles from './index.module.css';
 
 // ─── Completeness scoring ────────────────────────────────────────────────────
 
-export const SURVEY_COMPLETENESS_FIELDS = [
-  'fname', 'lname', 'dob', 'sex',
-  'householdId', 'communityname',
-  'surveyingUser', 'telephoneNumber',
-];
+// The field list itself lives in app/modules/data-quality: the dashboard's
+// triage loader scores against the same definition, and a second copy here is
+// how the two screens would drift. Same for detectDuplicates, which the
+// dashboard reduces its sampled duplicate count with. Re-exported for existing
+// importers.
+export { detectDuplicates, SURVEY_COMPLETENESS_FIELDS };
 
 export function computeSurveyCompleteness(record) {
   const filled = SURVEY_COMPLETENESS_FIELDS.filter((f) => {
@@ -47,25 +55,7 @@ export function computeFormResultsCompleteness(record, formDefinition) {
 // Keep legacy export name so existing tests referencing it still compile
 export const computeCompleteness = computeSurveyCompleteness;
 
-// ─── Duplicate / anomaly detection ──────────────────────────────────────────
-
-export function detectDuplicates(records) {
-  const seen = {};
-  const dups = new Set();
-  records.forEach((r) => {
-    const hid = r.get('householdId');
-    if (!hid) return;
-    const day = r.createdAt ? r.createdAt.toISOString().slice(0, 10) : 'unknown';
-    const key = `${hid}__${day}`;
-    if (seen[key]) {
-      dups.add(seen[key]);
-      dups.add(r.id);
-    } else {
-      seen[key] = r.id;
-    }
-  });
-  return dups;
-}
+// ─── Anomaly detection ───────────────────────────────────────────────────────
 
 export function flagAnomalies(records) {
   const anomalies = new Set();
@@ -78,6 +68,21 @@ export function flagAnomalies(records) {
 // ─── Source resolution ───────────────────────────────────────────────────────
 
 const PAGE_SIZE = 50;
+
+// The dashboard's needs-attention queue deep-links here with the signal name it
+// counted; each one resolves to the shared predicate that produced that count,
+// so the number the user clicked and the rows they land on stay the same set.
+//
+// Null-prototype, because the key comes straight off a user-supplied URL: on a
+// plain object literal, ?signal=constructor (or toString, valueOf,
+// hasOwnProperty) inherits a truthy non-predicate from Object.prototype and gets
+// called as though it were a query builder. With no prototype, only genuinely
+// registered signals resolve and everything else falls through to the ordinary
+// org-scoped query.
+const SIGNAL_QUERIES = Object.assign(Object.create(null), {
+  'unresolved-parent': unresolvedParentQuery,
+  'missing-key-fields': missingKeyFieldsQuery,
+});
 
 function resolveParseClass(source) {
   if (source === 'survey-data') return 'SurveyData';
@@ -112,6 +117,12 @@ export default function DataCurationManager() {
 
   const user = retrieveCurrentUserAsyncFunction();
   const org = user ? user.get('organization') : '';
+
+  // The dashboard's needs-attention queue deep-links here as
+  // /data/data-curation?signal=<name>. Optional-chained: this component also
+  // renders outside a router context.
+  const router = useRouter();
+  const signal = router?.query?.signal || '';
 
   // Derive surveyor + community filter options from a sample of records.
   // (Parse `distinct()` requires the Master Key, unavailable to the client SDK,
@@ -151,8 +162,15 @@ export default function DataCurationManager() {
     if (!org) return;
     setLoading(true);
     const parseClass = resolveParseClass(source);
-    const q = new Parse.Query(parseClass);
-    q.equalTo('surveyingOrganization', org);
+    // Signal-scoped queues build off the shared predicates in
+    // app/modules/data-quality, never off a copy. Constraining the QUERY (rather
+    // than filtering the 50 fetched rows) is what lets count() honour the signal
+    // too — and it adds no round trip, since find() and count() still run as the
+    // one concurrent pair.
+    const signalQuery = SIGNAL_QUERIES[signal];
+    const q = signalQuery
+      ? signalQuery({ Parse, org })
+      : new Parse.Query(parseClass).equalTo('surveyingOrganization', org);
     if (source.startsWith('form-results:')) {
       q.equalTo('formSpecificationsId', source.replace('form-results:', ''));
     }
@@ -171,7 +189,7 @@ export default function DataCurationManager() {
       })
       .catch(() => { setRecords([]); setTotal(0); })
       .finally(() => setLoading(false));
-  }, [source, filters, page, org]);
+  }, [source, filters, page, org, signal]);
 
   const handleSourceChange = (newSource) => {
     setSource(newSource);

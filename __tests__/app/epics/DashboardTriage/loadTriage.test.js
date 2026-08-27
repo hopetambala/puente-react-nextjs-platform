@@ -1,4 +1,5 @@
 import { loadDashboardTriage, SAMPLE_SIZE } from 'app/epics/DashboardTriage/loadTriage';
+import { SURVEY_COMPLETENESS_FIELDS } from 'app/modules/data-quality';
 
 const NOW = new Date('2026-08-21T12:00:00Z');
 
@@ -42,6 +43,21 @@ function makeParse({ counts = {}, finds = {}, failOn = null } = {}) {
 }
 
 const surveyQueries = (instances) => instances.filter((i) => i.cls === 'SurveyData');
+
+// Every condition a built query can match on, flattened across the OR tree.
+// Read off the jest.fn call records the mock above already keeps, so this asks
+// what the query ASKS FOR rather than how many sub-queries it took to ask it.
+const CONSTRAINTS = ['equalTo', 'doesNotExist', 'exists'];
+
+const conditionsOf = (q) => (q.cls === 'or'
+  ? q._or.reduce((acc, sub) => acc.concat(conditionsOf(sub)), [])
+  : CONSTRAINTS.reduce(
+    (acc, m) => acc.concat((q[m] && q[m].mock ? q[m].mock.calls : []).map((args) => [m].concat(args))),
+    [],
+  ));
+
+const asked = (conditions, tuple) => conditions
+  .some((c) => c.length === tuple.length && c.every((part, i) => part === tuple[i]));
 
 describe('loadDashboardTriage', () => {
   it('scopes every SurveyData query to the organization', async () => {
@@ -124,5 +140,25 @@ describe('loadDashboardTriage', () => {
 
     expect(data.signals.missingKeyFields.exact).toBe(true);
     expect(data.signals.possibleDuplicates.exact).toBe(false);
+  });
+
+  it('counts a key field holding the empty string as missing, like an absent one', async () => {
+    const { Parse, instances } = makeParse();
+    await loadDashboardTriage({ Parse, org: 'Puente', now: NOW });
+
+    // The missing-key-fields signal is the only OR the loader builds.
+    const missingQ = instances.find((q) => q.cls === 'or');
+    const conditions = missingQ ? conditionsOf(missingQ) : [];
+
+    // computeSurveyCompleteness scores '' as unfilled, so a record with
+    // telephoneNumber: '' is incomplete on the curation screen. The number the
+    // dashboard triages from has to agree, or it under-reports silently.
+    SURVEY_COMPLETENESS_FIELDS.forEach((field) => {
+      expect({
+        field,
+        matchesAbsent: asked(conditions, ['doesNotExist', field]),
+        matchesEmptyString: asked(conditions, ['equalTo', field, '']),
+      }).toEqual({ field, matchesAbsent: true, matchesEmptyString: true });
+    });
   });
 });
