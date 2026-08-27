@@ -170,6 +170,12 @@ yarn start     # Start production server
 
 Build artifacts go to `.next/`. The `redesign` branch is the active branch.
 
+Deploys are handled by Vercel (project `puente-manage`): every pull request gets a
+preview deployment, and merging to `master` deploys to production. There is no
+GitHub Actions deploy workflow — `.github/workflows/ci.yml` runs lint and tests
+only. Note that `next export` is not usable here: the app serves
+`getServerSideProps` routes, so it cannot be deployed as a static bundle.
+
 ## License
 
 [Business Source License 1.1 (BUSL-1.1)](LICENSE) — Copyright (c) 2026 Puente
