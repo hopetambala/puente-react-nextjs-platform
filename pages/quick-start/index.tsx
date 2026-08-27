@@ -40,9 +40,13 @@ type TriageData = {
  * and where to send a team next (coverage). Totals are demoted to a footer
  * because they inform nothing on their own.
  *
- * Deliberately absent — each was in the previous version and each was removed
- * on purpose, so please read docs/design-direction.md §11.3 before adding one
- * back: a greeting, an activity feed, a forms list, any chart.
+ * Deliberately absent, each removed on purpose — a greeting, an activity feed,
+ * a forms list, any chart. The greeting cost a row of vertical space on the
+ * most-visited screen in the product and answered nothing; fifty rows of the
+ * same sentence is a log, not awareness; a forms list is navigation, not
+ * attention; and nothing here is a trend question yet. Before adding one back,
+ * make it answer the only two questions this screen takes: does it tell you
+ * whether to trust today's data, or does it hand you work?
  */
 export default function Dashboard() {
   const { t } = useTranslation('common');
