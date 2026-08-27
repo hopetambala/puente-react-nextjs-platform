@@ -38,6 +38,7 @@ jest.mock('app/services/parse', () => ({ initialize: jest.fn() }));
 
 const { levenshtein } = require('app/epics/DataCurationManager/CommunityAudit');
 const CommunityAudit = require('app/epics/DataCurationManager/CommunityAudit').default;
+const { Parse: MockParse } = require('parse');
 
 describe('levenshtein (pure function)', () => {
   it('returns 0 for identical strings', () => {
@@ -114,5 +115,35 @@ describe('CommunityAudit — apply canonical name', () => {
     fireEvent.click(screen.getByText(/apply/i));
     fireEvent.click(screen.getByText('Rename records'));
     await waitFor(() => expect(mockSave).toHaveBeenCalled());
+  });
+});
+
+// The audit samples community names per Parse class. A class name that is not in
+// schema/schema.json returns zero rows instead of erroring, so its communities
+// silently vanish from the audit — and from the rename that follows.
+describe('CommunityAudit — audited Parse classes', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockFind.mockResolvedValue([]);
+  });
+
+  it('samples HistoryEnvironmentalHealth', async () => {
+    render(<CommunityAudit org="TestOrg" />);
+    await waitFor(() => expect(MockParse.Query).toHaveBeenCalledWith('HistoryEnvironmentalHealth'));
+  });
+
+  it('never samples the non-existent EnvironmentalHealth class', async () => {
+    render(<CommunityAudit org="TestOrg" />);
+    await waitFor(() => expect(MockParse.Query).toHaveBeenCalledWith('HistoryEnvironmentalHealth'));
+    expect(MockParse.Query).not.toHaveBeenCalledWith('EnvironmentalHealth');
+  });
+
+  it('samples SurveyData, EvaluationMedical and Vitals', async () => {
+    render(<CommunityAudit org="TestOrg" />);
+    await waitFor(() => {
+      expect(MockParse.Query).toHaveBeenCalledWith('SurveyData');
+      expect(MockParse.Query).toHaveBeenCalledWith('EvaluationMedical');
+      expect(MockParse.Query).toHaveBeenCalledWith('Vitals');
+    });
   });
 });

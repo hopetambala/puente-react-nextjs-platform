@@ -9,7 +9,7 @@ import { retrieveCurrentUserAsyncFunction } from 'app/modules/user';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { Parse } from 'parse';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import CommunityAudit from './CommunityAudit';
 import DuplicateResolver from './DuplicateResolver';
@@ -28,12 +28,34 @@ import SourceSelector from './SourceSelector';
 // importers.
 export { detectDuplicates, SURVEY_COMPLETENESS_FIELDS };
 
-export function computeSurveyCompleteness(record) {
-  const filled = SURVEY_COMPLETENESS_FIELDS.filter((f) => {
+// The clinical extension classes share none of SurveyData's identity fields —
+// they reach the person through a `client` pointer. Each is scored against the
+// readings a surveyor is expected to record, deliberately excluding metadata
+// (surveyingUser, surveyingOrganization, client, createdAt): a well-attributed
+// record with no readings is not a complete one. Which fields count as required
+// is a domain call — adjust these lists rather than adding metadata back.
+const SOURCE_COMPLETENESS_FIELDS = {
+  'survey-data': SURVEY_COMPLETENESS_FIELDS,
+  vitals: ['bloodPressure', 'pulse', 'temp', 'weight', 'height', 'respRate'],
+  'eval-medical': ['AssessmentandEvaluation', 'part_of_body', 'duration', 'condition_progression', 'planOfAction'],
+  'env-health': ['houseMaterial', 'waterAccess', 'bathroomAccess', 'electricityAccess', 'foodSecurity', 'latrineAccess'],
+};
+
+function completenessFieldsForSource(source) {
+  return SOURCE_COMPLETENESS_FIELDS[source] || SURVEY_COMPLETENESS_FIELDS;
+}
+
+function computeCompletenessForSource(record, source) {
+  const fields = completenessFieldsForSource(source);
+  const filled = fields.filter((f) => {
     const v = record.get(f);
     return v !== null && v !== undefined && v !== '';
   });
-  return Math.round((filled.length / SURVEY_COMPLETENESS_FIELDS.length) * 100);
+  return Math.round((filled.length / fields.length) * 100);
+}
+
+export function computeSurveyCompleteness(record) {
+  return computeCompletenessForSource(record, 'survey-data');
 }
 
 const FORM_RESULT_META_FIELDS = ['surveyingUser', 'surveyingOrganization', 'client', 'createdAt'];
@@ -57,10 +79,22 @@ export const computeCompleteness = computeSurveyCompleteness;
 
 // ─── Anomaly detection ───────────────────────────────────────────────────────
 
-export function flagAnomalies(records) {
+// Scores one record with the metric its own source has. Custom forms carry their
+// own (30% metadata + 70% answered-vs-expected); every other source is scored
+// against its class's field list. Routing every completeness read through here
+// keeps the summary bar, the anomaly flags, the completeness filter and the
+// per-row bar from disagreeing with each other.
+export function scoreRecord(record, source, formDefinition) {
+  if (source.startsWith('form-results:')) {
+    return computeFormResultsCompleteness(record, formDefinition).overall;
+  }
+  return computeCompletenessForSource(record, source);
+}
+
+export function flagAnomalies(records, source = 'survey-data', formDefinition = null) {
   const anomalies = new Set();
   records.forEach((r) => {
-    if (computeSurveyCompleteness(r) < 60) anomalies.add(r.id);
+    if (scoreRecord(r, source, formDefinition) < 60) anomalies.add(r.id);
   });
   return anomalies;
 }
@@ -95,13 +129,26 @@ const SIGNAL_NOTICE_KEYS = Object.assign(Object.create(null), {
   'missing-key-fields': 'data_curation_filtered_missing-key-fields',
 });
 
+const EMPTY_FILTERS = {
+  search: '', surveyor: '', community: '', from: null, to: null, status: 'all', completeness: 'all',
+};
+
 function resolveParseClass(source) {
   if (source === 'survey-data') return 'SurveyData';
   if (source === 'eval-medical') return 'EvaluationMedical';
   if (source === 'vitals') return 'Vitals';
-  if (source === 'env-health') return 'EnvironmentalHealth';
+  if (source === 'env-health') return 'HistoryEnvironmentalHealth';
   if (source.startsWith('form-results:')) return 'FormResults';
   return 'SurveyData';
+}
+
+// Whether this source's class stores only its own data and reaches the person
+// through a `client` pointer. Derived from resolveParseClass so the query's
+// include() and RecordsTable's person/community reads cannot drift apart —
+// including for an unrecognised source, which resolveParseClass sends to
+// SurveyData and which therefore genuinely carries its own person fields.
+export function sourceHasClientPointer(source) {
+  return resolveParseClass(source) !== 'SurveyData';
 }
 
 // ─── Orchestrator ────────────────────────────────────────────────────────────
@@ -112,9 +159,7 @@ export default function DataCurationManager() {
   const [view, setView] = useState('records');
   const [source, setSource] = useState('survey-data');
   const [formDefinition, setFormDefinition] = useState(null);
-  const [filters, setFilters] = useState({
-    search: '', surveyor: '', community: '', from: null, to: null, status: 'all', completeness: 'all',
-  });
+  const [filters, setFilters] = useState(EMPTY_FILTERS);
   const [records, setRecords] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
@@ -122,7 +167,12 @@ export default function DataCurationManager() {
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [duplicateGroup, setDuplicateGroup] = useState(null);
   const [dups, setDups] = useState(new Set());
-  const [anomalies, setAnomalies] = useState(new Set());
+  // Derived, not stored: the form definition arrives from its own effect after
+  // the records do, and a stored set would keep pre-definition scores.
+  const anomalies = useMemo(
+    () => flagAnomalies(records, source, formDefinition),
+    [records, source, formDefinition],
+  );
   const [surveyors, setSurveyors] = useState([]);
   const [communities, setCommunities] = useState([]);
 
@@ -182,6 +232,11 @@ export default function DataCurationManager() {
     const q = signalQuery
       ? signalQuery({ Parse, org })
       : new Parse.Query(parseClass).equalTo('surveyingOrganization', org);
+    // Every class except SurveyData holds no person or community fields of its
+    // own and points at the SurveyData record via `client`. include() resolves
+    // that pointer in the same round-trip; without it the pointer arrives
+    // unfetched and every read through it is undefined.
+    if (sourceHasClientPointer(source)) q.include('client');
     if (source.startsWith('form-results:')) {
       q.equalTo('formSpecificationsId', source.replace('form-results:', ''));
     }
@@ -196,7 +251,6 @@ export default function DataCurationManager() {
         setRecords(results);
         setTotal(count);
         setDups(detectDuplicates(results));
-        setAnomalies(flagAnomalies(results));
       })
       .catch(() => { setRecords([]); setTotal(0); })
       .finally(() => setLoading(false));
@@ -207,6 +261,10 @@ export default function DataCurationManager() {
     setPage(0);
     setSelectedRecord(null);
     setDuplicateGroup(null);
+    // Filters are class-specific: communityname exists only on SurveyData, so a
+    // leftover community filter matches zero rows on any other class and reads
+    // as "no data collected" rather than surfacing an error.
+    setFilters(EMPTY_FILTERS);
   };
 
   const handleFilterChange = (newFilters) => {
@@ -235,14 +293,14 @@ export default function DataCurationManager() {
     if (filters.status === 'duplicates' && !dups.has(r.id)) return false;
     if (filters.status === 'anomalies' && !anomalies.has(r.id)) return false;
     if (filters.status === 'clean' && (dups.has(r.id) || anomalies.has(r.id))) return false;
-    const pct = computeSurveyCompleteness(r);
+    const pct = scoreRecord(r, source, formDefinition);
     if (filters.completeness === 'high' && pct < 80) return false;
     if (filters.completeness === 'low' && pct >= 60) return false;
     return true;
   });
 
   const avgCompleteness = records.length
-    ? Math.round(records.reduce((sum, r) => sum + computeSurveyCompleteness(r), 0) / records.length)
+    ? Math.round(records.reduce((sum, r) => sum + scoreRecord(r, source, formDefinition), 0) / records.length)
     : 0;
 
   return (
