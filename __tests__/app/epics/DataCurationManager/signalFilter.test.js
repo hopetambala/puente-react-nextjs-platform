@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { SURVEY_COMPLETENESS_FIELDS } from 'app/modules/data-quality';
 
 // ─── Mocks ───────────────────────────────────────────────────────────────────
@@ -62,6 +62,7 @@ jest.mock('parse', () => {
       doesNotExist: jest.fn(function dne(...a) { return mockRecord(this, 'doesNotExist', ...a); }),
       greaterThanOrEqualTo: jest.fn(function gte(...a) { return mockRecord(this, 'greaterThanOrEqualTo', ...a); }),
       lessThanOrEqualTo: jest.fn(function lte(...a) { return mockRecord(this, 'lessThanOrEqualTo', ...a); }),
+      include: jest.fn(function inc(...a) { return mockRecord(this, 'include', ...a); }),
       descending: jest.fn().mockReturnThis(),
       select: jest.fn().mockReturnThis(),
       limit: jest.fn(function lim(n) { this._limit = n; return this; }),
@@ -80,6 +81,7 @@ jest.mock('parse', () => {
       _limit: null,
       _skipped: false,
       equalTo: jest.fn().mockReturnThis(),
+      include: jest.fn().mockReturnThis(),
       descending: jest.fn().mockReturnThis(),
       limit: jest.fn(function lim(n) { this._limit = n; return this; }),
       skip: jest.fn(function sk() { this._skipped = true; return this; }),
@@ -115,7 +117,29 @@ jest.mock('app/impacto-design-system', () => ({
   ),
 }));
 
-jest.mock('app/epics/DataCurationManager/SourceSelector', () => () => <div data-testid="source-selector" />);
+// The REAL SourceSelector renders here, so a test can change the data source
+// the way a user does — by picking an option off the control by the label it
+// shows. Only react-select is stubbed, down to a native <select> carrying the
+// selector's own option list, verbatim from
+// __tests__/app/epics/DataCurationManager/SourceSelector/index.test.js.
+jest.mock('react-select', () => ({
+  options, value, onChange, inputId, placeholder,
+}) => (
+  <select
+    data-testid="source-select"
+    id={inputId}
+    value={value?.value ?? ''}
+    onChange={(e) => {
+      const flat = options.flatMap((g) => g.options ?? [g]);
+      onChange(flat.find((o) => o.value === e.target.value));
+    }}
+  >
+    <option value="" disabled>{placeholder}</option>
+    {options.map((group) => (group.options
+      ? group.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)
+      : <option key={group.value} value={group.value}>{group.label}</option>))}
+  </select>
+));
 jest.mock('app/epics/DataCurationManager/FilterBar', () => () => <div data-testid="filter-bar" />);
 jest.mock('app/epics/DataCurationManager/RecordsTable', () => ({ records }) => (
   <div data-testid="records-table">{records.length} rows</div>
@@ -138,6 +162,13 @@ const pagedQuery = () => mockInstances.find((q) => q._skipped);
 const flattenConstraints = (q) => (q.cls === 'or'
   ? q._or.reduce((acc, sub) => acc.concat(flattenConstraints(sub)), [])
   : q._constraints.slice());
+
+// Which Parse class(es) a query actually reads from, flattened across the OR
+// tree for the same reason flattenConstraints is: a signal-scoped queue is an OR
+// of sub-queries, and it is the sub-queries that name the class.
+const classesQueried = (q) => [...new Set(q.cls === 'or'
+  ? q._or.reduce((acc, sub) => acc.concat(classesQueried(sub)), [])
+  : [q.cls])];
 
 const asked = (constraints, tuple) => constraints
   .some((c) => c.length === tuple.length && c.every((part, i) => part === tuple[i]));
@@ -265,5 +296,40 @@ describe('signal deep link', () => {
       marksTheViewAsRestricted: true,
       everyStringShipsAsALocaleKey: true,
     });
+  });
+});
+
+describe('signal deep link, after the source is changed', () => {
+  it('queries the newly selected source class rather than SurveyData while ?signal= is still in the URL', async () => {
+    // The user arrives on a needs-attention deep link, then asks for a
+    // different class from the source selector. The signal lives in the URL and
+    // the source lives in component state, so the signal outlives the source
+    // change — but every signal predicate in app/modules/data-quality is
+    // SurveyData-only (the key fields and the offline household link exist
+    // nowhere else). A user who asks for Vitals and is handed SurveyData rows
+    // has no way to tell: the rows render, the table fills, nothing errors.
+    mockRouterQuery = { signal: 'missing-key-fields' };
+
+    render(<DataCurationManager />);
+    await waitFor(() => expect(pagedQuery()).toBeDefined());
+
+    // Only the fetch that follows the source change is under test — the arrival
+    // fetch has its own coverage above — so the recorder starts clean here and
+    // pagedQuery() can only be the post-change paginated fetch.
+    mockInstances.length = 0;
+
+    // Driven off the label the selector actually shows, through the real
+    // SourceSelector, so this asserts the path a user takes rather than poking
+    // the orchestrator's setSource.
+    const vitals = await screen.findByRole('option', { name: 'Vitals' });
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: vitals.value } });
+
+    await waitFor(() => expect(pagedQuery()).toBeDefined());
+
+    // Asserted on the class the paginated fetch is built against — flattened
+    // across the OR tree, because a signal-scoped queue names its class on the
+    // sub-queries. Whatever narrowing survives the source change, the rows have
+    // to come from the class the user picked.
+    expect(classesQueried(pagedQuery())).toEqual(['Vitals']);
   });
 });

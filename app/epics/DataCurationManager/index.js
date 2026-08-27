@@ -185,6 +185,15 @@ export default function DataCurationManager() {
   const router = useRouter();
   const signal = router?.query?.signal || '';
 
+  // Every signal predicate in app/modules/data-quality reads SurveyData and only
+  // SurveyData — the key fields and the offline household link exist on no other
+  // class. The signal lives in the URL while the source lives in component
+  // state, so the signal outlives a source change: honouring a stale one would
+  // hand a user who asked for Vitals a page of SurveyData rows, with nothing on
+  // screen to tell them. Derived once, so the fetch below and the notice above
+  // the figures cannot disagree about which narrowing is in force.
+  const activeSignal = resolveParseClass(source) === 'SurveyData' ? signal : '';
+
   // Derive surveyor + community filter options from a sample of records.
   // (Parse `distinct()` requires the Master Key, unavailable to the client SDK,
   //  so we sample up to 1000 rows and reduce to distinct values in the browser.)
@@ -228,7 +237,7 @@ export default function DataCurationManager() {
     // than filtering the 50 fetched rows) is what lets count() honour the signal
     // too — and it adds no round trip, since find() and count() still run as the
     // one concurrent pair.
-    const signalQuery = SIGNAL_QUERIES[signal];
+    const signalQuery = SIGNAL_QUERIES[activeSignal];
     const q = signalQuery
       ? signalQuery({ Parse, org })
       : new Parse.Query(parseClass).equalTo('surveyingOrganization', org);
@@ -254,7 +263,7 @@ export default function DataCurationManager() {
       })
       .catch(() => { setRecords([]); setTotal(0); })
       .finally(() => setLoading(false));
-  }, [source, filters, page, org, signal]);
+  }, [source, filters, page, org, activeSignal]);
 
   const handleSourceChange = (newSource) => {
     setSource(newSource);
@@ -322,8 +331,8 @@ export default function DataCurationManager() {
           <SourceSelector source={source} org={org} onChange={handleSourceChange} />
 
           {/* Active signal filter notice — sits directly above the figures it qualifies */}
-          {SIGNAL_NOTICE_KEYS[signal] && (
-            <p className={styles.signalNotice}>{t(SIGNAL_NOTICE_KEYS[signal])}</p>
+          {SIGNAL_NOTICE_KEYS[activeSignal] && (
+            <p className={styles.signalNotice}>{t(SIGNAL_NOTICE_KEYS[activeSignal])}</p>
           )}
 
           {/* Summary bar */}
