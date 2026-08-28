@@ -651,6 +651,45 @@ deliberately, across the entire dataset.**
 **Never combine them.** A single restrictive pass means the first signal of a
 mistake is a partner phoning to say their data vanished.
 
+### 7.3a Household is a permanent exception to the 100% gate
+
+Established by the production audit, 2026-08-28. **14,688 of 14,736 Households
+(99.7%) carry no organization and cannot be given one.**
+
+They carry nothing that identifies who collected them:
+
+| Attribute | Coverage on the 14,688 |
+|---|---|
+| `surveyingOrganization` | 0 — by definition |
+| `surveyingUser` | **0** |
+| `householdId` | the field does not exist on `Household` |
+| `objectIdOffline` | 48 of 14,736 |
+| `client` pointer | 429, and it targets `Household`, not `SurveyData` |
+| Inbound `SurveyData.householdClient` | **3** of 43,979 |
+
+No reverse lookup is possible: there is nothing to look up *through*. Attributing
+them by geography or time window would be a heuristic pass, which §6 forbids —
+and the 2026-07-15 orphan backfill already established that time proximity
+misattributes in this dataset (median parent→child gap ~1 hour, p90 ~30h).
+
+**Forward path: already closed, but unproven.** `postHouseholdArray` applies
+`mergeMetadataAsFallback`, and Collect's offline uploader sends
+`surveyingOrganization` in its metadata — shipped 2026-07-15 with the orphan fix.
+Every org-less Household predates it. No Household has been created since, so
+production offers no evidence either way; the claim rests on code inspection.
+
+**Consequence — the gates in §7.4 and §11 must be scoped per class, not global.**
+A global 100% requirement can never be met while these 14,688 exist, and a gate
+that can never pass is a gate that quietly stops being enforced. Two honest options:
+
+- **Exempt `Household` explicitly**, with the count recorded, and require 100% of
+  every other class. Preferred: it keeps the gate meaningful where it can be met.
+- **Delete the unattributable Households**, if they turn out to be vestigial —
+  note that only 3 SurveyData records reference a Household at all, so the class
+  may be effectively unused. A separate decision with its own dry run.
+
+Until one is chosen, **Pass B must not run on `Household`.**
+
 ### 7.4 Gates on Pass B — every one is blocking
 
 - **An organization is not locked down until 100% of its users resolve** into its
