@@ -51,6 +51,22 @@ describe('resolveOrganization', () => {
     expect(collide).toThrow(/PDC/i);
   });
 
+  it('accepts a Parse object pointer, which exposes .id rather than .objectId', () => {
+    // A caller passing record.get('organization') hands over a Parse.Object,
+    // whose id lives on `.id`. Reading only `.objectId` would silently ignore
+    // the pointer and fall through to string matching — the exact silent
+    // fallthrough this module exists to prevent.
+    const parseObjectPointer = { id: 'id-wof', className: 'Organization' };
+
+    const result = resolveOrganization(
+      { pointer: parseObjectPointer, name: 'Puente' },
+      [WOF, org('puente', ['Puente'])],
+    );
+
+    expect(result.status).toBe('resolved');
+    expect(result.organization.shortCode).toBe('wof');
+  });
+
   // ─── Guards ────────────────────────────────────────────────────────────────
   // These pin properties the implementation already has. They are regression
   // guards, not drivers — each passed on first run.

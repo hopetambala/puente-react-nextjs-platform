@@ -34,10 +34,19 @@ export function normalizeOrganizationName(value) {
  * Returns `{ status: 'resolved', organization }` or `{ status: 'unresolved',
  * value }`. Never falls back to a "closest" organization: an unresolved record
  * is recoverable, a misattributed one is not.
+ *
+ * @throws {Error} when two organizations claim the same alias. Callers on a
+ *   write path must catch this: a collision is an ops problem and must never
+ *   reject work collected in the field.
  */
 export function resolveOrganization({ pointer, name } = {}, organizations = []) {
-  if (pointer && pointer.objectId) {
-    const byPointer = organizations.find((o) => o.objectId === pointer.objectId);
+  // A raw Parse pointer carries `objectId`; a hydrated Parse.Object carries
+  // `id`. Reading only one silently ignores the other and falls through to
+  // string matching, which is the silent mis-resolution this module exists to
+  // prevent — so accept both.
+  const pointerId = pointer && (pointer.objectId || pointer.id);
+  if (pointerId) {
+    const byPointer = organizations.find((o) => o.objectId === pointerId);
     if (byPointer) return { status: 'resolved', organization: byPointer };
   }
 
