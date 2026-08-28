@@ -21,3 +21,13 @@
   color: var(--tk-dlite-semantic-color-text-primary);
 }
 
+.signalNotice {
+  margin: 0;
+  padding: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-lg);
+  background: var(--tk-dlite-semantic-color-surface-raised);
+  border: 1px solid var(--tk-dlite-semantic-color-border);
+  border-radius: var(--tk-dlite-semantic-border-radius-md);
+  font-family: var(--font-family);
+  font-size: var(--tk-dlite-semantic-typography-size-300);
+  color: var(--tk-dlite-semantic-color-text-secondary);
+}

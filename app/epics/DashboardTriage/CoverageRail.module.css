@@ -1,0 +1,74 @@
+/* Condensed 40px density — this rail is reference, not the scan target. */
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--tk-dlite-semantic-spacing-xs);
+  min-height: 40px;
+  padding-inline: var(--tk-dlite-semantic-spacing-sm);
+  border-block-end: 1px solid var(--tk-dlite-semantic-color-border);
+  font-size: var(--tk-dlite-semantic-typography-size-200);
+}
+
+.name {
+  flex: 1;
+  min-width: 0;
+  color: var(--tk-dlite-semantic-color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Tabular so counts line up down the rail. */
+.records {
+  min-width: 4ch;
+  text-align: end;
+  color: var(--tk-dlite-semantic-color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.synced {
+  min-width: 9ch;
+  text-align: end;
+  color: var(--tk-dlite-semantic-color-text-tertiary);
+}
+
+/* Quiet is the finding, so it gets the one colour in this rail — and it always
+   carries its own text, never colour alone. */
+.quiet {
+  min-width: 9ch;
+  text-align: end;
+  color: var(--tk-dlite-semantic-color-feedback-warning);
+  font-weight: 600;
+}
+
+.disclosure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tk-dlite-semantic-spacing-xxs);
+  margin-block-start: var(--tk-dlite-semantic-spacing-xs);
+  padding-inline: var(--tk-dlite-semantic-spacing-sm);
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  font-size: var(--tk-dlite-semantic-typography-size-100);
+}
+
+.skeletonRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--tk-dlite-semantic-spacing-xs);
+  min-height: 40px;
+  padding-inline: var(--tk-dlite-semantic-spacing-sm);
+}
+
+.more {
+  margin-block: var(--tk-dlite-semantic-spacing-xs) 0;
+  padding-inline: var(--tk-dlite-semantic-spacing-sm);
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  font-size: var(--tk-dlite-semantic-typography-size-100);
+}

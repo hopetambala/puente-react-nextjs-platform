@@ -32,6 +32,16 @@ yarn-error.log*
 # virtual env
 nextenv/
 
-# Auto-generated visual-qa screenshots (regenerable; not versioned)
-.claude/screenshots/
 /logs
+
+# ─── Local Claude Code setup — deliberately NOT versioned ───────────────────
+# This repo is public/source-available; the Claude configuration is personal
+# tooling, not part of the product. Keep it local.
+#
+# NOTE: .claude/ was tracked before 2026-08-21 (commits 3a1534a, f34b5b7 and
+# others), so those older files remain in the published git history even though
+# new work here is ignored. Removing them from history needs a rewrite.
+.claude/
+__tests__/claude/
+docs/README.md
+docs/design-direction.md

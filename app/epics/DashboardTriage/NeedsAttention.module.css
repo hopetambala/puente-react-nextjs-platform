@@ -1,0 +1,73 @@
+/* A queue is a list, not a stack of cards — rules between rows, no elevation
+   per row. Regular 48px density: this is a scan target, not a dense table. */
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--tk-dlite-semantic-spacing-sm);
+  min-height: 48px;
+  padding-inline: var(--tk-dlite-semantic-spacing-sm);
+  border-block-end: 1px solid var(--tk-dlite-semantic-color-border);
+  color: var(--tk-dlite-semantic-color-text-primary);
+  text-decoration: none;
+  transition: background-color var(--tk-dlite-semantic-duration-fast) ease-out;
+}
+
+.row:hover,
+.row:focus-visible {
+  background: var(--tk-dlite-semantic-color-surface-raised);
+}
+
+/* Fixed inline size so counts align down the column. In a records tool a
+   ragged numeric column reads as sloppy data, not sloppy CSS. */
+.count {
+  min-width: 3ch;
+  text-align: end;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.label {
+  flex: 1;
+  min-width: 0;
+}
+
+.tags {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tk-dlite-semantic-spacing-xxs);
+  flex-shrink: 0;
+}
+
+.estimated {
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  font-size: var(--tk-dlite-semantic-typography-size-100);
+}
+
+.skeletonRow {
+  display: flex;
+  align-items: center;
+  gap: var(--tk-dlite-semantic-spacing-sm);
+  min-height: 48px;
+  padding-inline: var(--tk-dlite-semantic-spacing-sm);
+}
+
+/* The only transition here is the row hover. Honour reduced motion — the repo
+   had zero coverage before this file; don't add to that debt. */
+@media (prefers-reduced-motion: reduce) {
+  .row {
+    transition: none;
+  }
+}
+
+.unavailable {
+  margin-block: var(--tk-dlite-semantic-spacing-xs) 0;
+  padding-inline: var(--tk-dlite-semantic-spacing-sm);
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  font-size: var(--tk-dlite-semantic-typography-size-100);
+}

@@ -1,192 +1,55 @@
-.dashboard {
-  display: flex;
-  flex-direction: column;
-  gap: var(--tk-dlite-semantic-spacing-700);
-}
-
-/* skeleton row layout — shimmer comes from the Skeleton component */
-.skeletonRow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--tk-dlite-semantic-color-border);
-
-  &:last-child { border-bottom: none; }
-}
-
-/* stat strip */
-.statStrip {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--tk-dlite-semantic-spacing-md);
-}
-
-.statCard {
-  display: flex;
-  flex-direction: column;
-  gap: var(--tk-dlite-semantic-spacing-xs);
-}
-
-.statLabel {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--tk-dlite-semantic-color-text-secondary);
-  font-family: var(--font-family-heading);
-}
-
-.statValue {
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--tk-dlite-semantic-color-text-primary);
-  font-family: var(--font-family-heading);
-  line-height: 1;
-}
-
-.statMeta {
-  font-size: 12px;
-  color: var(--tk-dlite-semantic-color-text-secondary);
-  font-family: var(--font-family-heading);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: var(--tk-dlite-semantic-spacing-xs);
-}
-
-.pulse {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--tk-dlite-primitive-color-green-500);
-  flex-shrink: 0;
-}
-
-/* two-column body */
+/* Queue dominant, coverage as a rail. Logical properties so the Arabic locale
+   mirrors without a rewrite. */
 .body {
   display: grid;
-  grid-template-columns: 1.4fr 1fr;
-  gap: var(--tk-dlite-semantic-spacing-md);
-  align-items: start;
+  grid-template-columns: 65fr 35fr;
+  gap: var(--tk-dlite-semantic-spacing-lg);
+  padding: var(--tk-dlite-semantic-spacing-md);
 }
 
-/* panels */
-.panelHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--tk-dlite-semantic-spacing-md);
+/* German and Portuguese run long: stack rather than squeeze the columns. */
+@media (max-width: 900px) {
+  .body {
+    grid-template-columns: 1fr;
+  }
+}
+
+.queue,
+.rail {
+  min-width: 0;
 }
 
 .panelTitle {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--tk-dlite-semantic-color-text-primary);
-  font-family: var(--font-family-heading);
-}
-
-/* activity feed */
-.activityList {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  max-height: 420px;
-  overflow-y: auto;
-}
-
-.activityRow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--tk-dlite-semantic-color-border);
-
-  &:last-child {
-    border-bottom: none;
-  }
-}
-
-.activityTime {
-  font-family: var(--font-family-mono);
-  font-size: 11px;
+  margin: 0 0 var(--tk-dlite-semantic-spacing-xs);
+  padding-inline: var(--tk-dlite-semantic-spacing-sm);
   color: var(--tk-dlite-semantic-color-text-secondary);
-  flex-shrink: 0;
-  min-width: 92px;
-  white-space: nowrap;
-}
-
-.activityDot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--tk-dlite-semantic-color-border);
-  flex-shrink: 0;
-}
-
-.activityText {
-  font-size: 13px;
-  color: var(--tk-dlite-semantic-color-text-primary);
-  font-family: var(--font-family-heading);
-}
-
-.activityEmpty {
-  font-size: 13px;
-  color: var(--tk-dlite-semantic-color-text-secondary);
-  font-family: var(--font-family-heading);
-  padding: var(--tk-dlite-semantic-spacing-lg) 0;
-  text-align: center;
-}
-
-/* forms list */
-.formList {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.formRow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--tk-dlite-semantic-color-border);
-
-  &:last-child {
-    border-bottom: none;
-  }
-}
-
-.formDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.formName {
-  flex: 1;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--tk-dlite-semantic-color-text-primary);
-  font-family: var(--font-family-heading);
-}
-
-.panelLink {
-  font-size: 12px;
+  font-size: var(--tk-dlite-semantic-typography-size-200);
   font-weight: 600;
-  color: var(--tk-dlite-semantic-color-action-primary);
-  text-decoration: none;
-  font-family: var(--font-family-heading);
-
-  &:hover {
-    text-decoration: underline;
-  }
 }
 
-.spinnerWrap {
+.contextStrip {
   display: flex;
-  justify-content: center;
-  padding: var(--tk-dlite-semantic-spacing-xl) 0;
+  flex-wrap: wrap;
+  gap: var(--tk-dlite-semantic-spacing-lg);
+  padding-block: var(--tk-dlite-semantic-spacing-sm);
+  padding-inline: var(--tk-dlite-semantic-spacing-md);
+  border-block-start: 1px solid var(--tk-dlite-semantic-color-border);
+}
+
+.contextItem {
+  display: flex;
+  align-items: baseline;
+  gap: var(--tk-dlite-semantic-spacing-xxs);
+  min-width: 0;
+}
+
+.contextValue {
+  color: var(--tk-dlite-semantic-color-text-primary);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.contextLabel {
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  font-size: var(--tk-dlite-semantic-typography-size-100);
 }
