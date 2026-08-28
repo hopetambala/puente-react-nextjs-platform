@@ -651,6 +651,45 @@ deliberately, across the entire dataset.**
 **Never combine them.** A single restrictive pass means the first signal of a
 mistake is a partner phoning to say their data vanished.
 
+### 7.3a Household is a permanent exception to the 100% gate
+
+Established by the production audit, 2026-08-28. **14,688 of 14,736 Households
+(99.7%) carry no organization and cannot be given one.**
+
+They carry nothing that identifies who collected them:
+
+| Attribute | Coverage on the 14,688 |
+|---|---|
+| `surveyingOrganization` | 0 — by definition |
+| `surveyingUser` | **0** |
+| `householdId` | the field does not exist on `Household` |
+| `objectIdOffline` | 48 of 14,736 |
+| `client` pointer | 429, and it targets `Household`, not `SurveyData` |
+| Inbound `SurveyData.householdClient` | **3** of 43,979 |
+
+No reverse lookup is possible: there is nothing to look up *through*. Attributing
+them by geography or time window would be a heuristic pass, which §6 forbids —
+and the 2026-07-15 orphan backfill already established that time proximity
+misattributes in this dataset (median parent→child gap ~1 hour, p90 ~30h).
+
+**Forward path: already closed, but unproven.** `postHouseholdArray` applies
+`mergeMetadataAsFallback`, and Collect's offline uploader sends
+`surveyingOrganization` in its metadata — shipped 2026-07-15 with the orphan fix.
+Every org-less Household predates it. No Household has been created since, so
+production offers no evidence either way; the claim rests on code inspection.
+
+**Consequence — the gates in §7.4 and §11 must be scoped per class, not global.**
+A global 100% requirement can never be met while these 14,688 exist, and a gate
+that can never pass is a gate that quietly stops being enforced. Two honest options:
+
+- **Exempt `Household` explicitly**, with the count recorded, and require 100% of
+  every other class. Preferred: it keeps the gate meaningful where it can be met.
+- **Delete the unattributable Households**, if they turn out to be vestigial —
+  note that only 3 SurveyData records reference a Household at all, so the class
+  may be effectively unused. A separate decision with its own dry run.
+
+Until one is chosen, **Pass B must not run on `Household`.**
+
 ### 7.4 Gates on Pass B — every one is blocking
 
 - **An organization is not locked down until 100% of its users resolve** into its
@@ -778,18 +817,24 @@ ships with i18n keys — not English strings to be translated later.
 | Days from month-end to all invoices sent | The actual stated pain. **Baseline before Phase 0** or the rest is unmeasurable. |
 | Days sales outstanding | Tests whether automated dunning beats manual chasing |
 | Invoices needing manual correction after sending | If this stays high after Phase 1, the alias table is incomplete |
-| % of org strings resolving to a canonical `Organization` | **100%, and it is a gate, not a target** — see below |
+| % of org strings resolving to a canonical `Organization` | **100% per class, and it is a gate, not a target** — see below. `Household` is an explicit exception (§7.3a). |
 | Operator time per billing cycle | The one that decides whether Phase 2 was worth building |
 
 ### 100% resolution is a gate on three separate things
 
 Not a dashboard number to watch trend upward. Nothing below proceeds until it
-holds, per organization:
+holds, **per organization and per class**.
+
+> **Scoped per class, with `Household` exempted.** 14,688 of 14,736 Households
+> cannot be attributed at all (§7.3a). A single global gate could therefore never
+> pass, and a gate that can never pass is one that quietly stops being enforced.
+> Require 100% of every other class; record `Household`'s count as a named,
+> accepted exception and do not run Pass B on it.
 
 | Gate | Why 99% fails |
 |---|---|
 | **Pointer-only reads** (§3) | The unresolved records become invisible the moment consumers stop reading the string |
-| **Pass B ACL lockdown** (§7.4) | An unplaced user loses all access to their own organization's data |
+| **Pass B ACL lockdown** (§7.4) | An unplaced user loses all access to their own organization's data. Skipped entirely for `Household` (§7.3a). |
 | **Invoicing an organization** | Its usage evidence is understated by whatever did not resolve, and the invoice is wrong in the customer's favour or ours — both bad |
 
 The failure mode is identical in all three: **the shortfall is silent.** A 99%
@@ -827,8 +872,11 @@ than reported as a percentage. A number trending toward 100% invites shipping at
 8. `count()` every one of the 9 classes; record the totals before starting.
 9. Dry run with zero writes; the `unresolved` bucket is empty or every entry is
    explicitly signed off. Re-run until true.
-10. Execute against **one small class first** — `EvaluationSurgical` (12 fields)
-    or `Household` — never `SurveyData` or `HistoryEnvironmentalHealth` first.
+10. Execute against **one small, resolvable class first** — `EvaluationSurgical`
+    or `Allergies`. **Not `Household`**: 99.7% of it is unattributable (§7.3a), so
+    it would prove nothing about the backfill and cannot reach the gate. Never
+    start with `SurveyData` or `HistoryEnvironmentalHealth` either — too large to
+    fail cheaply.
 11. Re-run the same class immediately: the second pass must write **zero** records.
     If it writes any, the idempotency filter is wrong — stop.
 12. Spot-check that `editedAt` / `editedBy` on touched `SurveyData` rows are
