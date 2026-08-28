@@ -129,6 +129,10 @@ const { t } = useTranslation('common');
 return <button>{t('button_save')}</button>;
 ```
 
+**Puente supports exactly three languages: English (`eng`, default), Spanish
+(`spa`), and Haitian Creole (`hat`).** Adding or removing one is a deliberate
+change to both this repo and Collect — see [docs/i18n/README.md](docs/i18n/README.md).
+
 Translations live in: `public/locales/{eng,spa,hat}/common.json`
 
 **When you add a new string, add it to all 3 locale files.** CI enforces this:

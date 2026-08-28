@@ -82,3 +82,39 @@ describe('Navigation is genuinely translated, not copied from English', () => {
     });
   });
 });
+
+// ─── The supported language set ─────────────────────────────────────────────
+// Puente supports exactly three languages, in both Manage and Collect:
+// English, Spanish, Haitian Creole. This is a product decision, not an
+// implementation detail — the field operation is in the Dominican Republic,
+// and Collect made the same call long before Manage did.
+//
+// The parity check above guarantees a locale is COMPLETE. It says nothing
+// about which locales may exist, so a fully-translated `deu` would sail
+// through it. This guards the set itself. Manage previously shipped five
+// Next.js template locales (ara/deu/ind/prt/zho) that nobody supported and
+// nobody noticed were 47 keys stale; the point of this test is that they
+// cannot come back by accident.
+//
+// Collect uses the two-letter equivalents (en/es/hk) for the same three
+// languages. Adding a language is a deliberate change to BOTH repos and to
+// docs/i18n/README.md — not a one-line edit here.
+const SUPPORTED_LOCALES = ['eng', 'spa', 'hat'];
+
+describe('Supported languages', () => {
+  it('ships exactly English, Spanish, and Haitian Creole', () => {
+    expect([...locales].sort()).toEqual([...SUPPORTED_LOCALES].sort());
+  });
+
+  it('defaults to English, which is the source catalog every locale is compared against', () => {
+    expect(defaultLocale).toBe('eng');
+    expect(SUPPORTED_LOCALES).toContain(defaultLocale);
+  });
+
+  it('has no catalog directory on disk outside the supported set', () => {
+    const onDisk = fs
+      .readdirSync(LOCALES_DIR)
+      .filter((entry) => fs.statSync(path.join(LOCALES_DIR, entry)).isDirectory());
+    expect(onDisk.sort()).toEqual([...SUPPORTED_LOCALES].sort());
+  });
+});

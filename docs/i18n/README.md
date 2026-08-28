@@ -1,4 +1,44 @@
-# Spanish and Haitian Creole in Manage
+# Languages in Puente
+
+## Supported languages — the canonical list
+
+**Puente supports exactly three languages: English, Spanish, and Haitian
+Creole.** Nothing else. This is a product decision driven by where the work
+happens — the field operation is in the Dominican Republic, serving Dominican
+and Haitian communities.
+
+| Language | Manage (this repo) | Collect (mobile) |
+| --- | --- | --- |
+| English *(default)* | `eng` | `en` |
+| Spanish | `spa` | `es` |
+| Haitian Creole | `hat` | `hk` |
+
+The two apps use different code schemes for the same three languages — Manage
+uses ISO 639-2/T three-letter codes, Collect uses two-letter. That is a
+historical difference, not a meaningful one; do not "fix" either to match the
+other without checking every consumer.
+
+**English is `defaultLocale`.** It is the source catalog every other locale is
+compared against by the parity gate, and it is not removable.
+
+**Adding or removing a language is a deliberate change to both repos and to
+this file** — not a one-line edit to `next-i18next.config.js`. Two tests
+enforce that:
+
+- `Supported languages` in `__tests__/locales/translations.test.js` asserts the
+  set is exactly `eng`/`spa`/`hat`, in the config *and* on disk. A locale added
+  back by accident fails the build even if fully translated.
+- `Locale parity` in the same file asserts every shipped locale defines every
+  key English defines. No allowlist.
+
+### Why this is written down twice
+
+Manage previously shipped `ara`, `deu`, `ind`, `prt`, `zho` — Next.js template
+leftovers nobody supported. They sat 47 keys behind English from June to August
+2026 and nobody noticed, because with no `fallbackLng` a missing key renders
+the English string rather than a raw key name. The failure was invisible by
+construction. Prose alone did not prevent it; the test is what makes it
+unforgettable, and this section is what explains the test.
 
 ## What shipped
 
