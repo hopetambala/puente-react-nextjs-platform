@@ -93,3 +93,32 @@ export function resolveOrganization({ pointer, name } = {}, organizations = []) 
 
   return { status: 'unresolved', value: name ?? null };
 }
+
+/**
+ * Organizations that must never be offered in a user-facing picker.
+ *
+ * `internal-test` exists so ~830 junk records (`testORG`, `Xyz`, Faker company
+ * names) resolve and never bill. It is bookkeeping, not somewhere a real person
+ * signs up.
+ */
+const NON_SELECTABLE_SHORT_CODES = new Set(['internal-test']);
+
+/**
+ * Maps `Organization` records to the shape the picker expects, sorted by name.
+ *
+ * Sorting uses the same folding as `normalizeOrganizationName` so that
+ * "Asociación" files under A rather than after Z — these names are frequently
+ * Spanish, and a picker that buries the accented ones is a picker people scroll
+ * past.
+ *
+ * Inactive organizations are omitted: a retired partner must not be offerable
+ * to a new account.
+ */
+export function toOrganizationOptions(records = []) {
+  return (records || [])
+    .filter((r) => r.get('active') !== false)
+    .filter((r) => !NON_SELECTABLE_SHORT_CODES.has(r.get('shortCode')))
+    .map((r) => ({ id: r.id, label: r.get('name'), shortCode: r.get('shortCode') }))
+    .sort((a, b) => normalizeOrganizationName(a.label)
+      .localeCompare(normalizeOrganizationName(b.label)));
+}
