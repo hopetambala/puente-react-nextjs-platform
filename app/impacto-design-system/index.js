@@ -7,6 +7,7 @@ import EmptyState from './empty-state';
 import FormInput from './form-controls/input';
 import RadioGroup from './form-controls/radio-group';
 import Icon from './icon';
+import LanguageSwitcher from './language-switcher';
 import Link from './Link';
 import Modal from './modal';
 import Panel from './panel';
@@ -31,6 +32,7 @@ export {
   EmptyState,
   FormInput,
   Icon,
+  LanguageSwitcher,
   Link,
   Modal,
   Page,

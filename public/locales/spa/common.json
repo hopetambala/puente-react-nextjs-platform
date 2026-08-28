@@ -121,5 +121,6 @@
   "triage_unavailable_possible-duplicates": "hogares duplicados",
   "triage_unavailable_missing-key-fields": "campos clave faltantes",
   "data_curation_filtered_missing-key-fields": "Mostrando solo los registros a los que les faltan campos clave. Las cifras siguientes describen este conjunto filtrado, no todos los registros.",
-  "data_curation_filtered_unresolved-parent": "Mostrando solo los registros con un vínculo de hogar sin resolver. Las cifras siguientes describen este conjunto filtrado, no todos los registros."
+  "data_curation_filtered_unresolved-parent": "Mostrando solo los registros con un vínculo de hogar sin resolver. Las cifras siguientes describen este conjunto filtrado, no todos los registros.",
+  "language": "Idioma"
 }

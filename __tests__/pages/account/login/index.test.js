@@ -12,7 +12,9 @@ jest.mock('app/modules/user', () => ({
 }));
 
 jest.mock('next/router', () => ({
-  useRouter: () => ({ push: jest.fn(), query: {} }),
+  useRouter: () => ({
+    push: jest.fn(), query: {}, asPath: '/account/login', locale: 'eng',
+  }),
 }));
 
 jest.mock('next-i18next', () => ({
@@ -103,5 +105,18 @@ describe('Form submission', () => {
     await waitFor(() => {
       expect(retrieveSignInFunction).not.toHaveBeenCalled();
     });
+  });
+});
+
+// Settings sits behind BOTH authentication and English. Someone who cannot
+// read the login screen cannot navigate to Settings to change the language,
+// so the switcher has to be reachable here or it never reaches the person who
+// needs it. Each language is named in its own language, never translated.
+describe('Language switcher', () => {
+  it('offers the supported languages before sign-in, each in its own language', () => {
+    render(<Login />);
+    expect(screen.getByRole('button', { name: 'English' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Español' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Kreyòl Ayisyen' })).toBeInTheDocument();
   });
 });

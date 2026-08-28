@@ -124,5 +124,6 @@
   "triage_unavailable_possible-duplicates": "duplicate households",
   "triage_unavailable_missing-key-fields": "missing key fields",
   "data_curation_filtered_missing-key-fields": "Showing only records missing key fields. The counts below describe this filtered set, not every record.",
-  "data_curation_filtered_unresolved-parent": "Showing only records with an unresolved household link. The counts below describe this filtered set, not every record."
+  "data_curation_filtered_unresolved-parent": "Showing only records with an unresolved household link. The counts below describe this filtered set, not every record.",
+  "language": "Language"
 }

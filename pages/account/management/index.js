@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */ // TODO: upgrade to latest eslint tooling
 
 import { yupResolver } from '@hookform/resolvers'
-import { AppShell, Button, Card, PageHeader, Spinner, Stack } from 'app/impacto-design-system'
+import { AppShell, Button, Card, LanguageSwitcher, PageHeader, Spinner, Stack } from 'app/impacto-design-system'
 import {
     retrieveCurrentUserAsyncFunction,
     retrieveSignInFunction,
@@ -118,6 +118,14 @@ function Management(props) {
           </FormProvider>
         </Card>
         )}
+
+        {/* Deliberately outside the FormProvider: that form is yup-validated,
+            submits, re-authenticates and redirects, and language is not a
+            _User field. Also outside the loading ternary, so the choice stays
+            available while the profile is still fetching. */}
+        <Card padding="extraLarge">
+          <LanguageSwitcher />
+        </Card>
       </div>
     </AppShell>
   )

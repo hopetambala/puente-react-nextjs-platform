@@ -2,6 +2,7 @@ import { yupResolver } from '@hookform/resolvers';
 import {
     Button,
     FormInput,
+    LanguageSwitcher,
     Toast,
 } from 'app/impacto-design-system';
 import { retrieveSignInFunction } from 'app/modules/user';
@@ -123,6 +124,11 @@ function Login() {
 
           <div className={styles.hint}>{t('login_collect_hint')}</div>
         </div>
+
+        {/* Beneath the card, not in the left column: Settings is behind both
+            auth and English, so this is the only place someone who cannot read
+            the current language can change it. */}
+        <LanguageSwitcher className={styles.languageSwitcher} />
       </div>
     </div>
   );
