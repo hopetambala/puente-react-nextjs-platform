@@ -1,7 +1,7 @@
 import { useTranslation } from 'next-i18next';
 import PropTypes from 'prop-types';
 
-import { nextFormikKey } from '../_utils';
+import { toFormikKey } from '../_utils';
 import styles from './index.module.css';
 
 function Toggle({
@@ -88,7 +88,7 @@ function Inspector({ block, onChange, onClose }) {
               // FormResults from new submits across two CSV columns.
               update({
                 label: newLabel,
-                formikKey: formikKey || nextFormikKey('', '', newLabel),
+                formikKey: formikKey || toFormikKey(newLabel),
               });
             }}
           />

@@ -30,11 +30,12 @@ const Input = (props) => {
 
     const elementsIndex = formItems.findIndex((element) => element.id === id);
     const newArray = [...formItems];
+    const current = newArray[elementsIndex];
     if (type !== 'sideLabel') {
       newArray[elementsIndex] = {
-        ...newArray[elementsIndex],
+        ...current,
         label: value,
-        formikKey: nextFormikKey(newArray[elementsIndex].formikKey, newArray[elementsIndex].label, value),
+        formikKey: nextFormikKey(current.formikKey, current.label, value),
       };
     } else {
       newArray[elementsIndex] = {

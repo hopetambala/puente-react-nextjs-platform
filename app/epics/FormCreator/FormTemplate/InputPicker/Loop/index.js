@@ -29,10 +29,11 @@ const Loop = (props) => {
 
     const elementsIndex = formItems.findIndex((element) => element.id === id);
     const newArray = [...formItems];
+    const current = newArray[elementsIndex];
     newArray[elementsIndex] = {
-      ...newArray[elementsIndex],
+      ...current,
       label: value,
-      formikKey: nextFormikKey(newArray[elementsIndex].formikKey, newArray[elementsIndex].label, value),
+      formikKey: nextFormikKey(current.formikKey, current.label, value),
     };
 
     setFormItems(newArray);
