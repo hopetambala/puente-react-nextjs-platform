@@ -8,7 +8,7 @@ import styles from './index.module.scss';
 
 const Select = (props) => {
   const {
-    item, formItems, setFormItems, removeValue,
+    item, formItems, setFormItems, removeValue, keyFrozen,
   } = props;
 
   const [options, setOptions] = useState([{
@@ -47,7 +47,7 @@ const Select = (props) => {
     const elementsIndex = formItems.findIndex((element) => element.id === id);
     const newArray = [...formItems];
     const current = newArray[elementsIndex];
-    const formikKey = nextFormikKey(current.formikKey, current.label, value);
+    const formikKey = nextFormikKey(current.formikKey, current.label, value, keyFrozen);
 
     const newOptions = [...options];
     let updatedOptions = [];

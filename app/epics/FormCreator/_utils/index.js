@@ -16,12 +16,19 @@ const toFormikKey = (label) => label.replace(/[`~!@#$%^&*()+=|}[{'";:?.>,<\\|\]/
  * FormResults (`title` = old key) from new submissions (`title` = new key),
  * which is how a monthly CSV can look like last month's answers vanished.
  *
- * While the current key still matches the current label, keep deriving — that
- * is the creation-time path, where the steward is still typing the question.
- * Once they diverge (a converted geolocation block, a prior rename that was
- * migrated), keep the existing key.
+ * On a saved form (`keyFrozen`), never re-derive — Collect already wrote
+ * fields[].title from the existing key. Fall back to toFormikKey only if
+ * the key is empty (rare on a saved form).
+ *
+ * On an unsaved form, while the current key still matches the current label,
+ * keep deriving — that is the creation-time path, where the steward is still
+ * typing the question. Once they diverge (a converted geolocation block, a
+ * prior rename that was migrated), keep the existing key.
  */
-const nextFormikKey = (existingKey, existingLabel, newLabel) => {
+const nextFormikKey = (existingKey, existingLabel, newLabel, keyFrozen) => {
+  if (keyFrozen) {
+    return existingKey || toFormikKey(newLabel);
+  }
   if (existingKey && existingKey !== toFormikKey(existingLabel || '')) {
     return existingKey;
   }

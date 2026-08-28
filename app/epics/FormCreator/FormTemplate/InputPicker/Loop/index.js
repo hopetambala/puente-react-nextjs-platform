@@ -10,6 +10,7 @@ const Loop = (props) => {
     item,
     formItems, setFormItems,
     removeValue,
+    keyFrozen,
   } = props;
 
   const [numberQuestionsToRepeat, setNumberQuestionsToRepeat] = useState(null);
@@ -33,7 +34,7 @@ const Loop = (props) => {
     newArray[elementsIndex] = {
       ...current,
       label: value,
-      formikKey: nextFormikKey(current.formikKey, current.label, value),
+      formikKey: nextFormikKey(current.formikKey, current.label, value, keyFrozen),
     };
 
     setFormItems(newArray);

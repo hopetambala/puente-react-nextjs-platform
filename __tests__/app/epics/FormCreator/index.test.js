@@ -303,6 +303,37 @@ describe('Inspector — block selection', () => {
     );
   });
 
+  it('passes keyFrozen false to FormTemplate on a new form', () => {
+    const FormTemplate = require('app/epics/FormCreator/FormTemplate');
+    render(<FormCreator context={makeContext()} user={mockUser} />);
+    expect(FormTemplate).toHaveBeenCalledWith(
+      expect.objectContaining({ keyFrozen: false }),
+      expect.anything(),
+    );
+  });
+
+  it('passes keyFrozen true to FormTemplate when editing a saved form', async () => {
+    const FormTemplate = require('app/epics/FormCreator/FormTemplate');
+    const ctx = makeContext({
+      action: 'edit',
+      data: {
+        name: 'Existing Form',
+        description: '',
+        fields: [],
+        typeOfForm: ['Custom'],
+        organizations: ['test-org'],
+        objectId: 'form-xyz',
+      },
+    });
+    render(<FormCreator context={ctx} user={mockUser} />);
+    await waitFor(() => {
+      expect(FormTemplate).toHaveBeenCalledWith(
+        expect.objectContaining({ keyFrozen: true }),
+        expect.anything(),
+      );
+    });
+  });
+
   it('replaces the empty state with the Inspector when a block is selected', async () => {
     const { act } = require('@testing-library/react');
     render(<FormCreator context={makeContext()} user={mockUser} />);

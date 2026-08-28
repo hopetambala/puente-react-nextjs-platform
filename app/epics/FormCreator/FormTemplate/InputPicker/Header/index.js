@@ -10,6 +10,7 @@ const Header = (props) => {
     item,
     formItems, setFormItems,
     removeValue,
+    keyFrozen,
   } = props;
   const [activeInput, setActiveInput] = useState(item.active !== undefined ? item.active : true);
 
@@ -32,7 +33,7 @@ const Header = (props) => {
     newArray[elementsIndex] = {
       ...current,
       label: value,
-      formikKey: nextFormikKey(current.formikKey, current.label, value),
+      formikKey: nextFormikKey(current.formikKey, current.label, value, keyFrozen),
       active: activeInput,
     };
 

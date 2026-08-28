@@ -88,3 +88,22 @@ describe('onSelectBlock prop', () => {
     });
   });
 });
+
+describe('keyFrozen prop', () => {
+  it('passes keyFrozen to each InputPicker', () => {
+    const InputPicker = require('app/epics/FormCreator/FormTemplate/InputPicker');
+    render(
+      <FormTemplate
+        formItems={[makeItem()]}
+        setFormItems={jest.fn()}
+        removeValue={jest.fn()}
+        onSelectBlock={jest.fn()}
+        keyFrozen
+      />,
+    );
+    expect(InputPicker).toHaveBeenCalledWith(
+      expect.objectContaining({ keyFrozen: true }),
+      expect.anything(),
+    );
+  });
+});

@@ -12,6 +12,7 @@ const PaperInputPicker = (props) => {
     formItems, setFormItems,
     removeValue,
     onSelectBlock,
+    keyFrozen,
   } = props;
 
   const selectBlock = () => onSelectBlock && onSelectBlock(item);
@@ -45,18 +46,21 @@ const PaperInputPicker = (props) => {
         formItems={formItems}
         setFormItems={setFormItems}
         removeValue={removeValue}
+        keyFrozen={keyFrozen}
       />
       <Select
         item={item}
         formItems={formItems}
         setFormItems={setFormItems}
         removeValue={removeValue}
+        keyFrozen={keyFrozen}
       />
       <Header
         item={item}
         formItems={formItems}
         setFormItems={setFormItems}
         removeValue={removeValue}
+        keyFrozen={keyFrozen}
       />
       <Geolocation
         item={item}
@@ -69,6 +73,7 @@ const PaperInputPicker = (props) => {
         formItems={formItems}
         setFormItems={setFormItems}
         removeValue={removeValue}
+        keyFrozen={keyFrozen}
       />
     </div>
   );

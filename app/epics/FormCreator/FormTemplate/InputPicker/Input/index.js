@@ -10,6 +10,7 @@ const Input = (props) => {
     item,
     formItems, setFormItems,
     removeValue,
+    keyFrozen,
   } = props;
   const [activeInput, setActiveInput] = useState(item.active !== undefined ? item.active : true);
 
@@ -35,7 +36,7 @@ const Input = (props) => {
       newArray[elementsIndex] = {
         ...current,
         label: value,
-        formikKey: nextFormikKey(current.formikKey, current.label, value),
+        formikKey: nextFormikKey(current.formikKey, current.label, value, keyFrozen),
       };
     } else {
       newArray[elementsIndex] = {
