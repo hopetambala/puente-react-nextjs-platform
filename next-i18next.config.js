@@ -10,7 +10,7 @@ module.exports = {
     // Next.js template leftovers with no Dominican Republic relevance, 47
     // keys stale since June, and silently rendering English to anyone who
     // reached them.
-    locales: ['eng'],
+    locales: ['eng', 'spa', 'hat'],
   },
   localePath: path.resolve('./public/locales'),
 };
