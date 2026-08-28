@@ -18,7 +18,9 @@ import styles from './SyncRibbon.module.css';
  */
 
 // Only non-fresh states earn a badge — a badge on every state carries no signal.
-const STATUS_VARIANT = { aging: 'yellow', stale: 'red', never: 'blue' };
+// `unknown` warns in yellow rather than `never`'s blue: `never` is settled
+// information, `unknown` is a caution that the field itself can't be trusted.
+const STATUS_VARIANT = { aging: 'yellow', stale: 'red', never: 'blue', unknown: 'yellow' };
 
 export default function SyncRibbon({ state, loading }) {
   const { t } = useTranslation('common');
@@ -34,8 +36,15 @@ export default function SyncRibbon({ state, loading }) {
 
   const { status, hoursSince, daysSince, recordsLast24h } = state;
 
+  // A `null` count means the 24h count query never ran. A bare `null` renders as
+  // a gap and a `0` would claim nothing arrived — a claim the ribbon cannot
+  // support — so it falls back to the em-dash the page's context strip uses.
+  const records = recordsLast24h === null ? '—' : recordsLast24h;
+
   const recency = () => {
-    if (status === 'never') return null;
+    // `never` has no sync to age, and `unknown` means we couldn't read the sync
+    // time — stating an elapsed time for a timestamp we never read would invent it.
+    if (status === 'never' || status === 'unknown') return null;
     if (hoursSince < 24) return t('sync_ribbon_hours_ago', { count: hoursSince });
     return t('sync_ribbon_days_ago', { count: daysSince });
   };
@@ -54,7 +63,7 @@ export default function SyncRibbon({ state, loading }) {
       <span className={styles.separator} aria-hidden="true">·</span>
 
       <span className={styles.group}>
-        <span className={styles.value}>{recordsLast24h}</span>
+        <span className={styles.value}>{records}</span>
         <span className={styles.label}>{t('sync_ribbon_records_24h')}</span>
       </span>
 
@@ -74,9 +83,11 @@ SyncRibbon.defaultProps = {
 
 SyncRibbon.propTypes = {
   state: PropTypes.shape({
-    status: PropTypes.oneOf(['never', 'fresh', 'aging', 'stale']).isRequired,
+    status: PropTypes.oneOf(['never', 'fresh', 'aging', 'stale', 'unknown']).isRequired,
     hoursSince: PropTypes.number,
     daysSince: PropTypes.number,
+    // Optional (not `isRequired`), which is what makes a `null` count valid here:
+    // PropTypes only warns on a null value when the prop is required.
     recordsLast24h: PropTypes.number,
   }),
   loading: PropTypes.bool,

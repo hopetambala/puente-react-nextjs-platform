@@ -161,4 +161,40 @@ describe('loadDashboardTriage', () => {
       }).toEqual({ field, matchesAbsent: true, matchesEmptyString: true });
     });
   });
+
+  it('distinguishes a last-sync read that failed from one that found nothing', async () => {
+    // Both cases leave lastSyncAt null, so the page cannot tell "no records yet"
+    // apart from "we could not read". A separate flag says whether we KNOW.
+    const empty = await loadDashboardTriage({
+      Parse: makeParse().Parse, org: 'Puente', now: NOW,
+    });
+    const failed = await loadDashboardTriage({
+      Parse: makeParse({ failOn: 'SurveyData' }).Parse, org: 'Puente', now: NOW,
+    });
+
+    expect({
+      queryResolvedWithZeroRows: empty.sync.lastSyncAvailable,
+      queryRejected: failed.sync.lastSyncAvailable,
+    }).toEqual({ queryResolvedWithZeroRows: true, queryRejected: false });
+  });
+
+  it('reports a failed 24-hour count as unknown rather than as zero records', async () => {
+    // The ribbon prints this number verbatim. If a rejected count is flattened
+    // to 0, we assert "no records arrived in the last 24 hours" about the
+    // organization's data on the strength of our own broken request. null is
+    // this module's existing word for "this query did not run" — every signal
+    // uses it that way — so a failure must say null, and only a real count of
+    // nothing may say 0.
+    const failed = await loadDashboardTriage({
+      Parse: makeParse({ failOn: 'SurveyData' }).Parse, org: 'Puente', now: NOW,
+    });
+    const genuinelyZero = await loadDashboardTriage({
+      Parse: makeParse({ counts: { SurveyData: 0 } }).Parse, org: 'Puente', now: NOW,
+    });
+
+    expect({
+      countQueryRejected: failed.sync.recordsLast24h,
+      countQueryReturnedZero: genuinelyZero.sync.recordsLast24h,
+    }).toEqual({ countQueryRejected: null, countQueryReturnedZero: 0 });
+  });
 });

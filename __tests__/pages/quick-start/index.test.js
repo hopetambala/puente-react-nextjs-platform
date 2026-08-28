@@ -215,4 +215,100 @@ describe('Empty and failure states', () => {
     await waitFor(() => expect(mockLoad).toHaveBeenCalled());
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
   });
+
+  it('tells a brand-new organization where records come from, instead of an all-clear', async () => {
+    // Never synced: the reads RAN (lastSyncAvailable) and genuinely found
+    // nothing, so every check returns an exact zero. Reporting that as "every
+    // record passed the quality checks" is a quality verdict on an empty
+    // database — and it is the first thing a new user sees.
+    mockLoad.mockResolvedValue(payload({
+      sync: { lastSyncAt: null, lastSyncAvailable: true, recordsLast24h: 0 },
+      signals: {
+        missingKeyFields: { count: 0, exact: true },
+        unresolvedParent: { count: 0, exact: true },
+        possibleDuplicates: { count: 0, exact: false },
+        possibleFormDrift: { count: 0, exact: false },
+      },
+      coverage: { records: [], sampleSize: 1000 },
+    }));
+    render(<Dashboard />);
+
+    expect(await screen.findByTestId('triage-no-records')).toBeInTheDocument();
+    expect(screen.queryByTestId('triage-clear')).not.toBeInTheDocument();
+    // Records are not entered in this web app, so the onboarding copy has to
+    // ship in the locale — a raw key here strands a first-time user.
+    expect(document.body.textContent).not.toMatch(/MISSING:/);
+  });
+
+  it('does not turn a failed freshness read into a claim about the organization', async () => {
+    // The freshness read FAILED (network, permissions) while every quality
+    // check ran and returned an exact zero. A failed request tells us nothing
+    // about this organization's fieldwork, so the screen must not spend it on
+    // any claim about their data.
+    mockLoad.mockResolvedValue(payload({
+      sync: { lastSyncAt: null, lastSyncAvailable: false, recordsLast24h: 0 },
+      signals: {
+        missingKeyFields: { count: 0, exact: true },
+        unresolvedParent: { count: 0, exact: true },
+        possibleDuplicates: { count: 0, exact: false },
+        possibleFormDrift: { count: 0, exact: false },
+      },
+      coverage: { records: [], sampleSize: 1000 },
+    }));
+    render(<Dashboard />);
+
+    // Nothing found, but the screen cannot account for everything.
+    expect(await screen.findByTestId('triage-partial')).toBeInTheDocument();
+    expect(screen.queryByTestId('triage-clear')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('triage-no-records')).not.toBeInTheDocument();
+
+    // "Nothing has synced yet" asserts the organization has never collected
+    // anything — our own failed read must never be reported as their fieldwork.
+    expect(screen.getByTestId('sync-ribbon')).not.toHaveTextContent(/Nothing has synced yet/);
+
+    expect(document.body.textContent).not.toMatch(/MISSING:/);
+  });
+
+  it('does not report a total load failure as a clean bill of health', async () => {
+    // The whole load failed, so NOTHING was checked. The screen knows nothing
+    // about this organization's data quality — least of all that it is fine.
+    mockLoad.mockRejectedValue(new Error('offline'));
+    render(<Dashboard />);
+
+    await waitFor(() => expect(mockLoad).toHaveBeenCalled());
+    // Wait for the queue to actually finish loading before asserting an
+    // ABSENCE, otherwise the assertion passes vacuously against a skeleton
+    // that simply has not rendered a verdict yet.
+    await waitFor(() => expect(screen.queryByTestId('triage-loading')).not.toBeInTheDocument());
+
+    expect(screen.queryByTestId('triage-clear')).not.toBeInTheDocument();
+    // A failed load must still leave the page standing, not blank the screen.
+    expect(screen.getByText('Dashboard')).toBeInTheDocument();
+  });
+
+  it('shows a placeholder in the context strip when the 24-hour count could not be read', async () => {
+    // The load SUCCEEDED — only the 24h count query failed — so `data` is
+    // present and every other figure on the strip is real. React renders that
+    // lone `null` as nothing, leaving an empty slot beside "Records synced ·
+    // last 24 hours", which reads as a broken screen rather than as a figure we
+    // could not read.
+    mockLoad.mockResolvedValue(payload({
+      sync: {
+        lastSyncAt: new Date(Date.now() - 3 * 3600 * 1000),
+        lastSyncAvailable: true,
+        recordsLast24h: null,
+      },
+    }));
+    render(<Dashboard />);
+    await screen.findByTestId('sync-ribbon');
+
+    const strip = screen.getByTestId('context-strip');
+    // The same em-dash the strip already shows when the whole load failed, so a
+    // value we could not read looks deliberate instead of missing.
+    expect(strip).toHaveTextContent('—');
+    // A zero that is not part of a longer number, so the zeros inside the
+    // "1,000 records" caveat cannot satisfy it and a bare "0" abutting the
+    // label still can: the only thing that matches is a fabricated count.
+    expect(strip).not.toHaveTextContent(/(?<!\d)0(?!\d)/);
+  });
 });

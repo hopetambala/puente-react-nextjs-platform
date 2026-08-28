@@ -119,7 +119,13 @@ export async function loadDashboardTriage({ Parse, org, now = new Date() }) {
     accountsSynced,
     sync: {
       lastSyncAt: lastSyncRows && lastSyncRows[0] ? lastSyncRows[0].createdAt : null,
-      recordsLast24h: recordsLast24h ?? 0,
+      // A failed read also leaves lastSyncAt null, and an organization with no
+      // records yet must not be indistinguishable from one we could not read.
+      lastSyncAvailable: lastSyncRows !== null,
+      // A fabricated 0 would be the same defect as a fabricated 'never'
+      // above: our own broken request asserting that no records arrived all
+      // day. Only a count that really returned nothing may say 0.
+      recordsLast24h,
     },
     signals: {
       missingKeyFields: missingCount === null ? null : { count: missingCount, exact: true },

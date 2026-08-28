@@ -42,4 +42,13 @@ describe('summarizeSyncState', () => {
     expect(Object.values(s)).not.toContain('Last sync');
     expect(s.status).toMatch(/^(never|fresh|aging|stale)$/);
   });
+
+  it('reports unknown, not never, when the last-sync read did not run', () => {
+    const s = summarizeSyncState({
+      lastSyncAvailable: false, lastSyncAt: null, recordsLast24h: 0, now: NOW,
+    });
+
+    expect(s.status).toBe('unknown');
+    expect(s.status).not.toBe('never');
+  });
 });
