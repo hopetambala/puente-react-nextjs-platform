@@ -21,9 +21,11 @@
  * that did not fold them would disagree with the exporter about which records
  * belong to whom.
  *
- * NFD decomposition plus combining-mark removal covers those and every other
- * diacritic, rather than a hand-maintained character map that silently misses
- * whatever was not listed.
+ * NFD decomposition plus `\p{M}` covers those and every other diacritic,
+ * rather than a hand-maintained character map that silently misses whatever was
+ * not listed. `\p{M}` rather than the U+0300–U+036F range because that block is
+ * only one of several — a mark from Combining Diacritical Marks Extended
+ * (U+1AB0+) survived the range check and still blocked a match.
  *
  * Exported because three callers must agree on what "the same organization
  * name" means: this resolver, the admin surface checking a new alias for a
@@ -34,7 +36,7 @@ export function normalizeOrganizationName(value) {
   if (typeof value !== 'string') return null;
   return value
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\p{M}/gu, '')
     .trim()
     .toLowerCase();
 }

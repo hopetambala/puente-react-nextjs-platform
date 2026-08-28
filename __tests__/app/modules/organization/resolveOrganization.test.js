@@ -86,6 +86,15 @@ describe('resolveOrganization', () => {
     expect(accented.organization.shortCode).toBe('asoc');
   });
 
+  it('folds combining marks outside the U+0300 block too', () => {
+    // U+0300–U+036F is only one of several combining-mark ranges. A mark from
+    // Combining Diacritical Marks Extended (U+1AB0+) survived the first fix and
+    // still blocked a match — so the promise of "accent-insensitive" was wider
+    // than the implementation. \p{M} covers every Unicode mark category.
+    expect(normalizeOrganizationName('A\u1AB0')).toBe('a');
+    expect(normalizeOrganizationName('A\u0301')).toBe('a');
+  });
+
   it('folds every accent the exporter strips, including ñ and ü', () => {
     const N = org('enye', ['Fundacion Nunez Munoz']);
 

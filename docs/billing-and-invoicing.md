@@ -817,18 +817,24 @@ ships with i18n keys — not English strings to be translated later.
 | Days from month-end to all invoices sent | The actual stated pain. **Baseline before Phase 0** or the rest is unmeasurable. |
 | Days sales outstanding | Tests whether automated dunning beats manual chasing |
 | Invoices needing manual correction after sending | If this stays high after Phase 1, the alias table is incomplete |
-| % of org strings resolving to a canonical `Organization` | **100%, and it is a gate, not a target** — see below |
+| % of org strings resolving to a canonical `Organization` | **100% per class, and it is a gate, not a target** — see below. `Household` is an explicit exception (§7.3a). |
 | Operator time per billing cycle | The one that decides whether Phase 2 was worth building |
 
 ### 100% resolution is a gate on three separate things
 
 Not a dashboard number to watch trend upward. Nothing below proceeds until it
-holds, per organization:
+holds, **per organization and per class**.
+
+> **Scoped per class, with `Household` exempted.** 14,688 of 14,736 Households
+> cannot be attributed at all (§7.3a). A single global gate could therefore never
+> pass, and a gate that can never pass is one that quietly stops being enforced.
+> Require 100% of every other class; record `Household`'s count as a named,
+> accepted exception and do not run Pass B on it.
 
 | Gate | Why 99% fails |
 |---|---|
 | **Pointer-only reads** (§3) | The unresolved records become invisible the moment consumers stop reading the string |
-| **Pass B ACL lockdown** (§7.4) | An unplaced user loses all access to their own organization's data |
+| **Pass B ACL lockdown** (§7.4) | An unplaced user loses all access to their own organization's data. Skipped entirely for `Household` (§7.3a). |
 | **Invoicing an organization** | Its usage evidence is understated by whatever did not resolve, and the invoice is wrong in the customer's favour or ours — both bad |
 
 The failure mode is identical in all three: **the shortfall is silent.** A 99%
@@ -866,8 +872,11 @@ than reported as a percentage. A number trending toward 100% invites shipping at
 8. `count()` every one of the 9 classes; record the totals before starting.
 9. Dry run with zero writes; the `unresolved` bucket is empty or every entry is
    explicitly signed off. Re-run until true.
-10. Execute against **one small class first** — `EvaluationSurgical` (12 fields)
-    or `Household` — never `SurveyData` or `HistoryEnvironmentalHealth` first.
+10. Execute against **one small, resolvable class first** — `EvaluationSurgical`
+    or `Allergies`. **Not `Household`**: 99.7% of it is unattributable (§7.3a), so
+    it would prove nothing about the backfill and cannot reach the gate. Never
+    start with `SurveyData` or `HistoryEnvironmentalHealth` either — too large to
+    fail cheaply.
 11. Re-run the same class immediately: the second pass must write **zero** records.
     If it writes any, the idempotency filter is wrong — stop.
 12. Spot-check that `editedAt` / `editedBy` on touched `SurveyData` rows are
