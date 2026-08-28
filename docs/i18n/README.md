@@ -84,15 +84,8 @@ the 19 strings where Collect already has a human translation of the same
 English.
 
 Corrections go directly into `public/locales/<locale>/<namespace>.json`. Change
-values, never keys: renaming a key makes it *missing* as far as the gate is
-concerned, and the build fails naming it. (The gate checks only for keys the
-default locale defines. A leftover key that English no longer has is **not**
-detected — see the open item at the end of this file.)
-
-Interpolation placeholders (`{{count}}`, `{{name}}`) are enforced: a
-translation that drops or renames one fails the build even though the key
-exists, because i18next would otherwise render a sentence with the number
-missing, or the literal text `{{nombre}}`.
+values, never keys: a renamed key fails the build twice, once as a key English
+defines that the locale lacks, and once as a key only the locale has.
 
 ### Choices a reviewer should check first
 
@@ -118,6 +111,22 @@ missing, or the literal text `{{nombre}}`.
   and arguably should be rewritten or deleted rather than translated.
 
 ## The parity gate
+
+Three checks, all in
+[`__tests__/locales/translations.test.js`](../../__tests__/locales/translations.test.js),
+none with an allowlist:
+
+1. **Missing keys** — a key the default locale defines that a locale lacks. The
+   original failure: five locales sat 47 keys behind English for three months.
+2. **Interpolation placeholders** — `{{count}}` and friends must match the
+   English set for that key, in any order. A key can exist and still be broken:
+   a dropped placeholder renders a sentence with the number missing, a renamed
+   one renders the literal `{{nombre}}` to the user.
+3. **Unexpected keys** — a key only the locale defines. It is unreachable, since
+   no `t()` call resolves it. The retired `deu` catalog held a key literally
+   named `zurück`: someone translated the KEY instead of the value, so a real
+   translation of "back to home" existed that nothing could ever display.
+
 
 [`__tests__/locales/translations.test.js`](../../__tests__/locales/translations.test.js)
 fails the build when any locale in `next-i18next.config.js` is missing any key
@@ -154,11 +163,6 @@ The choice persists in the `NEXT_LOCALE` cookie, which Next.js reads ahead of
 
 ## Open items
 
-- **No unexpected-key detection.** The gate finds keys English defines that a
-  locale lacks. It does not find the reverse: a key left behind in a locale
-  after English dropped it. The retired `deu` catalog had exactly this — a
-  `zurück` key holding a translation nothing could read. Collect's checker has
-  an `--orphans` mode; Manage's does not yet.
 - **No RTL locale ships.** `ara` was the only one and it was retired, so the
   right-to-left path is now unexercised. Keep using logical properties
   (`margin-inline-start`, `text-align: start`) as cheap insurance.

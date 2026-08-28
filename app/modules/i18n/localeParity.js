@@ -27,6 +27,7 @@ function placeholdersIn(value) {
 function checkLocaleParity({ defaultLocale, locales, catalogs }) {
   const missing = [];
   const placeholders = [];
+  const unexpected = [];
   const source = catalogs[defaultLocale] || {};
 
   locales
@@ -49,9 +50,20 @@ function checkLocaleParity({ defaultLocale, locales, catalogs }) {
           }
         });
       });
+
+      // The mirror of `missing`: a key this locale defines that the default
+      // locale does not. Usually a key English dropped and the translation
+      // kept, or — as in the retired `deu` catalog — a key whose NAME was
+      // translated, stranding a real translation no t() call could reach.
+      Object.keys(catalog).forEach((namespace) => {
+        Object.keys(catalog[namespace]).forEach((key) => {
+          if (source[namespace] && key in source[namespace]) return;
+          unexpected.push({ locale, namespace, key });
+        });
+      });
     });
 
-  return { missing, placeholders };
+  return { missing, placeholders, unexpected };
 }
 
 function groupByLocale(violations) {
@@ -65,8 +77,10 @@ function groupByLocale(violations) {
  * Render the gap as an actionable failure message: which locale, which
  * namespace, which key.
  */
-function formatParityReport({ missing = [], placeholders = [] }) {
-  if (missing.length === 0 && placeholders.length === 0) return '';
+function formatParityReport({ missing = [], placeholders = [], unexpected = [] }) {
+  if (missing.length === 0 && placeholders.length === 0 && unexpected.length === 0) {
+    return '';
+  }
 
   const lines = [''];
 
@@ -103,6 +117,25 @@ function formatParityReport({ missing = [], placeholders = [] }) {
       '  A dropped or renamed placeholder renders the wrong text to the user,',
     );
     lines.push('  so it fails the build even though the key exists.');
+  }
+
+  if (unexpected.length > 0) {
+    lines.push('');
+    const grouped = groupByLocale(unexpected);
+    Object.keys(grouped)
+      .sort()
+      .forEach((locale) => {
+        const entries = grouped[locale].sort();
+        lines.push(`  ${locale} defines ${entries.length} key(s) English does not:`);
+        entries.forEach((entry) => lines.push(`    - ${entry}`));
+      });
+    lines.push('');
+    lines.push(
+      '  Delete these, or add the key to the default locale. A key only this',
+    );
+    lines.push(
+      '  locale has is unreachable — no t() call in the app can resolve it.',
+    );
   }
 
   return lines.join('\n');

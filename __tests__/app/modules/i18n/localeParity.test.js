@@ -89,3 +89,52 @@ describe('checkLocaleParity — interpolation placeholders', () => {
     expect(report.placeholders).toEqual([]);
   });
 });
+
+describe('checkLocaleParity — unexpected keys', () => {
+  // The mirror of `missing`, and the half that was absent. The retired `deu`
+  // catalog held a key literally named `zurück` — someone translated the KEY
+  // rather than the value — so a real translation of "back to home" existed
+  // that no `t('back')` call could ever reach. Nothing flagged it for months.
+  it('flags a key the locale defines that the default locale does not', () => {
+    const report = checkLocaleParity({
+      defaultLocale: 'eng',
+      locales: ['eng', 'deu'],
+      catalogs: {
+        eng: { common: { back: 'back to home' } },
+        deu: { common: { back: 'zurück nach Hause', 'zurück': 'zurück nach Hause' } },
+      },
+    });
+
+    expect(report.unexpected).toEqual([
+      { locale: 'deu', namespace: 'common', key: 'zurück' },
+    ]);
+  });
+
+  it('flags every key of a namespace the default locale does not ship', () => {
+    const report = checkLocaleParity({
+      defaultLocale: 'eng',
+      locales: ['eng', 'spa'],
+      catalogs: {
+        eng: { common: { greeting: 'Hello' } },
+        spa: { common: { greeting: 'Hola' }, legacy: { old_key: 'viejo' } },
+      },
+    });
+
+    expect(report.unexpected).toEqual([
+      { locale: 'spa', namespace: 'legacy', key: 'old_key' },
+    ]);
+  });
+
+  it('stays silent when the locale mirrors the default exactly', () => {
+    const report = checkLocaleParity({
+      defaultLocale: 'eng',
+      locales: ['eng', 'spa'],
+      catalogs: {
+        eng: { common: { greeting: 'Hello' } },
+        spa: { common: { greeting: 'Hola' } },
+      },
+    });
+
+    expect(report.unexpected).toEqual([]);
+  });
+});

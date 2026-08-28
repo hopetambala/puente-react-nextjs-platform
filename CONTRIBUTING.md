@@ -73,6 +73,11 @@ import styles from './index.module.scss';
 
 Run `npx eslint --fix <file>` if you're unsure — the auto-fixer is the source of truth.
 
+Use `eslint`, not `next lint`, when you want to fix one file. `next lint --file
+<file> --fix` ignores the scoping and rewrites every file in the project, which
+produces a diff of hundreds of unrelated files. `yarn lint` is check-only;
+`yarn lint:fix` is the repo-wide one, and it is rarely what you want.
+
 ### Headings
 
 No raw `<h1>` or `<h2>` tags outside of the `<PageHeader>` component. Use `<PageHeader title="..." />` for page-level headings. Use Panel titles or `.sectionLabel` for sections. This keeps heading hierarchy consistent.
