@@ -122,3 +122,41 @@ export function toOrganizationOptions(records = []) {
     .sort((a, b) => normalizeOrganizationName(a.label)
       .localeCompare(normalizeOrganizationName(b.label)));
 }
+
+/**
+ * Upper bound on the organization fetch. There are 37 in production and they are
+ * created by hand, so this is a guard against an unbounded query rather than a
+ * page size. If it is ever reached the picker is showing an incomplete list, so
+ * the caller is told the load is unreliable rather than left to assume it is
+ * complete.
+ */
+export const ORGANIZATION_FETCH_LIMIT = 500;
+
+/**
+ * Loads the organizations offerable at registration.
+ *
+ * Returns `{ options, unavailable }`. The flag matters more than it looks: an
+ * empty dropdown because nothing loaded and an empty dropdown because no
+ * organizations exist are indistinguishable to the person looking at it, and the
+ * first must never present as the second. Same rule the dashboard applies to a
+ * check that could not run.
+ *
+ * Runs before anyone is signed in, so it relies on the public read ACL the
+ * Organization records carry.
+ */
+export async function loadOrganizations(Parse) {
+  try {
+    const query = new Parse.Query('Organization');
+    query.select('name', 'shortCode', 'active');
+    query.limit(ORGANIZATION_FETCH_LIMIT);
+    const records = await query.find();
+
+    return {
+      options: toOrganizationOptions(records),
+      unavailable: false,
+      truncated: records.length === ORGANIZATION_FETCH_LIMIT,
+    };
+  } catch (error) {
+    return { options: [], unavailable: true, truncated: false };
+  }
+}

@@ -6,9 +6,12 @@ import {
     Text,
     Toast,
 } from 'app/impacto-design-system';
+import FormSelectAutoComplete from 'app/impacto-design-system/form-controls/select-autocomplete';
+import { loadOrganizations } from 'app/modules/organization';
 import { retrieveSignUpFunction } from 'app/modules/user';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { Parse } from 'parse';
+import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import * as yup from 'yup';
@@ -34,6 +37,18 @@ function Register() {
     resolver: yupResolver(validationSchema),
   });
   const [notificationType, setNotificationType] = useState('email');
+  // `unavailable` starts false so the picker renders immediately; a failed load
+  // flips it. Never conflate "could not load" with "no organizations exist" —
+  // both look like an empty dropdown, and only one is the user's problem.
+  const [organizations, setOrganizations] = useState({ options: [], unavailable: false });
+
+  useEffect(() => {
+    let ignore = false;
+    loadOrganizations(Parse).then((result) => {
+      if (!ignore) setOrganizations(result);
+    });
+    return () => { ignore = true; };
+  }, []);
 
   const { handleSubmit, errors } = methods;
 
@@ -74,12 +89,25 @@ function Register() {
                 label="Last Name"
                 errorobj={errors}
               />
-              <FormInput
-                name="organization"
-                label="Organization Name"
-                required
-                errorobj={errors}
-              />
+              {organizations.unavailable ? (
+                // Text takes a fixed prop list and does not forward data-* or
+                // arbitrary attributes, so the test hook lives on the wrapper.
+                <div data-testid="organization-unavailable">
+                  <Text
+                    element="p"
+                    color="red"
+                    text="We could not load the list of organizations. Check your connection and reload the page."
+                  />
+                </div>
+              ) : (
+                <FormSelectAutoComplete
+                  name="organization"
+                  label="Organization"
+                  required
+                  options={organizations.options}
+                  errorobj={errors}
+                />
+              )}
               <FormInput
                 name="email"
                 label="Email Address"
