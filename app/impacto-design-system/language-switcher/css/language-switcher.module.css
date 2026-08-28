@@ -42,6 +42,8 @@
    blindness. aria-current carries the same fact to assistive tech. */
 .optionActive {
   color: var(--tk-dlite-semantic-color-text-primary);
+  /* TODO(dlite): the puente brand ships no typography weight token, only
+     font-family (body/heading/mono). Raw 600 until one exists. */
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 0.25em;

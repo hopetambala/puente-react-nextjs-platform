@@ -118,3 +118,36 @@ describe('Supported languages', () => {
     expect(onDisk.sort()).toEqual([...SUPPORTED_LOCALES].sort());
   });
 });
+
+// The review worksheet is how a native Creole speaker checks the strings
+// Claude wrote. It drifted stale within a single session — four keys were
+// added after it was generated, so a reviewer would have silently skipped
+// them, including one this repo authored. A worksheet that quietly omits rows
+// is worse than no worksheet, because it looks complete.
+describe('Translation review worksheet', () => {
+  it('covers every key in every namespace', () => {
+    const csv = fs.readFileSync(
+      path.join(__dirname, '..', '..', 'docs', 'i18n', 'review-worksheet.csv'),
+      'utf8',
+    );
+    // Column 2 is `key`; rows are quoted only where a value needs it, and the
+    // first two columns never do, so a prefix match is enough to enumerate.
+    const covered = new Set(
+      csv
+        .split('\n')
+        .slice(1)
+        .filter(Boolean)
+        .map((line) => line.split(',').slice(0, 2).join(':')),
+    );
+
+    const expected = [];
+    Object.keys(catalogs[defaultLocale]).forEach((namespace) => {
+      Object.keys(catalogs[defaultLocale][namespace]).forEach((key) => {
+        expected.push(`${namespace}:${key}`);
+      });
+    });
+
+    const uncovered = expected.filter((entry) => !covered.has(entry));
+    expect(uncovered).toEqual([]);
+  });
+});
