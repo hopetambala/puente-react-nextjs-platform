@@ -8,8 +8,11 @@ import styles from './index.module.css';
 export function levenshtein(a, b) {
   const m = a.length;
   const n = b.length;
-  const dp = Array.from({ length: m + 1 }, (_, i) =>
-    Array.from({ length: n + 1 }, (_, j) => (i === 0 ? j : (j === 0 ? i : 0))));
+  const dp = Array.from({ length: m + 1 }, () => Array.from({ length: n + 1 }, () => 0));
+  // Base cases: turning a string into the empty string costs one delete per
+  // character, so row 0 counts up the length of b and column 0 the length of a.
+  for (let i = 0; i <= m; i += 1) dp[i][0] = i;
+  for (let j = 0; j <= n; j += 1) dp[0][j] = j;
   for (let i = 1; i <= m; i += 1) {
     for (let j = 1; j <= n; j += 1) {
       dp[i][j] = a[i - 1] === b[j - 1]
@@ -120,9 +123,14 @@ export default function CommunityAudit({ org }) {
             // eslint-disable-next-line react/no-array-index-key
             <div key={gi} className={styles.group}>
               <div className={styles.variants}>
-                {group.map((name) => (
-                  <label key={name} className={styles.variant}>
+                {group.map((name, vi) => (
+                  <label
+                    key={name}
+                    className={styles.variant}
+                    htmlFor={`canonical-${gi}-${vi}`}
+                  >
                     <input
+                      id={`canonical-${gi}-${vi}`}
                       type="radio"
                       name={`canonical-${gi}`}
                       checked={(canonical[gi] || group[0]) === name}

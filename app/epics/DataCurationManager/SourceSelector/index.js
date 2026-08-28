@@ -11,6 +11,15 @@ const FIXED_SOURCES = [
   { value: 'vitals',       label: 'Vitals' },
 ];
 
+// Selected outranks focused: the keyboard/pointer focus ring moves between
+// options while the chosen one stays chosen, and it must keep reading as chosen
+// while that happens.
+function optionBackground(state) {
+  if (state.isSelected) return 'var(--tk-dlite-semantic-color-action-primary)';
+  if (state.isFocused) return 'var(--tk-dlite-semantic-color-surface-raised)';
+  return 'transparent';
+}
+
 const selectStyles = {
   container: (base) => ({ ...base, minWidth: 220, flex: 1 }),
   control: (base, state) => ({
@@ -42,7 +51,7 @@ const selectStyles = {
     ...base,
     fontSize: 13,
     fontFamily: 'var(--font-family)',
-    backgroundColor: state.isSelected ? 'var(--tk-dlite-semantic-color-action-primary)' : state.isFocused ? 'var(--tk-dlite-semantic-color-surface-raised)' : 'transparent',
+    backgroundColor: optionBackground(state),
     color: state.isSelected ? 'var(--tk-dlite-semantic-color-text-on-primary)' : 'var(--tk-dlite-semantic-color-text-primary)',
     cursor: 'pointer',
   }),

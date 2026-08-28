@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 jest.mock('react-beautiful-dnd', () => ({
   DragDropContext: ({ children }) => <>{children}</>,
@@ -29,7 +29,7 @@ const mockProvided = {
 };
 const mockItem = { id: 'item-1', fieldType: 'input', label: 'Test question' };
 
-function renderComponent() {
+function renderComponent(onSelectBlock = jest.fn()) {
   return render(
     <PaperInputPicker
       provided={mockProvided}
@@ -38,7 +38,7 @@ function renderComponent() {
       formItems={[mockItem]}
       setFormItems={jest.fn()}
       removeValue={jest.fn()}
-      onSelectBlock={jest.fn()}
+      onSelectBlock={onSelectBlock}
     />
   );
 }
@@ -69,5 +69,36 @@ describe('drag handle accessibility', () => {
   it('drag handle is a button so it is keyboard-focusable and correctly announced by assistive tech', () => {
     renderComponent();
     expect(screen.getByRole('button', { name: /drag to reorder/i })).toBeInTheDocument();
+  });
+});
+
+describe('block selection is reachable without a mouse', () => {
+  it('selects the block when keyboard focus enters it', () => {
+    const onSelectBlock = jest.fn();
+    renderComponent(onSelectBlock);
+
+    fireEvent.focusIn(screen.getByTestId('drag-handle'));
+
+    expect(onSelectBlock).toHaveBeenCalledWith(mockItem);
+  });
+
+  // Clicking a block's chrome selects it without moving focus, so the caret can
+  // still sit in a different block's input. Typing must re-select the block the
+  // caret is actually in, or the Inspector edits the wrong question.
+  it('selects the block when a key is pressed inside it', () => {
+    const onSelectBlock = jest.fn();
+    renderComponent(onSelectBlock);
+
+    fireEvent.keyDown(screen.getByTestId('drag-handle'), { key: 'a' });
+
+    expect(onSelectBlock).toHaveBeenCalledWith(mockItem);
+  });
+
+  // The wrapper only exists for drag-and-drop and card styling; its children
+  // carry the semantics. Marking it presentational is what makes the selection
+  // handlers legitimate instead of a static div with a click handler.
+  it('marks the block wrapper as presentational', () => {
+    const { container } = renderComponent();
+    expect(container.firstChild).toHaveAttribute('role', 'presentation');
   });
 });

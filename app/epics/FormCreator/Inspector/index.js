@@ -4,6 +4,39 @@ import PropTypes from 'prop-types';
 import { toFormikKey } from '../_utils';
 import styles from './index.module.css';
 
+function Toggle({
+  id, label, checked, onChange,
+}) {
+  return (
+    <div className={styles.toggle}>
+      <label className={styles.toggleLabel} htmlFor={id}>
+        {label}
+      </label>
+      <input
+        id={id}
+        type="checkbox"
+        className={styles.toggleCheckbox}
+        aria-label={label}
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+      />
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
+      <span
+        className={`${styles.switch} ${checked ? styles.switchOn : ''}`}
+        onClick={() => onChange(!checked)}
+        aria-hidden="true"
+      />
+    </div>
+  );
+}
+
+Toggle.propTypes = {
+  id: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  checked: PropTypes.bool.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
+
 function Inspector({ block, onChange, onClose }) {
   const { t } = useTranslation('common');
   if (!block) return null;
@@ -98,12 +131,14 @@ function Inspector({ block, onChange, onClose }) {
             <div className={styles.options}>
               {options.map((opt) => {
                 const isObj = typeof opt === 'object' && opt !== null;
-                const label = isObj ? opt.label : opt;
+                // Not `label`: that name is the block's own label, destructured
+                // above. This is the label of one choice within it.
+                const optionLabel = isObj ? opt.label : opt;
                 const key = isObj ? (opt.id ?? opt.label) : opt;
                 return (
                   <div key={key} className={styles.optionRow}>
                     <span className={styles.grip} aria-hidden="true">⋮⋮</span>
-                    <span>{label}</span>
+                    <span>{optionLabel}</span>
                   </div>
                 );
               })}
@@ -126,39 +161,6 @@ function Inspector({ block, onChange, onClose }) {
     </div>
   );
 }
-
-function Toggle({
-  id, label, checked, onChange,
-}) {
-  return (
-    <div className={styles.toggle}>
-      <label className={styles.toggleLabel} htmlFor={id}>
-        {label}
-      </label>
-      <input
-        id={id}
-        type="checkbox"
-        className={styles.toggleCheckbox}
-        aria-label={label}
-        checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-      />
-      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
-      <span
-        className={`${styles.switch} ${checked ? styles.switchOn : ''}`}
-        onClick={() => onChange(!checked)}
-        aria-hidden="true"
-      />
-    </div>
-  );
-}
-
-Toggle.propTypes = {
-  id: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  checked: PropTypes.bool.isRequired,
-  onChange: PropTypes.func.isRequired,
-};
 
 Inspector.defaultProps = {
   block: null,

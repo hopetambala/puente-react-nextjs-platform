@@ -3,6 +3,17 @@ import React from 'react';
 
 import styles from './css/cell.module.css';
 
+// Defined at module scope, not inside Cell. A component created during render
+// gets a fresh type on every render, so React tears the cell's DOM down and
+// rebuilds it each time instead of updating it. `isHeaderCell` is destructured
+// out so that it is not spread onto the th/td as a DOM attribute, matching what
+// the previous closure-captured version rendered.
+const CellElement = ({ isHeaderCell, children: kids, ...rest }) => (isHeaderCell ? (
+  <th {...rest}>
+    {kids}
+  </th>
+) : <td {...rest}>{kids}</td>);
+
 const Cell = ({
   children,
   className,
@@ -22,14 +33,9 @@ const Cell = ({
     ...style,
   };
 
-  const Element = ({ children: kids, ...rest }) => (isHeaderCell ? (
-    <th {...rest}>
-      {kids}
-    </th>
-  ) : <td {...rest}>{kids}</td>);
-
   return (
-    <Element
+    <CellElement
+      isHeaderCell={isHeaderCell}
       role="cell"
       className={containerClassName}
       style={cssStyles}
@@ -51,7 +57,7 @@ const Cell = ({
           {children}
         </div>
       )}
-    </Element>
+    </CellElement>
   );
 };
 

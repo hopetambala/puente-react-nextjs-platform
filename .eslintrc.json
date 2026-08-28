@@ -10,13 +10,61 @@
     "prettier"
   ],
   "parser": "@typescript-eslint/parser",
-  "plugins": ["react", "simple-import-sort", "@typescript-eslint"],
+  "plugins": [
+    "react",
+    "simple-import-sort",
+    "@typescript-eslint"
+  ],
   "rules": {
     "prefer-const": "error",
     "react/react-in-jsx-scope": "off",
     "react/jsx-filename-extension": "off",
     "react/jsx-props-no-spreading": "off",
     "simple-import-sort/imports": "error",
-    "simple-import-sort/exports": "error"
+    "simple-import-sort/exports": "error",
+    "react/prop-types": "warn",
+    "react/function-component-definition": "warn",
+    "react/jsx-no-bind": "warn",
+    "jsx-a11y/anchor-is-valid": [
+      "error",
+      {
+        "components": [
+          "Link"
+        ],
+        "specialLink": [
+          "hrefLeft",
+          "hrefRight"
+        ],
+        "aspects": [
+          "invalidHref",
+          "preferButton"
+        ]
+      }
+    ],
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "js": "never",
+        "jsx": "never",
+        "mjs": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+    ],
+    "react/require-default-props": "warn",
+    "react/jsx-no-useless-fragment": "warn",
+    "react/no-array-index-key": "warn",
+    "import/prefer-default-export": "warn",
+    "lines-between-class-members": "warn",
+    "max-classes-per-file": "warn",
+    "@typescript-eslint/no-explicit-any": "warn",
+    // The base no-shadow rule reports a false positive on every TypeScript
+    // `enum` (the enum's own name counts as shadowing itself). The
+    // @typescript-eslint version is TS-aware and still catches real shadowing
+    // in .js and .ts alike. Swap documented at
+    // https://typescript-eslint.io/rules/no-shadow
+    "no-shadow": "off",
+    "@typescript-eslint/no-shadow": "error"
   }
 }

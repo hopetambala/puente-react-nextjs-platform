@@ -19,8 +19,8 @@ export default function TopBar({ breadcrumb, topBarActions }) {
   const router = useRouter();
 
   useEffect(() => {
-    const user = retrieveCurrentUserAsyncFunction();
-    if (user) setUser(user);
+    const currentUser = retrieveCurrentUserAsyncFunction();
+    if (currentUser) setUser(currentUser);
   }, []);
 
   return (

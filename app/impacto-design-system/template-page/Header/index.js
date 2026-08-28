@@ -7,7 +7,7 @@ import FormatListBulletedIcon from '@material-ui/icons/FormatListBulletedOutline
 import PersonOutline from '@material-ui/icons/PersonOutline';
 import StoreIcon from '@material-ui/icons/Store';
 import { retrieveCurrentUserAsyncFunction, retrieveSignOutFunction } from 'app/modules/user';
-import clsx from 'clsx';
+import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
@@ -24,7 +24,7 @@ function NavItem({ icon: Icon, label, onClick, active, danger, open, classes }) 
     <div
       role="button"
       tabIndex={0}
-      className={clsx(classes.navItem, {
+      className={classNames(classes.navItem, {
         [classes.navItemActive]: active,
         [classes.dangerItem]: danger,
       })}
@@ -53,12 +53,12 @@ export default function Header({ children }) {
     <div className={classes.root}>
       <Drawer
         variant="permanent"
-        className={clsx(classes.drawer, {
+        className={classNames(classes.drawer, {
           [classes.drawerOpen]: open,
           [classes.drawerClose]: !open,
         })}
         classes={{
-          paper: clsx({
+          paper: classNames({
             [classes.drawerOpen]: open,
             [classes.drawerClose]: !open,
           }),

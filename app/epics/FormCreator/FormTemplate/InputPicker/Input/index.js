@@ -1,7 +1,7 @@
+import { toFormikKey } from 'app/epics/FormCreator/_utils';
 import { Button, Text } from 'app/impacto-design-system';
 import { useEffect, useState } from 'react';
 
-import { toFormikKey } from 'app/epics/FormCreator/_utils';
 import ActiveInput from '../Utils';
 import styles from './index.module.scss';
 

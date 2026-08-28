@@ -20,6 +20,10 @@
  * column names, but that happens downstream — both sides are unnormalised here,
  * so normalising would invent mismatches that do not exist in Parse.
  */
+// Named export to match its sibling helpers (coverage, syncState,
+// triageQueue), which all export named functions. A default here purely to
+// satisfy the linter would make this module the inconsistent one.
+// eslint-disable-next-line import/prefer-default-export
 export function detectFormDrift({ specs = [], results = [] } = {}) {
   const resultsBySpec = new Map();
   results.forEach((r) => {

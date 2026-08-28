@@ -12,7 +12,7 @@ const columns = [
     accessorFn: (row) => row.question_answer,
     id: 'question_answer',
     cell: (info) => info.getValue(),
-    header: function question_answer() {
+    header: function QuestionAnswerHeader() {
       return <span>Answer to Question</span>;
     },
   },
@@ -31,12 +31,17 @@ const DataAnalyticsManager = () => {
       },
     });
 
+    // snake_case because these are the Django ETL service's own field names,
+    // read straight off its response. Renaming them to satisfy the linter would
+    // break the read — the contract belongs to the Python service, not to us.
+    /* eslint-disable camelcase */
     const prunedData = serverData.map(
       ({ surveying_organization, question_answer }) => ({
         surveying_organization,
         question_answer,
       }),
     );
+    /* eslint-enable camelcase */
     setData(prunedData);
   };
 
