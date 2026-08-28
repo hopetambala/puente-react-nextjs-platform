@@ -21,7 +21,19 @@ export const FRESH_MAX_HOURS = 24;
 /** Under three days: worth noticing, not yet alarming. */
 export const AGING_MAX_HOURS = 72;
 
-export function summarizeSyncState({ lastSyncAt, recordsLast24h = 0, now = new Date() }) {
+export function summarizeSyncState({
+  lastSyncAvailable = true, lastSyncAt, recordsLast24h = 0, now = new Date(),
+}) {
+  // A failed or skipped read tells us nothing, so it must not be reported as
+  // 'never' — that key asserts the organization has genuinely never synced, a
+  // claim only an answered query can support. Defaults true so existing callers,
+  // which do ask and do get an answer, keep their meaning.
+  if (!lastSyncAvailable) {
+    return {
+      status: 'unknown', hoursSince: null, daysSince: null, recordsLast24h,
+    };
+  }
+
   if (!lastSyncAt) {
     return {
       status: 'never', hoursSince: null, daysSince: null, recordsLast24h,

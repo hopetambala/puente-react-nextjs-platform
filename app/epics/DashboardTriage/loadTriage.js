@@ -119,6 +119,9 @@ export async function loadDashboardTriage({ Parse, org, now = new Date() }) {
     accountsSynced,
     sync: {
       lastSyncAt: lastSyncRows && lastSyncRows[0] ? lastSyncRows[0].createdAt : null,
+      // A failed read also leaves lastSyncAt null, and an organization with no
+      // records yet must not be indistinguishable from one we could not read.
+      lastSyncAvailable: lastSyncRows !== null,
       recordsLast24h: recordsLast24h ?? 0,
     },
     signals: {

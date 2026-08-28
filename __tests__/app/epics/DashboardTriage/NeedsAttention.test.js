@@ -100,3 +100,22 @@ describe('when a check could not run', () => {
     expect(screen.getByTestId('triage-unavailable-note')).toBeInTheDocument();
   });
 });
+
+describe('when the organization has no records yet', () => {
+  it('tells a first-time organization records arrive by mobile sync, instead of an all-clear', () => {
+    render(<NeedsAttention rows={[]} recordState="none" loading={false} />);
+
+    expect(screen.getByTestId('triage-no-records')).toBeInTheDocument();
+    expect(screen.queryByTestId('triage-clear')).not.toBeInTheDocument();
+    expect(screen.getByText('triage_no_records')).toBeInTheDocument();
+    expect(screen.getByText('triage_no_records_sub')).toBeInTheDocument();
+  });
+
+  it('withholds both the all-clear and the no-records claim when it cannot tell which is true', () => {
+    render(<NeedsAttention rows={[]} recordState="unknown" unavailable={[]} loading={false} />);
+
+    expect(screen.getByTestId('triage-partial')).toBeInTheDocument();
+    expect(screen.queryByTestId('triage-clear')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('triage-no-records')).not.toBeInTheDocument();
+  });
+});

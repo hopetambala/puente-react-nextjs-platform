@@ -161,4 +161,20 @@ describe('loadDashboardTriage', () => {
       }).toEqual({ field, matchesAbsent: true, matchesEmptyString: true });
     });
   });
+
+  it('distinguishes a last-sync read that failed from one that found nothing', async () => {
+    // Both cases leave lastSyncAt null, so the page cannot tell "no records yet"
+    // apart from "we could not read". A separate flag says whether we KNOW.
+    const empty = await loadDashboardTriage({
+      Parse: makeParse().Parse, org: 'Puente', now: NOW,
+    });
+    const failed = await loadDashboardTriage({
+      Parse: makeParse({ failOn: 'SurveyData' }).Parse, org: 'Puente', now: NOW,
+    });
+
+    expect({
+      queryResolvedWithZeroRows: empty.sync.lastSyncAvailable,
+      queryRejected: failed.sync.lastSyncAvailable,
+    }).toEqual({ queryResolvedWithZeroRows: true, queryRejected: false });
+  });
 });

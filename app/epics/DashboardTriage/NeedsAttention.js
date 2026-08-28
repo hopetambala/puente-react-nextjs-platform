@@ -21,7 +21,9 @@ import styles from './NeedsAttention.module.css';
 
 const SEVERITY_VARIANT = { critical: 'red', high: 'orange', medium: 'yellow' };
 
-export default function NeedsAttention({ rows, unavailable, loading }) {
+export default function NeedsAttention({
+  rows, unavailable, recordState, loading,
+}) {
   const { t } = useTranslation('common');
 
   const note = unavailable.length > 0 && (
@@ -46,10 +48,32 @@ export default function NeedsAttention({ rows, unavailable, loading }) {
   }
 
   // An empty queue is a GOOD outcome on this screen — but only if every check
-  // actually ran. An all-clear that might be wrong is worse than no answer, so
-  // a failed check downgrades this to an explicit partial result.
+  // actually ran, and only if there were records to run them against. An
+  // all-clear that might be wrong is worse than no answer, so it is the LAST of
+  // three branches: each branch above it is a state that disqualifies the claim.
   if (rows.length === 0) {
-    if (unavailable.length > 0) {
+    // An organization that has definitively never synced has no records for
+    // those checks to have found anything in, so "no records yet" is the more
+    // useful, equally true thing to say. It outranks the partial result below
+    // because it stays true even when a check also failed — and the note still
+    // discloses that. Unlike the all-clear it never claims a check passed.
+    // Records are not entered here; they arrive from the Collect mobile app,
+    // which is why this names the app rather than offering a create action.
+    if (recordState === 'none') {
+      return (
+        <div data-testid="triage-no-records">
+          <EmptyState message={t('triage_no_records')} sub={t('triage_no_records_sub')} />
+          {note}
+        </div>
+      );
+    }
+    // Not knowing whether records exist disqualifies BOTH claims above: the
+    // all-clear would assert the checks found nothing in real data, and the
+    // no-records message would assert there is none. "Nothing found, but not
+    // everything could be checked" is the strongest honest reading of an empty
+    // queue we cannot fully account for, so an unknown record state lands here
+    // even when every check ran.
+    if (unavailable.length > 0 || recordState === 'unknown') {
       return (
         <div data-testid="triage-partial">
           <EmptyState message={t('triage_partial')} sub={t('triage_partial_sub')} />
@@ -97,7 +121,9 @@ export default function NeedsAttention({ rows, unavailable, loading }) {
   );
 }
 
-NeedsAttention.defaultProps = { rows: [], unavailable: [], loading: false };
+NeedsAttention.defaultProps = {
+  rows: [], unavailable: [], recordState: 'some', loading: false,
+};
 
 NeedsAttention.propTypes = {
   rows: PropTypes.arrayOf(PropTypes.shape({
@@ -110,5 +136,7 @@ NeedsAttention.propTypes = {
   })),
   /** Signal ids whose check could not run — see findUnavailableSignals. */
   unavailable: PropTypes.arrayOf(PropTypes.string),
+  /** Whether the organization has any records at all to check. */
+  recordState: PropTypes.oneOf(['some', 'none', 'unknown']),
   loading: PropTypes.bool,
 };

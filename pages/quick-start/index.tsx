@@ -23,7 +23,7 @@ type Signal = { count: number; exact: boolean } | null;
 
 type TriageData = {
   accountsSynced: { count: number; exact: boolean };
-  sync: { lastSyncAt: Date | null; recordsLast24h: number };
+  sync: { lastSyncAt: Date | null; lastSyncAvailable: boolean; recordsLast24h: number };
   signals: {
     missingKeyFields: Signal;
     unresolvedParent: Signal;
@@ -31,6 +31,24 @@ type TriageData = {
     possibleFormDrift: Signal;
   };
   coverage: { records: { community: string; syncedAt: Date }[]; sampleSize: number };
+};
+
+/**
+ * How the sync answer decides whether the organization has records to check.
+ * Only these two statuses say anything about that; every other status describes
+ * a sync that happened, which means records exist, so anything absent from this
+ * map means 'some'.
+ *
+ * 'never' means the last-sync read RAN and found nothing, so there is no data
+ * for the checks to have cleared. 'unknown' means that read FAILED, which
+ * leaves us unable to tell an empty organization from a clean one; our own
+ * broken request is not evidence about their fieldwork either way, so the page
+ * forwards that uncertainty to the queue rather than resolving it — collapsing
+ * it into 'some' would quietly license the all-clear.
+ */
+const RECORD_STATE_BY_SYNC_STATUS: Record<string, 'none' | 'unknown'> = {
+  never: 'none',
+  unknown: 'unknown',
 };
 
 /**
@@ -81,6 +99,9 @@ export default function Dashboard() {
   const coverage = data
     ? summarizeCoverage({ ...data.coverage, now: new Date() })
     : null;
+  // Read off the same sync answer the ribbon uses, so the queue and the ribbon
+  // cannot disagree about whether this organization has ever synced.
+  const recordState = (syncState && RECORD_STATE_BY_SYNC_STATUS[syncState.status]) || 'some';
 
   return (
     <AppShell breadcrumb={['Dashboard']}>
@@ -89,7 +110,12 @@ export default function Dashboard() {
       <div className={styles.body}>
         <section className={styles.queue}>
           <h2 className={styles.panelTitle}>{t('dashboard_needs_attention')}</h2>
-          <NeedsAttention rows={queue} unavailable={unavailable} loading={loading} />
+          <NeedsAttention
+            rows={queue}
+            unavailable={unavailable}
+            recordState={recordState}
+            loading={loading}
+          />
         </section>
 
         <aside className={styles.rail}>

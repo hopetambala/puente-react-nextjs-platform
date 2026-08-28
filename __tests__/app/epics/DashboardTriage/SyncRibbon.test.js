@@ -52,6 +52,22 @@ describe('SyncRibbon', () => {
     expect(screen.getByTestId('sync-ribbon')).toHaveTextContent(/sync_ribbon_status_never/);
   });
 
+  it('reports an unreadable sync state without claiming nothing has synced', () => {
+    render(<SyncRibbon state={state({
+      status: 'unknown', hoursSince: null, daysSince: null, recordsLast24h: 0,
+    })}
+    loading={false}
+    />);
+
+    const ribbon = screen.getByTestId('sync-ribbon');
+    // Say the sync time is unreadable...
+    expect(ribbon).toHaveTextContent(/sync_ribbon_status_unknown/);
+    // ...without claiming this organization has never synced anything...
+    expect(ribbon).not.toHaveTextContent(/sync_ribbon_status_never/);
+    // ...and without stating a recency for the time it could not read.
+    expect(ribbon).not.toHaveTextContent(/sync_ribbon_(hours|days)_ago/);
+  });
+
   it('renders a placeholder while loading instead of a zero', () => {
     render(<SyncRibbon state={null} loading />);
 

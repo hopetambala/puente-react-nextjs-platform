@@ -215,4 +215,57 @@ describe('Empty and failure states', () => {
     await waitFor(() => expect(mockLoad).toHaveBeenCalled());
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
   });
+
+  it('tells a brand-new organization where records come from, instead of an all-clear', async () => {
+    // Never synced: the reads RAN (lastSyncAvailable) and genuinely found
+    // nothing, so every check returns an exact zero. Reporting that as "every
+    // record passed the quality checks" is a quality verdict on an empty
+    // database — and it is the first thing a new user sees.
+    mockLoad.mockResolvedValue(payload({
+      sync: { lastSyncAt: null, lastSyncAvailable: true, recordsLast24h: 0 },
+      signals: {
+        missingKeyFields: { count: 0, exact: true },
+        unresolvedParent: { count: 0, exact: true },
+        possibleDuplicates: { count: 0, exact: false },
+        possibleFormDrift: { count: 0, exact: false },
+      },
+      coverage: { records: [], sampleSize: 1000 },
+    }));
+    render(<Dashboard />);
+
+    expect(await screen.findByTestId('triage-no-records')).toBeInTheDocument();
+    expect(screen.queryByTestId('triage-clear')).not.toBeInTheDocument();
+    // Records are not entered in this web app, so the onboarding copy has to
+    // ship in the locale — a raw key here strands a first-time user.
+    expect(document.body.textContent).not.toMatch(/MISSING:/);
+  });
+
+  it('does not turn a failed freshness read into a claim about the organization', async () => {
+    // The freshness read FAILED (network, permissions) while every quality
+    // check ran and returned an exact zero. A failed request tells us nothing
+    // about this organization's fieldwork, so the screen must not spend it on
+    // any claim about their data.
+    mockLoad.mockResolvedValue(payload({
+      sync: { lastSyncAt: null, lastSyncAvailable: false, recordsLast24h: 0 },
+      signals: {
+        missingKeyFields: { count: 0, exact: true },
+        unresolvedParent: { count: 0, exact: true },
+        possibleDuplicates: { count: 0, exact: false },
+        possibleFormDrift: { count: 0, exact: false },
+      },
+      coverage: { records: [], sampleSize: 1000 },
+    }));
+    render(<Dashboard />);
+
+    // Nothing found, but the screen cannot account for everything.
+    expect(await screen.findByTestId('triage-partial')).toBeInTheDocument();
+    expect(screen.queryByTestId('triage-clear')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('triage-no-records')).not.toBeInTheDocument();
+
+    // "Nothing has synced yet" asserts the organization has never collected
+    // anything — our own failed read must never be reported as their fieldwork.
+    expect(screen.getByTestId('sync-ribbon')).not.toHaveTextContent(/Nothing has synced yet/);
+
+    expect(document.body.textContent).not.toMatch(/MISSING:/);
+  });
 });
