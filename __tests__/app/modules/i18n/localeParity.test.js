@@ -138,3 +138,57 @@ describe('checkLocaleParity — unexpected keys', () => {
     expect(report.unexpected).toEqual([]);
   });
 });
+
+describe('checkLocaleParity — nested catalogs', () => {
+  // next-i18next supports nested JSON, and Collect's catalogs are nested.
+  // Manage's are flat today, so comparing only top-level keys happens to work
+  // — but it fails OPEN: a nested child could vanish and the gate would call
+  // the locale complete. A gate that under-checks silently is worse than no
+  // gate, because the green build is taken as proof.
+  it('reports a missing nested key by its dotted path', () => {
+    const report = checkLocaleParity({
+      defaultLocale: 'eng',
+      locales: ['eng', 'spa'],
+      catalogs: {
+        eng: { common: { nav: { home: 'Home', away: 'Away' } } },
+        spa: { common: { nav: { home: 'Inicio' } } },
+      },
+    });
+
+    expect(report.missing).toEqual([
+      { locale: 'spa', namespace: 'common', key: 'nav.away' },
+    ]);
+  });
+
+  it('checks placeholders inside nested values', () => {
+    const report = checkLocaleParity({
+      defaultLocale: 'eng',
+      locales: ['eng', 'spa'],
+      catalogs: {
+        eng: { common: { stats: { synced: '{{count}} synced' } } },
+        spa: { common: { stats: { synced: 'sincronizados' } } },
+      },
+    });
+
+    expect(report.placeholders).toEqual([
+      {
+        locale: 'spa', namespace: 'common', key: 'stats.synced', expected: ['count'], actual: [],
+      },
+    ]);
+  });
+
+  it('reports an unexpected nested key by its dotted path', () => {
+    const report = checkLocaleParity({
+      defaultLocale: 'eng',
+      locales: ['eng', 'spa'],
+      catalogs: {
+        eng: { common: { nav: { home: 'Home' } } },
+        spa: { common: { nav: { home: 'Inicio', legacy: 'viejo' } } },
+      },
+    });
+
+    expect(report.unexpected).toEqual([
+      { locale: 'spa', namespace: 'common', key: 'nav.legacy' },
+    ]);
+  });
+});
