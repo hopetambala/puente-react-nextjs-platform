@@ -46,11 +46,12 @@ const Text = ({
     </Tag>
   );
 
-  // DefaultMessage is an empty string so that in the chance that an object is
-  // passed without an `id`, the app does not crash, which is react-intl's default behavior:
-  // https://github.com/formatjs/formatjs/issues/1108
+  // This branch once rendered react-intl's <FormattedMessage>, which took a
+  // `defaultMessage` prop. react-intl is no longer a dependency of this project
+  // and the wrapper is a plain <div>, so `defaultMessage` was an invalid DOM
+  // attribute that nothing read; it has been dropped.
   const formattedMessage = (
-    <div defaultMessage="" {...text}>
+    <div {...text}>
       {(...content) => (
         <Tag className={classname} title={hoverText}>
           {content}

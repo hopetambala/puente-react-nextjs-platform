@@ -21,9 +21,10 @@
     "export": "next build && next export",
     "reinstall": "rm yarn.lock && rm -rf node_modules/ && yarn install",
     "release": "standard-version",
-    "lint": "next lint --fix",
+    "lint": "next lint",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "lint:fix": "next lint --fix"
   },
   "dependencies": {
     "@apollo/client": "^3.3.17",
@@ -49,6 +50,7 @@
     "parse": "^3.0.0",
     "pg": "^8.11.1",
     "pg-hstore": "^2.3.4",
+    "prop-types": "^15.8.1",
     "react": "17",
     "react-anchor-link-smooth-scroll": "^1.0.12",
     "react-beautiful-dnd": "^13.0.0",

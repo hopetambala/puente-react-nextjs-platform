@@ -1,8 +1,7 @@
+import { Badge, EmptyState, Spinner } from 'app/impacto-design-system';
 import Parse from 'parse';
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
-
-import { Badge, EmptyState, Spinner } from 'app/impacto-design-system';
 
 import styles from './index.module.css';
 

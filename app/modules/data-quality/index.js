@@ -81,3 +81,110 @@ export function detectDuplicates(records) {
   });
   return dups;
 }
+
+/**
+ * The Parse class a curation source reads from.
+ *
+ * Lives here rather than in the curation epic so the completeness scoring
+ * below — and the epic's queries — resolve a source the one way. Unrecognised
+ * sources fall back to SurveyData deliberately: it is the class that carries
+ * its own person fields, so a row from it is still readable.
+ */
+export function resolveParseClass(source) {
+  if (source === 'survey-data') return 'SurveyData';
+  if (source === 'eval-medical') return 'EvaluationMedical';
+  if (source === 'vitals') return 'Vitals';
+  if (source === 'env-health') return 'HistoryEnvironmentalHealth';
+  if (source.startsWith('form-results:')) return 'FormResults';
+  return 'SurveyData';
+}
+
+/**
+ * Whether this source's class stores only its own data and reaches the person
+ * through a `client` pointer.
+ *
+ * Derived from resolveParseClass so the query's include() and RecordsTable's
+ * person/community reads cannot drift apart — including for an unrecognised
+ * source, which resolveParseClass sends to SurveyData and which therefore
+ * genuinely carries its own person fields.
+ */
+export function sourceHasClientPointer(source) {
+  return resolveParseClass(source) !== 'SurveyData';
+}
+
+/**
+ * Completeness — the per-source "how much of this record was actually filled
+ * in" score, and the anomaly flag derived from it.
+ *
+ * The clinical extension classes share none of SurveyData's identity fields —
+ * they reach the person through a `client` pointer. Each is scored against the
+ * readings a surveyor is expected to record, deliberately excluding metadata
+ * (surveyingUser, surveyingOrganization, client, createdAt): a well-attributed
+ * record with no readings is not a complete one. Which fields count as required
+ * is a domain call — adjust these lists rather than adding metadata back.
+ */
+const SOURCE_COMPLETENESS_FIELDS = {
+  'survey-data': SURVEY_COMPLETENESS_FIELDS,
+  vitals: ['bloodPressure', 'pulse', 'temp', 'weight', 'height', 'respRate'],
+  'eval-medical': ['AssessmentandEvaluation', 'part_of_body', 'duration', 'condition_progression', 'planOfAction'],
+  'env-health': ['houseMaterial', 'waterAccess', 'bathroomAccess', 'electricityAccess', 'foodSecurity', 'latrineAccess'],
+};
+
+function completenessFieldsForSource(source) {
+  return SOURCE_COMPLETENESS_FIELDS[source] || SURVEY_COMPLETENESS_FIELDS;
+}
+
+function computeCompletenessForSource(record, source) {
+  const fields = completenessFieldsForSource(source);
+  const filled = fields.filter((f) => {
+    const v = record.get(f);
+    return v !== null && v !== undefined && v !== '';
+  });
+  return Math.round((filled.length / fields.length) * 100);
+}
+
+export function computeSurveyCompleteness(record) {
+  return computeCompletenessForSource(record, 'survey-data');
+}
+
+// Legacy export name, kept so importers written against it keep resolving.
+export const computeCompleteness = computeSurveyCompleteness;
+
+const FORM_RESULT_META_FIELDS = ['surveyingUser', 'surveyingOrganization', 'client', 'createdAt'];
+
+export function computeFormResultsCompleteness(record, formDefinition) {
+  const answered = new Set((record.get('fields') || []).map((f) => f.title));
+  const expected = (formDefinition?.get('fields') || []).map((f) => f.formikKey).filter(Boolean);
+  const metaScore = FORM_RESULT_META_FIELDS.filter((f) => !!(f === 'createdAt' ? (record.createdAt || record.get(f)) : record.get(f))).length / FORM_RESULT_META_FIELDS.length;
+  const fieldScore = expected.length > 0
+    ? expected.filter((k) => answered.has(k)).length / expected.length
+    : 1;
+  return {
+    meta: Math.round(metaScore * 100),
+    fields: Math.round(fieldScore * 100),
+    overall: Math.round((metaScore * 0.3 + fieldScore * 0.7) * 100),
+  };
+}
+
+/**
+ * Scores one record with the metric its own source has.
+ *
+ * Custom forms carry their own (30% metadata + 70% answered-vs-expected); every
+ * other source is scored against its class's field list. Routing every
+ * completeness read through here keeps the summary bar, the anomaly flags, the
+ * completeness filter and the per-row bar from disagreeing with each other.
+ */
+export function scoreRecord(record, source, formDefinition) {
+  if (source.startsWith('form-results:')) {
+    return computeFormResultsCompleteness(record, formDefinition).overall;
+  }
+  return computeCompletenessForSource(record, source);
+}
+
+export function flagAnomalies(records, source = 'survey-data', formDefinition = null) {
+  const anomalies = new Set();
+  records.forEach((r) => {
+    if (scoreRecord(r, source, formDefinition) < 60) anomalies.add(r.id);
+  });
+  return anomalies;
+}

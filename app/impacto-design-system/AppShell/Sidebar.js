@@ -1,7 +1,7 @@
 import { retrieveSignOutFunction } from 'app/modules/user';
-import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'next-i18next';
 import PropTypes from 'prop-types';
 
 import styles from './AppShell.module.css';

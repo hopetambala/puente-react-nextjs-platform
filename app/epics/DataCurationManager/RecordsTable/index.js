@@ -1,6 +1,8 @@
 import { Badge, Button, Skeleton } from 'app/impacto-design-system';
+// Straight from the shared module, not from the parent epic: the epic imports
+// this table, so reaching back into it for these would be an import cycle.
+import { computeFormResultsCompleteness, scoreRecord, sourceHasClientPointer } from 'app/modules/data-quality';
 
-import { computeFormResultsCompleteness, scoreRecord, sourceHasClientPointer } from '../index';
 import styles from './index.module.css';
 
 const PAGE_SIZE = 50;
@@ -94,6 +96,11 @@ export default function RecordsTable({
             // eslint-disable-next-line react/no-array-index-key
             [0, 1, 2, 3, 4].map((i) => (
               <tr key={i}>
+                {/* A `td` is labelled by its column header, which the rule cannot
+                    resolve statically; it also treats every `td` as interactive.
+                    The cell holds a loading placeholder, so there is no label to
+                    add. */}
+                {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
                 <td colSpan={isFormResults ? 6 : 6}>
                   <Skeleton width="100%" height={16} />
                 </td>
@@ -109,10 +116,16 @@ export default function RecordsTable({
               {isFormResults ? (
                 <FormResultsCompleteness record={r} formDefinition={formDefinition} />
               ) : (
+                // The score is announced by CompletenessBar's own aria-label,
+                // which the rule cannot see across the component boundary.
+                // eslint-disable-next-line jsx-a11y/control-has-associated-label
                 <td className={styles.completenessCell}>
                   <CompletenessBar pct={scoreRecord(r, source, formDefinition)} />
                 </td>
               )}
+              {/* Flags are announced by the chips themselves; the rule cannot
+                  see labels across the component boundary. */}
+              {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
               <td onClick={(e) => e.stopPropagation()}>
                 <FlagChips
                   isDup={dups.has(r.id)}

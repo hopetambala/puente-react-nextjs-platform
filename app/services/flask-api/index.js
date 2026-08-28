@@ -1,4 +1,4 @@
-const fetchData = async (path) => await fetch(`${process.env.NEXT_PUBLIC_PUENTE_DATA_EXPORTER_API_URL}${path}`, {
+const fetchData = async (path) => fetch(`${process.env.NEXT_PUBLIC_PUENTE_DATA_EXPORTER_API_URL}${path}`, {
   method: 'GET',
   headers: {
     Accept: 'application/json',

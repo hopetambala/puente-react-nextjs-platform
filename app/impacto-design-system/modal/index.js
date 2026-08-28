@@ -1,9 +1,14 @@
 import MaterialModal from '@material-ui/core/Modal';
 import { makeStyles } from '@material-ui/core/styles';
-import {
-  Button, Card, Stack, Text,
-} from 'app/impacto-design-system';
 import { useState } from 'react';
+
+// Imported from the concrete modules, not the barrel: Modal is itself exported
+// from app/impacto-design-system, so importing the barrel here made the package
+// index depend on itself.
+import Button from '../button';
+import Card from '../card';
+import Stack from '../stack';
+import Text from '../text';
 
 function rand() {
   return Math.round(Math.random() * 20) - 10;

@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+
 import styles from './empty-state.module.css';
 
 export default function EmptyState({ message, sub }) {

@@ -31,31 +31,41 @@ const FormMarketplace = ({ context, router }) => {
     router.push(href);
   };
 
-  return (
-    <div className={styles.formMarketplace}>
-      {loading ? (
+  // Three mutually exclusive states — loading, empty, populated — as early
+  // returns rather than ternaries nested inside the JSX.
+  const renderContent = () => {
+    if (loading) {
+      return (
         <div className={styles.loadingState}>
           <Spinner />
         </div>
-      ) : formSpecs.length > 0 ? (
-        <div className={styles.cards}>
-          {formSpecs.map((form) => (
-            <CardAlt
-              key={form.objectId}
-              title={form.name}
-              description={form.description}
-              actions={[
-                {
-                  text: 'Duplicate',
-                  action: () => passDataToFormCreator('duplicate', form),
-                },
-              ]}
-            />
-          ))}
-        </div>
-      ) : (
-        <EmptyState message="No forms available yet." />
-      )}
+      );
+    }
+    if (formSpecs.length === 0) {
+      return <EmptyState message="No forms available yet." />;
+    }
+    return (
+      <div className={styles.cards}>
+        {formSpecs.map((form) => (
+          <CardAlt
+            key={form.objectId}
+            title={form.name}
+            description={form.description}
+            actions={[
+              {
+                text: 'Duplicate',
+                action: () => passDataToFormCreator('duplicate', form),
+              },
+            ]}
+          />
+        ))}
+      </div>
+    );
+  };
+
+  return (
+    <div className={styles.formMarketplace}>
+      {renderContent()}
     </div>
   );
 };
