@@ -1,0 +1,72 @@
+/**
+ * Resolving an organization reference to a canonical `Organization`.
+ *
+ * See docs/billing-and-invoicing.md §3.
+ */
+
+/**
+ * Folds an organization string to its comparison form: case-insensitive and
+ * whitespace-trimmed. Non-strings become `null`, so an absent organization can
+ * never collide with an empty-string alias.
+ *
+ * Exported because three callers must agree on what "the same organization
+ * name" means: this resolver, the admin surface checking a new alias for a
+ * collision before saving, and the §6 backfill. If any of them normalized
+ * differently they would disagree about which records belong to whom.
+ */
+export function normalizeOrganizationName(value) {
+  return typeof value === 'string' ? value.trim().toLowerCase() : null;
+}
+
+/**
+ * Resolves an organization reference to a canonical `Organization`.
+ *
+ * Takes `{ pointer, name }` explicitly rather than reading a record, because
+ * `organization` is a POINTER on record classes but a STRING on `_User` —
+ * sniffing the shape would silently mis-read one of them.
+ *
+ * The pointer is canonical when present. The name is the organization string as
+ * collected in the field, matched case-insensitively through `aliases` — which
+ * is the fix for the live bug in §2, where a user whose organization is
+ * "puente" matches no records saying "Puente" and sees an empty app with no
+ * error.
+ *
+ * Returns `{ status: 'resolved', organization }` or `{ status: 'unresolved',
+ * value }`. Never falls back to a "closest" organization: an unresolved record
+ * is recoverable, a misattributed one is not.
+ *
+ * @throws {Error} when two organizations claim the same alias. Callers on a
+ *   write path must catch this: a collision is an ops problem and must never
+ *   reject work collected in the field.
+ */
+export function resolveOrganization({ pointer, name } = {}, organizations = []) {
+  // A raw Parse pointer carries `objectId`; a hydrated Parse.Object carries
+  // `id`. Reading only one silently ignores the other and falls through to
+  // string matching, which is the silent mis-resolution this module exists to
+  // prevent — so accept both.
+  const pointerId = pointer && (pointer.objectId || pointer.id);
+  if (pointerId) {
+    const byPointer = organizations.find((o) => o.objectId === pointerId);
+    if (byPointer) return { status: 'resolved', organization: byPointer };
+  }
+
+  const wanted = normalizeOrganizationName(name);
+  const matches = wanted === null ? [] : organizations.filter(
+    (o) => (o.aliases || []).some((alias) => normalizeOrganizationName(alias) === wanted),
+  );
+
+  // Two organizations claiming one alias misroutes records AND money, and a
+  // wrong pointer is indistinguishable from a right one. Refuse rather than
+  // pick. See docs/billing-and-invoicing.md §13 assumption 7.
+  if (matches.length > 1) {
+    const claimants = matches.map((o) => o.shortCode).join(', ');
+    throw new Error(
+      `Ambiguous organization alias "${name}": claimed by ${claimants}. `
+      + 'Aliases must be unique across organizations.',
+    );
+  }
+
+  if (matches.length === 1) return { status: 'resolved', organization: matches[0] };
+
+  return { status: 'unresolved', value: name ?? null };
+}
