@@ -67,6 +67,32 @@ describe('resolveOrganization', () => {
     expect(result.organization.shortCode).toBe('wof');
   });
 
+  it('folds Spanish accents, so "Asociación" and "Asociacion" are one organization', () => {
+    // Production audit 2026-08-28: 524 records say
+    // 'Asociacion para el impacto de desarrollo comunitario' and 31 say
+    // 'Asociación…'. One character splits 555 records across two organizations.
+    //
+    // The Flask exporter already strips accents before writing CSV headers
+    // (replace_spanish_characters: á→a, é→e, í→i, ó→o, ú→u, ñ→n, ü→u), so a
+    // resolver that does NOT fold them disagrees with the export pipeline about
+    // which records belong to whom.
+    const ASOC = org('asoc', ['Asociacion para el impacto de desarrollo comunitario']);
+
+    const accented = resolveOrganization(
+      { name: 'Asociación para el impacto de desarrollo comunitario' }, [ASOC],
+    );
+
+    expect(accented.status).toBe('resolved');
+    expect(accented.organization.shortCode).toBe('asoc');
+  });
+
+  it('folds every accent the exporter strips, including ñ and ü', () => {
+    const N = org('enye', ['Fundacion Nunez Munoz']);
+
+    expect(resolveOrganization({ name: 'Fundación Núñez Muñoz' }, [N]).status).toBe('resolved');
+    expect(normalizeOrganizationName('ÁÉÍÓÚÑÜ')).toBe('aeiounu');
+  });
+
   // ─── Guards ────────────────────────────────────────────────────────────────
   // These pin properties the implementation already has. They are regression
   // guards, not drivers — each passed on first run.

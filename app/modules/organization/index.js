@@ -5,9 +5,25 @@
  */
 
 /**
- * Folds an organization string to its comparison form: case-insensitive and
- * whitespace-trimmed. Non-strings become `null`, so an absent organization can
- * never collide with an empty-string alias.
+ * Folds an organization string to its comparison form: accent-, case- and
+ * whitespace-insensitive. Non-strings become `null`, so an absent organization
+ * can never collide with an empty-string alias.
+ *
+ * Accents are folded because organization names here are frequently Spanish and
+ * are typed both ways. The 2026-08-28 production audit found 524 records under
+ * 'Asociacion para el impacto de desarrollo comunitario' and 31 under
+ * 'Asociación…' — one character splitting 555 records across what would
+ * otherwise be two organizations.
+ *
+ * It also keeps us consistent with the export pipeline, which already strips
+ * accents before writing CSV headers (`replace_spanish_characters` in
+ * puente-flask-rest-aggregator: á→a, é→e, í→i, ó→o, ú→u, ñ→n, ü→u). A resolver
+ * that did not fold them would disagree with the exporter about which records
+ * belong to whom.
+ *
+ * NFD decomposition plus combining-mark removal covers those and every other
+ * diacritic, rather than a hand-maintained character map that silently misses
+ * whatever was not listed.
  *
  * Exported because three callers must agree on what "the same organization
  * name" means: this resolver, the admin surface checking a new alias for a
@@ -15,7 +31,12 @@
  * differently they would disagree about which records belong to whom.
  */
 export function normalizeOrganizationName(value) {
-  return typeof value === 'string' ? value.trim().toLowerCase() : null;
+  if (typeof value !== 'string') return null;
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase();
 }
 
 /**
