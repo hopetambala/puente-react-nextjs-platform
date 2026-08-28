@@ -1,3 +1,4 @@
+import { nextFormikKey } from 'app/epics/FormCreator/_utils';
 import { Button } from 'app/impacto-design-system';
 import { useEffect, useState } from 'react';
 
@@ -31,7 +32,7 @@ const Loop = (props) => {
     newArray[elementsIndex] = {
       ...newArray[elementsIndex],
       label: value,
-      formikKey: value.replace(/[`~!@#$%^&*()+=|}[{'";:?.>,<\\|\]/]+|_/g, ''),
+      formikKey: nextFormikKey(newArray[elementsIndex].formikKey, newArray[elementsIndex].label, value),
     };
 
     setFormItems(newArray);

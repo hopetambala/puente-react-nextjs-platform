@@ -1,4 +1,4 @@
-import { toFormikKey } from 'app/epics/FormCreator/_utils';
+import { nextFormikKey, toFormikKey } from 'app/epics/FormCreator/_utils';
 import { Button, Stack } from 'app/impacto-design-system';
 import React, { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
@@ -43,26 +43,29 @@ const Select = (props) => {
 
   const setValue = async (event) => {
     const { value, id } = event.target;
-    const formikKey = toFormikKey(value);
 
     const elementsIndex = formItems.findIndex((element) => element.id === id);
     const newArray = [...formItems];
+    const current = newArray[elementsIndex];
+    const formikKey = nextFormikKey(current.formikKey, current.label, value);
 
     const newOptions = [...options];
     let updatedOptions = [];
 
-    // handle change to textKey from formikKey perspective
+    // Rewrite option textKeys only when the question key actually changes.
+    // Frozen keys (converted geolocation blocks, migrated labels) must keep
+    // the historical __key__option titles already stored on FormResults.
     newOptions.forEach((option) => {
-      const newOption = option;
+      const newOption = { ...option };
       const splitTextKey = option.textKey.split('__');
-      if (splitTextKey.length === 3) {
+      if (formikKey !== current.formikKey && splitTextKey.length === 3) {
         newOption.textKey = `__${formikKey}__${splitTextKey[2]}`;
       }
       updatedOptions = updatedOptions.concat(newOption);
     });
 
     newArray[elementsIndex] = {
-      ...newArray[elementsIndex],
+      ...current,
       label: value,
       formikKey,
       options: updatedOptions,

@@ -1,7 +1,7 @@
 import { useTranslation } from 'next-i18next';
 import PropTypes from 'prop-types';
 
-import { toFormikKey } from '../_utils';
+import { nextFormikKey } from '../_utils';
 import styles from './index.module.css';
 
 function Toggle({
@@ -83,7 +83,13 @@ function Inspector({ block, onChange, onClose }) {
             value={label}
             onChange={(e) => {
               const newLabel = e.target.value;
-              update({ label: newLabel, formikKey: toFormikKey(newLabel) });
+              // Never overwrite a key that already exists — Inspector is the
+              // edit path, not creation. Recalculating here splits historical
+              // FormResults from new submits across two CSV columns.
+              update({
+                label: newLabel,
+                formikKey: formikKey || nextFormikKey('', '', newLabel),
+              });
             }}
           />
         </div>

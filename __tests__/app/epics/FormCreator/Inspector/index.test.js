@@ -200,10 +200,43 @@ describe('Inspector — null block', () => {
   });
 });
 
-// ─── RED: label edit recalculates formikKey ───────────────────────────────────
+// ─── Label edit must not rewrite a frozen formikKey ───────────────────────────
+// Collect stores FormResults.fields[].title from formikKey at submit time.
+// Inspector used to call toFormikKey(newLabel) on every rename. After a
+// converted geolocation block was relabeled, export pivoted on title → two
+// CSV columns for one question, and last month looked empty on the old
+// header. Recalculating the key here is that bug. Keep it inverted.
 
-describe('label edit recalculates formikKey', () => {
-  it('calls onChange with both label and a freshly-stripped formikKey when the label input changes', () => {
+describe('label edit does not recalculate an existing formikKey', () => {
+  it('keeps a converted geolocation formikKey when the question is renamed', () => {
+    const mockOnChange = jest.fn();
+    const block = {
+      id: 'b58b0000-0000-4000-8000-000000000001',
+      fieldType: 'select',
+      label: 'Continue in the program?',
+      formikKey: 'geolocation_b58b',
+      required: false,
+      allowOther: false,
+      multiSelect: false,
+      options: ['Yes', 'No'],
+    };
+    render(<Inspector block={block} onChange={mockOnChange} onClose={jest.fn()} />);
+
+    fireEvent.change(screen.getByLabelText('Label'), {
+      target: { value: 'Keep going?' },
+    });
+
+    // toFormikKey('Keep going?') === 'Keep going'. If Inspector starts
+    // recalculating again, this assertion is the tripwire.
+    expect(mockOnChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        label: 'Keep going?',
+        formikKey: 'geolocation_b58b',
+      }),
+    );
+  });
+
+  it('keeps the existing formikKey when the label input changes', () => {
     const mockOnChange = jest.fn();
     const block = {
       id: 'b1',
@@ -219,6 +252,30 @@ describe('label edit recalculates formikKey', () => {
 
     const labelInput = screen.getByLabelText('Label');
     fireEvent.change(labelInput, { target: { value: 'New label!' } });
+
+    expect(mockOnChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        label: 'New label!',
+        formikKey: 'oldlabel',
+      }),
+    );
+  });
+
+  it('derives a formikKey only when the block does not already have one', () => {
+    const mockOnChange = jest.fn();
+    const block = {
+      id: 'b1',
+      fieldType: 'input',
+      label: '',
+      formikKey: '',
+      required: false,
+      allowOther: false,
+      multiSelect: false,
+      options: [],
+    };
+    render(<Inspector block={block} onChange={mockOnChange} onClose={jest.fn()} />);
+
+    fireEvent.change(screen.getByLabelText('Label'), { target: { value: 'New label!' } });
 
     expect(mockOnChange).toHaveBeenCalledWith(
       expect.objectContaining({

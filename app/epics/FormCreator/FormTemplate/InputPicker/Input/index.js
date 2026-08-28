@@ -1,4 +1,4 @@
-import { toFormikKey } from 'app/epics/FormCreator/_utils';
+import { nextFormikKey } from 'app/epics/FormCreator/_utils';
 import { Button, Text } from 'app/impacto-design-system';
 import { useEffect, useState } from 'react';
 
@@ -34,7 +34,7 @@ const Input = (props) => {
       newArray[elementsIndex] = {
         ...newArray[elementsIndex],
         label: value,
-        formikKey: toFormikKey(value),
+        formikKey: nextFormikKey(newArray[elementsIndex].formikKey, newArray[elementsIndex].label, value),
       };
     } else {
       newArray[elementsIndex] = {

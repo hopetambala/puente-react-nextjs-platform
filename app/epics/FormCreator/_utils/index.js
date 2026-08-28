@@ -10,6 +10,24 @@ import styles from '../index.module.scss';
  */
 const toFormikKey = (label) => label.replace(/[`~!@#$%^&*()+=|}[{'";:?.>,<\\|\]/]+|_/g, '');
 
+/**
+ * formikKey is derived from the label once, at field-creation time, and then
+ * frozen. Re-deriving it when a steward renames a question splits historical
+ * FormResults (`title` = old key) from new submissions (`title` = new key),
+ * which is how a monthly CSV can look like last month's answers vanished.
+ *
+ * While the current key still matches the current label, keep deriving — that
+ * is the creation-time path, where the steward is still typing the question.
+ * Once they diverge (a converted geolocation block, a prior rename that was
+ * migrated), keep the existing key.
+ */
+const nextFormikKey = (existingKey, existingLabel, newLabel) => {
+  if (existingKey && existingKey !== toFormikKey(existingLabel || '')) {
+    return existingKey;
+  }
+  return toFormikKey(newLabel);
+};
+
 // This method is needed for rendering clones of draggables
 const getRenderItem = (items) => function getRenderItemSecond(provided, snapshot, rubric) {
   const item = items[rubric.source.index];
@@ -39,4 +57,4 @@ const copy = (source, destination, droppableSource, droppableDestination) => {
   return destination;
 };
 
-export { copy, getRenderItem, reorder, toFormikKey };
+export { copy, getRenderItem, nextFormikKey, reorder, toFormikKey };

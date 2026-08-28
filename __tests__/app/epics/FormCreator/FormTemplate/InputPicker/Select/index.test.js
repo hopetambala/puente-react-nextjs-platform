@@ -130,3 +130,48 @@ describe('removeOption', () => {
     expect(callArg[0].options).toEqual([optionB]);
   });
 });
+
+describe('question label edit', () => {
+  // Converted geolocation block: editing the question text used to run
+  // toFormikKey on the new label and rewrite option textKeys. Historical
+  // FormResults stayed on geolocation_b58b / __geolocation_b58b__Yes; new
+  // submissions wrote a new title. The CSV grew an empty historical column
+  // next to a full live column.
+  it('does not rewrite a synthetic geolocation formikKey when the visible label changes', () => {
+    const mockSetFormItems = jest.fn();
+    const item = {
+      id: 'b58b0000-0000-4000-8000-000000000001',
+      fieldType: 'select',
+      label: 'Continue in the program?',
+      formikKey: 'geolocation_b58b',
+      options: [{
+        id: 'opt-a',
+        label: 'Yes',
+        value: 'Yes',
+        text: false,
+        textQuestion: '',
+        textKey: '__geolocation_b58b__Yes',
+      }],
+    };
+
+    render(
+      <Select
+        item={item}
+        formItems={[item]}
+        setFormItems={mockSetFormItems}
+        removeValue={jest.fn()}
+      />
+    );
+    mockSetFormItems.mockClear();
+
+    fireEvent.change(screen.getByPlaceholderText('Enter your question here'), {
+      target: { value: 'Keep going?', id: 'b58b0000-0000-4000-8000-000000000001' },
+    });
+
+    expect(mockSetFormItems).toHaveBeenCalled();
+    const updated = mockSetFormItems.mock.calls[0][0][0];
+    expect(updated.formikKey).toBe('geolocation_b58b');
+    expect(updated.label).toBe('Keep going?');
+    expect(updated.options[0].textKey).toBe('__geolocation_b58b__Yes');
+  });
+});
