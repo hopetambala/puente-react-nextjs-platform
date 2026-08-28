@@ -1,28 +1,29 @@
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
 const AppContext = createContext();
 
 export function AppWrapper({ children }) {
   const [globalStore, setGlobalStore] = useState({});
 
-  const addPropToStore = (key, data) => {
-    const store = globalStore;
-    store[key] = data;
-    setGlobalStore(store);
-  };
+  const addPropToStore = useCallback((key, data) => {
+    setGlobalStore((prev) => ({ ...prev, [key]: data }));
+  }, []);
 
-  const removePropFromStore = (key) => {
-    const store = globalStore;
-    delete store[key];
-    setGlobalStore(store);
-  };
+  const removePropFromStore = useCallback((key) => {
+    setGlobalStore((prev) => {
+      // Copy-then-delete rather than rest-destructuring the key out: the
+      // omitted-key binding trips @typescript-eslint/no-unused-vars under this
+      // config, and trading a fixed suppression for a new one is no trade.
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+  }, []);
 
   // Memoised purely to stop a new context value being constructed on every
-  // render. `globalStore` is the only value this object depends on, and both
-  // closures below capture nothing else that changes, so [globalStore] is the
-  // complete dependency list. This deliberately does not touch how
-  // addPropToStore/removePropFromStore update state — that is tracked
-  // separately and changing it here would alter behaviour app-wide.
+  // render. Both writers build a new store object and go through the functional
+  // updater form, so React sees a fresh reference and consumers re-render, and
+  // neither closure can capture a stale `globalStore`.
   const contextProps = useMemo(
     () => ({
       globalStore,
@@ -32,8 +33,7 @@ export function AppWrapper({ children }) {
         store: globalStore,
       },
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [globalStore],
+    [globalStore, addPropToStore, removePropFromStore],
   );
 
   return (
