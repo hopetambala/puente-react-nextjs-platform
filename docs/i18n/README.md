@@ -43,7 +43,7 @@ unforgettable, and this section is what explains the test.
 ## What shipped
 
 Manage now ships **English (`eng`), Spanish (`spa`), and Haitian Creole
-(`hat`)** — 162 keys each, at enforced parity.
+(`hat`)** — 166 keys each, at enforced parity.
 
 The previous locale set (`ara`, `deu`, `ind`, `prt`, `zho`) was retired on
 2026-08-28. It came from a Next.js template, had no Dominican Republic
@@ -71,21 +71,28 @@ The confidence is **not uniform**, and the difference matters:
 | **Haitian Creole** | **Needs native review before it reaches Haitian staff.** Anchored to Collect's existing human `hk.json` for vocabulary and register, but not authored by a Creole speaker. |
 
 Reviewing shortcut that did **not** work: lifting the strings wholesale from
-Collect. Only 19 of 162 (11%) of Manage's English strings appear in Collect's
+Collect. Only 19 of 166 (11%) of Manage's English strings appear in Collect's
 601-key corpus. Collect's vocabulary is field data entry — forms, vitals,
 households, offline sync. Manage's is dashboards, triage, curation, export. The
 overlap is greetings and buttons.
 
 ## Reviewing
 
-[`review-worksheet.csv`](./review-worksheet.csv) — 162 rows, English alongside
+[`review-worksheet.csv`](./review-worksheet.csv) — 166 rows, English alongside
 both translations, with a `reviewed_by` column and a `notes` column flagging
 the 19 strings where Collect already has a human translation of the same
 English.
 
-Corrections go directly into `public/locales/<locale>/<namespace>.json`. Keys
-must not be renamed — the parity gate will reject a renamed key as both a
-missing key and an unexpected one.
+Corrections go directly into `public/locales/<locale>/<namespace>.json`. Change
+values, never keys: renaming a key makes it *missing* as far as the gate is
+concerned, and the build fails naming it. (The gate checks only for keys the
+default locale defines. A leftover key that English no longer has is **not**
+detected — see the open item at the end of this file.)
+
+Interpolation placeholders (`{{count}}`, `{{name}}`) are enforced: a
+translation that drops or renames one fails the build even though the key
+exists, because i18next would otherwise render a sentence with the number
+missing, or the literal text `{{nombre}}`.
 
 ### Choices a reviewer should check first
 
@@ -121,10 +128,37 @@ This is what stops the next 47-key drift: adding a key to
 `public/locales/eng/common.json` without adding it to `spa` and `hat` turns CI
 red in the same commit, naming every missing key per locale.
 
-## Known follow-up: there is no language switcher
+## The language switcher
 
-Manage has no UI for changing language. Locale is reachable only by URL path
-(`/spa/quick-start`) or browser auto-detect, so a program manager cannot choose
-Spanish from inside the app. Collect solves this with a `LanguagePicker` in
-Settings; Manage needs an equivalent. That is a UI surface requiring the design
-gate, tracked separately from this work.
+Manage now has one, in two places:
+
+- **The login page**, beneath the sign-in card. This is the one that matters.
+  Settings sits behind *both* authentication and English, so someone who cannot
+  read the login screen cannot navigate to Settings to change it. Collect does
+  not have this problem — `expo-localization` reads the device locale, making
+  its picker a correction rather than the entry path. Manage's only equivalent
+  signal is `Accept-Language`, and on a shared field-office machine configured
+  in English that is simply wrong, with no recovery.
+- **Settings** (`/account/management`), the durable home, matching Collect's
+  mental model. It sits outside the profile form on purpose: that form is
+  yup-validated, submits, re-authenticates and redirects, and language is not a
+  `_User` field.
+
+Deliberately **not** in the TopBar. It is a set-once control, so permanent
+chrome directly above the data table is the wrong trade — and being inside
+`AppShell` it is behind authentication anyway, so it would not have solved the
+problem it exists for.
+
+The choice persists in the `NEXT_LOCALE` cookie, which Next.js reads ahead of
+`Accept-Language`. Without it the choice survives exactly one navigation.
+
+## Open items
+
+- **No unexpected-key detection.** The gate finds keys English defines that a
+  locale lacks. It does not find the reverse: a key left behind in a locale
+  after English dropped it. The retired `deu` catalog had exactly this — a
+  `zurück` key holding a translation nothing could read. Collect's checker has
+  an `--orphans` mode; Manage's does not yet.
+- **No RTL locale ships.** `ara` was the only one and it was retired, so the
+  right-to-left path is now unexercised. Keep using logical properties
+  (`margin-inline-start`, `text-align: start`) as cheap insurance.

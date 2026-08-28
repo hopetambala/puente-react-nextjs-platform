@@ -11,8 +11,22 @@
  * without touching the filesystem. A catalog is `{ [namespace]: { [key]: value } }`.
  */
 
+/**
+ * i18next substitutes `{{count}}` and friends at render time. A translation
+ * that drops one renders a sentence with the number missing; one that renames
+ * it renders the literal "{{nombre}}" to the user. Key-presence parity cannot
+ * see either failure, so the sets are compared directly. Order does not
+ * matter — languages reorder clauses.
+ */
+function placeholdersIn(value) {
+  return [...String(value).matchAll(/\{\{\s*(\w+)\s*\}\}/g)]
+    .map((match) => match[1])
+    .sort();
+}
+
 function checkLocaleParity({ defaultLocale, locales, catalogs }) {
   const missing = [];
+  const placeholders = [];
   const source = catalogs[defaultLocale] || {};
 
   locales
@@ -22,13 +36,22 @@ function checkLocaleParity({ defaultLocale, locales, catalogs }) {
       Object.keys(source).forEach((namespace) => {
         const translations = catalog[namespace] || {};
         Object.keys(source[namespace]).forEach((key) => {
-          if (key in translations) return;
-          missing.push({ locale, namespace, key });
+          if (!(key in translations)) {
+            missing.push({ locale, namespace, key });
+            return;
+          }
+          const expected = placeholdersIn(source[namespace][key]);
+          const actual = placeholdersIn(translations[key]);
+          if (expected.join('|') !== actual.join('|')) {
+            placeholders.push({
+              locale, namespace, key, expected, actual,
+            });
+          }
         });
       });
     });
 
-  return { missing };
+  return { missing, placeholders };
 }
 
 function groupByLocale(violations) {
@@ -42,27 +65,45 @@ function groupByLocale(violations) {
  * Render the gap as an actionable failure message: which locale, which
  * namespace, which key.
  */
-function formatParityReport({ missing }) {
-  if (missing.length === 0) return '';
+function formatParityReport({ missing = [], placeholders = [] }) {
+  if (missing.length === 0 && placeholders.length === 0) return '';
 
-  const grouped = groupByLocale(missing);
   const lines = [''];
 
-  Object.keys(grouped)
-    .sort()
-    .forEach((locale) => {
-      const entries = grouped[locale].sort();
-      lines.push(`  ${locale} is missing ${entries.length} key(s):`);
-      entries.forEach((entry) => lines.push(`    - ${entry}`));
-    });
+  if (missing.length > 0) {
+    const grouped = groupByLocale(missing);
+    Object.keys(grouped)
+      .sort()
+      .forEach((locale) => {
+        const entries = grouped[locale].sort();
+        lines.push(`  ${locale} is missing ${entries.length} key(s):`);
+        entries.forEach((entry) => lines.push(`    - ${entry}`));
+      });
+    lines.push('');
+    lines.push(
+      '  A locale ships only when it is complete. Have a human translator supply',
+    );
+    lines.push(
+      '  these strings, or remove the locale from next-i18next.config.js.',
+    );
+  }
 
-  lines.push('');
-  lines.push(
-    '  A locale ships only when it is complete. Have a human translator supply',
-  );
-  lines.push(
-    '  these strings, or remove the locale from next-i18next.config.js.',
-  );
+  if (placeholders.length > 0) {
+    lines.push('');
+    placeholders.forEach(({
+      locale, namespace, key, expected, actual,
+    }) => {
+      lines.push(
+        `  ${locale} ${namespace}:${key} — placeholders differ: `
+          + `English has [${expected.join(', ')}], translation has [${actual.join(', ')}]`,
+      );
+    });
+    lines.push('');
+    lines.push(
+      '  A dropped or renamed placeholder renders the wrong text to the user,',
+    );
+    lines.push('  so it fails the build even though the key exists.');
+  }
 
   return lines.join('\n');
 }

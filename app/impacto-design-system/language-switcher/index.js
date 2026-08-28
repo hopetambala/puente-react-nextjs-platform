@@ -1,3 +1,4 @@
+import { LANGUAGES } from 'app/modules/i18n/languages';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -6,32 +7,12 @@ import React from 'react';
 
 import styles from './css/language-switcher.module.css';
 
-/**
- * The three languages Puente supports.
- *
- * `endonym` — each language written in ITS OWN language, never translated.
- * Someone who cannot read the current UI language must still recognise their
- * own; rendering "Spanish" in English fails exactly the person this control
- * exists for. No flags either: flags are countries, not languages, and for a
- * Haitian person in the DR any flag choice for Creole carries meaning we have
- * no business asserting.
- *
- * `locale` — Manage's ISO 639-2/T code, matching next-i18next.config.js.
- * `bcp47`  — what the HTML `lang` attribute requires, which is the SHORTEST
- *            available ISO 639 code. "spa"/"hat" are invalid there because
- *            "es"/"ht" exist, and a screen reader given an invalid tag will
- *            not switch pronunciation for the option.
- *
- * This list is duplicated from next-i18next.config.js rather than imported:
- * that config `require`s Node's `path`, so importing it into a client
- * component would pull it into the browser bundle. The duplication is held
- * honest by a test asserting this list equals `i18n.locales`.
- */
-const LANGUAGES = [
-  { locale: 'eng', bcp47: 'en', endonym: 'English' },
-  { locale: 'spa', bcp47: 'es', endonym: 'Español' },
-  { locale: 'hat', bcp47: 'ht', endonym: 'Kreyòl Ayisyen' },
-];
+// LANGUAGES is the shared table in app/modules/i18n/languages.js — the same
+// one pages/_document.js uses for <Html lang>. Endonyms are never translated:
+// someone who cannot read the current UI language must still recognise their
+// own. No flags either — flags are countries, not languages, and for a Haitian
+// person in the DR any flag choice for Creole carries meaning we have no
+// business asserting.
 
 const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
 
