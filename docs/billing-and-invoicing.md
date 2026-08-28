@@ -141,6 +141,14 @@ Record classes gain a **pointer** — `organization → Organization`. It become
 field features read; `surveyingOrganization` is kept on the record as collected
 provenance but stops being queried.
 
+> **`stripeCustomerId` and `billingEmail` must not land on `Organization` until
+> its permissions are settled** (§7.1). New classes inherit permissive defaults,
+> and every existing class in the snapshot is publicly writable. Billing
+> identifiers in a world-writable class is not a risk worth taking for the
+> convenience of one join. Ship the class with `name`/`shortCode`/`aliases`
+> first; add the billing fields behind the access-control work, or put them on a
+> separate, locked class.
+
 ### `surveyingOrganization` stops being a query key — the goal is full replacement
 
 The intent is that features **stop reading the string and read the pointer**.
@@ -597,11 +605,30 @@ works; only the *role* half is dead. `addToRole` couples the two by setting
 `organization`, `email`, and `phonenumber` on every account may be readable by any
 authenticated client, subject only to the `_User` CLP.
 
-> **Read the CLPs before designing any of this.** They are configured in the
-> Back4App dashboard and exist in no repo, so neither this plan nor anyone's
-> recollection can stand in for looking. If they already restrict reads, the
-> exposure above is much narrower than it appears and §7 shrinks. If they don't,
-> it is exactly as broad as it appears. **This is step zero of Phase 5.**
+> **A CLP snapshot DOES exist in this repo, and it is alarming.**
+> `schema/schema.json` carries `classLevelPermissions` per class. **All 17
+> classes** — `SurveyData`, `Vitals`, `FormResults`, and also `_User`,
+> `_Session`, and `_Role` — are set to:
+>
+> ```json
+> "find": {"*": true}, "get": {"*": true}, "count": {"*": true},
+> "create": {"*": true}, "update": {"*": true}, "delete": {"*": true},
+> "addField": {"*": true}
+> ```
+>
+> In Parse, `"*"` means **public** — not "any authenticated user". Combined with
+> §7.1's finding that records carry no ACL, the App ID and the JavaScript key
+> that ships in the browser bundle would be enough to read, modify, or **delete**
+> any survey, clinical, or user record, and to mutate the schema.
+>
+> **Two caveats, stated deliberately.** The snapshot's last commit was an
+> unrelated navigation change, so it may be stale. And it has **not** been
+> verified against production. **Confirm in the Back4App dashboard before acting
+> on it — and before dismissing it.**
+>
+> If it holds, this is a pre-existing exposure far more urgent than billing, and
+> §7 stops being a Phase 5 nicety. It also means an `Organization` class holding
+> `stripeCustomerId` and `billingEmail` would inherit the same defaults.
 
 ### 7.2 Why this is more dangerous than the §6 backfill
 
