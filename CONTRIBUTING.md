@@ -120,7 +120,7 @@ public/locales/               # Translations (6 languages)
 
 ## One More Thing
 
-If you're adding text the user will see, add it to all 6 locale files: `public/locales/{eng,ara,deu,ind,prt,zho}/common.json`. Use the `useTranslation('common')` hook. No hardcoded English strings.
+If you're adding text the user will see, add it to all 3 locale files: `public/locales/{eng,spa,hat}/common.json`. Use the `useTranslation('common')` hook. No hardcoded English strings. CI fails if a locale is missing a key — there is no allowlist, so English-only is not an option.
 
 ---
 

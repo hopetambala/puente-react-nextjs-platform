@@ -129,9 +129,11 @@ const { t } = useTranslation('common');
 return <button>{t('button_save')}</button>;
 ```
 
-Translations live in: `public/locales/{eng,ara,deu,ind,prt,zho}/common.json`
+Translations live in: `public/locales/{eng,spa,hat}/common.json`
 
-**When you add a new string, add it to all 6 locale files.**
+**When you add a new string, add it to all 3 locale files.** CI enforces this:
+`__tests__/locales/translations.test.js` fails the build if any locale is missing
+a key English defines, in any namespace. There is no allowlist.
 
 ## Testing
 
