@@ -1,6 +1,6 @@
 import classNames from 'classnames';
-import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'next-i18next';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -27,7 +27,7 @@ const LANGUAGES = [
 
 const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
 
-const LanguageSwitcher = ({ className }) => {
+function LanguageSwitcher({ className }) {
   const { t } = useTranslation('common');
   const router = useRouter();
   const { asPath, locale: activeLocale } = router;
@@ -67,7 +67,7 @@ const LanguageSwitcher = ({ className }) => {
       </div>
     </div>
   );
-};
+}
 
 LanguageSwitcher.defaultProps = {
   className: undefined,
