@@ -83,7 +83,13 @@ function Inspector({ block, onChange, onClose }) {
             value={label}
             onChange={(e) => {
               const newLabel = e.target.value;
-              update({ label: newLabel, formikKey: toFormikKey(newLabel) });
+              // Never overwrite a key that already exists — Inspector is the
+              // edit path, not creation. Recalculating here splits historical
+              // FormResults from new submits across two CSV columns.
+              update({
+                label: newLabel,
+                formikKey: formikKey || toFormikKey(newLabel),
+              });
             }}
           />
         </div>

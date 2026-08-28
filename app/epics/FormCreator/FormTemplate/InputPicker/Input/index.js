@@ -1,4 +1,4 @@
-import { toFormikKey } from 'app/epics/FormCreator/_utils';
+import { nextFormikKey } from 'app/epics/FormCreator/_utils';
 import { Button, Text } from 'app/impacto-design-system';
 import { useEffect, useState } from 'react';
 
@@ -10,6 +10,7 @@ const Input = (props) => {
     item,
     formItems, setFormItems,
     removeValue,
+    keyFrozen,
   } = props;
   const [activeInput, setActiveInput] = useState(item.active !== undefined ? item.active : true);
 
@@ -30,11 +31,12 @@ const Input = (props) => {
 
     const elementsIndex = formItems.findIndex((element) => element.id === id);
     const newArray = [...formItems];
+    const current = newArray[elementsIndex];
     if (type !== 'sideLabel') {
       newArray[elementsIndex] = {
-        ...newArray[elementsIndex],
+        ...current,
         label: value,
-        formikKey: toFormikKey(value),
+        formikKey: nextFormikKey(current.formikKey, current.label, value, keyFrozen),
       };
     } else {
       newArray[elementsIndex] = {

@@ -1,3 +1,4 @@
+import { nextFormikKey } from 'app/epics/FormCreator/_utils';
 import { Button } from 'app/impacto-design-system';
 import { useEffect, useState } from 'react';
 
@@ -9,6 +10,7 @@ const Loop = (props) => {
     item,
     formItems, setFormItems,
     removeValue,
+    keyFrozen,
   } = props;
 
   const [numberQuestionsToRepeat, setNumberQuestionsToRepeat] = useState(null);
@@ -28,10 +30,11 @@ const Loop = (props) => {
 
     const elementsIndex = formItems.findIndex((element) => element.id === id);
     const newArray = [...formItems];
+    const current = newArray[elementsIndex];
     newArray[elementsIndex] = {
-      ...newArray[elementsIndex],
+      ...current,
       label: value,
-      formikKey: value.replace(/[`~!@#$%^&*()+=|}[{'";:?.>,<\\|\]/]+|_/g, ''),
+      formikKey: nextFormikKey(current.formikKey, current.label, value, keyFrozen),
     };
 
     setFormItems(newArray);

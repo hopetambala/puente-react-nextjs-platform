@@ -130,3 +130,125 @@ describe('removeOption', () => {
     expect(callArg[0].options).toEqual([optionB]);
   });
 });
+
+describe('question label edit', () => {
+  // Converted geolocation block: editing the question text used to run
+  // toFormikKey on the new label and rewrite option textKeys. Historical
+  // FormResults stayed on geolocation_b58b / __geolocation_b58b__Yes; new
+  // submissions wrote a new title. The CSV grew an empty historical column
+  // next to a full live column.
+  it('does not rewrite a synthetic geolocation formikKey when the visible label changes', () => {
+    const mockSetFormItems = jest.fn();
+    const item = {
+      id: 'b58b0000-0000-4000-8000-000000000001',
+      fieldType: 'select',
+      label: 'Continue in the program?',
+      formikKey: 'geolocation_b58b',
+      options: [{
+        id: 'opt-a',
+        label: 'Yes',
+        value: 'Yes',
+        text: false,
+        textQuestion: '',
+        textKey: '__geolocation_b58b__Yes',
+      }],
+    };
+
+    render(
+      <Select
+        item={item}
+        formItems={[item]}
+        setFormItems={mockSetFormItems}
+        removeValue={jest.fn()}
+      />
+    );
+    mockSetFormItems.mockClear();
+
+    fireEvent.change(screen.getByPlaceholderText('Enter your question here'), {
+      target: { value: 'Keep going?', id: 'b58b0000-0000-4000-8000-000000000001' },
+    });
+
+    expect(mockSetFormItems).toHaveBeenCalled();
+    const updated = mockSetFormItems.mock.calls[0][0][0];
+    expect(updated.formikKey).toBe('geolocation_b58b');
+    expect(updated.label).toBe('Keep going?');
+    expect(updated.options[0].textKey).toBe('__geolocation_b58b__Yes');
+  });
+
+  it('keeps formikKey on a saved form even when the key currently matches the label', () => {
+    const mockSetFormItems = jest.fn();
+    const item = {
+      id: 'item-saved',
+      fieldType: 'select',
+      label: 'Continue in the program',
+      formikKey: 'Continue in the program',
+      options: [{
+        id: 'opt-a',
+        label: 'Yes',
+        value: 'Yes',
+        text: false,
+        textQuestion: '',
+        textKey: '__Continue in the program__Yes',
+      }],
+    };
+
+    render(
+      <Select
+        item={item}
+        formItems={[item]}
+        setFormItems={mockSetFormItems}
+        removeValue={jest.fn()}
+        keyFrozen
+      />
+    );
+    mockSetFormItems.mockClear();
+
+    fireEvent.change(screen.getByPlaceholderText('Enter your question here'), {
+      target: { value: 'Keep going?', id: 'item-saved' },
+    });
+
+    expect(mockSetFormItems).toHaveBeenCalled();
+    const updated = mockSetFormItems.mock.calls[0][0][0];
+    expect(updated.formikKey).toBe('Continue in the program');
+    expect(updated.label).toBe('Keep going?');
+    expect(updated.options[0].textKey).toBe('__Continue in the program__Yes');
+  });
+
+  it('updates formikKey on an unsaved form while the key is still in sync', () => {
+    const mockSetFormItems = jest.fn();
+    const item = {
+      id: 'item-new',
+      fieldType: 'select',
+      label: 'Continue in the program',
+      formikKey: 'Continue in the program',
+      options: [{
+        id: 'opt-a',
+        label: 'Yes',
+        value: 'Yes',
+        text: false,
+        textQuestion: '',
+        textKey: '__Continue in the program__Yes',
+      }],
+    };
+
+    render(
+      <Select
+        item={item}
+        formItems={[item]}
+        setFormItems={mockSetFormItems}
+        removeValue={jest.fn()}
+        keyFrozen={false}
+      />
+    );
+    mockSetFormItems.mockClear();
+
+    fireEvent.change(screen.getByPlaceholderText('Enter your question here'), {
+      target: { value: 'Keep going?', id: 'item-new' },
+    });
+
+    const updated = mockSetFormItems.mock.calls[0][0][0];
+    expect(updated.formikKey).toBe('Keep going');
+    expect(updated.label).toBe('Keep going?');
+    expect(updated.options[0].textKey).toBe('__Keep going__Yes');
+  });
+});

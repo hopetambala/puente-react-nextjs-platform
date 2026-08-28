@@ -5,7 +5,7 @@ import InputPicker from './InputPicker';
 
 const FormTemplate = (props) => {
   const {
-    formItems, setFormItems, removeValue, onSelectBlock,
+    formItems, setFormItems, removeValue, onSelectBlock, keyFrozen,
   } = props;
   return (
     <Droppable droppableId="DROP-AREA" className={styles.formTemplate}>
@@ -22,6 +22,7 @@ const FormTemplate = (props) => {
                   provided={providedDrag}
                   innerRef={providedDrag.innerRef}
                   onSelectBlock={onSelectBlock}
+                  keyFrozen={keyFrozen}
                 />
               )}
             </Draggable>

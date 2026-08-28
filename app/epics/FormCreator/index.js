@@ -318,6 +318,7 @@ function FormCreator({ context, user }) {
                 removeValue={removeValue}
                 onSelectBlock={setSelectedBlock}
                 selectedBlockId={selectedBlock?.id}
+                keyFrozen={Boolean(formId)}
               />
             </div>
           </div>

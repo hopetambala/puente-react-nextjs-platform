@@ -14,11 +14,11 @@ jest.mock('react-beautiful-dnd', () => ({
   ),
 }));
 
-jest.mock('app/epics/FormCreator/FormTemplate/InputPicker/Input', () => () => null);
-jest.mock('app/epics/FormCreator/FormTemplate/InputPicker/Select', () => () => null);
-jest.mock('app/epics/FormCreator/FormTemplate/InputPicker/Header', () => () => null);
+jest.mock('app/epics/FormCreator/FormTemplate/InputPicker/Input', () => jest.fn(() => null));
+jest.mock('app/epics/FormCreator/FormTemplate/InputPicker/Select', () => jest.fn(() => null));
+jest.mock('app/epics/FormCreator/FormTemplate/InputPicker/Header', () => jest.fn(() => null));
 jest.mock('app/epics/FormCreator/FormTemplate/InputPicker/Geolocation', () => () => null);
-jest.mock('app/epics/FormCreator/FormTemplate/InputPicker/Loop', () => () => null);
+jest.mock('app/epics/FormCreator/FormTemplate/InputPicker/Loop', () => jest.fn(() => null));
 jest.mock('app/epics/FormCreator/FormTemplate/InputPicker/index.module.scss', () => ({ block: 'block' }));
 
 const PaperInputPicker = require('app/epics/FormCreator/FormTemplate/InputPicker').default;
@@ -29,7 +29,7 @@ const mockProvided = {
 };
 const mockItem = { id: 'item-1', fieldType: 'input', label: 'Test question' };
 
-function renderComponent(onSelectBlock = jest.fn()) {
+function renderComponent(onSelectBlock = jest.fn(), extraProps = {}) {
   return render(
     <PaperInputPicker
       provided={mockProvided}
@@ -39,6 +39,7 @@ function renderComponent(onSelectBlock = jest.fn()) {
       setFormItems={jest.fn()}
       removeValue={jest.fn()}
       onSelectBlock={onSelectBlock}
+      {...extraProps}
     />
   );
 }
@@ -100,5 +101,23 @@ describe('block selection is reachable without a mouse', () => {
   it('marks the block wrapper as presentational', () => {
     const { container } = renderComponent();
     expect(container.firstChild).toHaveAttribute('role', 'presentation');
+  });
+});
+
+describe('keyFrozen prop', () => {
+  it('forwards keyFrozen to Input, Select, Header, and Loop', () => {
+    const Input = require('app/epics/FormCreator/FormTemplate/InputPicker/Input');
+    const Select = require('app/epics/FormCreator/FormTemplate/InputPicker/Select');
+    const Header = require('app/epics/FormCreator/FormTemplate/InputPicker/Header');
+    const Loop = require('app/epics/FormCreator/FormTemplate/InputPicker/Loop');
+
+    renderComponent(jest.fn(), { keyFrozen: true });
+
+    [Input, Select, Header, Loop].forEach((Component) => {
+      expect(Component).toHaveBeenCalledWith(
+        expect.objectContaining({ keyFrozen: true }),
+        expect.anything(),
+      );
+    });
   });
 });
