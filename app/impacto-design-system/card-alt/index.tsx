@@ -33,7 +33,14 @@ type CardProps = {
 const Card = ({
   title, description, nextLink, shouldOpenTab, actions,
 }: CardProps) => (
-  <a href={nextLink} className={styles.card} target={shouldOpenTab ? '_blank' : '_self'}>
+  <a
+    href={nextLink}
+    className={styles.card}
+    target={shouldOpenTab ? '_blank' : '_self'}
+    // Only the new-tab branch needs the opener/referrer guard; leaving `rel`
+    // off the same-tab branch keeps the Referer header these links send today.
+    rel={shouldOpenTab ? 'noreferrer' : undefined}
+  >
     <h3>{title}</h3>
     <p>{description}</p>
     {actions && (

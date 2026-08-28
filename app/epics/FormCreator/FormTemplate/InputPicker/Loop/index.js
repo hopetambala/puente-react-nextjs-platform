@@ -51,16 +51,13 @@ const Loop = (props) => {
         for (let i = index - value; i < index; i += 1) {
           if (i >= 0) {
             // geolocation is only feildtype that does not have a label
-            if (copiedFormItems[i].fieldType !== 'geolocation') {
+            if (copiedFormItems[i].fieldType === 'geolocation') {
+              repeatItems = repeatItems.concat('geolocation');
+            } else {
               if (copiedFormItems[i].fieldType === 'loop') {
                 setDoubleLoop(true);
               }
               repeatItems = repeatItems.concat(copiedFormItems[i].label);
-            } else if (copiedFormItems[i].fieldType !== 'geolocation') {
-              repeatItems = repeatItems.concat('geolocation');
-            } else {
-              // loop
-              setDoubleLoop(true);
             }
           } else {
             setRepeatQuestionsExcceeded(true);

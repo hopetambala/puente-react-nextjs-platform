@@ -20,6 +20,11 @@ type Parameter = {
     };
 };
   
+// snake_case because it names the Django ETL service's own route
+// (`fact/list_filter_sort/`) and is re-exported as that key on `fact`.
+// Renaming it would desync the client from the Python service's URL and break
+// the call site in app/epics/DataAnalyticsManager.
+// eslint-disable-next-line camelcase
  const list_filter_sort = (body : Parameter) => 
   fetch(
     `${process.env.NEXT_PUBLIC_PUENTE_REST_ETL_URL}${MODEL}/list_filter_sort/`,
@@ -35,4 +40,5 @@ type Parameter = {
 
 
 
+// eslint-disable-next-line camelcase -- see the note on list_filter_sort above
 export const fact = { list, list_filter_sort };

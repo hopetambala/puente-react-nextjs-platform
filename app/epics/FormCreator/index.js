@@ -270,8 +270,8 @@ function FormCreator({ context, user }) {
           <div className={styles.canvasMain}>
             {/* Form settings card */}
             <div className={styles.settingsCard}>
-              <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel} htmlFor="formType">Type of form</label>
+              <label className={styles.fieldGroup} htmlFor="formType">
+                <span className={styles.fieldLabel}>Type of form</span>
                 <select
                   id="formType"
                   name="formType"
@@ -282,10 +282,10 @@ function FormCreator({ context, user }) {
                   <option value="Custom">Custom</option>
                   <option value="Assets">Assets</option>
                 </select>
-              </div>
+              </label>
 
-              <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel} htmlFor="formName">Form name</label>
+              <label className={styles.fieldGroup} htmlFor="formName">
+                <span className={styles.fieldLabel}>Form name</span>
                 <input
                   id="formName"
                   value={formName}
@@ -294,10 +294,10 @@ function FormCreator({ context, user }) {
                   placeholder="Give your form a detailed name"
                   className={styles.input}
                 />
-              </div>
+              </label>
 
-              <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel} htmlFor="formDescription">Description</label>
+              <label className={styles.fieldGroup} htmlFor="formDescription">
+                <span className={styles.fieldLabel}>Description</span>
                 <input
                   id="formDescription"
                   value={formDescription}
@@ -306,7 +306,7 @@ function FormCreator({ context, user }) {
                   placeholder="Describe how this form will be used"
                   className={styles.input}
                 />
-              </div>
+              </label>
             </div>
 
             {/* Form builder canvas */}

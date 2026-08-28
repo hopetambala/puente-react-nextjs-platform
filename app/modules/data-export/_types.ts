@@ -51,7 +51,7 @@ export class DataExporter {
 
 export class CustomDataExporter extends DataExporter {
   constructor() {
-    super(ENDPOINTS['Custom'])
+    super(ENDPOINTS.Custom)
   }
    async getSpecificRecordsByOrganization(organization:string, formId:string) {
     const orgsData = await fetchCSV(`v2/${this.endpoint}/organizations/${organization}/${formId}`)

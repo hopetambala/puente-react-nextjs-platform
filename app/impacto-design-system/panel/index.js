@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+
 import styles from './panel.module.css';
 
 export default function Panel({ title, action, noPadding, children }) {

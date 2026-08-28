@@ -17,15 +17,28 @@ jest.mock('@material-ui/core/styles', () => ({
   makeStyles: () => () => ({ paper: 'paper-class' }),
 }));
 
-// Modal imports Button/Card/Stack/Text from app/impacto-design-system — mock
-// to avoid the circular dep and keep the test focused on Modal behavior.
-jest.mock('app/impacto-design-system', () => ({
-  Button: ({ text, onClick, intent }) => (
+// Mocked at the concrete component modules rather than the barrel. Modal used
+// to import these through app/impacto-design-system, which made the barrel
+// import itself — a real dependency cycle that this mock was quietly working
+// around. Modal now imports each component directly, so the mock follows it
+// there. Same stubs, same assertions; only the specifier moved.
+jest.mock('app/impacto-design-system/button', () => ({
+  __esModule: true,
+  default: ({ text, onClick, intent }) => (
     <button type="button" data-intent={intent} onClick={onClick}>{text}</button>
   ),
-  Card: ({ children }) => <div>{children}</div>,
-  Stack: ({ children }) => <div>{children}</div>,
-  Text: ({ text, element: El = 'span' }) => <El>{text}</El>,
+}));
+jest.mock('app/impacto-design-system/card', () => ({
+  __esModule: true,
+  default: ({ children }) => <div>{children}</div>,
+}));
+jest.mock('app/impacto-design-system/stack', () => ({
+  __esModule: true,
+  default: ({ children }) => <div>{children}</div>,
+}));
+jest.mock('app/impacto-design-system/text', () => ({
+  __esModule: true,
+  default: ({ text, element: El = 'span' }) => <El>{text}</El>,
 }));
 
 const Modal = require('app/impacto-design-system/modal').default;

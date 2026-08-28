@@ -1,5 +1,9 @@
-import { customQueryService } from 'app/modules/cloud-code';
 import _ from 'underscore';
+
+// Imported from ../crud rather than the `app/modules/cloud-code` barrel: the
+// barrel re-exports this module, so going through it forms an import cycle
+// (barrel -> custom-data-retrieval -> barrel).
+import { customQueryService } from '../crud';
 
 const retrieveCustomData = async (organization) => {
   try {

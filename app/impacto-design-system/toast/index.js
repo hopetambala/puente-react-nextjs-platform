@@ -28,6 +28,12 @@ const Toast = ({
       <Text text={text} />
     </div>
     {!shouldHideDismissButton && (
+    // The button is labelled: <Text text="Dismiss" /> renders "Dismiss" as the
+    // button's text content. jsx-a11y cannot follow a label passed through a
+    // component prop rather than as children, so it reports a false positive.
+    // Adding an aria-label here would introduce an untranslated user-facing
+    // string for a control that already has a visible one.
+    // eslint-disable-next-line jsx-a11y/control-has-associated-label
     <button className={styles.action} onClick={closeToast} type="button">
       <Text text="Dismiss" />
     </button>

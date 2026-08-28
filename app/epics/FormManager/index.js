@@ -54,11 +54,6 @@ function FormManager({ context, router, user }) {
     return list.filter((f) => f.name.toLowerCase().includes(term));
   }, [noWorkflowData, searchTerm]);
 
-  useEffect(() => {
-    if (!organization) return;
-    refreshWorkflowData();
-  }, [organization]);
-
   const appendToCategory = (map, key, record) => {
     // eslint-disable-next-line no-param-reassign
     map[key] = key in map ? map[key].concat([record]) : [record];
@@ -90,6 +85,11 @@ function FormManager({ context, router, user }) {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!organization) return;
+    refreshWorkflowData();
+  }, [organization]);
 
   const passDataToFormCreator = (action, data) => {
     const href = '/forms/form-creator';
