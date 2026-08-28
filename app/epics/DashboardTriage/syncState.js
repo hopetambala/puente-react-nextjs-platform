@@ -21,6 +21,18 @@ export const FRESH_MAX_HOURS = 24;
 /** Under three days: worth noticing, not yet alarming. */
 export const AGING_MAX_HOURS = 72;
 
+/**
+ * Typed here rather than at the call site: without this, TypeScript infers
+ * `recordsLast24h` as `number` from the `= 0` default and rejects the null an
+ * unreadable count sends. The default only fires on `undefined` -- a null is
+ * forwarded untouched, and the ribbon renders it as a placeholder.
+ *
+ * @param {object} input
+ * @param {boolean} [input.lastSyncAvailable] False when the last-sync read did not run.
+ * @param {Date|string|null} [input.lastSyncAt] When Parse RECEIVED the newest record.
+ * @param {number|null} [input.recordsLast24h] Null when the count query did not run.
+ * @param {Date} [input.now]
+ */
 export function summarizeSyncState({
   lastSyncAvailable = true, lastSyncAt, recordsLast24h = 0, now = new Date(),
 }) {

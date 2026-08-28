@@ -268,4 +268,47 @@ describe('Empty and failure states', () => {
 
     expect(document.body.textContent).not.toMatch(/MISSING:/);
   });
+
+  it('does not report a total load failure as a clean bill of health', async () => {
+    // The whole load failed, so NOTHING was checked. The screen knows nothing
+    // about this organization's data quality — least of all that it is fine.
+    mockLoad.mockRejectedValue(new Error('offline'));
+    render(<Dashboard />);
+
+    await waitFor(() => expect(mockLoad).toHaveBeenCalled());
+    // Wait for the queue to actually finish loading before asserting an
+    // ABSENCE, otherwise the assertion passes vacuously against a skeleton
+    // that simply has not rendered a verdict yet.
+    await waitFor(() => expect(screen.queryByTestId('triage-loading')).not.toBeInTheDocument());
+
+    expect(screen.queryByTestId('triage-clear')).not.toBeInTheDocument();
+    // A failed load must still leave the page standing, not blank the screen.
+    expect(screen.getByText('Dashboard')).toBeInTheDocument();
+  });
+
+  it('shows a placeholder in the context strip when the 24-hour count could not be read', async () => {
+    // The load SUCCEEDED — only the 24h count query failed — so `data` is
+    // present and every other figure on the strip is real. React renders that
+    // lone `null` as nothing, leaving an empty slot beside "Records synced ·
+    // last 24 hours", which reads as a broken screen rather than as a figure we
+    // could not read.
+    mockLoad.mockResolvedValue(payload({
+      sync: {
+        lastSyncAt: new Date(Date.now() - 3 * 3600 * 1000),
+        lastSyncAvailable: true,
+        recordsLast24h: null,
+      },
+    }));
+    render(<Dashboard />);
+    await screen.findByTestId('sync-ribbon');
+
+    const strip = screen.getByTestId('context-strip');
+    // The same em-dash the strip already shows when the whole load failed, so a
+    // value we could not read looks deliberate instead of missing.
+    expect(strip).toHaveTextContent('—');
+    // A zero that is not part of a longer number, so the zeros inside the
+    // "1,000 records" caveat cannot satisfy it and a bare "0" abutting the
+    // label still can: the only thing that matches is a fabricated count.
+    expect(strip).not.toHaveTextContent(/(?<!\d)0(?!\d)/);
+  });
 });

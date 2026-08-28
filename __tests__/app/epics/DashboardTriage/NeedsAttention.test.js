@@ -118,4 +118,12 @@ describe('when the organization has no records yet', () => {
     expect(screen.queryByTestId('triage-clear')).not.toBeInTheDocument();
     expect(screen.queryByTestId('triage-no-records')).not.toBeInTheDocument();
   });
+
+  it('still discloses the failed check while showing the no-records state', () => {
+    render(<NeedsAttention rows={[]} recordState="none" unavailable={['form-drift']} loading={false} />);
+
+    expect(screen.getByTestId('triage-no-records')).toBeInTheDocument();
+    expect(screen.getByTestId('triage-unavailable-note'))
+      .toHaveTextContent(/triage_unavailable_form-drift/);
+  });
 });

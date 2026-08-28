@@ -36,6 +36,11 @@ export default function SyncRibbon({ state, loading }) {
 
   const { status, hoursSince, daysSince, recordsLast24h } = state;
 
+  // A `null` count means the 24h count query never ran. A bare `null` renders as
+  // a gap and a `0` would claim nothing arrived — a claim the ribbon cannot
+  // support — so it falls back to the em-dash the page's context strip uses.
+  const records = recordsLast24h === null ? '—' : recordsLast24h;
+
   const recency = () => {
     // `never` has no sync to age, and `unknown` means we couldn't read the sync
     // time — stating an elapsed time for a timestamp we never read would invent it.
@@ -58,7 +63,7 @@ export default function SyncRibbon({ state, loading }) {
       <span className={styles.separator} aria-hidden="true">·</span>
 
       <span className={styles.group}>
-        <span className={styles.value}>{recordsLast24h}</span>
+        <span className={styles.value}>{records}</span>
         <span className={styles.label}>{t('sync_ribbon_records_24h')}</span>
       </span>
 
@@ -81,6 +86,8 @@ SyncRibbon.propTypes = {
     status: PropTypes.oneOf(['never', 'fresh', 'aging', 'stale', 'unknown']).isRequired,
     hoursSince: PropTypes.number,
     daysSince: PropTypes.number,
+    // Optional (not `isRequired`), which is what makes a `null` count valid here:
+    // PropTypes only warns on a null value when the prop is required.
     recordsLast24h: PropTypes.number,
   }),
   loading: PropTypes.bool,

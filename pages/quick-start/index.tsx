@@ -23,7 +23,7 @@ type Signal = { count: number; exact: boolean } | null;
 
 type TriageData = {
   accountsSynced: { count: number; exact: boolean };
-  sync: { lastSyncAt: Date | null; lastSyncAvailable: boolean; recordsLast24h: number };
+  sync: { lastSyncAt: Date | null; lastSyncAvailable: boolean; recordsLast24h: number | null };
   signals: {
     missingKeyFields: Signal;
     unresolvedParent: Signal;
@@ -100,8 +100,13 @@ export default function Dashboard() {
     ? summarizeCoverage({ ...data.coverage, now: new Date() })
     : null;
   // Read off the same sync answer the ribbon uses, so the queue and the ribbon
-  // cannot disagree about whether this organization has ever synced.
-  const recordState = (syncState && RECORD_STATE_BY_SYNC_STATUS[syncState.status]) || 'some';
+  // cannot disagree about whether this organization has ever synced. A load that
+  // never returned is the strongest form of "we don't know" — nothing was
+  // checked at all — so it takes the same branch as an unreadable freshness
+  // query rather than defaulting to 'some' and licensing the all-clear.
+  const recordState = syncState
+    ? (RECORD_STATE_BY_SYNC_STATUS[syncState.status] || 'some')
+    : 'unknown';
 
   return (
     <AppShell breadcrumb={['Dashboard']}>
@@ -127,7 +132,7 @@ export default function Dashboard() {
       {/* Totals live here, demoted, each with its denominator and its caveat. */}
       <footer className={styles.contextStrip} data-testid="context-strip">
         <span className={styles.contextItem}>
-          <span className={styles.contextValue}>{data ? data.sync.recordsLast24h : '—'}</span>
+          <span className={styles.contextValue}>{data?.sync.recordsLast24h ?? '—'}</span>
           <span className={styles.contextLabel}>
             {t('context_records_synced')}
             {' · '}
