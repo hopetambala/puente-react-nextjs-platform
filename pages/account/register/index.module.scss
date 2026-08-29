@@ -58,7 +58,9 @@
 /* A real <button>, not a link: it toggles a disclosure, it does not navigate.
    Styled to read as a link so it stays quiet next to the picker. */
 .notListed {
-  align-self: flex-start;
+  /* No align-self here: Stack wraps this fragment in a plain block <div>
+     (StackItem), so there is no flex parent to align against. A <button> is
+     inline-block, so it already shrinks to its text. */
   margin-top: var(--tk-dlite-semantic-spacing-xs);
   padding: 0;
   border: 0;
