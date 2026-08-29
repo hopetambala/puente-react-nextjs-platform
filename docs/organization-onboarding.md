@@ -42,8 +42,10 @@ an ops problem, a person who cannot make an account is a field problem.
 
 ### Step 1 — Create the `Organization` (staff, once per partner)
 
-**Required before anyone from that partner registers.** There is no UI for this
-yet; `app/epics/OrganizationAdmin/` is unbuilt (see
+**Required before anyone from that partner registers**, and since the picker
+went live it is the ONLY way — a person can no longer create an organization by
+typing a new name. There is still no UI for this step; `app/epics/OrganizationAdmin/`
+has its data loader but no screen (see
 [billing-and-invoicing.md](billing-and-invoicing.md) §8).
 
 `createOrganization` requires the **master key**, so it cannot be called from
@@ -74,7 +76,7 @@ Notes that matter:
 
 | App | Where | Organization field |
 |---|---|---|
-| **Manage** | `/account/register` | Picker, once PR #86 lands. Free text until then. |
+| **Manage** | `/account/register` | Picker over the `Organization` class (live) |
 | **Collect** | Sign Up screen | **Free text**, and its suggestion list has never worked — see below |
 
 Either way the server resolves what was submitted and stores the **canonical
