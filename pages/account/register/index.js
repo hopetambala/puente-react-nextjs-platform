@@ -10,8 +10,10 @@ import FormSelectAutoComplete from 'app/impacto-design-system/form-controls/sele
 import { loadOrganizations, selectedOrganizationName } from 'app/modules/organization';
 import { retrieveSignUpFunction } from 'app/modules/user';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { Parse } from 'parse';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import * as yup from 'yup';
@@ -22,19 +24,35 @@ const HELP_ID = 'organization-not-listed-help';
 
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
-const validationSchema = yup.object().shape({
-  firstname: yup.string(),
-  lastname: yup.string(),
-  organization: yup.string().required('Organization Name is required'),
-  email: yup.string().email('Invalid email format').required('Email Address is required'),
-  phonenumber: yup.string().matches(phoneRegExp, 'Password is required'),
-  password: yup.string().required('Password is required'),
-  passwordconfirmation: yup.string()
-    .oneOf([yup.ref('password'), null], 'Passwords must match'),
-});
+/**
+ * Built from `t` rather than at module scope, so validation messages are
+ * translated like everything else on the page.
+ *
+ * Safe to rebuild on a locale change: react-hook-form 6.15.8 refreshes
+ * `resolverRef.current` on every render (dist/index.cjs.development.js:716), so
+ * a new resolver is picked up rather than the first render's being cached.
+ */
+export function buildRegisterSchema(t) {
+  return yup.object().shape({
+    firstname: yup.string(),
+    lastname: yup.string(),
+    organization: yup.string().required(t('register_error_organization')),
+    email: yup.string()
+      .email(t('register_error_email_invalid'))
+      .required(t('register_error_email_required')),
+    // This read 'Password is required' — a copy-paste that told people their
+    // phone number was a password. Nothing tested the schema, so nothing caught it.
+    phonenumber: yup.string().matches(phoneRegExp, t('register_error_phone')),
+    password: yup.string().required(t('register_error_password')),
+    passwordconfirmation: yup.string()
+      .oneOf([yup.ref('password'), null], t('register_error_password_match')),
+  });
+}
 
 function Register() {
+  const { t } = useTranslation('common');
   const router = useRouter();
+  const validationSchema = useMemo(() => buildRegisterSchema(t), [t]);
   const methods = useForm({
     resolver: yupResolver(validationSchema),
   });
@@ -83,19 +101,19 @@ function Register() {
       <div className={styles.right} data-testid="auth-form">
         <div className={styles.card}>
           <Stack isVertical spacing="medium">
-            <Text text="Create an account" element="h2" />
-            <Text text="Required fields have an asterisk: *" element="p" />
+            <Text text={t('register_heading')} element="h2" />
+            <Text text={t('register_required_note')} element="p" />
           </Stack>
           <FormProvider {...methods}>
             <Stack isVertical className={styles.stack}>
               <FormInput
                 name="firstname"
-                label="First Name"
+                label={t('register_field_first_name')}
                 errorobj={errors}
               />
               <FormInput
                 name="lastname"
-                label="Last Name"
+                label={t('register_field_last_name')}
                 errorobj={errors}
               />
               {organizations.unavailable ? (
@@ -105,14 +123,14 @@ function Register() {
                   <Text
                     element="p"
                     color="red"
-                    text="We could not load the list of organizations. Check your connection and reload the page."
+                    text={t('register_org_unavailable')}
                   />
                 </div>
               ) : (
                 <>
                   <FormSelectAutoComplete
                     name="organization"
-                    label="Organization"
+                    label={t('register_field_organization')}
                     required
                     options={organizations.options}
                     errorobj={errors}
@@ -126,7 +144,7 @@ function Register() {
                     aria-expanded={orgNotListedOpen}
                     aria-controls={orgNotListedOpen ? HELP_ID : undefined}
                   >
-                    My organization isn&apos;t listed
+                    {t('register_org_not_listed')}
                   </button>
                   {orgNotListedOpen && (
                     <div
@@ -134,28 +152,27 @@ function Register() {
                       className={styles.notListedHelp}
                       data-testid="organization-not-listed-help"
                     >
-                      Puente staff add organizations by hand, which is what
-                      keeps the list worth trusting. Email
+                      {t('register_org_help')}
                       {' '}
+                      {/* The link goes last rather than mid-sentence: splitting a
+                          sentence around an anchor forces translators into
+                          English word order. */}
                       <a href="mailto:info@puente-dr.org?subject=Add%20my%20organization%20to%20Puente%20Manage">
-                        info@puente-dr.org
+                        {t('register_org_help_cta')}
                       </a>
-                      {' '}
-                      with your organization&apos;s name. Once it appears in the
-                      list you can finish registering.
                     </div>
                   )}
                 </>
               )}
               <FormInput
                 name="email"
-                label="Email Address"
+                label={t('register_field_email')}
                 required
                 errorobj={errors}
               />
               <FormInput
                 name="phonenumber"
-                label="Phone Number"
+                label={t('register_field_phone')}
                 required
                 errorobj={errors}
               />
@@ -163,13 +180,13 @@ function Register() {
             <Stack isVertical className={styles.stack}>
               <FormInput
                 name="password"
-                label="Password"
+                label={t('register_field_password')}
                 required
                 errorobj={errors}
               />
               <FormInput
                 name="passwordconfirmation"
-                label="Confirm Password"
+                label={t('register_field_password_confirm')}
                 required
                 errorobj={errors}
               />
@@ -179,13 +196,13 @@ function Register() {
             <Button
               intent={notificationType === 'email' ? 'primary' : ''}
               onClick={() => setNotificationType('email')}
-              text="Send confirmation via email?"
+              text={t('register_confirm_email')}
               isFullWidth
             />
             <Button
               intent={notificationType === 'text' ? 'primary' : ''}
               onClick={() => setNotificationType('text')}
-              text="Send confirmation via text?"
+              text={t('register_confirm_text')}
               isFullWidth
             />
           </Stack>
@@ -193,12 +210,12 @@ function Register() {
             <Button
               intent="primary"
               onClick={handleSubmit(onSubmit)}
-              text="Register"
+              text={t('register_submit')}
               isFullWidth
             />
             <Button
               href="/account/login"
-              text="Cancel"
+              text={t('register_cancel')}
               isFullWidth
             />
           </Stack>
@@ -206,6 +223,14 @@ function Register() {
       </div>
     </div>
   );
+}
+
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+    },
+  };
 }
 
 export default Register;
