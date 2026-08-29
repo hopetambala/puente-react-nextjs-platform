@@ -25,3 +25,19 @@
     color: var(--tk-dlite-semantic-color-feedback-danger);
     font-size: var(--font-size-small);
 }
+/* Organization is shown, not edited — it is the tenancy principal, not a
+   preference. Styled as a stated fact rather than a disabled input, because a
+   greyed-out box reads as "temporarily unavailable" rather than "not yours to
+   change". */
+.readOnlyValue {
+  margin: 0;
+  color: var(--tk-dlite-semantic-color-text-primary);
+  font-size: var(--tk-dlite-semantic-typography-size-400);
+}
+
+.readOnlyNote {
+  margin-top: var(--tk-dlite-semantic-spacing-xs);
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  font-size: var(--tk-dlite-semantic-typography-size-300);
+  line-height: 1.5;
+}
