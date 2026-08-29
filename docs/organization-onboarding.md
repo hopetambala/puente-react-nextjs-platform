@@ -110,18 +110,59 @@ organization resolves before checking anything else.**
 
 ---
 
+## One organization, several strings
+
+Records carry the `surveyingOrganization` string that was **collected**, so one
+organization's records are spread across every string it has ever been called.
+This is not an edge case — measured in production 2026-08-29:
+
+| Organization | Canonical name | Also stored as |
+|---|---:|---|
+| DR Missions | 11 rows | `DRMT` — **611 rows** |
+| Rayjon | 185 rows | `Rayjon Eye Clinic` — **1,196 rows** |
+
+**Anything that scopes by organization must match the whole alias set, never one
+string.** Filtering on the canonical name alone showed a Rayjon user 13% of
+their own data and a DR Missions user 1%, with no error and nothing on screen to
+suggest anything was missing.
+
+In Manage this is `organizationMatchValues` / `loadOrganizationScope` in
+`app/modules/organization`, used with `containedIn`. In the exporter it is the
+`short-code` paths:
+
+    /v3/records/short-code/<shortCode>
+    /v2/<type>/short-code/<shortCode>
+    /v2/<type>/short-code/<shortCode>/<formid>
+
+`shortCode` rather than a list of names because names contain commas
+("Beahan, Cole and Wolf" is a real alias), so they cannot be a delimited path
+segment. The old `/organizations/<name>` paths still exist and still behave
+exactly as before — they were never repointed.
+
+**Collect does NOT do this yet.** It filters client-side with `equalTo`
+(`services/parse/crud/index.js`), so on mobile a surveyor still sees only the
+records matching their own account string. There is no Cloud Code seam for it
+and no OTA channel, so it needs a store release. As of 2026-08-29 two DR
+Missions accounts see zero records on mobile for this reason.
+
 ## Known gaps
 
 - **No admin UI.** Step 1 needs the master key and a console. `OrganizationAdmin`
   is planned but unbuilt.
-- **No queue of unresolved accounts.** Nobody is notified when a signup fails to
-  resolve; you have to go looking in the logs.
+- **No queue of unresolved accounts.** The loader exists
+  (`app/epics/OrganizationAdmin/loadOrganizationAdmin.js`) but there is no
+  screen, and nobody is notified when a signup fails to resolve.
+  For scale: 123 of 792 accounts do not resolve, across 105 distinct strings —
+  but **every one of them has zero records**, so they are dormant signups and a
+  billing-hygiene item rather than a user-facing outage.
 - **Collect's organization suggestions have never worked.**
   `modules/cached-resources/read.js` returns the enclosing function instead of the
   accumulated list (`f5adb8b6`, Feb 2023), and the cache only populates after
   login — so a fresh install always renders a bare text box. Fixing it needs a
   store release; Collect has no OTA path (`EXUpdatesEnabled` is `false` on iOS,
   `expo.modules.updates.ENABLED` is `false` on Android).
+- **Collect's record scoping** still uses a single string (see above). Needs a
+  store release; there is no OTA path.
 - **Nobody approves accounts.** `adminVerified` is flipped by a link emailed to
   the registrant themselves, and nothing in either app gates on it. Treat it as
   metadata, not as access control, until §7 of the billing plan lands.
