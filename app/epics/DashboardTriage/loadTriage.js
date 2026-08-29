@@ -40,10 +40,13 @@ const FORM_SPEC_LIMIT = 20;
 // whole dashboard, and buildTriageQueue treats null as "absent, not zero".
 const soft = (p) => p.then((v) => v, () => null);
 
-export async function loadDashboardTriage({ Parse, org, now = new Date() }) {
+export async function loadDashboardTriage({ Parse, orgValues = [], now = new Date() }) {
   const since24h = new Date(now.getTime() - DAY_MS);
 
-  const scoped = (cls) => new Parse.Query(cls).equalTo('surveyingOrganization', org);
+  // containedIn, never equalTo: one organization's records are spread across
+  // every string it has ever been called, and filtering on a single one hides
+  // the rest with no error. See organizationMatchValues.
+  const scoped = (cls) => new Parse.Query(cls).containedIn('surveyingOrganization', orgValues);
 
   // 1 — most recent arrival, for the ribbon.
   const lastSyncQ = scoped('SurveyData');
@@ -58,12 +61,12 @@ export async function loadDashboardTriage({ Parse, org, now = new Date() }) {
   // 3 — records missing at least one key field. Exact. The predicate lives in
   // app/modules/data-quality so this and the curation surface cannot drift
   // apart on what "missing" means — notably, both count '' as missing.
-  const missingQ = missingKeyFieldsQuery({ Parse, org });
+  const missingQ = missingKeyFieldsQuery({ Parse, orgValues });
 
   // 4 — orphans: the offline parent link was minted on the device but never
   // resolved to a household server-side. Same shared predicate the curation
   // surface filters its ?signal=unresolved-parent page with.
-  const orphanQ = unresolvedParentQuery({ Parse, org });
+  const orphanQ = unresolvedParentQuery({ Parse, orgValues });
 
   // 5 — ONE wide sample, two consumers (duplicates + coverage). select() keeps
   // this to 3 fields instead of SurveyData's ~65.
@@ -74,7 +77,7 @@ export async function loadDashboardTriage({ Parse, org, now = new Date() }) {
 
   // 6 — active form definitions, for the drift check.
   const specsQ = new Parse.Query('FormSpecificationsV2');
-  specsQ.equalTo('organizations', org);
+  specsQ.containedIn('organizations', orgValues);
   // `active` is the STRING 'true' on this class, not a boolean.
   specsQ.equalTo('active', 'true');
   specsQ.limit(FORM_SPEC_LIMIT);

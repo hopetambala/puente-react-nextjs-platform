@@ -20,8 +20,8 @@ export const SURVEY_COMPLETENESS_FIELDS = [
  * to match. Every arm re-applies the org scope, because `Parse.Query.or` holds
  * no constraint of its own — an unscoped arm would match other orgs' records.
  */
-export function missingKeyFieldsQuery({ Parse, org }) {
-  const scoped = () => new Parse.Query('SurveyData').equalTo('surveyingOrganization', org);
+export function missingKeyFieldsQuery({ Parse, orgValues = [] }) {
+  const scoped = () => new Parse.Query('SurveyData').containedIn('surveyingOrganization', orgValues);
 
   // Two sub-queries per field, not one: a single Parse query cannot hold both
   // doesNotExist(f) and equalTo(f, '') on the same key — the second constraint
@@ -45,9 +45,9 @@ export function missingKeyFieldsQuery({ Parse, org }) {
  * COLLECTED the record); `organization` lives on _User and describes an
  * account, so it would scope nothing on SurveyData.
  */
-export function unresolvedParentQuery({ Parse, org }) {
+export function unresolvedParentQuery({ Parse, orgValues = [] }) {
   return new Parse.Query('SurveyData')
-    .equalTo('surveyingOrganization', org)
+    .containedIn('surveyingOrganization', orgValues)
     .exists('householdObjectIdOffline')
     .doesNotExist('householdId');
 }

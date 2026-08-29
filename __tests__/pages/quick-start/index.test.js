@@ -74,7 +74,7 @@ describe('Org scoping', () => {
     render(<Dashboard />);
 
     await waitFor(() => expect(mockLoad).toHaveBeenCalledWith(
-      expect.objectContaining({ org: 'Puente' }),
+      expect.objectContaining({ orgValues: ['Puente'] }),
     ));
   });
 });

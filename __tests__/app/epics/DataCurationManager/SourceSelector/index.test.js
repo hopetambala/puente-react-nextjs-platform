@@ -12,6 +12,7 @@ jest.mock('parse', () => ({
   Parse: {
     Query: jest.fn(() => ({
       equalTo: jest.fn().mockReturnThis(),
+  containedIn: jest.fn().mockReturnThis(),
       notEqualTo: jest.fn().mockReturnThis(),
       find: mockFormsFindFn,
     })),
@@ -52,14 +53,14 @@ describe('SourceSelector', () => {
   });
 
   it('renders People Records as the default selected option', async () => {
-    render(<SourceSelector source="survey-data" org="TestOrg" onChange={mockOnChange} />);
+    render(<SourceSelector source="survey-data" orgValues={['TestOrg']} onChange={mockOnChange} />);
     await waitFor(() => {
       expect(screen.getByDisplayValue(/People Records/i)).toBeInTheDocument();
     });
   });
 
   it('renders fixed source options (EvaluationMedical, Vitals, EnvironmentalHealth)', async () => {
-    render(<SourceSelector source="survey-data" org="TestOrg" onChange={mockOnChange} />);
+    render(<SourceSelector source="survey-data" orgValues={['TestOrg']} onChange={mockOnChange} />);
     await waitFor(() => {
       const select = screen.getByRole('combobox');
       expect(select).toBeInTheDocument();
@@ -76,7 +77,7 @@ describe('SourceSelector', () => {
     const mockForm = { id: 'form1', get: (k) => ({ name: 'WaSH Survey' }[k]) };
     mockFormsFindFn.mockResolvedValue([mockForm]);
 
-    render(<SourceSelector source="survey-data" org="TestOrg" onChange={mockOnChange} />);
+    render(<SourceSelector source="survey-data" orgValues={['TestOrg']} onChange={mockOnChange} />);
     await waitFor(() => {
       expect(screen.getByText('WaSH Survey')).toBeInTheDocument();
     });
@@ -86,7 +87,7 @@ describe('SourceSelector', () => {
     const mockForm = { id: 'form1', get: (k) => ({ name: 'WaSH Survey' }[k]) };
     mockFormsFindFn.mockResolvedValue([mockForm]);
 
-    render(<SourceSelector source="survey-data" org="TestOrg" onChange={mockOnChange} />);
+    render(<SourceSelector source="survey-data" orgValues={['TestOrg']} onChange={mockOnChange} />);
     await waitFor(() => screen.getByText('WaSH Survey'));
 
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'form-results:form1' } });
@@ -94,7 +95,7 @@ describe('SourceSelector', () => {
   });
 
   it('calls onChange with eval-medical when Medical Evaluation selected', async () => {
-    render(<SourceSelector source="survey-data" org="TestOrg" onChange={mockOnChange} />);
+    render(<SourceSelector source="survey-data" orgValues={['TestOrg']} onChange={mockOnChange} />);
     await waitFor(() => screen.getByRole('combobox'));
 
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'eval-medical' } });
@@ -106,7 +107,7 @@ describe('SourceSelector', () => {
     const mockForm = { id: 'form-null-active', get: (k) => ({ name: 'New Form', active: null }[k]) };
     mockFormsFindFn.mockResolvedValue([mockForm]);
 
-    render(<SourceSelector source="survey-data" org="TestOrg" onChange={mockOnChange} />);
+    render(<SourceSelector source="survey-data" orgValues={['TestOrg']} onChange={mockOnChange} />);
     await waitFor(() => expect(screen.getByText('New Form')).toBeInTheDocument());
 
     const { Parse } = require('parse');
@@ -116,19 +117,19 @@ describe('SourceSelector', () => {
   });
 
   it('queries FormSpecificationsV2 by the "organizations" field (not surveyingOrganization)', async () => {
-    render(<SourceSelector source="survey-data" org="TestOrg" onChange={mockOnChange} />);
+    render(<SourceSelector source="survey-data" orgValues={['TestOrg']} onChange={mockOnChange} />);
     await waitFor(() => expect(mockFormsFindFn).toHaveBeenCalled());
     // The equalTo mock is on the shared query chain — check it was called with 'organizations'
     const { Parse } = require('parse');
     const queryInstance = Parse.Query.mock.results[0].value;
-    expect(queryInstance.equalTo).toHaveBeenCalledWith('organizations', 'TestOrg');
+    expect(queryInstance.containedIn).toHaveBeenCalledWith('organizations', ['TestOrg']);
   });
 
   it('renders system record options alongside custom form options in one control', async () => {
     const mockForm = { id: 'form1', get: (k) => ({ name: 'WaSH Survey' }[k]) };
     mockFormsFindFn.mockResolvedValue([mockForm]);
 
-    render(<SourceSelector source="survey-data" org="TestOrg" onChange={mockOnChange} />);
+    render(<SourceSelector source="survey-data" orgValues={['TestOrg']} onChange={mockOnChange} />);
 
     await waitFor(() => {
       const select = screen.getByTestId('source-select');
