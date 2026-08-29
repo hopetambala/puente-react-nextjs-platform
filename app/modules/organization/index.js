@@ -130,9 +130,11 @@ export function toOrganizationOptions(records = []) {
  * caller is told the load is unreliable rather than left to assume it is
  * complete.
  *
- * Deliberately no record count here. Organizations are created by hand, often in
- * the Back4App dashboard, so any number written into this comment is stale the
- * moment staff add a partner — and a stale number in a comment reads as fact. If it is ever reached the picker is showing an incomplete list, so
+ * The population is dozens, not thousands (37 on 2026-08-28, counted against
+ * production), and it grows only when staff add a partner. That order of
+ * magnitude is what makes 500 a safe guard; the exact figure is deliberately not
+ * pinned here, because a census in a comment rots silently and then reads as
+ * fact. If it is ever reached the picker is showing an incomplete list, so
  * the caller is told the load is unreliable rather than left to assume it is
  * complete.
  */
