@@ -22,7 +22,6 @@ const validationSchema = yup
     'First Name': yup.string().required('First Name is Required'),
     'Last Name': yup.string().required('Last Name is Required'),
     'Email Address': yup.string().required('Email is Required'),
-    Organization: yup.string().required('Username or Phone Number is Required'),
     Password: yup.string(),
   })
   .required()
@@ -43,7 +42,9 @@ function Management(props) {
     const updatedUser = {
       firstname: data['First Name'],
       lastname: data['Last Name'],
-      organization: data.Organization,
+      // From the loaded profile, not the form: organization is not editable
+      // here, and reading data.Organization would submit undefined and wipe it.
+      organization: user.Organization,
       phonenumber: data['Phone Number'],
       email: data['Email Address'],
     }
@@ -62,7 +63,9 @@ function Management(props) {
     const updatedUser = {
       firstname: data['First Name'],
       lastname: data['Last Name'],
-      organization: data.Organization,
+      // From the loaded profile, not the form: organization is not editable
+      // here, and reading data.Organization would submit undefined and wipe it.
+      organization: user.Organization,
       phonenumber: data['Phone Number'],
       email: data['Email Address'],
       password: data.Password,
@@ -89,6 +92,24 @@ function Management(props) {
               <Stack isVertical spacing="large" className={styles.stack} fill>
                 {user &&
                   Object.keys(user).map((attr) => (
+                    attr === 'Organization' ? (
+                      /* Read-only on purpose. Organization is the tenancy and
+                         billing principal — a free-text box here let anyone move
+                         themselves into another organization and see its data,
+                         and a picker would only make the destinations easier to
+                         find. Changing it is a staff action. */
+                      <Stack isVertical fill>
+                        <label htmlFor={attr}>{attr}</label>
+                        <p className={styles.readOnlyValue}>{user[attr]}</p>
+                        <p
+                          className={styles.readOnlyNote}
+                          data-testid="organization-change-note"
+                        >
+                          Your organization determines which records you can see.
+                          Email info@puente-dr.org to change it.
+                        </p>
+                      </Stack>
+                    ) : (
                     <Stack isVertical fill>
                       <label htmlFor={attr}>{attr}</label>
                       <input name={attr} ref={register} />
@@ -98,6 +119,7 @@ function Management(props) {
                         </p>
                       )}
                     </Stack>
+                    )
                   ))}
               </Stack>
               <Stack isVertical spacing="large">

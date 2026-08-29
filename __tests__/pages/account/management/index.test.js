@@ -104,3 +104,30 @@ describe('Language switcher', () => {
     });
   });
 });
+
+describe('Organization is not self-service', () => {
+  // Organization is the tenancy and billing principal. A free-text box here let
+  // anyone move themselves into another organization and see its data — the
+  // last free-text door into _User.organization after the register picker
+  // landed, and the likeliest source of the 17 'Puente ' (trailing space)
+  // accounts in production. A picker would not fix it; it would make
+  // tenant-hopping easier by listing the destinations.
+  it('does not render an editable organization field', async () => {
+    const { container } = render(<ManagementWrapper />);
+    await waitFor(() => expect(container.querySelector('input[name="First Name"]')).toBeTruthy());
+
+    expect(container.querySelector('input[name="Organization"]')).toBeNull();
+  });
+
+  it('still shows which organization the account belongs to', async () => {
+    render(<ManagementWrapper />);
+
+    expect(await screen.findByText('test-org')).toBeInTheDocument();
+  });
+
+  it('tells the person how to change it', async () => {
+    render(<ManagementWrapper />);
+
+    expect(await screen.findByTestId('organization-change-note')).toBeInTheDocument();
+  });
+});
