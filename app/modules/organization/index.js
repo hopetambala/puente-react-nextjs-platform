@@ -97,9 +97,12 @@ export function resolveOrganization({ pointer, name } = {}, organizations = []) 
 /**
  * Organizations that must never be offered in a user-facing picker.
  *
- * `internal-test` exists so ~830 junk records (`testORG`, `Xyz`, Faker company
- * names) resolve and never bill. It is bookkeeping, not somewhere a real person
- * signs up.
+ * `internal-test` is the intended home for the junk values the 2026-08-28 alias
+ * audit found (`testORG`, `Xyz`, Faker company names), so they resolve and never
+ * bill. It is bookkeeping, not somewhere a real person signs up.
+ *
+ * NOTE: that Organization has not been created yet. This filter is inert until
+ * it is.
  */
 const NON_SELECTABLE_SHORT_CODES = new Set(['internal-test']);
 
@@ -124,9 +127,14 @@ export function toOrganizationOptions(records = []) {
 }
 
 /**
- * Upper bound on the organization fetch. There are 37 in production and they are
- * created by hand, so this is a guard against an unbounded query rather than a
- * page size. If it is ever reached the picker is showing an incomplete list, so
+ * Upper bound on the organization fetch. Organizations are created by hand, so
+ * this is a guard against an unbounded query rather than a page size.
+ *
+ * How many exist in production: as of 2026-08-28, ZERO. `createOrganization` is
+ * deployed but has no caller in any repo, and the alias audit was explicitly
+ * read-only. This picker therefore CANNOT SHIP until the records exist — an
+ * empty list is a successful load, so registration would simply be impossible
+ * with no error to explain it. See the merge gate in docs/billing-and-invoicing.md. If it is ever reached the picker is showing an incomplete list, so
  * the caller is told the load is unreliable rather than left to assume it is
  * complete.
  */
