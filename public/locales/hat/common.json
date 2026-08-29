@@ -125,5 +125,7 @@
   "triage_unavailable_missing-key-fields": "chan kle ki manke",
   "data_curation_filtered_missing-key-fields": "N ap montre sèlman dosye ki manke chan kle. Chif ki anba yo dekri ansanm filtre sa a, se pa tout dosye yo.",
   "data_curation_filtered_unresolved-parent": "N ap montre sèlman dosye ki gen yon lyen kay ki poko rezoud. Chif ki anba yo dekri ansanm filtre sa a, se pa tout dosye yo.",
-  "language": "Lang"
+  "language": "Lang",
+  "login_sub": "Kreye fòm, siveye teren an epi analize repons yo.",
+  "divider_or": "oswa"
 }

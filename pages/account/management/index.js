@@ -123,7 +123,7 @@ function Management(props) {
             submits, re-authenticates and redirects, and language is not a
             _User field. Also outside the loading ternary, so the choice stays
             available while the profile is still fetching. */}
-        <Card padding="extraLarge">
+        <Card padding="medium">
           <LanguageSwitcher />
         </Card>
       </div>

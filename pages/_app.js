@@ -19,6 +19,7 @@ import 'styles/landing-page/top-loading-bar.css'
 
 import CssBaseline from '@material-ui/core/CssBaseline'
 import { ThemeProvider } from '@material-ui/core/styles'
+import { stripLocalePrefix, syncDocumentLanguage } from 'app/modules/i18n/languages'
 import theme from 'app/modules/theme'
 import { parseUserValue } from 'app/modules/user'
 import parseService from 'app/services/parse'
@@ -55,7 +56,10 @@ function App(props) {
       '/account/reset',
       '/account/management',
     ]
-    const path = url.split('?')[0]
+    // Strip the locale prefix before comparing: publicPaths is written without
+    // one, and routeChangeComplete hands over the full URL. Without this, every
+    // /spa/* and /hat/* public route fails the guard and renders blank.
+    const path = stripLocalePrefix(url)
     if (!parseUser && !publicPaths.includes(path)) {
       setAuthorized(false)
       router.push({
@@ -81,13 +85,19 @@ function App(props) {
     const hideContent = () => setAuthorized(false)
     router.events.on('routeChangeStart', hideContent)
 
-    // on route change complete - run auth check
-    router.events.on('routeChangeComplete', authCheck)
+    // on route change complete - run auth check, and re-assert <html lang>,
+    // which Next resets to the raw routing locale ("spa") on a client-side
+    // locale change, undoing the BCP 47 tag ("es") _document rendered.
+    const onRouteDone = (url) => {
+      authCheck(url)
+      syncDocumentLanguage(document.documentElement.lang)
+    }
+    router.events.on('routeChangeComplete', onRouteDone)
 
     // unsubscribe from events in useEffect return function
     return () => {
       router.events.off('routeChangeStart', hideContent)
-      router.events.off('routeChangeComplete', authCheck)
+      router.events.off('routeChangeComplete', onRouteDone)
     }
   }, [])
 

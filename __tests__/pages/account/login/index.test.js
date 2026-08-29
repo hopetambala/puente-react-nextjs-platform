@@ -120,3 +120,20 @@ describe('Language switcher', () => {
     expect(screen.getByRole('button', { name: 'Kreyòl Ayisyen' })).toBeInTheDocument();
   });
 });
+
+// Found by visual QA, not by any test: the Spanish page rendered a translated
+// heading, fields and button, then an English subtitle and an English "or".
+// Shipping a language switcher onto a half-translated page promises something
+// the page does not deliver. The mock returns the key for anything it does not
+// map, so asserting the key proves the string goes through t().
+describe('No hardcoded English in the sign-in card', () => {
+  it('translates the subtitle', () => {
+    render(<Login />);
+    expect(screen.getByText('login_sub')).toBeInTheDocument();
+  });
+
+  it('translates the divider between sign-in and the alternatives', () => {
+    render(<Login />);
+    expect(screen.getByText('divider_or')).toBeInTheDocument();
+  });
+});

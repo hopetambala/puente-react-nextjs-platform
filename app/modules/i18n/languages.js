@@ -35,8 +35,51 @@ const DEFAULT_BCP47 = 'en';
  * worse for a screen reader than a wrong-but-valid tag.
  */
 function toBcp47(locale) {
-  const match = LANGUAGES.find((language) => language.locale === locale);
-  return match ? match.bcp47 : DEFAULT_BCP47;
+  const byRoutingId = LANGUAGES.find((language) => language.locale === locale);
+  if (byRoutingId) return byRoutingId.bcp47;
+  // Idempotent: an already-correct tag maps to itself, so re-syncing a page
+  // that the server rendered correctly cannot clobber it back to the default.
+  const byTag = LANGUAGES.find((language) => language.bcp47 === locale);
+  if (byTag) return byTag.bcp47;
+  return DEFAULT_BCP47;
 }
 
-module.exports = { LANGUAGES, toBcp47 };
+/**
+ * Remove a leading locale segment from a URL path.
+ *
+ * Routing checks in the app (notably the auth guard's public-path list in
+ * pages/_app.js) are written WITHOUT locale prefixes. On initial load that
+ * works, because Next strips the locale from `router.asPath`. But
+ * `routeChangeComplete` hands over the full URL, so after a language switch
+ * `/spa/account/login` fails a list that only contains `/account/login`, and
+ * the guard blanks a public page.
+ *
+ * Matching is segment-exact on purpose: `/spades/x` must not become `/des/x`.
+ */
+function stripLocalePrefix(path) {
+  const withoutQuery = String(path).split('?')[0];
+  const segments = withoutQuery.split('/');
+  const isLocale = LANGUAGES.some((language) => language.locale === segments[1]);
+  if (!isLocale) return withoutQuery;
+
+  const rest = `/${segments.slice(2).join('/')}`;
+  if (rest === '/') return '/';
+  return rest.replace(/\/$/, '') || '/';
+}
+
+/**
+ * Re-assert <html lang> as a BCP 47 tag.
+ *
+ * _document gets this right on the server, but Next overwrites
+ * documentElement.lang with the RAW routing locale on a client-side locale
+ * change, so a page served as lang="es" silently becomes lang="spa" the
+ * moment someone uses the language switcher without a reload.
+ */
+function syncDocumentLanguage(locale) {
+  if (typeof document === 'undefined') return;
+  document.documentElement.lang = toBcp47(locale);
+}
+
+module.exports = {
+  LANGUAGES, stripLocalePrefix, syncDocumentLanguage, toBcp47,
+};

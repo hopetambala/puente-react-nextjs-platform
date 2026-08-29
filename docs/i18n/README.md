@@ -158,8 +158,37 @@ chrome directly above the data table is the wrong trade — and being inside
 `AppShell` it is behind authentication anyway, so it would not have solved the
 problem it exists for.
 
-The choice persists in the `NEXT_LOCALE` cookie, which Next.js reads ahead of
-`Accept-Language`. Without it the choice survives exactly one navigation.
+The choice is written to the `NEXT_LOCALE` cookie, which Next.js reads ahead of
+`Accept-Language` when it detects a locale. Verified behaviour, so nobody
+over-promises it:
+
+| Visit | Result with `NEXT_LOCALE=spa` |
+| --- | --- |
+| `/` | redirects to `/spa`, `lang="es"` |
+| `/account/login` (unprefixed deep link) | stays English |
+
+Next only runs locale detection at the app root. Once switched, the locale
+lives in the URL, so navigation inside the app keeps it — but a **bookmarked
+unprefixed deep link opens in English**. Closing that would need middleware,
+which is not in this change.
+
+### Two bugs this surfaced, both fixed
+
+- **The auth guard blanked every locale-prefixed page.** `pages/_app.js`
+  compares the current URL against a list of public paths written without
+  locale prefixes. On first load that works, because Next strips the locale
+  from `router.asPath` — but `routeChangeComplete` hands over the full URL, so
+  `/spa/account/login` was not in the list, the guard treated a public page as
+  private, and rendered nothing. `stripLocalePrefix` now normalises the path
+  first. This affected any locale-prefixed route, not just the switcher.
+- **`<html lang>` reverted on client-side switches.** `_document` renders the
+  correct BCP 47 tag, but Next overwrites `documentElement.lang` with the raw
+  routing locale on a client-side locale change, so a page served as `lang="es"`
+  became `lang="spa"` the moment someone used the switcher without reloading.
+  `syncDocumentLanguage` re-asserts it on every route change.
+
+Neither was reachable by unit tests; both were found by driving the real app in
+a browser.
 
 ## Open items
 
