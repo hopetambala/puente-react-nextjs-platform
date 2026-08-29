@@ -74,8 +74,15 @@ export function resolveOrganization({ pointer, name } = {}, organizations = []) 
   }
 
   const wanted = normalizeOrganizationName(name);
+  // The canonical name is ALWAYS an implicit alias. `aliases` defaults to [] at
+  // creation and the registration picker offers an organization's `name`, so
+  // matching aliases alone lets an organization sit in the dropdown and still
+  // resolve as unknown. Kept identical to the server resolver in
+  // puente-node-cloudcode/cloud/src/services/organization/organization.js — if
+  // the two diverge, the two systems disagree about who owns a record.
   const matches = wanted === null ? [] : organizations.filter(
-    (o) => (o.aliases || []).some((alias) => normalizeOrganizationName(alias) === wanted),
+    (o) => [o.name, ...(o.aliases || [])]
+      .some((candidate) => normalizeOrganizationName(candidate) === wanted),
   );
 
   // Two organizations claiming one alias misroutes records AND money, and a

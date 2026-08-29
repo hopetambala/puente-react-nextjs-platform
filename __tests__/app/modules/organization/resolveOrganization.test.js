@@ -155,3 +155,18 @@ describe('normalizeOrganizationName', () => {
     expect(normalizeOrganizationName(null)).toBeNull();
   });
 });
+
+describe('the canonical name is an implicit alias', () => {
+  it('resolves an organization that lists no aliases', () => {
+    // Must stay identical to the server resolver in
+    // puente-node-cloudcode/cloud/src/services/organization/organization.js.
+    // If they disagree, the two systems disagree about who owns a record.
+    // Raised by Copilot on cloudcode PR #620.
+    const orgs = [{
+      objectId: 'id-alias-free', shortCode: 'alias-free', name: 'Alias Free Org', aliases: [],
+    }];
+
+    expect(resolveOrganization({ name: 'Alias Free Org' }, orgs))
+      .toEqual({ status: 'resolved', organization: orgs[0] });
+  });
+});
