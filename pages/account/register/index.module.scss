@@ -54,3 +54,36 @@
 .stack {
   padding-bottom: var(--spacer-l);
 }
+
+/* A real <button>, not a link: it toggles a disclosure, it does not navigate.
+   Styled to read as a link so it stays quiet next to the picker. */
+.notListed {
+  /* No align-self here: Stack wraps this fragment in a plain block <div>
+     (StackItem), so there is no flex parent to align against. A <button> is
+     inline-block, so it already shrinks to its text. */
+  margin-top: var(--tk-dlite-semantic-spacing-xs);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: var(--tk-dlite-semantic-color-action-primary);
+  font-family: var(--tk-dlite-semantic-typography-font-heading);
+  font-size: var(--tk-dlite-semantic-typography-size-300);
+  font-weight: 500;
+  text-align: start;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.notListedHelp {
+  margin-top: var(--tk-dlite-semantic-spacing-sm);
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  font-size: var(--tk-dlite-semantic-typography-size-300);
+  line-height: 1.5;
+
+  a {
+    color: var(--tk-dlite-semantic-color-action-primary);
+  }
+}

@@ -6,14 +6,19 @@ import {
     Text,
     Toast,
 } from 'app/impacto-design-system';
+import FormSelectAutoComplete from 'app/impacto-design-system/form-controls/select-autocomplete';
+import { loadOrganizations, selectedOrganizationName } from 'app/modules/organization';
 import { retrieveSignUpFunction } from 'app/modules/user';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { Parse } from 'parse';
+import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import * as yup from 'yup';
 
 import styles from './index.module.scss';
+
+const HELP_ID = 'organization-not-listed-help';
 
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
@@ -34,11 +39,30 @@ function Register() {
     resolver: yupResolver(validationSchema),
   });
   const [notificationType, setNotificationType] = useState('email');
+  // `unavailable` starts false so the picker renders immediately; a failed load
+  // flips it. Never conflate "could not load" with "no organizations exist" —
+  // both look like an empty dropdown, and only one is the user's problem.
+  const [organizations, setOrganizations] = useState({ options: [], unavailable: false });
+  const [orgNotListedOpen, setOrgNotListedOpen] = useState(false);
+
+  useEffect(() => {
+    let ignore = false;
+    loadOrganizations(Parse).then((result) => {
+      if (!ignore) setOrganizations(result);
+    });
+    return () => { ignore = true; };
+  }, []);
 
   const { handleSubmit, errors } = methods;
 
   const onSubmit = async (user) => {
-    await retrieveSignUpFunction(user, notificationType).then(() => {
+    // The picker yields a react-select option object; signup stores
+    // String(organization), so an object lands as "[object Object]".
+    const payload = {
+      ...user,
+      organization: selectedOrganizationName(user.organization),
+    };
+    await retrieveSignUpFunction(payload, notificationType).then(() => {
       router.push('/quick-start');
     }).catch((e) => toast(
       <Toast text={`${e.message}`} isError />,
@@ -74,12 +98,55 @@ function Register() {
                 label="Last Name"
                 errorobj={errors}
               />
-              <FormInput
-                name="organization"
-                label="Organization Name"
-                required
-                errorobj={errors}
-              />
+              {organizations.unavailable ? (
+                // Text takes a fixed prop list and does not forward data-* or
+                // arbitrary attributes, so the test hook lives on the wrapper.
+                <div data-testid="organization-unavailable">
+                  <Text
+                    element="p"
+                    color="red"
+                    text="We could not load the list of organizations. Check your connection and reload the page."
+                  />
+                </div>
+              ) : (
+                <>
+                  <FormSelectAutoComplete
+                    name="organization"
+                    label="Organization"
+                    required
+                    options={organizations.options}
+                    errorobj={errors}
+                  />
+                  {/* Only offered when the list actually loaded. If it did not,
+                      we cannot claim an organization is missing from it. */}
+                  <button
+                    type="button"
+                    className={styles.notListed}
+                    onClick={() => setOrgNotListedOpen((open) => !open)}
+                    aria-expanded={orgNotListedOpen}
+                    aria-controls={orgNotListedOpen ? HELP_ID : undefined}
+                  >
+                    My organization isn&apos;t listed
+                  </button>
+                  {orgNotListedOpen && (
+                    <div
+                      id={HELP_ID}
+                      className={styles.notListedHelp}
+                      data-testid="organization-not-listed-help"
+                    >
+                      Puente staff add organizations by hand, which is what
+                      keeps the list worth trusting. Email
+                      {' '}
+                      <a href="mailto:info@puente-dr.org?subject=Add%20my%20organization%20to%20Puente%20Manage">
+                        info@puente-dr.org
+                      </a>
+                      {' '}
+                      with your organization&apos;s name. Once it appears in the
+                      list you can finish registering.
+                    </div>
+                  )}
+                </>
+              )}
               <FormInput
                 name="email"
                 label="Email Address"

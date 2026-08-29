@@ -74,8 +74,15 @@ export function resolveOrganization({ pointer, name } = {}, organizations = []) 
   }
 
   const wanted = normalizeOrganizationName(name);
+  // The canonical name is ALWAYS an implicit alias. `aliases` defaults to [] at
+  // creation and the registration picker offers an organization's `name`, so
+  // matching aliases alone lets an organization sit in the dropdown and still
+  // resolve as unknown. Kept identical to the server resolver in
+  // puente-node-cloudcode/cloud/src/services/organization/organization.js — if
+  // the two diverge, the two systems disagree about who owns a record.
   const matches = wanted === null ? [] : organizations.filter(
-    (o) => (o.aliases || []).some((alias) => normalizeOrganizationName(alias) === wanted),
+    (o) => [o.name, ...(o.aliases || [])]
+      .some((candidate) => normalizeOrganizationName(candidate) === wanted),
   );
 
   // Two organizations claiming one alias misroutes records AND money, and a
@@ -92,4 +99,102 @@ export function resolveOrganization({ pointer, name } = {}, organizations = []) 
   if (matches.length === 1) return { status: 'resolved', organization: matches[0] };
 
   return { status: 'unresolved', value: name ?? null };
+}
+
+/**
+ * Organizations that must never be offered in a user-facing picker.
+ *
+ * `internal-test` is the home for the junk values the 2026-08-28 alias audit
+ * found (`testORG`, `Xyz`, Faker company names), so they resolve and never bill.
+ * It is bookkeeping, not somewhere a real person signs up.
+ */
+const NON_SELECTABLE_SHORT_CODES = new Set(['internal-test']);
+
+/**
+ * Maps `Organization` records to the shape the picker expects, sorted by name.
+ *
+ * Sorting uses the same folding as `normalizeOrganizationName` so that
+ * "Asociación" files under A rather than after Z — these names are frequently
+ * Spanish, and a picker that buries the accented ones is a picker people scroll
+ * past.
+ *
+ * Inactive organizations are omitted: a retired partner must not be offerable
+ * to a new account.
+ */
+export function toOrganizationOptions(records = []) {
+  return (records || [])
+    .filter((r) => r.get('active') !== false)
+    .filter((r) => !NON_SELECTABLE_SHORT_CODES.has(r.get('shortCode')))
+    .map((r) => ({ id: r.id, label: r.get('name'), shortCode: r.get('shortCode') }))
+    .sort((a, b) => normalizeOrganizationName(a.label)
+      .localeCompare(normalizeOrganizationName(b.label)));
+}
+
+/**
+ * Upper bound on the organization fetch. Organizations are created by hand by
+ * Puente staff, so this is a guard against an unbounded query rather than a page
+ * size. If it is ever reached the picker is showing an incomplete list, so the
+ * caller is told the load is unreliable rather than left to assume it is
+ * complete.
+ *
+ * The population is dozens, not thousands (37 on 2026-08-28, counted against
+ * production), and it grows only when staff add a partner. That order of
+ * magnitude is what makes 500 a safe guard; the exact figure is deliberately not
+ * pinned here, because a census in a comment rots silently and then reads as
+ * fact. If it is ever reached the picker is showing an incomplete list, so
+ * the caller is told the load is unreliable rather than left to assume it is
+ * complete.
+ */
+export const ORGANIZATION_FETCH_LIMIT = 500;
+
+/**
+ * Loads the organizations offerable at registration.
+ *
+ * Returns `{ options, unavailable }`. The flag matters more than it looks: an
+ * empty dropdown because nothing loaded and an empty dropdown because no
+ * organizations exist are indistinguishable to the person looking at it, and the
+ * first must never present as the second. Same rule the dashboard applies to a
+ * check that could not run.
+ *
+ * Runs before anyone is signed in, so it relies on the public read ACL the
+ * Organization records carry.
+ */
+export async function loadOrganizations(Parse) {
+  try {
+    const query = new Parse.Query('Organization');
+    query.select('name', 'shortCode', 'active');
+    query.limit(ORGANIZATION_FETCH_LIMIT);
+    const records = await query.find();
+
+    return {
+      options: toOrganizationOptions(records),
+      unavailable: false,
+      truncated: records.length === ORGANIZATION_FETCH_LIMIT,
+    };
+  } catch (error) {
+    return { options: [], unavailable: true, truncated: false };
+  }
+}
+
+/**
+ * react-select hands react-hook-form the whole selected OPTION OBJECT
+ * (`{ label, value }`), not a bare value. Everything downstream wants the
+ * canonical name STRING:
+ *
+ *   - cloudcode's `signup` does `user.set('organization', String(organization))`,
+ *     so an object is stored as the literal "[object Object]";
+ *   - Collect renders `_User.organization` straight into JSX and matches records
+ *     with an exact `equalTo` against `surveyingOrganization`;
+ *   - `_User.organization` is declared `String` in both repos' schema.json.
+ *
+ * The option's `label` is the Organization's canonical `name` (see
+ * toOrganizationOptions), which is the value records carry — so it is what makes
+ * an account match its organization's existing data.
+ *
+ * The objectId is still on the option as `value`, for whenever _User gains a
+ * real pointer. Storing the name today is not a decision against that.
+ */
+export function selectedOrganizationName(selection) {
+  if (selection && typeof selection.label === 'string') return selection.label;
+  return selection;
 }
