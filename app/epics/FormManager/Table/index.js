@@ -11,6 +11,7 @@ const FormManagerTable = ({
   retrieveCustomData,
   passDataToFormCreator,
   organization,
+  shortCode,
   puenteForm,
   onSelectForm,
 }) => {
@@ -129,7 +130,7 @@ const FormManagerTable = ({
                         />
                       </>
                     )}
-                    <CSVButton form={row} surveyingOrganization={organization} />
+                    <CSVButton form={row} surveyingOrganization={organization} shortCode={shortCode} />
                   </div>
                 </td>
               </ExpandableTableRow>

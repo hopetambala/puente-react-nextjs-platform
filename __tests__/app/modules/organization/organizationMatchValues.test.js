@@ -74,3 +74,41 @@ describe('loadOrganizationScope', () => {
       .toEqual(['Puente']);
   });
 });
+
+describe('loadOrganizationIdentity', () => {
+  const { loadOrganizationIdentity } = require('app/modules/organization');
+
+  const makeParse = (records) => ({
+    Query: class {
+      select() { return this; }
+
+      limit() { return this; }
+
+      async find() { return records; }
+    },
+  });
+
+  const record = {
+    id: 'o1',
+    get: (k) => ({ name: 'DR Missions', shortCode: 'dr-missions', aliases: ['DR Missions', 'DRMT'] }[k]),
+  };
+
+  it('returns the shortCode alongside the match values', async () => {
+    // The CSV exporter needs the shortCode: the aggregator keys its
+    // alias-aware export path on it, because organization names contain commas
+    // ("Beahan, Cole and Wolf") and cannot be a delimited path segment.
+    const result = await loadOrganizationIdentity(makeParse([record]), 'DRMT');
+
+    expect(result.shortCode).toBe('dr-missions');
+    expect(result.values.sort()).toEqual(['DR Missions', 'DRMT']);
+  });
+
+  it('has no shortCode when the organization is unrecognised', async () => {
+    // Callers fall back to the legacy single-string export path. 123 of 792
+    // production accounts do not resolve; they must still be able to export.
+    const result = await loadOrganizationIdentity(makeParse([record]), 'Peace Corps');
+
+    expect(result.shortCode).toBeNull();
+    expect(result.values).toEqual(['Peace Corps']);
+  });
+});

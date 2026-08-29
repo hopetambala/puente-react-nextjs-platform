@@ -230,6 +230,47 @@ export function organizationMatchValues(name, organizations = []) {
 }
 
 /**
+ * An organization's identity for a viewer: every string its records may carry,
+ * plus the `shortCode` the CSV exporter needs.
+ *
+ * One read serves both. The exporter keys on shortCode because organization
+ * names contain commas ("Beahan, Cole and Wolf" is a real alias), so they
+ * cannot be passed as a delimited path segment.
+ */
+export async function loadOrganizationIdentity(Parse, organization) {
+  try {
+    const query = new Parse.Query('Organization');
+    query.select('name', 'shortCode', 'aliases', 'active');
+    query.limit(ORGANIZATION_FETCH_LIMIT);
+    const records = await query.find();
+    const organizations = records.map((r) => ({
+      objectId: r.id,
+      name: r.get('name'),
+      shortCode: r.get('shortCode'),
+      aliases: r.get('aliases') || [],
+    }));
+
+    let resolved;
+    try {
+      resolved = resolveOrganization({ name: organization }, organizations);
+    } catch (error) {
+      resolved = { status: 'unresolved' };
+    }
+
+    return {
+      values: organizationMatchValues(organization, organizations),
+      // Null when unrecognised, so callers fall back to the legacy
+      // single-string export path rather than exporting nothing.
+      shortCode: resolved.status === 'resolved'
+        ? resolved.organization.shortCode || null
+        : null,
+    };
+  } catch (error) {
+    return { values: [organization], shortCode: null };
+  }
+}
+
+/**
  * The set of `surveyingOrganization` values a viewer's records may carry.
  *
  * One extra read per page, deliberately: without it every org-scoped query
@@ -238,19 +279,6 @@ export function organizationMatchValues(name, organizations = []) {
  * flaky read narrows the view rather than blanking it.
  */
 export async function loadOrganizationScope(Parse, organization) {
-  try {
-    const query = new Parse.Query('Organization');
-    query.select('name', 'shortCode', 'aliases', 'active');
-    query.limit(ORGANIZATION_FETCH_LIMIT);
-    const records = await query.find();
-    return organizationMatchValues(organization, records.map((r) => ({
-      objectId: r.id,
-      name: r.get('name'),
-      shortCode: r.get('shortCode'),
-      aliases: r.get('aliases') || [],
-    })));
-  } catch (error) {
-    return [organization];
-  }
+  const { values } = await loadOrganizationIdentity(Parse, organization);
+  return values;
 }
-

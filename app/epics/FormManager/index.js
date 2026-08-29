@@ -1,5 +1,7 @@
 import { EmptyState, Panel, Skeleton } from 'app/impacto-design-system';
 import { retrieveCustomData } from 'app/modules/cloud-code';
+import { loadOrganizationIdentity } from 'app/modules/organization';
+import { Parse } from 'parse';
 import { useEffect, useMemo, useState } from 'react';
 import { isArray } from 'underscore';
 
@@ -34,6 +36,20 @@ function FormManager({ context, router, user }) {
   const [selectedForm, setSelectedForm] = useState(null);
 
   const organization = user?.organization || '';
+
+  // The CSV exporter keys on shortCode so an export covers every string the
+  // organization's records carry. Null until resolved, and null for an
+  // organization we do not recognise — CSVButton falls back to the legacy
+  // single-name path in both cases rather than exporting nothing.
+  const [shortCode, setShortCode] = useState(null);
+  useEffect(() => {
+    if (!organization) return undefined;
+    let ignore = false;
+    loadOrganizationIdentity(Parse, organization).then((identity) => {
+      if (!ignore) setShortCode(identity.shortCode);
+    });
+    return () => { ignore = true; };
+  }, [organization]);
 
   const filteredWorkflowData = useMemo(() => {
     if (!searchTerm.trim()) return workflowData;
@@ -166,6 +182,7 @@ function FormManager({ context, router, user }) {
                 retrieveCustomData={retrieveCustomData}
                 passDataToFormCreator={passDataToFormCreator}
                 organization={organization}
+                shortCode={shortCode}
                 onSelectForm={setSelectedForm}
                 puenteForm
               />
@@ -182,6 +199,7 @@ function FormManager({ context, router, user }) {
                       retrieveCustomData={retrieveCustomData}
                       passDataToFormCreator={passDataToFormCreator}
                       organization={organization}
+                      shortCode={shortCode}
                       onSelectForm={setSelectedForm}
                     />
                   </Panel>
@@ -196,6 +214,7 @@ function FormManager({ context, router, user }) {
                       retrieveCustomData={retrieveCustomData}
                       passDataToFormCreator={passDataToFormCreator}
                       organization={organization}
+                      shortCode={shortCode}
                       onSelectForm={setSelectedForm}
                     />
                   </Panel>
