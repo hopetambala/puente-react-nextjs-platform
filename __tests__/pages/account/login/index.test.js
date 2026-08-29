@@ -12,7 +12,9 @@ jest.mock('app/modules/user', () => ({
 }));
 
 jest.mock('next/router', () => ({
-  useRouter: () => ({ push: jest.fn(), query: {} }),
+  useRouter: () => ({
+    push: jest.fn(), query: {}, asPath: '/account/login', locale: 'eng',
+  }),
 }));
 
 jest.mock('next-i18next', () => ({
@@ -103,5 +105,35 @@ describe('Form submission', () => {
     await waitFor(() => {
       expect(retrieveSignInFunction).not.toHaveBeenCalled();
     });
+  });
+});
+
+// Settings sits behind BOTH authentication and English. Someone who cannot
+// read the login screen cannot navigate to Settings to change the language,
+// so the switcher has to be reachable here or it never reaches the person who
+// needs it. Each language is named in its own language, never translated.
+describe('Language switcher', () => {
+  it('offers the supported languages before sign-in, each in its own language', () => {
+    render(<Login />);
+    expect(screen.getByRole('button', { name: 'English' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Español' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Kreyòl Ayisyen' })).toBeInTheDocument();
+  });
+});
+
+// Found by visual QA, not by any test: the Spanish page rendered a translated
+// heading, fields and button, then an English subtitle and an English "or".
+// Shipping a language switcher onto a half-translated page promises something
+// the page does not deliver. The mock returns the key for anything it does not
+// map, so asserting the key proves the string goes through t().
+describe('No hardcoded English in the sign-in card', () => {
+  it('translates the subtitle', () => {
+    render(<Login />);
+    expect(screen.getByText('login_sub')).toBeInTheDocument();
+  });
+
+  it('translates the divider between sign-in and the alternatives', () => {
+    render(<Login />);
+    expect(screen.getByText('divider_or')).toBeInTheDocument();
   });
 });

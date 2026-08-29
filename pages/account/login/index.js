@@ -2,6 +2,7 @@ import { yupResolver } from '@hookform/resolvers';
 import {
     Button,
     FormInput,
+    LanguageSwitcher,
     Toast,
 } from 'app/impacto-design-system';
 import { retrieveSignInFunction } from 'app/modules/user';
@@ -77,9 +78,7 @@ function Login() {
         <div className={styles.card}>
           <div className={styles.eyebrow}>{t('sign_in_to')}</div>
           <h1 className={styles.title}>Puente Manage</h1>
-          <p className={styles.sub}>
-            Build forms, monitor the field, and analyze responses.
-          </p>
+          <p className={styles.sub}>{t('login_sub')}</p>
 
           <FormProvider {...methods}>
             <div className={styles.fields}>
@@ -107,7 +106,7 @@ function Login() {
             isLoading={loading}
           />
 
-          <div className={styles.divider}>or</div>
+          <div className={styles.divider}>{t('divider_or')}</div>
 
           <div className={styles.altLinks}>
             <Link href="/account/login/reset-login" passHref>
@@ -122,6 +121,12 @@ function Login() {
           </div>
 
           <div className={styles.hint}>{t('login_collect_hint')}</div>
+
+          {/* Inside the card, not a sibling of it: `.right` is a ROW flexbox,
+              so a sibling lands beside the card rather than beneath it.
+              Settings is behind both auth and English, so this is the only
+              place someone who cannot read the current language can change it. */}
+          <LanguageSwitcher className={styles.languageSwitcher} />
         </div>
       </div>
     </div>

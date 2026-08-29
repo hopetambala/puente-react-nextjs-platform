@@ -1,0 +1,61 @@
+/* Quiet chrome: this is a set-once control, so it must be findable without
+   competing with the sign-in form or the records beneath it. */
+.root {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--tk-dlite-semantic-spacing-xs);
+}
+
+.label {
+  color: var(--tk-dlite-semantic-color-text-tertiary);
+  font-family: var(--tk-dlite-semantic-typography-font-body);
+  font-size: var(--tk-dlite-semantic-typography-size-100);
+}
+
+.options {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--tk-dlite-semantic-spacing-xxs);
+}
+
+.option {
+  padding: var(--tk-dlite-semantic-spacing-xxs) var(--tk-dlite-semantic-spacing-xs);
+  border: none;
+  border-radius: var(--tk-dlite-semantic-border-radius-sm);
+  background: none;
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  font-family: var(--tk-dlite-semantic-typography-font-body);
+  font-size: var(--tk-dlite-semantic-typography-size-100);
+  cursor: pointer;
+  transition: color var(--tk-dlite-semantic-duration-fast),
+    background-color var(--tk-dlite-semantic-duration-fast);
+}
+
+.option:hover {
+  color: var(--tk-dlite-semantic-color-text-primary);
+  background-color: var(--tk-dlite-semantic-color-surface-sunken);
+}
+
+/* Weight + underline, so the active choice survives greyscale and colour
+   blindness. aria-current carries the same fact to assistive tech. */
+.optionActive {
+  color: var(--tk-dlite-semantic-color-text-primary);
+  /* TODO(dlite): the puente brand ships no typography weight token, only
+     font-family (body/heading/mono). Raw 600 until one exists. */
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+.option:focus-visible {
+  outline: 2px solid var(--tk-dlite-semantic-color-action-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .option {
+    transition: none;
+  }
+}

@@ -44,6 +44,7 @@ jest.mock('app/impacto-design-system', () => ({
   ),
   Button: ({ text, onClick }) => <button type="button" onClick={onClick}>{text}</button>,
   Card: ({ children }) => <div>{children}</div>,
+  LanguageSwitcher: () => <div data-testid="language-switcher" />,
   Spinner: () => <div data-testid="spinner" />,
   Stack: ({ children }) => <div>{children}</div>,
   Text: ({ text, element: El = 'span' }) => <El>{text}</El>,
@@ -87,5 +88,19 @@ describe('PageHeader', () => {
     await waitFor(() =>
       expect(screen.getByRole('heading', { name: 'Account Settings' })).toBeInTheDocument(),
     );
+  });
+});
+
+// The durable home for the language choice, matching Collect's mental model.
+// It sits OUTSIDE the FormProvider on purpose — that form is yup-validated,
+// submits, re-authenticates and redirects, and language is not a _User field.
+// It also sits outside the loading ternary, so the choice stays available
+// while the profile is still being fetched.
+describe('Language switcher', () => {
+  it('renders on the settings page', async () => {
+    render(<ManagementWrapper />);
+    await waitFor(() => {
+      expect(screen.getByTestId('language-switcher')).toBeInTheDocument();
+    });
   });
 });

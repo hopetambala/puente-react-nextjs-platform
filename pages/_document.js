@@ -1,4 +1,5 @@
 import { ServerStyleSheets } from '@material-ui/core/styles';
+import { toBcp47 } from 'app/modules/i18n/languages';
 import theme from 'app/modules/theme';
 import Document, {
     Head, Html, Main, NextScript,
@@ -7,8 +8,14 @@ import React from 'react';
 
 export default class MyDocument extends Document {
   render() {
+    // Next.js does not set this for you. Hardcoding "en" told screen readers
+    // that every Spanish and Haitian Creole page was English. The locale is
+    // captured in getInitialProps below rather than read off __NEXT_DATA__,
+    // which the lint config rejects for its dangling underscores.
+    const { locale } = this.props;
+
     return (
-      <Html lang="en">
+      <Html lang={toBcp47(locale)}>
         <Head>
           {/* PWA primary color */}
           <meta name="theme-color" content={theme.palette.primary.main} />
@@ -67,6 +74,8 @@ MyDocument.getInitialProps = async (ctx) => {
 
   return {
     ...initialProps,
+    // Surfaced as a plain prop so render() can set <Html lang>.
+    locale: ctx.locale,
     // Styles fragment is rendered after the app and page rendering finish.
     styles: [...React.Children.toArray(initialProps.styles), sheets.getStyleElement()],
   };

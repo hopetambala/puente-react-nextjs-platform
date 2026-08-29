@@ -414,8 +414,9 @@ are the ones whose *absence* would let the bug back in.
 | `curation_signal_possible_duplicates` | Possible duplicate households |
 | `curation_signal_window_note` | Detected within the most recent 1,000 records. |
 
-Counts interpolate, never concatenate. The 65/35 split is the first thing German
-breaks; region labels tolerate 2× length. `ara` ships, so logical properties only.
+Counts interpolate, never concatenate. The 65/35 split is the first thing a long
+translation breaks; region labels tolerate 2× length. No RTL locale ships since
+`ara` was retired (2026-08-28), but keep logical properties — cheap insurance.
 
 ---
 

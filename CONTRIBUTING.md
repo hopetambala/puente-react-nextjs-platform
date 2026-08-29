@@ -73,6 +73,11 @@ import styles from './index.module.scss';
 
 Run `npx eslint --fix <file>` if you're unsure — the auto-fixer is the source of truth.
 
+Use `eslint`, not `next lint`, when you want to fix one file. `next lint --file
+<file> --fix` ignores the scoping and rewrites every file in the project, which
+produces a diff of hundreds of unrelated files. `yarn lint` is check-only;
+`yarn lint:fix` is the repo-wide one, and it is rarely what you want.
+
 ### Headings
 
 No raw `<h1>` or `<h2>` tags outside of the `<PageHeader>` component. Use `<PageHeader title="..." />` for page-level headings. Use Panel titles or `.sectionLabel` for sections. This keeps heading hierarchy consistent.
@@ -120,7 +125,11 @@ public/locales/               # Translations (6 languages)
 
 ## One More Thing
 
-If you're adding text the user will see, add it to all 6 locale files: `public/locales/{eng,ara,deu,ind,prt,zho}/common.json`. Use the `useTranslation('common')` hook. No hardcoded English strings.
+Puente supports exactly three languages — English, Spanish, Haitian Creole
+(see [docs/i18n/README.md](docs/i18n/README.md)). Don't add a fourth without
+that conversation; a test will stop you.
+
+If you're adding text the user will see, add it to all 3 locale files: `public/locales/{eng,spa,hat}/common.json`. Use the `useTranslation('common')` hook. No hardcoded English strings. CI fails if a locale is missing a key — there is no allowlist, so English-only is not an option.
 
 ---
 

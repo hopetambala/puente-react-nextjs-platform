@@ -129,9 +129,15 @@ const { t } = useTranslation('common');
 return <button>{t('button_save')}</button>;
 ```
 
-Translations live in: `public/locales/{eng,ara,deu,ind,prt,zho}/common.json`
+**Puente supports exactly three languages: English (`eng`, default), Spanish
+(`spa`), and Haitian Creole (`hat`).** Adding or removing one is a deliberate
+change to both this repo and Collect — see [docs/i18n/README.md](docs/i18n/README.md).
 
-**When you add a new string, add it to all 6 locale files.**
+Translations live in: `public/locales/{eng,spa,hat}/common.json`
+
+**When you add a new string, add it to all 3 locale files.** CI enforces this:
+`__tests__/locales/translations.test.js` fails the build if any locale is missing
+a key English defines, in any namespace. There is no allowlist.
 
 ## Testing
 
