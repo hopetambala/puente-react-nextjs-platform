@@ -14,16 +14,15 @@ jest.mock('next/router', () => ({
   useRouter: jest.fn(() => ({ push: jest.fn(), query: {} })),
 }));
 
-jest.mock('next-i18next', () => ({
-  useTranslation: () => ({
-    t: (key) => ({
-      register_title: 'Nice to meet you',
-      register_subtitle: 'Create your account',
-      register_already: 'Already have an account?',
-      sign_in: 'Sign in →',
-    }[key] ?? key),
-  }),
-}));
+// Resolves against the REAL English catalog rather than a hand-written stub.
+// That keeps the assertions below readable as English AND makes them fail if a
+// key is missing from the catalog — t() falls back to returning the key, so a
+// typo or an unadded key shows up as a failed query instead of passing quietly.
+jest.mock('next-i18next', () => {
+  // eslint-disable-next-line global-require
+  const catalog = require('../../../../public/locales/eng/common.json');
+  return { useTranslation: () => ({ t: (key) => catalog[key] ?? key }) };
+});
 
 jest.mock('app/modules/user', () => ({
   retrieveSignUpFunction: jest.fn().mockResolvedValue({}),
@@ -164,8 +163,13 @@ describe('the missing-organization escape hatch', () => {
     fireEvent.click(screen.getByRole('button', { name: /organization isn't listed/i }));
 
     const help = await screen.findByTestId('organization-not-listed-help');
-    expect(within(help).getByRole('link', { name: /info@puente-dr\.org/i }))
-      .toHaveAttribute('href', expect.stringContaining('mailto:info@puente-dr.org'));
+    const link = within(help).getByRole('link');
+
+    // The address lives in the href, not the link text: the visible label is
+    // translated copy, and putting a bare email address in the sentence forces
+    // every translator into English word order.
+    expect(link).toHaveAttribute('href', expect.stringContaining('mailto:info@puente-dr.org'));
+    expect(link).toHaveAccessibleName("Email us your organization's name");
   });
 });
 
@@ -220,5 +224,32 @@ describe('what the picker actually submits', () => {
       expect.objectContaining({ organization: 'Puente' }),
       expect.anything(),
     );
+  });
+});
+
+describe('register is translated', () => {
+  beforeEach(() => mockLoad.mockReset()
+    .mockResolvedValue({ options: ORGS, unavailable: false }));
+
+  it('loads translations for the requested locale', async () => {
+    // The page had no useTranslation and no getStaticProps at all, while login
+    // next door ships a language switcher — so choosing Spanish there landed you
+    // on a fully English page. Without getStaticProps the catalog never reaches
+    // the page and every string silently falls back to its key.
+    const { getStaticProps } = require('pages/account/register/index');
+
+    const result = await getStaticProps({ locale: 'spa' });
+
+    expect(result.props).toHaveProperty('_nextI18Next');
+  });
+
+  it('renders labels from the catalog, not literals', async () => {
+    // The mock returns the KEY when a key is missing, so this fails loudly if
+    // register_field_first_name was never added to public/locales/eng.
+    render(<Register />);
+    await screen.findByTestId('picker-organization');
+
+    expect(screen.getByLabelText('First Name')).toBeInTheDocument();
+    expect(screen.queryByLabelText('register_field_first_name')).not.toBeInTheDocument();
   });
 });
