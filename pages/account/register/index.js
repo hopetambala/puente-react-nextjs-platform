@@ -7,7 +7,7 @@ import {
     Toast,
 } from 'app/impacto-design-system';
 import FormSelectAutoComplete from 'app/impacto-design-system/form-controls/select-autocomplete';
-import { loadOrganizations } from 'app/modules/organization';
+import { loadOrganizations, selectedOrganizationName } from 'app/modules/organization';
 import { retrieveSignUpFunction } from 'app/modules/user';
 import { useRouter } from 'next/router';
 import { Parse } from 'parse';
@@ -56,7 +56,13 @@ function Register() {
   const { handleSubmit, errors } = methods;
 
   const onSubmit = async (user) => {
-    await retrieveSignUpFunction(user, notificationType).then(() => {
+    // The picker yields a react-select option object; signup stores
+    // String(organization), so an object lands as "[object Object]".
+    const payload = {
+      ...user,
+      organization: selectedOrganizationName(user.organization),
+    };
+    await retrieveSignUpFunction(payload, notificationType).then(() => {
       router.push('/quick-start');
     }).catch((e) => toast(
       <Toast text={`${e.message}`} isError />,

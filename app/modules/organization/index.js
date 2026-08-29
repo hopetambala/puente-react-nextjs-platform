@@ -160,3 +160,26 @@ export async function loadOrganizations(Parse) {
     return { options: [], unavailable: true, truncated: false };
   }
 }
+
+/**
+ * react-select hands react-hook-form the whole selected OPTION OBJECT
+ * (`{ label, value }`), not a bare value. Everything downstream wants the
+ * canonical name STRING:
+ *
+ *   - cloudcode's `signup` does `user.set('organization', String(organization))`,
+ *     so an object is stored as the literal "[object Object]";
+ *   - Collect renders `_User.organization` straight into JSX and matches records
+ *     with an exact `equalTo` against `surveyingOrganization`;
+ *   - `_User.organization` is declared `String` in both repos' schema.json.
+ *
+ * The option's `label` is the Organization's canonical `name` (see
+ * toOrganizationOptions), which is the value records carry — so it is what makes
+ * an account match its organization's existing data.
+ *
+ * The objectId is still on the option as `value`, for whenever _User gains a
+ * real pointer. Storing the name today is not a decision against that.
+ */
+export function selectedOrganizationName(selection) {
+  if (selection && typeof selection.label === 'string') return selection.label;
+  return selection;
+}

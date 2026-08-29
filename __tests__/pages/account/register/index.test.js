@@ -29,10 +29,14 @@ jest.mock('app/modules/user', () => ({
   retrieveSignUpFunction: jest.fn().mockResolvedValue({}),
 }));
 
+// Holds what the form would hand onSubmit. react-select gives react-hook-form
+// the whole selected OPTION OBJECT, not a bare value, so tests can set that
+// shape here to exercise the real submit boundary.
+let mockFormValues = {};
 jest.mock('react-hook-form', () => ({
   FormProvider: ({ children }) => <>{children}</>,
   useForm: () => ({
-    handleSubmit: (fn) => fn,
+    handleSubmit: (fn) => () => fn(mockFormValues),
     register: jest.fn(),
     errors: {},
   }),
@@ -45,7 +49,11 @@ jest.mock('parse', () => ({ Parse: {} }));
 // Defaults to a successful empty load so tests that are not about the picker
 // (the Phase 8 layout tests) do not have to stub it.
 const mockLoad = jest.fn().mockResolvedValue({ options: [], unavailable: false });
+// Only loadOrganizations is stubbed. selectedOrganizationName stays REAL — it
+// is the thing under test at the submit boundary, and mocking the whole module
+// is what hid this bug in the first place.
 jest.mock('app/modules/organization', () => ({
+  ...jest.requireActual('app/modules/organization'),
   loadOrganizations: (...a) => mockLoad(...a),
 }));
 
@@ -180,5 +188,37 @@ describe('the escape hatch as an accessible disclosure', () => {
 
     fireEvent.click(toggle);
     expect(screen.queryByTestId('organization-not-listed-help')).not.toBeInTheDocument();
+  });
+});
+
+describe('what the picker actually submits', () => {
+  const { retrieveSignUpFunction } = require('app/modules/user');
+
+  beforeEach(() => {
+    mockLoad.mockReset().mockResolvedValue({ options: ORGS, unavailable: false });
+    retrieveSignUpFunction.mockClear();
+    mockFormValues = {};
+  });
+
+  it('sends the canonical organization NAME, not the react-select option object', async () => {
+    // cloudcode's signup does `user.set('organization', String(organization))`.
+    // Hand it an object and every account is stored as the literal string
+    // "[object Object]" — which is exactly the empty-app-with-no-error bug the
+    // picker was built to kill. Collect also renders _User.organization straight
+    // into JSX, and matches records on it with an exact equalTo.
+    mockFormValues = {
+      email: 'someone@example.org',
+      organization: { label: 'Puente', value: 'b' },
+    };
+
+    render(<Register />);
+    await screen.findByTestId('picker-organization');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Register' }));
+
+    expect(retrieveSignUpFunction).toHaveBeenCalledWith(
+      expect.objectContaining({ organization: 'Puente' }),
+      expect.anything(),
+    );
   });
 });
