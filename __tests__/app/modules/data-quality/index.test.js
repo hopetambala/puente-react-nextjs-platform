@@ -16,6 +16,7 @@ function makeParse() {
       cls,
       _conditions: [],
       equalTo: jest.fn(function eq(k, v) { this._conditions.push(['equalTo', k, v]); return this; }),
+      containedIn: jest.fn(function ci(k, v) { this._conditions.push(['containedIn', k, v]); return this; }),
       notEqualTo: jest.fn(function ne(k, v) { this._conditions.push(['notEqualTo', k, v]); return this; }),
       exists: jest.fn(function ex(k) { this._conditions.push(['exists', k]); return this; }),
       doesNotExist: jest.fn(function dne(k) { this._conditions.push(['doesNotExist', k]); return this; }),
@@ -35,6 +36,7 @@ function makeParse() {
       _or: qs,
       _conditions: [],
       equalTo: jest.fn(function eq(k, v) { this._conditions.push(['equalTo', k, v]); return this; }),
+      containedIn: jest.fn(function ci(k, v) { this._conditions.push(['containedIn', k, v]); return this; }),
       count: jest.fn(() => Promise.resolve(0)),
       find: jest.fn(() => Promise.resolve([])),
     };
@@ -56,7 +58,7 @@ describe('missingKeyFieldsQuery', () => {
   it('treats a key field holding the empty string as missing, like an absent one', () => {
     const { Parse } = makeParse();
 
-    const query = missingKeyFieldsQuery({ Parse, org: 'Puente' });
+    const query = missingKeyFieldsQuery({ Parse, orgValues: ['Puente', 'Puentes'] });
     const conditions = flattenConditions(query);
 
     // A record with telephoneNumber: '' scores as incomplete in
@@ -78,7 +80,7 @@ describe('unresolvedParentQuery', () => {
     // shape of failure as one that asks for the wrong thing — so the diff below
     // stays an assertion either way.
     const conditions = typeof unresolvedParentQuery === 'function'
-      ? flattenConditions(unresolvedParentQuery({ Parse, org: 'Puente' }))
+      ? flattenConditions(unresolvedParentQuery({ Parse, orgValues: ['Puente', 'Puentes'] }))
       : [];
 
     // An orphan is a record the phone stamped with its own household ID that
@@ -89,7 +91,11 @@ describe('unresolvedParentQuery', () => {
     expect({
       hasOfflineLink: asked(conditions, ['exists', 'householdObjectIdOffline']),
       lacksResolvedParent: asked(conditions, ['doesNotExist', 'householdId']),
-      scopedToOrg: asked(conditions, ['equalTo', 'surveyingOrganization', 'Puente']),
+      // containedIn, not equalTo: an organization's records are spread across
+      // every string it has been called, and equalTo hides the rest silently.
+      scopedToOrg: conditions.some((c) => c[0] === 'containedIn'
+        && c[1] === 'surveyingOrganization'
+        && Array.isArray(c[2]) && c[2].includes('Puente') && c[2].includes('Puentes')),
     }).toEqual({
       hasOfflineLink: true,
       lacksResolvedParent: true,

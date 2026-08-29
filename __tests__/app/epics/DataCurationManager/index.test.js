@@ -30,6 +30,7 @@ const mockDistinct = jest.fn().mockResolvedValue([]);
 
 const mockQueryChain = {
   equalTo: jest.fn().mockReturnThis(),
+  containedIn: jest.fn().mockReturnThis(),
   select: jest.fn().mockReturnThis(),
   limit: jest.fn().mockReturnThis(),
   skip: jest.fn().mockReturnThis(),
@@ -41,6 +42,13 @@ const mockQueryChain = {
   count: mockCount,
   distinct: mockDistinct,
 };
+
+// Scope resolution has its own tests; here it would just add a Parse read to
+// every case. Returns the account's own string, which is the no-alias case.
+jest.mock('app/modules/organization', () => ({
+  ...jest.requireActual('app/modules/organization'),
+  loadOrganizationScope: (Parse, org) => Promise.resolve([org]),
+}));
 
 jest.mock('parse', () => ({
   Parse: {
@@ -291,7 +299,10 @@ describe('Orchestration', () => {
   it('scopes the Parse query to the user organization', async () => {
     mockFind.mockResolvedValue([makeRecord()]);
     render(<DataCurationManager />);
-    await waitFor(() => expect(mockQueryChain.equalTo).toHaveBeenCalledWith('surveyingOrganization', 'TestOrg'));
+    // containedIn now: an organization's records are spread across every string
+    // it has been called, and equalTo hid the rest with no error.
+    await waitFor(() => expect(mockQueryChain.containedIn)
+      .toHaveBeenCalledWith('surveyingOrganization', ['TestOrg']));
   });
 
   it('passes fetched records to RecordsTable', async () => {

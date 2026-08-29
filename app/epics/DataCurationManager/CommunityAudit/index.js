@@ -45,7 +45,7 @@ export function groupSimilarNames(names) {
 
 const AUDIT_CLASSES = ['SurveyData', 'EvaluationMedical', 'Vitals', 'HistoryEnvironmentalHealth'];
 
-export default function CommunityAudit({ org }) {
+export default function CommunityAudit({ orgValues }) {
   const [groups, setGroups] = useState([]);
   const [canonical, setCanonical] = useState({});
   const [applying, setApplying] = useState(null);
@@ -54,14 +54,14 @@ export default function CommunityAudit({ org }) {
   const [pendingGroup, setPendingGroup] = useState(null);
 
   useEffect(() => {
-    if (!org) return;
+    if (!orgValues || !orgValues.length) return;
     async function load() {
       // Parse `distinct()` needs the Master Key (client SDK can't use it), so
       // we sample records per class and reduce to distinct community names here.
       const all = await Promise.all(
         AUDIT_CLASSES.map(async (cls) => {
           const q = new Parse.Query(cls);
-          q.equalTo('surveyingOrganization', org);
+          q.containedIn('surveyingOrganization', orgValues);
           q.select('communityname');
           q.limit(1000);
           const recs = await q.find().catch(() => []);
@@ -72,7 +72,7 @@ export default function CommunityAudit({ org }) {
       setGroups(groupSimilarNames(names));
     }
     load();
-  }, [org]);
+  }, [orgValues]);
 
   async function applyCanonical() {
     if (pendingGroup === null) return;
@@ -86,7 +86,7 @@ export default function CommunityAudit({ org }) {
         const variants = group.filter((n) => n !== target);
         await Promise.all(variants.map(async (variant) => {
           const q = new Parse.Query(cls);
-          q.equalTo('surveyingOrganization', org);
+          q.containedIn('surveyingOrganization', orgValues);
           q.equalTo('communityname', variant);
           const recs = await q.find().catch(() => []);
           await Promise.all(recs.map((r) => {

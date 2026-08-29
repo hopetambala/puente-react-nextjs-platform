@@ -8,6 +8,7 @@ import {
   sourceHasClientPointer,
   unresolvedParentQuery,
 } from 'app/modules/data-quality';
+import { loadOrganizationScope } from 'app/modules/organization';
 import { retrieveCurrentUserAsyncFunction } from 'app/modules/user';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -106,6 +107,21 @@ export default function DataCurationManager() {
   const user = retrieveCurrentUserAsyncFunction();
   const org = user ? user.get('organization') : '';
 
+  // Every string this organization's records may carry, not just the one on the
+  // account. Records hold what was COLLECTED, and one organization's are spread
+  // across several strings — in production DR Missions has 11 rows under
+  // "DR Missions" and 611 under "DRMT". Filtering on one hid the rest silently.
+  // Starts as [org] so the first render is scoped rather than unscoped.
+  const [orgValues, setOrgValues] = useState(org ? [org] : []);
+  useEffect(() => {
+    if (!org) return undefined;
+    let ignore = false;
+    loadOrganizationScope(Parse, org).then((values) => {
+      if (!ignore) setOrgValues(values);
+    });
+    return () => { ignore = true; };
+  }, [org]);
+
   // The dashboard's needs-attention queue deep-links here as
   // /data/data-curation?signal=<name>. Optional-chained: this component also
   // renders outside a router context.
@@ -128,7 +144,7 @@ export default function DataCurationManager() {
     if (!org) return;
     const parseClass = resolveParseClass(source);
     const q = new Parse.Query(parseClass);
-    q.equalTo('surveyingOrganization', org);
+    q.containedIn('surveyingOrganization', orgValues);
     q.select('surveyingUser', 'communityname');
     q.limit(1000);
     q.find()
@@ -143,7 +159,7 @@ export default function DataCurationManager() {
         setCommunities([...cm].sort());
       })
       .catch(() => {});
-  }, [source, org]);
+  }, [source, org, orgValues]);
 
   // Load FormResults form definition when source is a custom form
   useEffect(() => {
@@ -166,8 +182,8 @@ export default function DataCurationManager() {
     // one concurrent pair.
     const signalQuery = SIGNAL_QUERIES[activeSignal];
     const q = signalQuery
-      ? signalQuery({ Parse, org })
-      : new Parse.Query(parseClass).equalTo('surveyingOrganization', org);
+      ? signalQuery({ Parse, orgValues })
+      : new Parse.Query(parseClass).containedIn('surveyingOrganization', orgValues);
     // Every class except SurveyData holds no person or community fields of its
     // own and points at the SurveyData record via `client`. include() resolves
     // that pointer in the same round-trip; without it the pointer arrives
@@ -190,7 +206,7 @@ export default function DataCurationManager() {
       })
       .catch(() => { setRecords([]); setTotal(0); })
       .finally(() => setLoading(false));
-  }, [source, filters, page, org, activeSignal]);
+  }, [source, filters, page, org, orgValues, activeSignal]);
 
   const handleSourceChange = (newSource) => {
     setSource(newSource);
@@ -255,7 +271,7 @@ export default function DataCurationManager() {
       {view === 'records' && (
         <>
           {/* Source selector */}
-          <SourceSelector source={source} org={org} onChange={handleSourceChange} />
+          <SourceSelector source={source} orgValues={orgValues} onChange={handleSourceChange} />
 
           {/* Active signal filter notice — sits directly above the figures it qualifies */}
           {SIGNAL_NOTICE_KEYS[activeSignal] && (
@@ -331,7 +347,7 @@ export default function DataCurationManager() {
       )}
 
       {/* Community audit panel */}
-      {view === 'community-audit' && <CommunityAudit org={org} />}
+      {view === 'community-audit' && <CommunityAudit orgValues={orgValues} />}
     </div>
   );
 }

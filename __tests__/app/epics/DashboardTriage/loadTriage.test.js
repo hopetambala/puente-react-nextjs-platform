@@ -13,6 +13,7 @@ function makeParse({ counts = {}, finds = {}, failOn = null } = {}) {
       _limit: null,
       _org: null,
       equalTo: jest.fn(function eq(k, v) { if (k === 'surveyingOrganization') this._org = v; return this; }),
+      containedIn: jest.fn(function ci(k, v) { if (k === 'surveyingOrganization' || k === 'organizations') this._orgIn = v; return this; }),
       greaterThanOrEqualTo: jest.fn().mockReturnThis(),
       descending: jest.fn().mockReturnThis(),
       exists: jest.fn().mockReturnThis(),
@@ -60,23 +61,30 @@ const asked = (conditions, tuple) => conditions
   .some((c) => c.length === tuple.length && c.every((part, i) => part === tuple[i]));
 
 describe('loadDashboardTriage', () => {
-  it('scopes every SurveyData query to the organization', async () => {
+  it('scopes every SurveyData query to EVERY string the organization uses', async () => {
+    // containedIn, not equalTo. Records carry the string that was collected and
+    // one organization's are spread across several: measured in production,
+    // DR Missions has 11 rows under "DR Missions" and 611 under "DRMT". Filtering
+    // on one string showed that user 1% of their own data, with no error.
     const { Parse, instances } = makeParse();
-    await loadDashboardTriage({ Parse, org: 'Puente', now: NOW });
+    await loadDashboardTriage({ Parse, orgValues: ['Puente', 'Puentes'], now: NOW });
 
-    surveyQueries(instances).forEach((q) => expect(q._org).toBe('Puente'));
+    surveyQueries(instances).forEach((q) => {
+      expect(q._orgIn).toEqual(['Puente', 'Puentes']);
+      expect(q._org).toBeNull();
+    });
   });
 
   it('never calls distinct — the browser SDK has no Master Key', async () => {
     const { Parse, instances } = makeParse();
-    await loadDashboardTriage({ Parse, org: 'Puente', now: NOW });
+    await loadDashboardTriage({ Parse, orgValues: ['Puente', 'Puentes'], now: NOW });
 
     instances.forEach((q) => expect(q.distinct).toBeUndefined());
   });
 
   it('applies select() to the sample query so it does not transfer 65 fields', async () => {
     const { Parse, instances } = makeParse();
-    await loadDashboardTriage({ Parse, org: 'Puente', now: NOW });
+    await loadDashboardTriage({ Parse, orgValues: ['Puente', 'Puentes'], now: NOW });
 
     // Target the sample by its cap — other queries also use select() (the
     // last-sync probe selects createdAt), so select alone is ambiguous.
@@ -88,7 +96,7 @@ describe('loadDashboardTriage', () => {
 
   it('uses ONE shared sample for both duplicates and coverage', async () => {
     const { Parse, instances } = makeParse();
-    await loadDashboardTriage({ Parse, org: 'Puente', now: NOW });
+    await loadDashboardTriage({ Parse, orgValues: ['Puente', 'Puentes'], now: NOW });
 
     // Two sampled reads of the same rows would be a wasted round-trip.
     const samples = surveyQueries(instances).filter((q) => q._limit === SAMPLE_SIZE);
@@ -97,7 +105,7 @@ describe('loadDashboardTriage', () => {
 
   it('returns a null signal when its query fails, rather than throwing', async () => {
     const { Parse } = makeParse({ failOn: 'SurveyData' });
-    const data = await loadDashboardTriage({ Parse, org: 'Puente', now: NOW });
+    const data = await loadDashboardTriage({ Parse, orgValues: ['Puente', 'Puentes'], now: NOW });
 
     expect(data).toBeDefined();
     expect(data.signals.unresolvedParent).toBeNull();
@@ -105,7 +113,7 @@ describe('loadDashboardTriage', () => {
 
   it('reports the sample size it used so callers can disclose saturation', async () => {
     const { Parse } = makeParse();
-    const data = await loadDashboardTriage({ Parse, org: 'Puente', now: NOW });
+    const data = await loadDashboardTriage({ Parse, orgValues: ['Puente', 'Puentes'], now: NOW });
 
     expect(data.coverage.sampleSize).toBe(SAMPLE_SIZE);
   });
@@ -117,7 +125,7 @@ describe('loadDashboardTriage', () => {
       { get: (f) => ({ surveyingUser: 'b@x.org', communityname: 'C' }[f]), createdAt: NOW },
     ];
     const { Parse, instances } = makeParse({ finds: { SurveyData: rows } });
-    const data = await loadDashboardTriage({ Parse, org: 'Puente', now: NOW });
+    const data = await loadDashboardTriage({ Parse, orgValues: ['Puente', 'Puentes'], now: NOW });
 
     expect(data.accountsSynced.count).toBe(2);
     // Sampled, because it is reduced client-side from a capped read.
@@ -128,7 +136,7 @@ describe('loadDashboardTriage', () => {
 
   it('selects surveyingUser on the shared sample so the reduction is possible', async () => {
     const { Parse, instances } = makeParse();
-    await loadDashboardTriage({ Parse, org: 'Puente', now: NOW });
+    await loadDashboardTriage({ Parse, orgValues: ['Puente', 'Puentes'], now: NOW });
 
     const sample = surveyQueries(instances).find((q) => q._limit === SAMPLE_SIZE);
     expect(sample._select).toEqual(expect.arrayContaining(['surveyingUser']));
@@ -136,7 +144,7 @@ describe('loadDashboardTriage', () => {
 
   it('marks count-derived signals exact and sample-derived signals not', async () => {
     const { Parse } = makeParse({ counts: { or: 5, SurveyData: 2 } });
-    const data = await loadDashboardTriage({ Parse, org: 'Puente', now: NOW });
+    const data = await loadDashboardTriage({ Parse, orgValues: ['Puente', 'Puentes'], now: NOW });
 
     expect(data.signals.missingKeyFields.exact).toBe(true);
     expect(data.signals.possibleDuplicates.exact).toBe(false);
@@ -144,7 +152,7 @@ describe('loadDashboardTriage', () => {
 
   it('counts a key field holding the empty string as missing, like an absent one', async () => {
     const { Parse, instances } = makeParse();
-    await loadDashboardTriage({ Parse, org: 'Puente', now: NOW });
+    await loadDashboardTriage({ Parse, orgValues: ['Puente', 'Puentes'], now: NOW });
 
     // The missing-key-fields signal is the only OR the loader builds.
     const missingQ = instances.find((q) => q.cls === 'or');
@@ -166,10 +174,10 @@ describe('loadDashboardTriage', () => {
     // Both cases leave lastSyncAt null, so the page cannot tell "no records yet"
     // apart from "we could not read". A separate flag says whether we KNOW.
     const empty = await loadDashboardTriage({
-      Parse: makeParse().Parse, org: 'Puente', now: NOW,
+      Parse: makeParse().Parse, orgValues: ['Puente', 'Puentes'], now: NOW,
     });
     const failed = await loadDashboardTriage({
-      Parse: makeParse({ failOn: 'SurveyData' }).Parse, org: 'Puente', now: NOW,
+      Parse: makeParse({ failOn: 'SurveyData' }).Parse, orgValues: ['Puente', 'Puentes'], now: NOW,
     });
 
     expect({
@@ -186,10 +194,10 @@ describe('loadDashboardTriage', () => {
     // uses it that way — so a failure must say null, and only a real count of
     // nothing may say 0.
     const failed = await loadDashboardTriage({
-      Parse: makeParse({ failOn: 'SurveyData' }).Parse, org: 'Puente', now: NOW,
+      Parse: makeParse({ failOn: 'SurveyData' }).Parse, orgValues: ['Puente', 'Puentes'], now: NOW,
     });
     const genuinelyZero = await loadDashboardTriage({
-      Parse: makeParse({ counts: { SurveyData: 0 } }).Parse, org: 'Puente', now: NOW,
+      Parse: makeParse({ counts: { SurveyData: 0 } }).Parse, orgValues: ['Puente', 'Puentes'], now: NOW,
     });
 
     expect({

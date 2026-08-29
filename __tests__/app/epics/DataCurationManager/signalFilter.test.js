@@ -49,6 +49,11 @@ function mockRecord(inst, name, ...args) {
   inst._constraints.push([name, ...args]);
   return inst;
 }
+jest.mock('app/modules/organization', () => ({
+  ...jest.requireActual('app/modules/organization'),
+  loadOrganizationScope: (Parse, org) => Promise.resolve([org]),
+}));
+
 jest.mock('parse', () => {
   const Query = function Query(cls) {
     const inst = {
@@ -57,6 +62,7 @@ jest.mock('parse', () => {
       _limit: null,
       _skipped: false,
       equalTo: jest.fn(function eq(...a) { return mockRecord(this, 'equalTo', ...a); }),
+      containedIn: jest.fn(function ci(...a) { return mockRecord(this, 'containedIn', ...a); }),
       notEqualTo: jest.fn(function ne(...a) { return mockRecord(this, 'notEqualTo', ...a); }),
       exists: jest.fn(function ex(...a) { return mockRecord(this, 'exists', ...a); }),
       doesNotExist: jest.fn(function dne(...a) { return mockRecord(this, 'doesNotExist', ...a); }),
@@ -81,6 +87,7 @@ jest.mock('parse', () => {
       _limit: null,
       _skipped: false,
       equalTo: jest.fn().mockReturnThis(),
+      containedIn: jest.fn().mockReturnThis(),
       include: jest.fn().mockReturnThis(),
       descending: jest.fn().mockReturnThis(),
       limit: jest.fn(function lim(n) { this._limit = n; return this; }),
@@ -248,7 +255,9 @@ describe('signal deep link', () => {
     // signal predicates' arms. Asserted as one object so a partial degradation
     // (org scope dropped, or a signal arm left on) reads off the diff.
     expect({
-      scopedToOrg: asked(constraints, ['equalTo', 'surveyingOrganization', 'TestOrg']),
+      scopedToOrg: constraints.some((c) => c[0] === 'containedIn'
+        && c[1] === 'surveyingOrganization'
+        && Array.isArray(c[2]) && c[2].includes('TestOrg')),
       carriesUnresolvedParentArm: asked(constraints, ['exists', 'householdObjectIdOffline']),
       carriesMissingKeyFieldArm: SURVEY_COMPLETENESS_FIELDS
         .some((field) => asked(constraints, ['doesNotExist', field])),

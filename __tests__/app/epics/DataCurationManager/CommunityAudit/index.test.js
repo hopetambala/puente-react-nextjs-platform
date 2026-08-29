@@ -22,10 +22,16 @@ function recordsFromNames(names) {
   return names.map((n) => ({ get: (k) => (k === 'communityname' ? n : undefined), set: jest.fn(), save: mockSave }));
 }
 
+jest.mock('app/modules/organization', () => ({
+  ...jest.requireActual('app/modules/organization'),
+  loadOrganizationScope: (Parse, org) => Promise.resolve([org]),
+}));
+
 jest.mock('parse', () => ({
   Parse: {
     Query: jest.fn(() => ({
       equalTo: jest.fn().mockReturnThis(),
+  containedIn: jest.fn().mockReturnThis(),
       select: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
       find: mockFind,
@@ -64,13 +70,13 @@ describe('CommunityAudit — grouping', () => {
 
   it('renders the Community Audit panel', async () => {
     mockFind.mockResolvedValue([]);
-    render(<CommunityAudit org="TestOrg" />);
+    render(<CommunityAudit orgValues={['TestOrg']} />);
     await waitFor(() => expect(screen.getByText('Community Audit')).toBeInTheDocument());
   });
 
   it('shows grouped misspellings when similar names exist', async () => {
     mockFind.mockResolvedValue(recordsFromNames(['Sabana Yegua', 'Sabana Yégua', 'Nsanje']));
-    render(<CommunityAudit org="TestOrg" />);
+    render(<CommunityAudit orgValues={['TestOrg']} />);
     await waitFor(() => {
       expect(screen.getByText('Sabana Yegua')).toBeInTheDocument();
       expect(screen.getByText('Sabana Yégua')).toBeInTheDocument();
@@ -79,7 +85,7 @@ describe('CommunityAudit — grouping', () => {
 
   it('does not group names with distance > 2', async () => {
     mockFind.mockResolvedValue(recordsFromNames(['Nsanje', 'Blantyre']));
-    render(<CommunityAudit org="TestOrg" />);
+    render(<CommunityAudit orgValues={['TestOrg']} />);
     await waitFor(() => screen.getByText('Community Audit'));
     // Neither should be shown as a duplicate group
     expect(screen.queryByText(/apply/i)).not.toBeInTheDocument();
@@ -91,13 +97,13 @@ describe('CommunityAudit — apply canonical name', () => {
 
   it('renders an Apply button when a group exists', async () => {
     mockFind.mockResolvedValue(recordsFromNames(['Sabana Yegua', 'Sabana Yégua']));
-    render(<CommunityAudit org="TestOrg" />);
+    render(<CommunityAudit orgValues={['TestOrg']} />);
     await waitFor(() => expect(screen.getByText(/apply/i)).toBeInTheDocument());
   });
 
   it('opens a confirm dialog on Apply and does NOT save until confirmed', async () => {
     mockFind.mockResolvedValue(recordsFromNames(['Sabana Yegua', 'Sabana Yégua']));
-    render(<CommunityAudit org="TestOrg" />);
+    render(<CommunityAudit orgValues={['TestOrg']} />);
     await waitFor(() => screen.getByText(/apply/i));
     fireEvent.click(screen.getByText(/apply/i));
     expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -110,7 +116,7 @@ describe('CommunityAudit — apply canonical name', () => {
     mockFind
       .mockResolvedValueOnce(recordsFromNames(['Sabana Yegua', 'Sabana Yégua']))
       .mockResolvedValue(recordsFromNames(['Sabana Yégua']));
-    render(<CommunityAudit org="TestOrg" />);
+    render(<CommunityAudit orgValues={['TestOrg']} />);
     await waitFor(() => screen.getByText(/apply/i));
     fireEvent.click(screen.getByText(/apply/i));
     fireEvent.click(screen.getByText('Rename records'));
@@ -128,18 +134,18 @@ describe('CommunityAudit — audited Parse classes', () => {
   });
 
   it('samples HistoryEnvironmentalHealth', async () => {
-    render(<CommunityAudit org="TestOrg" />);
+    render(<CommunityAudit orgValues={['TestOrg']} />);
     await waitFor(() => expect(MockParse.Query).toHaveBeenCalledWith('HistoryEnvironmentalHealth'));
   });
 
   it('never samples the non-existent EnvironmentalHealth class', async () => {
-    render(<CommunityAudit org="TestOrg" />);
+    render(<CommunityAudit orgValues={['TestOrg']} />);
     await waitFor(() => expect(MockParse.Query).toHaveBeenCalledWith('HistoryEnvironmentalHealth'));
     expect(MockParse.Query).not.toHaveBeenCalledWith('EnvironmentalHealth');
   });
 
   it('samples SurveyData, EvaluationMedical and Vitals', async () => {
-    render(<CommunityAudit org="TestOrg" />);
+    render(<CommunityAudit orgValues={['TestOrg']} />);
     await waitFor(() => {
       expect(MockParse.Query).toHaveBeenCalledWith('SurveyData');
       expect(MockParse.Query).toHaveBeenCalledWith('EvaluationMedical');

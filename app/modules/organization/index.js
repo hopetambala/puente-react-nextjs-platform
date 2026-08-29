@@ -198,3 +198,59 @@ export function selectedOrganizationName(selection) {
   if (selection && typeof selection.label === 'string') return selection.label;
   return selection;
 }
+
+/**
+ * Every `surveyingOrganization` string that belongs to one organization.
+ *
+ * Records carry the string that was COLLECTED, and one organization's records
+ * are spread across several of them. Measured in production 2026-08-29:
+ * DR Missions has 11 rows under "DR Missions" and 611 under "DRMT"; Rayjon has
+ * 185 under "Rayjon" and 1196 under "Rayjon Eye Clinic". A query that filters on
+ * a single string therefore shows those users 1% and 13% of their own
+ * organization's data — with no error and no way to tell.
+ *
+ * Use with `containedIn`, never `equalTo`.
+ *
+ * Falls back to `[name]` whenever the organization cannot be identified — an
+ * unrecognised organization (123 of 792 accounts) must still see its own
+ * records, and an empty set would blank the app instead.
+ */
+export function organizationMatchValues(name, organizations = []) {
+  let resolved;
+  try {
+    resolved = resolveOrganization({ name }, organizations);
+  } catch (error) {
+    // Ambiguous alias. An ops problem; it must not blank a dashboard meanwhile.
+    return [name];
+  }
+  if (resolved.status !== 'resolved') return [name];
+
+  const org = resolved.organization;
+  return Array.from(new Set([org.name, ...(org.aliases || [])].filter(Boolean)));
+}
+
+/**
+ * The set of `surveyingOrganization` values a viewer's records may carry.
+ *
+ * One extra read per page, deliberately: without it every org-scoped query
+ * filters on a single string and silently hides the rest of that
+ * organization's data. Falls back to `[organization]` on any failure, so a
+ * flaky read narrows the view rather than blanking it.
+ */
+export async function loadOrganizationScope(Parse, organization) {
+  try {
+    const query = new Parse.Query('Organization');
+    query.select('name', 'shortCode', 'aliases', 'active');
+    query.limit(ORGANIZATION_FETCH_LIMIT);
+    const records = await query.find();
+    return organizationMatchValues(organization, records.map((r) => ({
+      objectId: r.id,
+      name: r.get('name'),
+      shortCode: r.get('shortCode'),
+      aliases: r.get('aliases') || [],
+    })));
+  } catch (error) {
+    return [organization];
+  }
+}
+

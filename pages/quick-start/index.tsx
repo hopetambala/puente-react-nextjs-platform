@@ -6,6 +6,7 @@ import SyncRibbon from 'app/epics/DashboardTriage/SyncRibbon';
 import { summarizeSyncState } from 'app/epics/DashboardTriage/syncState';
 import { buildTriageQueue, findUnavailableSignals } from 'app/epics/DashboardTriage/triageQueue';
 import { AppShell } from 'app/impacto-design-system';
+import { loadOrganizationScope } from 'app/modules/organization';
 import { retrieveCurrentUserAsyncFunction } from 'app/modules/user';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -78,11 +79,27 @@ export default function Dashboard() {
     if (user) setOrg(user.get('organization') || '');
   }, []);
 
+  // Every string this organization's records may carry. Resolved once, then
+  // every query below is scoped with containedIn instead of equalTo — records
+  // hold the string that was COLLECTED, and one organization's are spread
+  // across several. Measured in production: DR Missions has 11 rows under
+  // "DR Missions" and 611 under "DRMT", so equalTo showed that user 1% of
+  // their own data with no error and no way to tell.
+  const [orgValues, setOrgValues] = useState<string[]>([]);
   useEffect(() => {
-    if (!org) return;
+    if (!org) return undefined;
+    let ignore = false;
+    loadOrganizationScope(Parse, org).then((values: string[]) => {
+      if (!ignore) setOrgValues(values);
+    });
+    return () => { ignore = true; };
+  }, [org]);
+
+  useEffect(() => {
+    if (!orgValues.length) return;
     let ignore = false;
 
-    loadDashboardTriage({ Parse, org, now: new Date() })
+    loadDashboardTriage({ Parse, orgValues, now: new Date() })
       .then((d) => { if (!ignore) setData(d); })
       // A failed load must leave the page standing, not blank it.
       .catch(() => { if (!ignore) setData(null); })
@@ -90,7 +107,7 @@ export default function Dashboard() {
 
     // eslint-disable-next-line consistent-return
     return () => { ignore = true; };
-  }, [org]);
+  }, [orgValues]);
 
   const syncState = data ? summarizeSyncState({ ...data.sync, now: new Date() }) : null;
   const queue = data ? buildTriageQueue(data.signals) : [];

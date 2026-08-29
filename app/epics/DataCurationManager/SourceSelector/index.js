@@ -65,13 +65,13 @@ const selectStyles = {
   placeholder: (base) => ({ ...base, fontSize: 13, color: 'var(--tk-dlite-semantic-color-text-secondary)' }),
 };
 
-export default function SourceSelector({ source, org, onChange }) {
+export default function SourceSelector({ source, orgValues, onChange }) {
   const [customForms, setCustomForms] = useState([]);
 
   useEffect(() => {
-    if (!org) return;
+    if (!orgValues || !orgValues.length) return;
     const q = new Parse.Query('FormSpecificationsV2');
-    q.equalTo('organizations', org);
+    q.containedIn('organizations', orgValues);
     q.notEqualTo('active', 'false');
     q.find()
       .then((forms) => setCustomForms(forms.map((f) => ({
@@ -79,7 +79,7 @@ export default function SourceSelector({ source, org, onChange }) {
         label: f.get('name') || 'Untitled form',
       }))))
       .catch(() => setCustomForms([]));
-  }, [org]);
+  }, [orgValues]);
 
   const grouped = [
     {
