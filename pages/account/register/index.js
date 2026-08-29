@@ -18,6 +18,8 @@ import * as yup from 'yup';
 
 import styles from './index.module.scss';
 
+const HELP_ID = 'organization-not-listed-help';
+
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
 const validationSchema = yup.object().shape({
@@ -41,6 +43,7 @@ function Register() {
   // flips it. Never conflate "could not load" with "no organizations exist" —
   // both look like an empty dropdown, and only one is the user's problem.
   const [organizations, setOrganizations] = useState({ options: [], unavailable: false });
+  const [orgNotListedOpen, setOrgNotListedOpen] = useState(false);
 
   useEffect(() => {
     let ignore = false;
@@ -100,13 +103,43 @@ function Register() {
                   />
                 </div>
               ) : (
-                <FormSelectAutoComplete
-                  name="organization"
-                  label="Organization"
-                  required
-                  options={organizations.options}
-                  errorobj={errors}
-                />
+                <>
+                  <FormSelectAutoComplete
+                    name="organization"
+                    label="Organization"
+                    required
+                    options={organizations.options}
+                    errorobj={errors}
+                  />
+                  {/* Only offered when the list actually loaded. If it did not,
+                      we cannot claim an organization is missing from it. */}
+                  <button
+                    type="button"
+                    className={styles.notListed}
+                    onClick={() => setOrgNotListedOpen((open) => !open)}
+                    aria-expanded={orgNotListedOpen}
+                    aria-controls={orgNotListedOpen ? HELP_ID : undefined}
+                  >
+                    My organization isn&apos;t listed
+                  </button>
+                  {orgNotListedOpen && (
+                    <div
+                      id={HELP_ID}
+                      className={styles.notListedHelp}
+                      data-testid="organization-not-listed-help"
+                    >
+                      Puente staff add organizations by hand, which is what
+                      keeps the list worth trusting. Email
+                      {' '}
+                      <a href="mailto:info@puente-dr.org?subject=Add%20my%20organization%20to%20Puente%20Manage">
+                        info@puente-dr.org
+                      </a>
+                      {' '}
+                      with your organization&apos;s name. Once it appears in the
+                      list you can finish registering.
+                    </div>
+                  )}
+                </>
               )}
               <FormInput
                 name="email"

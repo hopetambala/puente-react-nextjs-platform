@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 
 jest.mock('@hookform/resolvers', () => ({
   yupResolver: jest.fn(() => jest.fn()),
@@ -122,5 +122,63 @@ describe('organization picker', () => {
 
     await screen.findByTestId('picker-organization');
     expect(screen.queryByTestId('organization-unavailable')).not.toBeInTheDocument();
+  });
+});
+
+describe('"my organization isn\'t listed"', () => {
+  beforeEach(() => mockLoad.mockReset()
+    .mockResolvedValue({ options: ORGS, unavailable: false }));
+
+  it('offers a way forward when the organization is missing from the list', async () => {
+    // Without this, replacing free text with a picker trades one failure for
+    // another: a user whose organization was never created simply cannot
+    // register, and the page gives them no idea why or what to do.
+    render(<Register />);
+    await screen.findByTestId('picker-organization');
+
+    expect(
+      screen.getByRole('button', { name: /organization isn't listed/i }),
+    ).toBeInTheDocument();
+  });
+});
+
+describe('the missing-organization escape hatch', () => {
+  beforeEach(() => mockLoad.mockReset()
+    .mockResolvedValue({ options: ORGS, unavailable: false }));
+
+  it('routes the request to a human instead of a dead end', async () => {
+    // Organizations are created by Puente staff by hand. So the honest answer
+    // is a contact route, not a form field — and the page has to say so, or a
+    // blocked user has no idea the path exists.
+    render(<Register />);
+    await screen.findByTestId('picker-organization');
+
+    fireEvent.click(screen.getByRole('button', { name: /organization isn't listed/i }));
+
+    const help = await screen.findByTestId('organization-not-listed-help');
+    expect(within(help).getByRole('link', { name: /info@puente-dr\.org/i }))
+      .toHaveAttribute('href', expect.stringContaining('mailto:info@puente-dr.org'));
+  });
+});
+
+describe('the escape hatch as an accessible disclosure', () => {
+  beforeEach(() => mockLoad.mockReset()
+    .mockResolvedValue({ options: ORGS, unavailable: false }));
+
+  it('reports its expanded state and can be closed again', async () => {
+    // A screen-reader user is told nothing by a button that silently reveals
+    // text below it, and a one-way disclosure leaves the help wedged open
+    // between the picker and the rest of the form.
+    render(<Register />);
+    await screen.findByTestId('picker-organization');
+
+    const toggle = screen.getByRole('button', { name: /organization isn't listed/i });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+
+    fireEvent.click(toggle);
+    expect(screen.queryByTestId('organization-not-listed-help')).not.toBeInTheDocument();
   });
 });
