@@ -134,5 +134,11 @@
   "register_confirm_email": "Voye konfimasyon pa imèl?",
   "register_confirm_text": "Voye konfimasyon pa mesaj tèks?",
   "register_submit": "Enskri",
-  "register_cancel": "Anile"
+  "register_cancel": "Anile",
+  "register_error_organization": "Òganizasyon an obligatwa",
+  "register_error_email_invalid": "Fòma adrès imèl la pa valab",
+  "register_error_email_required": "Adrès imèl la obligatwa",
+  "register_error_phone": "Antre yon nimewo telefòn ki valab",
+  "register_error_password": "Modpas la obligatwa",
+  "register_error_password_match": "Modpas yo dwe menm"
 }

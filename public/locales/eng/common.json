@@ -134,5 +134,11 @@
   "register_confirm_email": "Send confirmation via email?",
   "register_confirm_text": "Send confirmation via text?",
   "register_submit": "Register",
-  "register_cancel": "Cancel"
+  "register_cancel": "Cancel",
+  "register_error_organization": "Organization is required",
+  "register_error_email_invalid": "Invalid email format",
+  "register_error_email_required": "Email address is required",
+  "register_error_phone": "Enter a valid phone number",
+  "register_error_password": "Password is required",
+  "register_error_password_match": "Passwords must match"
 }

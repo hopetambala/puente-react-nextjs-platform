@@ -134,5 +134,11 @@
   "register_confirm_email": "¿Enviar confirmación por correo electrónico?",
   "register_confirm_text": "¿Enviar confirmación por mensaje de texto?",
   "register_submit": "Registrarse",
-  "register_cancel": "Cancelar"
+  "register_cancel": "Cancelar",
+  "register_error_organization": "La organización es obligatoria",
+  "register_error_email_invalid": "Formato de correo electrónico no válido",
+  "register_error_email_required": "El correo electrónico es obligatorio",
+  "register_error_phone": "Ingrese un número de teléfono válido",
+  "register_error_password": "La contraseña es obligatoria",
+  "register_error_password_match": "Las contraseñas deben coincidir"
 }

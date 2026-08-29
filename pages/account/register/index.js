@@ -13,7 +13,7 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { Parse } from 'parse';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import * as yup from 'yup';
@@ -24,20 +24,35 @@ const HELP_ID = 'organization-not-listed-help';
 
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
-const validationSchema = yup.object().shape({
-  firstname: yup.string(),
-  lastname: yup.string(),
-  organization: yup.string().required('Organization Name is required'),
-  email: yup.string().email('Invalid email format').required('Email Address is required'),
-  phonenumber: yup.string().matches(phoneRegExp, 'Password is required'),
-  password: yup.string().required('Password is required'),
-  passwordconfirmation: yup.string()
-    .oneOf([yup.ref('password'), null], 'Passwords must match'),
-});
+/**
+ * Built from `t` rather than at module scope, so validation messages are
+ * translated like everything else on the page.
+ *
+ * Safe to rebuild on a locale change: react-hook-form 6.15.8 refreshes
+ * `resolverRef.current` on every render (dist/index.cjs.development.js:716), so
+ * a new resolver is picked up rather than the first render's being cached.
+ */
+export function buildRegisterSchema(t) {
+  return yup.object().shape({
+    firstname: yup.string(),
+    lastname: yup.string(),
+    organization: yup.string().required(t('register_error_organization')),
+    email: yup.string()
+      .email(t('register_error_email_invalid'))
+      .required(t('register_error_email_required')),
+    // This read 'Password is required' — a copy-paste that told people their
+    // phone number was a password. Nothing tested the schema, so nothing caught it.
+    phonenumber: yup.string().matches(phoneRegExp, t('register_error_phone')),
+    password: yup.string().required(t('register_error_password')),
+    passwordconfirmation: yup.string()
+      .oneOf([yup.ref('password'), null], t('register_error_password_match')),
+  });
+}
 
 function Register() {
   const { t } = useTranslation('common');
   const router = useRouter();
+  const validationSchema = useMemo(() => buildRegisterSchema(t), [t]);
   const methods = useForm({
     resolver: yupResolver(validationSchema),
   });
