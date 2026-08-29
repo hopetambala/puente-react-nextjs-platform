@@ -112,3 +112,20 @@ describe('loadOrganizationIdentity', () => {
     expect(result.values).toEqual(['Peace Corps']);
   });
 });
+
+describe('a blank organization must not inherit the junk bucket', () => {
+  // internal-test carries an EMPTY STRING among its aliases in production, and
+  // normalizeOrganizationName('') returns '' rather than null — so a blank
+  // account organization folded to '' and matched it, handing the 11 accounts
+  // whose organization is blank the records of a bucket that is not theirs.
+  const INTERNAL = {
+    objectId: 'o9',
+    name: 'Internal / test',
+    shortCode: 'internal-test',
+    aliases: ['', 'testORG', 'Company A'],
+  };
+
+  it.each(['', '   '])('does not resolve %p', (blank) => {
+    expect(organizationMatchValues(blank, [INTERNAL])).toEqual([blank]);
+  });
+});

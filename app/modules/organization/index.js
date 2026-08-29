@@ -216,6 +216,14 @@ export function selectedOrganizationName(selection) {
  * records, and an empty set would blank the app instead.
  */
 export function organizationMatchValues(name, organizations = []) {
+  // A blank organization resolves to NOTHING, deliberately. The internal-test
+  // bucket carries an empty string among its aliases in production, and
+  // normalizeOrganizationName('') returns '' rather than null — so a blank
+  // account would otherwise fold to '' and match it, handing the 11 accounts
+  // whose organization is blank the records of a bucket that is not theirs.
+  // Blank is a data-quality problem to surface, never a tenancy to infer.
+  if (!normalizeOrganizationName(name)) return [name];
+
   let resolved;
   try {
     resolved = resolveOrganization({ name }, organizations);
