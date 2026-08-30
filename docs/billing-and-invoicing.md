@@ -1,5 +1,12 @@
 # Billing & invoicing — delivery scope
 
+> **Status note (2026-08-29):** the phase plan below is partly stale. Phase 1 is
+> largely shipped and parts of Phase 4 landed early. See
+> [organization-delivery-status.md](organization-delivery-status.md) for what is
+> actually done, what is live in production, and what to pick up next. This file
+> remains the authority on the *reasoning* — why flat-tier over metered, the
+> referee rule, the backfill runbook, the ACL sequencing.
+
 Branch: `feat/billing-organizations` (off `master`)
 
 ---
