@@ -20,8 +20,11 @@ const baseData = {
   truncated: false,
 };
 
+// These cover the STAFF view, which is what they were written for: staff see
+// every organization and the cross-tenant unresolved queue.
 const renderScreen = (data = {}, actions = {}) => render(
   <OrganizationAdmin
+    access={{ isStaff: true, orgAdminOf: [] }}
     data={{ ...baseData, ...data }}
     onCreate={actions.onCreate || jest.fn()}
     onEditAliases={actions.onEditAliases || jest.fn()}
@@ -131,5 +134,62 @@ describe('OrganizationAdmin — editing aliases', () => {
     expect(onEditAliases).toHaveBeenCalledWith({
       shortCode: 'wof', aliases: ['WOF', 'W.O.F.'],
     });
+  });
+});
+
+describe('OrganizationAdmin — what each viewer may see', () => {
+  // Caught by visual QA, not by these tests: an org admin was rendered the WHOLE
+  // registry — every partner's name, alias set and an editor for each. The
+  // server refuses those edits, so it was never a security hole, but a surface
+  // full of controls that fail is worse than one that omits them.
+  const twoOrgs = {
+    ...baseData,
+    organizations: [
+      org('wof', 'World Outreach Fund', ['WOF']),
+      org('rayjon', 'Rayjon', ['Rayjon Eye Clinic']),
+    ],
+  };
+
+  it('shows an org admin only the organizations they administer', () => {
+    render(
+      <OrganizationAdmin
+        data={twoOrgs}
+        access={{ isStaff: false, orgAdminOf: ['wof'] }}
+        onCreate={jest.fn()}
+        onEditAliases={jest.fn()}
+      />,
+    );
+
+    expect(screen.getAllByText('World Outreach Fund').length).toBeGreaterThan(0);
+    expect(screen.queryByText('Rayjon')).not.toBeInTheDocument();
+  });
+
+  it('shows staff every organization', () => {
+    render(
+      <OrganizationAdmin
+        data={twoOrgs}
+        access={{ isStaff: true, orgAdminOf: [] }}
+        onCreate={jest.fn()}
+        onEditAliases={jest.fn()}
+      />,
+    );
+
+    expect(screen.getAllByText('World Outreach Fund').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Rayjon').length).toBeGreaterThan(0);
+  });
+
+  it('hides the unresolved queue from an org admin — it is cross-tenant data', () => {
+    // The queue lists accounts from every organization that failed to resolve.
+    // That is Puente staff's worklist, not a partner's.
+    render(
+      <OrganizationAdmin
+        data={twoOrgs}
+        access={{ isStaff: false, orgAdminOf: ['wof'] }}
+        onCreate={jest.fn()}
+        onEditAliases={jest.fn()}
+      />,
+    );
+
+    expect(screen.queryByTestId('unresolved-denominator')).not.toBeInTheDocument();
   });
 });

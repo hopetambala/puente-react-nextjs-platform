@@ -20,6 +20,10 @@ import {
   createOrganization,
   editOrganizationAliases,
   isStaff,
+  listOrganizationMembers,
+  myOrganizationAccess,
+  setOrgAdmin,
+  setUserActive,
 } from './organization-admin';
 
 export {
@@ -31,6 +35,8 @@ export {
   editOrganizationAliases,
   getObjectsByGeolocation,
   isStaff,
+  listOrganizationMembers,
+  myOrganizationAccess,
   postObjectsToClass,
   postObjectsToClassWithRelation,
   removeQueryService,
@@ -39,5 +45,7 @@ export {
   retrievePuenteFormModifications,
   retrieveUniqueListOfOrganizations,
   sendMessage,
+  setOrgAdmin,
+  setUserActive,
   updateObject,
 };

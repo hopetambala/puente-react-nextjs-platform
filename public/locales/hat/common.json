@@ -161,5 +161,15 @@
   "org_admin_create_aliases": "Lòt fason yo ekri li, separe ak vigil",
   "org_admin_create_aliases_hint": "Tout fason ou te wè nan teren an. Non òganizasyon an toujou koresponn, kidonk ou pa bezwen mete l.",
   "org_admin_create_submit": "Ajoute òganizasyon",
-  "org_admin_create_required": "Ekri non òganizasyon an ak yon kòd kout."
+  "org_admin_create_required": "Ekri non òganizasyon an ak yon kòd kout.",
+  "org_admin_member_is_admin": "Administratè",
+  "org_admin_member_deactivated": "Dezaktive",
+  "org_admin_member_promote": "Fè administratè",
+  "org_admin_member_demote": "Retire administratè",
+  "org_admin_member_deactivate": "Dezaktive",
+  "org_admin_member_reactivate": "Reyaktive",
+  "org_admin_members_title": "Moun nan òganizasyon sa a",
+  "org_admin_members_empty": "Poko gen moun nan òganizasyon sa a.",
+  "org_admin_members_empty_sub": "Moun yo parèt isit la lè yo enskri ak òganizasyon sa a.",
+  "org_admin_members_unavailable": "Nou pa t kapab chaje moun nan òganizasyon sa a, kidonk lis sa a pa konplè. Tanpri eseye ankò nan kèk moman."
 }
