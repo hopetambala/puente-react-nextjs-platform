@@ -11,7 +11,6 @@ const NAV_GROUPS = [
     key: 'workspace',
     labelKey: 'Workspace',
     items: [
-      { id: 'dashboard', labelKey: 'nav_dashboard', icon: '◧', href: '/quick-start' },
       { id: 'forms', labelKey: 'nav_form_manager', icon: '⊟', href: '/forms/form-manager' },
       { id: 'form-creator', labelKey: 'nav_form_creator', icon: '✦', href: '/forms/form-creator' },
       { id: 'data', labelKey: 'nav_data', icon: '⊞', href: '/data/data-curation' },
@@ -22,6 +21,7 @@ const NAV_GROUPS = [
     key: 'org',
     labelKey: 'Org',
     items: [
+      { id: 'dashboard', labelKey: 'nav_dashboard', icon: '◧', href: '/quick-start' },
       { id: 'settings', labelKey: 'nav_settings', icon: '◌', href: '/account/management' },
     ],
   },
