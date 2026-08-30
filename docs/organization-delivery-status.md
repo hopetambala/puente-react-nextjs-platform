@@ -16,8 +16,8 @@ credentials for read queries are `APP_ID` + `REST_API_KEY` in the flask repo's
 
 | Repo | PR | What |
 |---|---|---|
-| cloudcode | #620 | `signup` resolves the organization; no unauthenticated admin self-grant; `createOrganization` is master-key only |
-| cloudcode | #621 | canonical name is an implicit alias (Copilot's finding); names participate in uniqueness both ways |
+| cloudcode | #619 | resolve and stamp the canonical `Organization` |
+| cloudcode | #620 | `signup` resolves the organization; no unauthenticated admin self-grant; `createOrganization` is master-key only. **Also** carries the canonical-name-is-an-implicit-alias fix (Copilot's finding) and names participating in uniqueness both ways — this was previously listed here as "#621", which never existed; that number is now the `puente_staff` PR |
 | Manage | #86 | registration picker over the `Organization` class |
 | Manage | #88 | register page i18n; phone field no longer says "Password is required" |
 | Manage | #89 | `containedIn` scoping across dashboard, curation, community audit, source selector, data-quality |
