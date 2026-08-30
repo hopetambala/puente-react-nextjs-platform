@@ -1,0 +1,175 @@
+/*
+ * Registry, not dashboard. The alias set is the subject: it is what records
+ * actually match against, so it gets the chips, the space, and the only accent
+ * on the surface. Everything else is a quiet frame.
+ *
+ * All values are --tk-dlite-* tokens. Logical properties throughout so the
+ * layout is not a rewrite in a right-to-left locale.
+ */
+
+.surface {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tk-dlite-semantic-spacing-lg);
+}
+
+/* ── An organization in the registry ─────────────────────────────────────── */
+
+.orgRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tk-dlite-semantic-spacing-sm);
+  padding-block: var(--tk-dlite-semantic-spacing-md);
+  border-block-end: 1px solid var(--tk-dlite-semantic-color-border);
+}
+
+.orgRow:last-child {
+  border-block-end: none;
+}
+
+.orgIdentity {
+  display: flex;
+  align-items: baseline;
+  gap: var(--tk-dlite-semantic-spacing-sm);
+  flex-wrap: wrap;
+}
+
+.orgName {
+  font-size: var(--tk-dlite-semantic-typography-size-300);
+  font-weight: var(--tk-dlite-primitive-fontWeight-bold);
+  color: var(--tk-dlite-semantic-color-text-primary);
+}
+
+/*
+ * The shortCode is an identifier, not prose: it is immutable, URL-safe, and the
+ * key the CSV exporter uses. Monospace so it reads as a key a person can copy
+ * without transcription error.
+ */
+.orgShortCode {
+  font-family: var(--tk-dlite-semantic-typography-font-mono), monospace;
+  font-size: var(--tk-dlite-semantic-typography-size-200);
+  color: var(--tk-dlite-semantic-color-text-secondary);
+}
+
+.aliasSet {
+  display: flex;
+  align-items: center;
+  gap: var(--tk-dlite-semantic-spacing-xs);
+  flex-wrap: wrap;
+}
+
+.implicitNote {
+  font-size: var(--tk-dlite-semantic-typography-size-100);
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  margin-inline-end: var(--tk-dlite-semantic-spacing-xs);
+}
+
+.aliasEditor {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--tk-dlite-semantic-spacing-sm);
+  flex-wrap: wrap;
+}
+
+/* ── Form fields ─────────────────────────────────────────────────────────── */
+
+.createForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tk-dlite-semantic-spacing-md);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tk-dlite-semantic-spacing-xs);
+}
+
+.fieldLabel {
+  font-size: var(--tk-dlite-semantic-typography-size-200);
+  font-weight: var(--tk-dlite-primitive-fontWeight-bold);
+  color: var(--tk-dlite-semantic-color-text-primary);
+}
+
+.input {
+  padding: var(--tk-dlite-semantic-spacing-sm);
+  font-size: var(--tk-dlite-semantic-typography-size-200);
+  color: var(--tk-dlite-semantic-color-text-primary);
+  background: var(--tk-dlite-semantic-color-surface-base);
+  border: 1px solid var(--tk-dlite-semantic-color-border);
+  border-radius: var(--tk-dlite-semantic-border-radius-sm);
+  min-inline-size: 0;
+  transition: border-color var(--tk-dlite-semantic-duration-fast);
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--tk-dlite-semantic-color-action-primary);
+  outline-offset: 1px;
+}
+
+.hint {
+  font-size: var(--tk-dlite-semantic-typography-size-100);
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  margin: 0;
+}
+
+/* ── Queue and states ────────────────────────────────────────────────────── */
+
+.denominator {
+  font-size: var(--tk-dlite-semantic-typography-size-200);
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  margin: 0 0 var(--tk-dlite-semantic-spacing-sm) 0;
+}
+
+.queue {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.queueRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--tk-dlite-semantic-spacing-sm);
+  padding-block: var(--tk-dlite-semantic-spacing-sm);
+  border-block-end: 1px solid var(--tk-dlite-semantic-color-border);
+}
+
+/* What the person actually typed — the string an alias has to be added for. */
+.typedString {
+  font-family: var(--tk-dlite-semantic-typography-font-mono), monospace;
+  font-size: var(--tk-dlite-semantic-typography-size-200);
+  color: var(--tk-dlite-semantic-color-text-primary);
+}
+
+.queueMeta {
+  font-size: var(--tk-dlite-semantic-typography-size-100);
+  color: var(--tk-dlite-semantic-color-text-secondary);
+}
+
+/*
+ * Not styled as an error: nothing is broken. It says the answer on screen is
+ * incomplete, which must never be mistaken for "all clear".
+ */
+.warning {
+  padding: var(--tk-dlite-semantic-spacing-sm);
+  margin-block-end: var(--tk-dlite-semantic-spacing-sm);
+  font-size: var(--tk-dlite-semantic-typography-size-200);
+  color: var(--tk-dlite-semantic-color-text-primary);
+  background: var(--tk-dlite-semantic-color-surface-sunken);
+  border-inline-start: 3px solid var(--tk-dlite-semantic-color-feedback-warning);
+  border-radius: var(--tk-dlite-semantic-border-radius-sm);
+}
+
+.error {
+  margin: 0;
+  font-size: var(--tk-dlite-semantic-typography-size-200);
+  color: var(--tk-dlite-semantic-color-feedback-danger);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .input {
+    transition: none;
+  }
+}
