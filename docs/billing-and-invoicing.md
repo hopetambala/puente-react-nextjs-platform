@@ -1,11 +1,20 @@
 # Billing & invoicing — delivery scope
 
-> **Status note (2026-08-29):** the phase plan below is partly stale. Phase 1 is
-> largely shipped and parts of Phase 4 landed early. See
-> [organization-delivery-status.md](organization-delivery-status.md) for what is
-> actually done, what is live in production, and what to pick up next. This file
-> remains the authority on the *reasoning* — why flat-tier over metered, the
-> referee rule, the backfill runbook, the ACL sequencing.
+> **Status note (updated 2026-08-30):** the phase plan below is partly stale.
+> Phase 1 is largely shipped and parts of Phase 4 landed early. This file remains
+> the authority on the *reasoning* — why flat-tier over metered, the referee
+> rule, the backfill runbook, the ACL sequencing. For state and sequencing, read:
+>
+> - **[billing-roadmap.md](billing-roadmap.md)** — the remaining path from today
+>   to invoices going out, with gates and decisions pre-resolved. **Start here.**
+> - [organization-delivery-status.md](organization-delivery-status.md) — what
+>   shipped, with production evidence
+> - [organization-admin-prd.md](organization-admin-prd.md) — the buildable spec
+>   for the next step
+>
+> **Do not execute the Phase 5 list below as a linear plan.** §5 Phase 0 sets an
+> evidence trigger for Phase 2 that a linear reading skips; it is Step B of the
+> roadmap.
 
 Branch: `feat/billing-organizations` (off `master`)
 

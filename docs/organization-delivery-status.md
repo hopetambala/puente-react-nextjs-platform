@@ -16,8 +16,8 @@ credentials for read queries are `APP_ID` + `REST_API_KEY` in the flask repo's
 
 | Repo | PR | What |
 |---|---|---|
-| cloudcode | #620 | `signup` resolves the organization; no unauthenticated admin self-grant; `createOrganization` is master-key only |
-| cloudcode | #621 | canonical name is an implicit alias (Copilot's finding); names participate in uniqueness both ways |
+| cloudcode | #619 | resolve and stamp the canonical `Organization` |
+| cloudcode | #620 | `signup` resolves the organization; no unauthenticated admin self-grant; `createOrganization` is master-key only. **Also** carries the canonical-name-is-an-implicit-alias fix (Copilot's finding) and names participating in uniqueness both ways — this was previously listed here as "#621", which never existed; that number is now the `puente_staff` PR |
 | Manage | #86 | registration picker over the `Organization` class |
 | Manage | #88 | register page i18n; phone field no longer says "Password is required" |
 | Manage | #89 | `containedIn` scoping across dashboard, curation, community audit, source selector, data-quality |
@@ -72,7 +72,15 @@ this work created.
 
 ## Next, in order
 
+> **The full remaining path — including everything past this near-term list, and
+> the evidence gate before the billing surface — is
+> [billing-roadmap.md](billing-roadmap.md).** This section is the near-term view;
+> that file is the whole route to invoices going out.
+
 ### 1. `puente_staff` role + `OrganizationAdmin` screen — the only real blocker
+
+**Spec:** [organization-admin-prd.md](organization-admin-prd.md) — the buildable
+PRD (scope, cross-repo sequencing, stories, tests). Read it before starting.
 
 Creating a partner organization needs the master key and a console. There is no
 UI, and since the picker landed **this is the only way a new partner can
