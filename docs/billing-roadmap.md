@@ -60,7 +60,7 @@ with their own value and their own clock.
 | **0** — org audit | **Done** | 37 orgs, 792 accounts, 123 unresolved (2026-08-29 production audit) |
 | **0** — Stripe Products/Prices, QuickBooks sync, hand-sent invoices, **§11 baseline metrics** | **Unverifiable from the repo** — ops | No Stripe reference exists anywhere in this codebase (verified 2026-08-30) |
 | **1** — `Organization` class, CRUD, resolver, picker, alias scoping | **Done** | cloudcode #620/#621; Manage #86/#88/#89/#90/#92/#93; aggregator #123/#124; Collect #613 |
-| **1** — admin surface | **NOT DONE — Step A** | `loadOrganizationAdmin.js` exists; **no screen, no write path** |
+| **1** — admin surface | **DONE 2026-08-30** | cloudcode #621/#622 live in prod; Manage #96 (wrappers) + #97 (screen at `/organization-admin`) live on Vercel. Awaiting only the `puente_staff` master-key seed (A4). |
 | **4** (partial, early) | **Done** | `short-code` export paths; `containedIn` alias scoping in Manage + Collect |
 | **2** — billing surface | **Entirely unbuilt** | No `app/epics/Billing/`, no `app/services/stripe/`, no `pages/api/`, zero Stripe references |
 | **3** — usage evidence | Unbuilt | — |
@@ -75,7 +75,28 @@ with their own value and their own clock.
 
 ---
 
-## STEP A — `puente_staff` + `OrganizationAdmin` (no gate; build it)
+## STEP A — `puente_staff` + `OrganizationAdmin` — ✅ COMPLETE 2026-08-30
+
+> **Shipped and live.** cloudcode #621 (puente_staff, isStaff, gated
+> createOrganization) and #622 (editOrganizationAliases) are **deployed to
+> production Back4App**; Manage #96 (cloud-code wrappers) and #97 (the screen at
+> /organization-admin) are **live on Vercel**.
+>
+> Verified in production by canary: `isStaff` returns `{"isStaff":false}`
+> unauthenticated, `createOrganization` and `editOrganizationAliases` both refuse
+> with the new message, and `resolveOrganization` is unaffected — the regression
+> check that matters, since Collect and Manage both depend on it.
+>
+> **The one remaining step is not code: seed `puente_staff` by master key (A4).**
+> Until then the route correctly redirects everyone, and the gate is a no-op —
+> every non-master call resolves to false exactly as before. Decision D2 stands:
+> generate the candidate list by query, have a human confirm, then run the seed.
+>
+> A review of #621 found and fixed a live escalation path: `addToRole` takes no
+> auth and writes under the master key, so it could have granted `puente_staff`
+> to any unauthenticated caller once the role existed. Demonstrated against a
+> real Parse server, then refused by name. The wider issue — `addToRole` being
+> unauthenticated at all — is assumption 7 below.
 
 **Spec:** [organization-admin-prd.md](organization-admin-prd.md) — scope,
 stories, tests, critical files, §4 decision locked (convenience-first).
