@@ -240,7 +240,8 @@ From billing §11, reduced to what applies on this path:
 | 2 | The §11 baselines were captured before Phase 0 | Ops — Step B | Without them, Step C's success is unprovable and the §11 metrics are theater |
 | 3 | The `_Role` CLP restricts writes to the master key | Eng w/ dashboard | If open, D1's gate is a paper gate; fix is one targeted CLP lock, **not** Step F |
 | 4 | Six partners is still the scale | Product | If partner count grows materially, Step B's "Stripe's screens are enough" answer flips |
-| 5 | No caller depends on `createOrganization` being master-key-**only** | Eng — grep cloudcode + its integration tests | Loosening the gate must not break tests that call it with `useMasterKey` |
+| 5 | ~~No caller depends on `createOrganization` being master-key-**only**~~ **CLEARED 2026-08-30** | Eng | Verified: the integration suite's `createOrganizationUnprivileged` guard test still passes; 82/82 green |
+| 7 | **`addToRole` is unauthenticated and writes under the master key** — pre-existing, now partially contained | Eng — its own change, not Step A | It could grant *any* role to *any* user. `puente_staff` is now refused by name (found and fixed in review of PR #621, demonstrated live), but the endpoint itself still needs an auth gate. Nothing calls it from Manage or Collect, so gating it is low-risk when someone picks it up. |
 | 6 | The three resolvers (cloudcode/Manage/Collect) have not drifted | Eng — diff them when touching any | If they diverge, the three systems disagree about who owns a record. **The standing maintenance hazard of this whole body of work.** |
 
 ---

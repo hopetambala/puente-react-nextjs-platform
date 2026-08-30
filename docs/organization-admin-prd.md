@@ -112,6 +112,36 @@ That boundary is only as strong as **who can join `puente_staff`**.
 >    belongs in the §7 record, and it strengthens the case for the `_Role` CLP
 >    lock below.
 
+> **Found and fixed in review, 2026-08-30 — `addToRole` was a live escalation
+> path.** `addToRole` (`roles.definer.js`) takes **no authentication** and does
+> every write under the master key. Any unauthenticated caller holding the app
+> id can name a role and join it. That was survivable while the only roles were
+> the three inert legacy ones — it stopped being survivable the moment
+> `puente_staff` gated `createOrganization`:
+>
+> ```js
+> Parse.Cloud.run('addToRole', { userID: '<own id>', roleName: 'puente_staff' })
+> ```
+>
+> The role's locked ACL does **not** prevent this, because `addToRole` writes
+> with the master key. **This was demonstrated against a live Parse server, not
+> theorised** — the regression test's failure took its neighbour down with it,
+> reporting role `puente_staff` where `manager` was expected, because the
+> escalation actually succeeded.
+>
+> **Fixed** in cloudcode by refusing the staff role by name, before any
+> mutation. Scoped narrowly on purpose: no app calls `addToRole` (zero call
+> sites in Manage and Collect), so legacy behaviour is preserved exactly.
+>
+> **Still open, deliberately:** `addToRole` is unauthenticated *at all*. That is
+> pre-existing, has its own blast radius, and belongs in its own change — see
+> the roadmap's Step F notes. It is now recorded rather than assumed harmless.
+>
+> **The lesson worth keeping:** the danger of a new privilege is not only how it
+> is *checked*, it is every existing path that can *grant* it. A locked ACL and
+> a server-side gate are both defeated by one unauthenticated endpoint that
+> writes with the master key.
+
 **Two things must both hold for the gate to be a *hard* boundary:**
 
 1. **Staff membership is master-key-only.** This phase assigns `puente_staff` via
