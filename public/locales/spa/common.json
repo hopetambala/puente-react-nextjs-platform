@@ -161,5 +161,15 @@
   "org_admin_create_aliases": "Otras formas de escribirlo, separadas por comas",
   "org_admin_create_aliases_hint": "Todas las formas vistas en el campo. El nombre de la organización siempre coincide, así que no hace falta incluirlo.",
   "org_admin_create_submit": "Agregar organización",
-  "org_admin_create_required": "Escriba el nombre de la organización y un código corto."
+  "org_admin_create_required": "Escriba el nombre de la organización y un código corto.",
+  "org_admin_member_is_admin": "Administrador",
+  "org_admin_member_deactivated": "Desactivado",
+  "org_admin_member_promote": "Hacer administrador",
+  "org_admin_member_demote": "Quitar administrador",
+  "org_admin_member_deactivate": "Desactivar",
+  "org_admin_member_reactivate": "Reactivar",
+  "org_admin_members_title": "Personas en esta organización",
+  "org_admin_members_empty": "Todavía no hay personas en esta organización.",
+  "org_admin_members_empty_sub": "Las personas aparecen aquí cuando se registran con esta organización.",
+  "org_admin_members_unavailable": "No se pudieron cargar las personas de esta organización, así que esta lista está incompleta. Vuelva a intentarlo en unos momentos."
 }

@@ -1,3 +1,4 @@
+import MembersPanel from 'app/epics/OrganizationAdmin/MembersPanel';
 import { Badge, Button, EmptyState, Panel } from 'app/impacto-design-system';
 import { useTranslation } from 'next-i18next';
 import PropTypes from 'prop-types';
@@ -21,7 +22,9 @@ const parseAliases = (value) => value
  * Rendering the set as discrete chips, with the canonical name marked as an
  * implicit member, is what makes that rule visible instead of folklore.
  */
-function OrganizationRow({ organization, onEditAliases }) {
+function OrganizationRow({
+  organization, onEditAliases, members, membersUnavailable, onSetOrgAdmin, onSetUserActive,
+}) {
   const { t } = useTranslation('common');
   const [draft, setDraft] = useState((organization.aliases || []).join(', '));
   const [error, setError] = useState(null);
@@ -87,11 +90,32 @@ function OrganizationRow({ organization, onEditAliases }) {
           {error}
         </p>
       )}
+
+      {members && (
+        <MembersPanel
+          shortCode={organization.shortCode}
+          members={members}
+          unavailable={membersUnavailable}
+          onSetOrgAdmin={onSetOrgAdmin}
+          onSetUserActive={onSetUserActive}
+        />
+      )}
     </div>
   );
 }
 
+OrganizationRow.defaultProps = {
+  members: null,
+  membersUnavailable: false,
+  onSetOrgAdmin: () => {},
+  onSetUserActive: () => {},
+};
+
 OrganizationRow.propTypes = {
+  members: PropTypes.arrayOf(PropTypes.shape({})),
+  membersUnavailable: PropTypes.bool,
+  onSetOrgAdmin: PropTypes.func,
+  onSetUserActive: PropTypes.func,
   organization: PropTypes.shape({
     name: PropTypes.string,
     shortCode: PropTypes.string,
@@ -258,28 +282,47 @@ UnresolvedQueue.propTypes = {
   truncated: PropTypes.bool.isRequired,
 };
 
-export default function OrganizationAdmin({ data, onCreate, onEditAliases }) {
+export default function OrganizationAdmin({
+  data, onCreate, onEditAliases, membersByShortCode, onSetOrgAdmin, onSetUserActive, access,
+}) {
   const { t } = useTranslation('common');
   const {
     organizations, accountsChecked, unresolved, unavailable, truncated,
   } = data;
 
+  const isStaff = Boolean(access && access.isStaff);
+  const adminOf = (access && access.orgAdminOf) || [];
+
+  // Staff administer every organization. A partner's admin sees ONLY their own:
+  // rendering the whole registry showed them every partner's name, alias set and
+  // an editor for each. The server refuses those edits, so it was never a
+  // security hole - but a surface full of controls that fail is worse than one
+  // that omits them.
+  const visible = isStaff
+    ? organizations
+    : organizations.filter((o) => adminOf.includes(o.shortCode));
+
   return (
     <div className={styles.surface}>
       <Panel title={t('org_admin_registry_title')}>
-        {organizations.length === 0 ? (
+        {visible.length === 0 ? (
           <EmptyState message={t('org_admin_registry_empty')} />
         ) : (
-          organizations.map((organization) => (
+          visible.map((organization) => (
             <OrganizationRow
               key={organization.shortCode}
               organization={organization}
               onEditAliases={onEditAliases}
+              members={(membersByShortCode || {})[organization.shortCode]}
+              membersUnavailable={Boolean((membersByShortCode || {}).unavailable)}
+              onSetOrgAdmin={onSetOrgAdmin}
+              onSetUserActive={onSetUserActive}
             />
           ))
         )}
       </Panel>
 
+      {isStaff && (
       <Panel title={t('org_admin_unresolved_title')}>
         <UnresolvedQueue
           unresolved={unresolved}
@@ -288,15 +331,32 @@ export default function OrganizationAdmin({ data, onCreate, onEditAliases }) {
           truncated={Boolean(truncated)}
         />
       </Panel>
+      )}
 
-      <Panel title={t('org_admin_create_title')}>
-        <CreateOrganizationForm onCreate={onCreate} />
-      </Panel>
+      {isStaff && (
+        <Panel title={t('org_admin_create_title')}>
+          <CreateOrganizationForm onCreate={onCreate} />
+        </Panel>
+      )}
     </div>
   );
 }
 
+OrganizationAdmin.defaultProps = {
+  membersByShortCode: null,
+  onSetOrgAdmin: () => {},
+  onSetUserActive: () => {},
+  access: null,
+};
+
 OrganizationAdmin.propTypes = {
+  membersByShortCode: PropTypes.shape({}),
+  onSetOrgAdmin: PropTypes.func,
+  onSetUserActive: PropTypes.func,
+  access: PropTypes.shape({
+    isStaff: PropTypes.bool,
+    orgAdminOf: PropTypes.arrayOf(PropTypes.string),
+  }),
   data: PropTypes.shape({
     organizations: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     accountsChecked: PropTypes.number.isRequired,

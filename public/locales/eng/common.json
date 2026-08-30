@@ -161,5 +161,15 @@
   "org_admin_create_aliases": "Other spellings, separated by commas",
   "org_admin_create_aliases_hint": "Every spelling seen in the field. The organization name always matches, so it does not need to be listed.",
   "org_admin_create_submit": "Add organization",
-  "org_admin_create_required": "Enter an organization name and a short code."
+  "org_admin_create_required": "Enter an organization name and a short code.",
+  "org_admin_member_is_admin": "Administrator",
+  "org_admin_member_deactivated": "Deactivated",
+  "org_admin_member_promote": "Make administrator",
+  "org_admin_member_demote": "Remove administrator",
+  "org_admin_member_deactivate": "Deactivate",
+  "org_admin_member_reactivate": "Reactivate",
+  "org_admin_members_title": "People in this organization",
+  "org_admin_members_empty": "No people in this organization yet.",
+  "org_admin_members_empty_sub": "People appear here once they register with this organization.",
+  "org_admin_members_unavailable": "The people in this organization could not be loaded, so this list is not complete. Try again shortly."
 }

@@ -173,3 +173,60 @@
     transition: none;
   }
 }
+
+/* ── Members ─────────────────────────────────────────────────────────────── */
+
+.memberList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.memberRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--tk-dlite-semantic-spacing-sm);
+  padding-block: var(--tk-dlite-semantic-spacing-sm);
+  border-block-end: 1px solid var(--tk-dlite-semantic-color-border);
+}
+
+.memberRow:last-child {
+  border-block-end: none;
+}
+
+.memberIdentity {
+  display: flex;
+  flex-direction: column;
+  /* The person is the subject of the row; actions sit to the trailing side. */
+  flex: 1 1 12rem;
+  min-inline-size: 0;
+}
+
+.memberName {
+  font-size: var(--tk-dlite-semantic-typography-size-200);
+  color: var(--tk-dlite-semantic-color-text-primary);
+}
+
+/* The username is the login identity — monospace so it can be copied without
+   transcription error, the same treatment shortCode gets. */
+.memberUsername {
+  font-family: var(--tk-dlite-semantic-typography-font-mono), monospace;
+  font-size: var(--tk-dlite-semantic-typography-size-100);
+  color: var(--tk-dlite-semantic-color-text-secondary);
+}
+
+.memberStatus {
+  display: flex;
+  align-items: center;
+  gap: var(--tk-dlite-semantic-spacing-xs);
+  flex-wrap: wrap;
+}
+
+.memberActions {
+  display: flex;
+  align-items: center;
+  gap: var(--tk-dlite-semantic-spacing-xs);
+  margin-inline-start: auto;
+  flex-wrap: wrap;
+}
