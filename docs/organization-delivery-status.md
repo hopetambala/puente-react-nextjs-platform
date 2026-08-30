@@ -97,13 +97,58 @@ exist** — a person can no longer create one by typing a novel name.
   it, check it on that one endpoint. **Not** the full §7 ACL migration, which is
   the riskiest phase in the plan and goes last.
 
-### 2. Collect's signup is still free text
+### 2. Collect's signup is still free text — and it is not a one-line fix
 
-Its suggestion list has never worked — `cacheAutofillData` in
-`modules/cached-resources/read.js` returns the enclosing function instead of the
-array (`f5adb8b6`, Feb 2023), and it only populates after login. #620 makes this
-*safe* (no admin self-grant, server-side resolution), so it is UX, not security.
-Needs a store release.
+Investigated and corrected 2026-08-30. The earlier entry here was wrong in two
+places; both corrections are load-bearing.
+
+**It is not a text field.** `domains/Auth/SignUp/index.js:225` renders an
+`Autofill` autocomplete. That component **falls back to a bare
+`react-native-paper` TextInput when its value list is empty**
+(`PaperInputPicker/AutoFill/index.js:123-138`), which is what a user sees. The
+picker is already there; it never turns on.
+
+**Why it never turns on.** `cacheAutofillData`
+(`modules/cached-resources/read.js:45`) builds `orgResults` correctly and then
+returns `orgs` — the enclosing arrow function — instead of it. `storeData`
+JSON-stringifies, and `JSON.stringify` **drops function-valued properties**, so
+the `organization` key never reaches storage. On read, `data[parameter].sort()`
+runs on `undefined`, throws, and the throw is swallowed by the catch at
+`AutoFill/index.js:63`. The list stays null and the field degrades to free text,
+with one `console.error` as the only trace.
+
+**Correction — the origin commit.** Previously attributed to `f5adb8b6`,
+Feb 2023. That commit is `chore: add prettier` and only re-indented the line.
+`git log -S "return orgs"` returns exactly one commit: **`dfc4cb6`,
+2022-01-18, "feat: unique communities"**, whose diff deletes
+`autofillData.organization = orgResults;` and adds `return orgs`. The bug is
+**four years and seven months old**, not three and a half.
+
+**Correction — Collect does query the `Organization` class.**
+`modules/organization/index.js:91` runs `new Parse.Query("Organization")`. What
+it does *not* do is use it here: the signup autofill sources from
+`customQueryService(0, 500, 'User', 'adminVerified', true)` and
+`user.get('organization')` (`read.js:26-32`) — the raw free-text user strings,
+which are exactly the junk the `Organization` class exists to replace.
+
+**So matching Manage is a rewrite of the data source, not a bug fix**, and it
+has two independent blockers:
+
+1. Fixing line 45 alone is not enough. `cacheAutofillData` runs only inside
+   `populateCache`, which is called post-login. **A fresh install has no cache at
+   all on the signup screen** — the exact moment the feature exists for.
+2. The source must move from `User.organization` strings to the curated
+   `Organization` class, read pre-authentication.
+
+**Why it survived four years: no test covers it.** No test file references
+`autofill_information`, `AutoFill`, or `Autofill`, and `.maestro/` has ten flows,
+none covering registration. A red test on `cacheAutofillData`'s return shape
+would have caught it on day one.
+
+cloudcode #620 makes this *safe* — no admin self-grant, server-side resolution —
+so it is UX, not security. **Needs a store release; Collect has no OTA**
+(`EXUpdatesEnabled` false on iOS, `expo.modules.updates.ENABLED` false on
+Android).
 
 ### 3. Stamping the canonical name on write — needs a decision, not code
 
