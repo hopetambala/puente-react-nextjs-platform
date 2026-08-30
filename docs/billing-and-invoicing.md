@@ -815,7 +815,12 @@ ships with i18n keys — not English strings to be translated later.
 - **Repointing the existing exporter URL** — additive `shortCode` path only (§3)
 - **Multi-currency and non-US tax** — US/USD confirmed; revisit only if that changes
 - **A general-purpose accounting system** — QuickBooks stays the book of record
-- **Self-serve organization creation** — Puente staff create orgs by hand
+- ~~**Self-serve organization creation** — Puente staff create orgs by hand~~
+  **REVERSED 2026-08-30** — see [self-service-organizations.md](self-service-organizations.md).
+  The exclusion was premised on a human being the guard against tenant forking;
+  that guard is now a server-side fuzzy match that refuses near-duplicate names
+  and routes them to staff. Billable orgs are still vetted: self-created ones
+  default to `plan: no-charge` until staff say otherwise
 - **Permission tiers within an organization** — build tenancy, not a hierarchy;
   the inert legacy roles are the argument (§7.1)
 - **Removing the legacy `admin`/`manager`/`contributor` roles** — harmless where

@@ -1,5 +1,11 @@
 # Onboarding an organization, and the accounts inside it
 
+> **Superseded in part, 2026-08-30.** The staff-only process below is being
+> replaced by self-service creation with a server-side fuzzy-match guard — see
+> [self-service-organizations.md](self-service-organizations.md). Until that
+> ships, everything here is still exactly how it works. After it ships, Step 1
+> becomes the fallback path for names the guard refuses, not the only path.
+
 **The process changed on 2026-08-29** with `puente-node-cloudcode` PR #620, which
 is live in production. The change is small to describe and easy to trip over:
 
