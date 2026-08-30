@@ -16,13 +16,21 @@ import {
   retrieveUniqueListOfOrganizations,
 } from './custom-data-retrieval';
 import sendMessage from './messaging';
+import {
+  createOrganization,
+  editOrganizationAliases,
+  isStaff,
+} from './organization-admin';
 
 export {
   countObject,
+  createOrganization,
   customMultiParamCountService,
   customMultiParamQueryService,
   customQueryService,
+  editOrganizationAliases,
   getObjectsByGeolocation,
+  isStaff,
   postObjectsToClass,
   postObjectsToClassWithRelation,
   removeQueryService,
