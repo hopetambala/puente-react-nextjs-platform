@@ -72,7 +72,15 @@ this work created.
 
 ## Next, in order
 
+> **The full remaining path — including everything past this near-term list, and
+> the evidence gate before the billing surface — is
+> [billing-roadmap.md](billing-roadmap.md).** This section is the near-term view;
+> that file is the whole route to invoices going out.
+
 ### 1. `puente_staff` role + `OrganizationAdmin` screen — the only real blocker
+
+**Spec:** [organization-admin-prd.md](organization-admin-prd.md) — the buildable
+PRD (scope, cross-repo sequencing, stories, tests). Read it before starting.
 
 Creating a partner organization needs the master key and a console. There is no
 UI, and since the picker landed **this is the only way a new partner can
