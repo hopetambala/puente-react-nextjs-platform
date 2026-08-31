@@ -248,6 +248,80 @@ the escalation path D3 exists to close.
 
 ---
 
+## Phase 0 decisions — taken 2026-08-31
+
+Four answers that unblock Stripe configuration. Recorded here because Stripe
+Products and Prices are built from them, and a price nobody wrote down becomes
+a price nobody can defend to a partner.
+
+| # | Question | **Decision** |
+|---|---|---|
+| **P1** | Partner tier shape | **Both models, together.** A recurring per-month subscription AND services priced per partner by negotiation. Not either/or. |
+| **P2** | Rate card services | **Custom form build · Data cleanup · Training · Custom export or integration.** All four. |
+| **P3** | Net terms | **Net 30.** This is what the days-overdue column counts from and what Stripe's dunning fires on. |
+| **P4** | §11 baselines before Phase 0 | **Skipped, deliberately.** See below. |
+
+**P1 changed the code.** A shared rate card cannot express a negotiated price,
+so `buildDraftInvoice` now takes `organization.negotiatedRates`, which override
+the catalogue per service code and are marked `negotiated` on the line. A
+negotiated rate is sufficient on its own with no catalogue entry — a bespoke
+engagement has no list price by definition, and requiring one would mean
+inventing a fake catalogue row for every one-off piece of work.
+
+### P4 — the baselines are being skipped, on purpose
+
+The plan says to capture days-from-month-end-to-invoices-sent and operator hours
+per cycle **before** Phase 0, or Phase 2 is unmeasurable by §11. Hope's call is
+to skip them and build regardless, on the grounds that the manual process is
+known to be painful enough that measuring it is not worth the delay.
+
+Recording it so it reads as a decision rather than an oversight, and so nobody
+later asks why there is no baseline:
+
+- **What is given up:** the Phase 2 retrospective has nothing to compare
+  against. "We built it and it feels faster" is the definition of metrics
+  theater, and that judgement will not be available.
+- **What survives:** the other two §11 metrics still work. *Invoices needing
+  manual correction* and *% of org strings resolving* are both measurable after
+  the fact, and the second is already at 89%.
+- **Cheapest recovery if this is regretted:** time the FIRST Stripe cycle rather
+  than the last manual one. It is not a true baseline — the tooling has already
+  changed — but it gives the second cycle something to beat.
+
+> **Anti-pattern — the undocumented skip.**
+> **Symptom:** a plan step quietly not done, so six months later nobody can tell
+> whether it was considered or forgotten.
+> **Consequence:** the same argument gets had twice, with less context the
+> second time.
+> **Fix:** write the decision and its cost down where the step was specified.
+> That is this section.
+
+---
+
+## What still blocks Phase 0
+
+Everything below is Stripe configuration, and the only missing inputs are
+amounts.
+
+| # | Item | Blocked on |
+|---|---|---|
+| 1 | ~~Audit the real org strings~~ | **DONE 2026-08-31** — 58 organizations, 89% of accounts resolving. See `organization-delivery-status.md` §4 and `billable-roster.md`. |
+| 2 | Stripe **Products** | Nothing — one subscription Product plus four service Products, named in P2 |
+| 3 | Stripe **Prices** | **The amounts.** One monthly subscription price, and a list price per service. Negotiated per-partner rates do not need Stripe Prices — they ride as invoice line items. |
+| 4 | Invoice branding, net terms | Nothing — terms are Net 30 (P3) |
+| 5 | Automatic dunning | Nothing — follows from Net 30 |
+| 6 | QuickBooks sync | Nothing — a toggle in Stripe |
+| 7 | Send this cycle from Stripe | Items 2–6 |
+
+**So Phase 0 is blocked on exactly one thing: the numbers.** A subscription
+price, and four service list prices. Everything else is configuration that
+follows from decisions already taken.
+
+Which organizations are `no-charge` is a separate decision and does not block
+Phase 0 — `billable-roster.md` quantifies it at 14 rows.
+
+---
+
 ## What genuinely cannot be done without a human
 
 Short list, deliberately. Everything else is decided above.
