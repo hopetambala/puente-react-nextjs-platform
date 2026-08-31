@@ -164,6 +164,60 @@ The plan sets this trigger itself, and a linear reading blows straight through i
 
 ---
 
+## STEP C / Phase 2 — COMPLETE 2026-08-31, on `feat/billing-organizations`
+
+Built, tested end to end against deployed production Cloud Code, and deliberately
+**not merged** — Hope merges this one.
+
+| Piece | Where |
+|---|---|
+| Invoice draft composer | `app/modules/billing/draftInvoice.js` |
+| Who-owes-what | `app/modules/billing/whoOwesWhat.js` + `app/epics/Billing/` |
+| Org billing page, editable plan and contact | `app/epics/Billing/Billing.js` |
+| Rate card editor (add / remove / re-price) | `app/epics/Billing/RateCardPanel.js` |
+| Stripe service, server-side only | `app/services/stripe/` |
+| Create-invoice route | `pages/api/billing/create-invoice.js` |
+| `Invoice` mirror, `RateCard`, `setOrganizationBilling` | cloudcode, **deployed** |
+
+773 tests across 86 suites. dlite scan clean, build clean, i18n in eng/spa/hat
+with the Creole worksheet current.
+
+**The constraints that survived contact with the code**, each now enforced by a
+test rather than a comment:
+
+- **Payment state is never authored in Parse.** `mirrorInvoice` is master-key
+  only; the draft shape cannot express `paid`; there is no settle control on the
+  screen. A test asserts the absence.
+- **The Stripe secret cannot reach the browser.** `secretFromEnv` refuses a
+  `NEXT_PUBLIC_*` variable and refuses a `pk_` key, and no error body echoes it.
+- **Usage is evidence, never the charge.** Attached to a draft, labelled
+  *Synced*, never *Collected*.
+- **"Could not read" never renders as "nothing owed."** The loader returns
+  `null`, not `[]`.
+
+**Three defects only driving the real page could find**, all from mocks that
+declared an API the component did not have: `AppShell` needs `breadcrumb` (the
+page crashed outright), `Badge` takes `children` not `text` (every plan badge
+rendered empty), `EmptyState` takes `message`/`sub` not `title`/`description`
+(blank empty state, required prop undefined). Plus a `useState` initialiser that
+ran once while the card arrived later, so the rate card claimed it was
+unreadable while the request had returned 200.
+
+> **Anti-pattern — the mock that invents an API.**
+> **Symptom:** a component test mocks a design-system component with the props
+> the author assumed it takes.
+> **Consequence:** the suite passes against a component rendering nothing.
+> Three times in one epic here.
+> **Fix:** read the component before mocking it, and drive the real page before
+> claiming a surface works.
+
+**What remains is Phase 0, and it is entirely operational** — see the Phase 0
+decisions section above. The create-invoice control is already on screen,
+disabled, naming `STRIPE_SECRET_KEY` as what is missing. It enables itself the
+moment that variable exists; no code change is needed.
+
+---
+
 ## STEP C — Phase 2, the billing surface (gated on Step B)
 
 Manage + cloudcode only. No Collect, no Flask.
