@@ -75,7 +75,11 @@ with their own value and their own clock.
 
 ---
 
-## STEP A — `puente_staff` + `OrganizationAdmin` — ✅ COMPLETE 2026-08-30
+## STEP A — `puente_staff` + `OrganizationAdmin` — ✅ COMPLETE, AND LIVE 2026-08-31
+
+Code complete 2026-08-30; **seeded in production 2026-08-31**. `puente_staff` is
+role `jJJ8TET4rj`, 30 organizations have an admin, and the screen is reachable.
+See `organization-delivery-status.md` §1–2.
 
 > **Shipped and live.** cloudcode #621 (puente_staff, isStaff, gated
 > createOrganization) and #622 (editOrganizationAliases) are **deployed to
@@ -216,13 +220,31 @@ and at scale. Unlocks partner-facing invoice visibility from Step C.
 | # | Question | **Decision** | Reversibility |
 |---|---|---|---|
 | **D1** | Is the `isStaff` gate a hard security boundary? | **Convenience-first.** Build now, label it convenience, verify the `_Role` CLP before calling it "secured." (PRD §4, locked 2026-08-30) | Trivial — relabel, or one CLP lock |
-| **D2** | Who becomes `puente_staff`? | **Default: the accounts whose organization resolves to the Puente canonical org AND already hold `role: administrator`.** Generate that list with a query, have a human confirm before running the seed. Do **not** seed by hand-typed guess. | Easy — add/remove role members |
+| **D2** | Who becomes `puente_staff`? | **SUPERSEDED 2026-08-31 — the stated rule is unsafe and returns the wrong people. See D2a.** | Easy — add/remove role members |
+| **D2a** | Who becomes `puente_staff`, corrected | **Named accounts only, confirmed by a human, never derived from `_User.role`.** Seeded so far: `Fs96JuuxOO` (hopetambala@gmail.com). | Easy — add/remove role members |
 | **D3** | Self-serve staff promotion? | **No, permanently.** Membership is master-key-seeded only. A "make me staff" endpoint is the entire escalation path. | n/a — a standing rule |
 | **D4** | Build Step C? | **Gated on Step B**, with the decision rule pre-committed above. Not a judgment call at the time — read the table. | n/a |
 | **D5** | Billing fields on `Organization` now? | **No.** Deferred until permissions are settled (billing §3). | Easy — add fields later |
 | **D6** | Do Steps D–F block billing? | **No.** Explicitly off the money path. | n/a |
 | **D7** | Order within Step A? | **cloudcode strictly before Manage.** The screen calls endpoints that reject every non-master call today. | n/a |
 | **D8** | `organizationVerified`/`Unverified` still exact-match free text (billing §14) | **Fold into Step A3** — they inherit the same case-sensitivity bug and the resolver already exists. Small, same repo, same deploy. | Easy |
+
+### Why D2 was superseded
+
+D2 said to seed the accounts whose organization is Puente and whose `role` is
+`administrator`. Run against production, that query returns **five Dominican
+field staff with phone-number usernames — and not Hope**, whose `role` is
+`contributor`.
+
+The rule is also unsafe on its own terms. `puente_staff` is the highest
+privilege in the system: it administers every organization. `_User.role` is a
+free-text string that `updateUser` — which takes **no authentication** — will
+set on any account by objectId. This roadmap already relies on that fact
+elsewhere to argue authorization must live in Parse roles and never in
+`_User.role`. D2 then derived the top privilege from exactly that field.
+
+Deriving staff membership from a field any unauthenticated caller can write is
+the escalation path D3 exists to close.
 
 ---
 
@@ -249,7 +271,49 @@ From billing §11, reduced to what applies on this path:
 | Days from month-end to all invoices sent | The stated pain. **Baseline before Step C** or Step C is unmeasurable. |
 | Operator time per billing cycle | Decides whether Step C was worth building — the retrospective on D4 |
 | Invoices needing manual correction | If high after Step A, the alias table is still incomplete |
-| % of org strings resolving, **per class** | **A gate, not a target.** 100%, `Household` exempted. A number trending to 100% invites shipping at 97%; a worklist with four rows invites clearing four rows. |
+| % of org strings resolving, **per class** | **MEASURED 2026-08-31 — the gate is met, and the metric needed restating. See below.** |
+
+### The per-class gate, measured — and why it was the wrong question
+
+Run against production, exact counts, not samples:
+
+| class | records | no organization | |
+|---|---|---|---|
+| `SurveyData` | 43,979 | 9 | 0.0% |
+| `EvaluationMedical` | 16,319 | 0 | 0.0% |
+| `Assets` | 447 | 1 | 0.2% |
+| `FormResults` | 34,810 | 330 | 0.9% |
+| `Vitals` | 20,587 | 3,366 | 16.4% |
+| `HistoryEnvironmentalHealth` | 33,508 | 8,444 | 25.2% |
+| `HistoryMedical` | 351 | 351 | **the field is absent from the schema** |
+| `Household` | 14,736 | 14,688 | 99.7% — exempted, and now we know why |
+
+Read literally, the gate fails on four classes and can never pass on
+`HistoryMedical`. That reading is wrong, and the correction is the finding:
+
+**Every unattributed record is pre-2023 legacy.** Filtered by `createdAt`, records
+with no organization created since 2023: `Vitals` **0**, `HistoryEnvironmentalHealth`
+**0**, `FormResults` **0**. `SurveyData` has 9 — and those are the faker test rows
+in §4a, not field data.
+
+They also cannot be repaired. A sample of 200 blank `Vitals` and 200 blank
+`HistoryEnvironmentalHealth` records carries **no `parseUser` and no
+`surveyingUser`** — there is nothing to attribute them from. They predate the
+app stamping attribution at all.
+
+**So the metric is restated:** *unattributed records created within the billing
+period.* By that measure it is **zero**, and it was zero before this work began.
+
+> **Anti-pattern — the unmeetable gate.**
+> **Symptom:** a 100% quality bar that counts records nobody can ever fix.
+> **Consequence:** either the gate is quietly ignored, or Step C waits forever on
+> a backfill with no input data. Both are worse than restating it.
+> **Fix:** scope the gate to the period the decision is about. A billing gate
+> should count billable-period records.
+
+**Consequence for the roadmap: data quality does not block Step C.** The gate
+that was meant to hold billing back is satisfied. Step C is now gated on Step B
+alone.
 
 ---
 
