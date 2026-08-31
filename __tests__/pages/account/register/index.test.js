@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 
 jest.mock('@hookform/resolvers', () => ({
   yupResolver: jest.fn(() => jest.fn()),
@@ -251,5 +251,28 @@ describe('register is translated', () => {
 
     expect(screen.getByLabelText('First Name')).toBeInTheDocument();
     expect(screen.queryByLabelText('register_field_first_name')).not.toBeInTheDocument();
+  });
+});
+
+describe('Register — confirmation is email only', () => {
+  // SMS confirmation is no longer supported. Offering a control that cannot
+  // work is worse than offering none: someone picks it, registers, and waits
+  // for a text that will never arrive.
+  it('does not offer confirmation via text', async () => {
+    render(<Register />);
+    await waitFor(() => expect(screen.getByTestId('auth-form')).toBeInTheDocument());
+    // Matched loosely: the mock resolves keys through a catalog, so the rendered
+    // string may be the English copy rather than the key.
+    expect(screen.queryByText(/via text/i)).not.toBeInTheDocument();
+    expect(screen.queryByText('register_confirm_text')).not.toBeInTheDocument();
+  });
+
+  it('does not present email as a choice either, since it is the only option', async () => {
+    // A picker with one option is not a choice, it is a decoration that implies
+    // an alternative exists.
+    render(<Register />);
+    await waitFor(() => expect(screen.getByTestId('auth-form')).toBeInTheDocument());
+    expect(screen.queryByText(/via email/i)).not.toBeInTheDocument();
+    expect(screen.queryByText('register_confirm_email')).not.toBeInTheDocument();
   });
 });
