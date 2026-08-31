@@ -234,6 +234,56 @@ International, Clinica Verde, Bridge of Life, Mission of Hope, Hope for
 Haitians. Creating one is a statement that they are a partner — do it through
 the admin screen, which is now reachable.
 
+### 4b. Registering the institutions that were never in the registry — 2026-08-31
+
+**21 organizations created**, taking account resolution from 681 to **712 of 796
+(89%)** and unresolved strings from 107 to 71. The registry is now 58
+organizations.
+
+**Created `active: false`, deliberately.** Every one of these has **zero
+records** — they are dormant by evidence, not by assumption. Inactive means the
+signup picker does not offer them, while `resolve()` still resolves their names,
+so the accounts scope correctly. Staff flip one to active in the admin screen
+the moment it is really a partner. Adding 21 never-used options to a picker a
+promotora uses one-handed in sunlight is a real cost.
+
+Created: Peace Corps, University of Notre Dame, Timmy Global Health, DREAM
+Project, HANWASH, Healing Waters International, Clinica Verde, Bridge of Life,
+Mission of Hope, Hope for Haitians, Hopeworks, Proyecto Corazones, Mision El
+Faro, ACOES, Rotary eClub of WASH, Operación Sonrisa, Mmanze Centre For Rural
+Development And Training, University of Missouri-Kansas City, William and Mary,
+Université de Kinshasa, Agape School Complex.
+
+**Aliases were added only for genuinely different strings** — `Peace Corpa`,
+`Notre Dame`, `Rotart eClub of WASH`. Case and whitespace variants need no
+alias; the resolver normalises before matching, so listing them is noise.
+
+**Six were deliberately NOT folded in**, because each is an inference of exactly
+the kind that produced `UMSI`→`MSI`: `PCDR` (Peace Corps Dominican Republic?),
+`UMSI` (Michigan's School of Information?), `Djusd`, `ASSAN`, `Ciudad de dios`,
+`Medical Service Trip`. Someone who knows the partners should decide these.
+
+**A shortCode trap, hit and fixed.** Deriving a shortCode by slugifying the raw
+name produces `operaci-n-sonrisa` and `universit-de-kinshasa` — the accented
+letter becomes a hyphen. `deriveShortCode` in `auth.definer.js` gets this right
+by calling `normalizeOrganizationName` (which strips accents) BEFORE slugifying.
+Anything generating a shortCode must do the same: it ends up in export URLs
+(`/v3/records/short-code/<shortCode>`) and in role names
+(`org_<shortCode>_admin`), so a mangled one is not cosmetic.
+
+### 4c. Community names cannot identify the remaining accounts
+
+Triangulating an unknown organization from the communities its records were
+collected in is what identified Holy Family Mission (community `cevicos`) and
+pointed at Divine Agency (surveyor `Deleo Moses Ocen`, whose account says `Ryans
+Well`).
+
+It cannot do more, and this is settled rather than assumed: of the 104 accounts
+whose organization did not resolve, **exactly one has ever collected a record** —
+`ACOES` (Scott Coppa), whose 3 records say `United Way SB`, and who is already
+United Way SB's admin. The other 103 have no records at all, so there is nothing
+to triangulate from.
+
 ### 4a. Nine faker records in production `SurveyData`
 
 The nine unresolved rows are test data, not survey data: names straight out of
