@@ -112,11 +112,19 @@ disqualifying:
 
 1. **It rewrites collected field values in place.** `r.set('communityname', target); r.save()`
    across every matched record. That is precisely what §5 forbids.
-2. **It renames at most 100 records per variant per class, and reports success.**
-   The rename query sets `containedIn` and `equalTo` but **no `limit`**, so it
-   takes Parse's default page size of 100. Its own modal says *"This updates
-   every matching record and cannot be undone."* For `La Islita` that is 100 of
-   10,439 — an irreversible, silent, partial rewrite.
+2. ~~**It renames at most 100 records per variant per class, and reports
+   success.**~~ **FIXED — PR #109, merged 2026-08-31.** The rename query set
+   `containedIn` and `equalTo` but **no `limit`**, so it took Parse's server
+   default of 100 while its own modal said *"This updates every matching record
+   and cannot be undone."* For `La Islita` that was 100 of 10,439 — irreversible,
+   silent and partial. It now re-queries until nothing matches, with an explicit
+   limit. Re-querying rather than `skip` is correct here because the rename is
+   destructive to its own filter: a renamed record no longer matches, so the next
+   query returns exactly the ones still untouched.
+
+   Point 1 above still stands, and is now the sharper objection: the rename
+   works correctly and should still not be used, because rewriting collected
+   values in place is what §5 forbids.
 3. **It only ever sees a sample.** Groups are built from `q.limit(1000)` per
    class, so on 43,979 rows it can see at most a few thousand values and most of
    the 520 fragmented communities are simply invisible to it.
