@@ -172,13 +172,5 @@
   "org_admin_members_empty": "Todavía no hay personas en esta organización.",
   "org_admin_members_empty_sub": "Las personas aparecen aquí cuando se registran con esta organización.",
   "org_admin_members_unavailable": "No se pudieron cargar las personas de esta organización, así que esta lista está incompleta. Vuelva a intentarlo en unos momentos.",
-  "org_admin_members_load": "Ver personas",
-  "billing_title": "Facturación",
-  "billing_who_owes_what": "Quién debe qué",
-  "billing_organizations": "Organizaciones",
-  "billing_nothing_outstanding": "Nada pendiente",
-  "billing_nothing_outstanding_detail": "Todas las facturas están pagadas, o todavía no se ha enviado ninguna.",
-  "billing_outstanding_unavailable": "No pudimos leer lo que está pendiente. Esto no significa que no se deba nada — inténtelo de nuevo.",
-  "billing_days_overdue": "{{count}} días de atraso",
-  "billing_no_plan": "Sin plan asignado"
+  "org_admin_members_load": "Ver personas"
 }
