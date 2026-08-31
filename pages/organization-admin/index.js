@@ -65,6 +65,25 @@ export default function OrganizationAdminPage() {
     setMembers(next);
   }, []);
 
+  /**
+   * Members for ONE organization, fetched on demand.
+   *
+   * This is how staff reach a partner's people at all: member loading is keyed
+   * on the organizations you administer, and staff administer none by that
+   * measure - they override every tenant instead. Fanning out across every
+   * organization on page load would be dozens of round-trips to answer a
+   * question about one of them.
+   */
+  const loadOneOrganization = useCallback(async (shortCode) => {
+    try {
+      const members = await listOrganizationMembers({ shortCode });
+      setMembers((current) => ({ ...current, [shortCode]: members }));
+    } catch (error) {
+      // A failed read must never render as an empty team.
+      setMembers((current) => ({ ...current, unavailable: true }));
+    }
+  }, []);
+
   const load = useCallback(async (currentAccess) => {
     setData(await loadOrganizationAdmin({ Parse }));
     await loadMembers(currentAccess.orgAdminOf);
@@ -106,6 +125,7 @@ export default function OrganizationAdminPage() {
           onEditAliases={(params) => after(() => editOrganizationAliases(params))}
           onSetOrgAdmin={(params) => after(() => setOrgAdmin(params))}
           onSetUserActive={(params) => after(() => setUserActive(params))}
+          onLoadMembers={loadOneOrganization}
         />
       ) : (
         <p>{t('org_admin_loading')}</p>

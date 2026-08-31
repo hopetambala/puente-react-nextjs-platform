@@ -171,5 +171,6 @@
   "org_admin_members_title": "Personas en esta organización",
   "org_admin_members_empty": "Todavía no hay personas en esta organización.",
   "org_admin_members_empty_sub": "Las personas aparecen aquí cuando se registran con esta organización.",
-  "org_admin_members_unavailable": "No se pudieron cargar las personas de esta organización, así que esta lista está incompleta. Vuelva a intentarlo en unos momentos."
+  "org_admin_members_unavailable": "No se pudieron cargar las personas de esta organización, así que esta lista está incompleta. Vuelva a intentarlo en unos momentos.",
+  "org_admin_members_load": "Ver personas"
 }
