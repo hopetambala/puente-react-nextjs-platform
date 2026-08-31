@@ -56,7 +56,11 @@ function Register() {
   const methods = useForm({
     resolver: yupResolver(validationSchema),
   });
-  const [notificationType, setNotificationType] = useState('email');
+  // Confirmation is email only. SMS is no longer supported, and offering a
+  // control that cannot work is worse than offering none - someone picks it,
+  // registers, and waits for a text that never arrives. Kept as a named
+  // constant rather than inlined so the signup contract still reads clearly.
+  const notificationType = 'email';
   // `unavailable` starts false so the picker renders immediately; a failed load
   // flips it. Never conflate "could not load" with "no organizations exist" —
   // both look like an empty dropdown, and only one is the user's problem.
@@ -170,10 +174,14 @@ function Register() {
                 required
                 errorobj={errors}
               />
+              {/* NOT required, and the schema agrees - the asterisk claimed
+                  otherwise while yup only pattern-matched it. Phone is contact
+                  information, not identity: it is shared between colleagues and
+                  reassigned when someone leaves, which is exactly why it stopped
+                  being the username. */}
               <FormInput
                 name="phonenumber"
                 label={t('register_field_phone')}
-                required
                 errorobj={errors}
               />
             </Stack>
@@ -192,20 +200,6 @@ function Register() {
               />
             </Stack>
           </FormProvider>
-          <Stack spacing="medium" fill>
-            <Button
-              intent={notificationType === 'email' ? 'primary' : ''}
-              onClick={() => setNotificationType('email')}
-              text={t('register_confirm_email')}
-              isFullWidth
-            />
-            <Button
-              intent={notificationType === 'text' ? 'primary' : ''}
-              onClick={() => setNotificationType('text')}
-              text={t('register_confirm_text')}
-              isFullWidth
-            />
-          </Stack>
           <Stack isVertical spacing="medium">
             <Button
               intent="primary"
