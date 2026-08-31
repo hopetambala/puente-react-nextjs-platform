@@ -101,31 +101,20 @@ this work created.
 > [billing-roadmap.md](billing-roadmap.md).** This section is the near-term view;
 > that file is the whole route to invoices going out.
 
-### 1. Seed `puente_staff` — the only thing standing between here and a working admin screen
+### 1. Seed `puente_staff` — DONE 2026-08-31
 
-**This is a master-key action. It is the one step nobody but Hope can do, and
-until it runs everything below it is unreachable.**
+Seeded and verified. `puente_staff` is role `jJJ8TET4rj`; Hope's account
+(`Fs96JuuxOO`, `hopetambala@gmail.com`) is in it, confirmed by reading the role
+back with the user constraint applied — **not** by calling `isStaff` with the
+master key, which is an override and answers yes for everyone.
 
-`puente_staff` gates `createOrganization`, `editOrganizationAliases`,
-`setOrgAdmin`, the seed endpoints, and the `/organization-admin` route guard in
-Manage. The role **has never been created in production**. So today the screen
-exists, is fully built, and redirects every single person who opens it.
+Two facts worth keeping:
 
-One call does it (cloudcode #632):
-
-```js
-Parse.Cloud.run('seedPuenteStaff', { userIds: ['<objectId>', '...'] },
-  { useMasterKey: true });
-```
-
-It creates the role if absent, adds the named accounts, and returns
-`{ granted, notFound, roleId }`. Re-running it is safe — check `notFound` is
-empty rather than assuming every id landed.
-
-Then confirm from the browser, signed in as one of those accounts, that
-`Parse.Cloud.run('isStaff')` returns `{ isStaff: true }`. **Do not verify this
-with the master key** — master is an override by design (D13), so it answers
-yes for everyone and proves nothing. That mistake has been made twice.
+- **There is no `hope@puente-dr.org` account.** The git author address is not
+  the Parse username. The real account is `hopetambala@gmail.com`; the other
+  match, `GYckWMYNCx`, is a `test@test.com` account under `testOrg`.
+- The role's ACL reads `{}`. That is correct — `setPublicReadAccess(false)`
+  serialises to an empty ACL, so nothing is publicly readable.
 
 ### 2. Seed the per-organization admins
 
@@ -169,7 +158,75 @@ tapping "Puente" left the field reading "Pu"; it now fills and closes. The
 Maestro flow that could not previously even type into the field runs all ten
 steps.
 
-### 4. What was never seeded, and what never existed
+### 4. The organization audit — done 2026-08-31, and it changes the plan
+
+Run against production with the master key. The headline: **there is no record
+scoping problem, and the "123 unresolved accounts" was never a backfill.**
+
+**Records — the number that matters, and it is COMPLETE, not sampled.** All
+43,979 `SurveyData` rows were paged (44 requests, `surveyingOrganization` only).
+**43,970 resolve. Nine do not, and all nine are blank.** Every survey record in
+production reaches an organization. No funder CSV is missing rows because of
+this.
+
+**Accounts.** 796 accounts, 38 organizations, 168 distinct organization strings:
+
+| | strings | accounts |
+|---|---|---|
+| resolve exactly | 53 | 646 |
+| resolve only after normalising | 8 | 25 |
+| resolve to nothing | 107 | 125 |
+
+The middle row needs **no** backfill: `"Puente "` with a trailing space already
+resolves, because the resolver normalises before matching. Rewriting those rows
+would be cosmetic.
+
+**Six organizations gained aliases** (`editOrganizationAliases`), recovering 10
+accounts and taking resolution from 671 to **681 of 796 (85%)**: Everett Rotary
+Club (`Everette`), Solea Water (`Soleawater`, `Solea water`), Michigan
+(`University of Michigan`, `Umich`), Constanza Medical Mission (its Spanish
+name), Zephyr Verification Group (doubled letter), Plan de Desarrollo (Spanish
+variant).
+
+**Aliases, not row rewrites.** For a typo the fix is one write to the
+organization, not many to `_User` — reversible, and it fixes historical records
+too. Note `editOrganizationAliases` **replaces** the list; always resend the
+existing aliases.
+
+**Why the rest cannot be automated.** A fuzzy matcher over the remaining strings
+produced three wrong answers out of nine: `UMSI`→`MSI` (it is Michigan's School
+of Information), `Tech`→`TECHO` (TECHO is a real NGO), `Accenture`→`internal-test`
+(it matched the junk-bucket alias `accentute`). Edit distance 1 is not identity.
+This is the same reasoning behind `findSimilarOrganization` refusing near
+matches at signup rather than joining them.
+
+**What the remaining 115 accounts actually are.** Not partner organizations.
+Employers people typed into a free-text box (`Apple`, `IBM`, `Intuit`,
+`Mayo Clinic`, `Accenture`), self-descriptions (`Self-Employed`, `Retired`,
+`just a guy`), placeholders (`n/a`, `None`, 11 blanks) and junk (`Hshshh`,
+`vsjzv`, `40`). There is no correct canonical value to backfill them to.
+
+**Real NGOs with no `Organization` record**, if you want them registered:
+Peace Corps (5 accounts, four spellings), University of Notre Dame (5, four
+spellings), Timmy Global Health, DREAM Project, HANWASH, Healing Waters
+International, Clinica Verde, Bridge of Life, Mission of Hope, Hope for
+Haitians. Creating one is a statement that they are a partner — do it through
+the admin screen, which is now reachable.
+
+### 4a. Nine faker records in production `SurveyData`
+
+The nine unresolved rows are test data, not survey data: names straight out of
+faker.js (`Hadley Dicki`, `Dayna Aufderhar`, `Herman Jaskolski`), created in
+three batches of three on 2026-03-09 and 2026-03-20. Each batch points at a
+`_User` that does not exist, via a 24-character **MongoDB** ObjectId rather than
+a 10-character Parse objectId — so they were not written by the app.
+
+They carry `fname`, `lname`, `dob`, `sex` and a photo, and no organization, so
+they are invisible to every export. Harmless to reads; they inflate the record
+count by nine. Deleting them is a destructive production write and has not been
+done.
+
+### 5. What was never seeded, and what never existed
 
 Worth stating plainly, because it has been guessed wrong twice:
 
@@ -187,19 +244,17 @@ Worth stating plainly, because it has been guessed wrong twice:
   seed. Only `planOrgAdminSeed`, which writes nothing, has been run against
   production — that is what exposed the DRMT matching bug fixed in #630.
 
-### 5. Stamping the canonical name on write — needs a decision, not code
+### 6. Stamping the canonical name on write — needs a decision, not code
 
 Collect still stamps `surveyingOrganization` from the account's own string, so
 the split keeps growing slowly. Reads handle it, so it costs nothing today.
 Changing it has provenance implications (`surveyingOrganization` is what the
 field actually collected) and deserves its own call.
 
-### 6. Deliberately not urgent
+### 7. Deliberately not urgent
 
-- **123 of 792 accounts do not resolve** — but **every one has zero records**.
-  Dormant signups, 105 mostly-junk strings. Billing hygiene, not an outage.
-  About a dozen look like real orgs that never collected (Peace Corps,
-  University of Notre Dame, Timmy Global Health, DREAM Project, HANWASH).
+- **115 of 796 accounts do not resolve** — see §4, which supersedes the earlier
+  estimate. Proven, not inferred: every `SurveyData` row but nine resolves.
 - **`updateUser` takes no auth** and runs under the master key — anyone can set
   `adminVerified`, `role`, or `organization` on any account by objectId. This is
   why authorization lives in Parse roles and never in `_User.role`. Hope said
