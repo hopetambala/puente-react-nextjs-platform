@@ -322,6 +322,51 @@ Phase 0 — `billable-roster.md` quantifies it at 14 rows.
 
 ---
 
+## D9 — the billing operator holds FULL `puente_staff`, accepted 2026-08-31
+
+`billing@puente-dr.org` was created and added to `puente_staff` so `/billing` is
+reachable. That role is coarse: it is the only staff role there is, so the
+billing operator can do everything Puente staff can do.
+
+**What that grants, beyond billing:**
+
+| Endpoint | Reach |
+|---|---|
+| `setOrgAdmin` | make anyone an admin of any organization |
+| `setUserActive` | deactivate any user in any organization |
+| `createOrganization`, `editOrganizationAliases` | create partners, rewrite alias sets |
+| `updateRateCard` | change every price |
+
+**What it does NOT grant** — master key only: `seedPuenteStaff` (cannot create
+more staff), `planOrgAdminSeed` / `applyOrgAdminSeed`, `mirrorInvoice` (cannot
+author payment state), `addToRole`, `lockLegacyRoleAcls`.
+
+**The decision: leave it as full staff.** Hope's call, 2026-08-31.
+
+**The risk being accepted, stated plainly.** Nothing in the billing job needs
+`setOrgAdmin` or `setUserActive`. A bookkeeper who can deactivate a promotora
+mid-fieldwork, or hand admin of a partner's data to a stranger, is a different
+risk from an engineer who can — and D1 accepted the coarse role back when
+"staff" meant Puente engineers, not an external operator at a `billing@`
+address.
+
+**The fix if this is revisited:** a `puente_billing` role gating only
+`updateRateCard`, `setOrganizationBilling`, `getOrganizationBilling`,
+`listInvoices` and the composer, with `puente_staff` also satisfying that gate so
+nothing existing breaks. A cloudcode change plus a route-guard tweak — small,
+and it stays small as long as billing endpoints are added behind the narrower
+gate rather than the broad one.
+
+> **Anti-pattern — the role that means "trusted".**
+> **Symptom:** one role gates everything privileged, so granting someone the
+> narrow thing they need also grants the broad things they do not.
+> **Consequence:** access decisions stop being about the job and start being
+> about the person, and the only options are all or nothing.
+> **Fix:** gate by capability, not by trust level. Recorded here rather than
+> fixed, because it is now an accepted risk with a named owner.
+
+---
+
 ## What genuinely cannot be done without a human
 
 Short list, deliberately. Everything else is decided above.
