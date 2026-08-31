@@ -43,6 +43,19 @@ export function groupSimilarNames(names) {
   return groups;
 }
 
+/**
+ * How many records the rename rewrites per round trip.
+ *
+ * The rename previously set no limit at all, so Parse applied its server
+ * default of 100 while the confirm dialog promised "every matching record".
+ * For La Islita - 10,439 records across six spellings - that renamed 100 and
+ * silently abandoned the rest, irreversibly.
+ */
+const RENAME_PAGE_SIZE = 1000;
+
+/** Safety bound on the re-query loop. See the comment at its use. */
+const RENAME_MAX_PASSES = 200;
+
 const AUDIT_CLASSES = ['SurveyData', 'EvaluationMedical', 'Vitals', 'HistoryEnvironmentalHealth'];
 
 export default function CommunityAudit({ orgValues }) {
@@ -85,14 +98,32 @@ export default function CommunityAudit({ orgValues }) {
       await Promise.all(AUDIT_CLASSES.map(async (cls) => {
         const variants = group.filter((n) => n !== target);
         await Promise.all(variants.map(async (variant) => {
-          const q = new Parse.Query(cls);
-          q.containedIn('surveyingOrganization', orgValues);
-          q.equalTo('communityname', variant);
-          const recs = await q.find().catch(() => []);
-          await Promise.all(recs.map((r) => {
-            r.set('communityname', target);
-            return r.save();
-          }));
+          // Renamed records drop out of this filter, so the next query returns
+          // the ones still unrenamed. That makes re-querying correct and `skip`
+          // wrong - skip would step over records that were never touched.
+          //
+          // The bound is a safety net, not a page count: if a save silently
+          // fails the filter never empties, and without it this loops forever.
+          for (let pass = 0; pass < RENAME_MAX_PASSES; pass += 1) {
+            const q = new Parse.Query(cls);
+            q.containedIn('surveyingOrganization', orgValues);
+            q.equalTo('communityname', variant);
+            // Explicit, because the omission is what caused the bug: Parse
+            // applies a server default of 100 when no limit is set, so this
+            // renamed 100 records and reported success for all of them.
+            q.limit(RENAME_PAGE_SIZE);
+            // eslint-disable-next-line no-await-in-loop
+            const recs = await q.find().catch(() => []);
+            if (!recs.length) break;
+            // eslint-disable-next-line no-await-in-loop
+            await Promise.all(recs.map((r) => {
+              r.set('communityname', target);
+              return r.save();
+            }));
+            // A short page means the last one; a full page means there may be
+            // more behind it.
+            if (recs.length < RENAME_PAGE_SIZE) break;
+          }
         }));
       }));
       setGroups((prev) => prev.filter((_, i) => i !== gi));
