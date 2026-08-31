@@ -116,20 +116,41 @@ Two facts worth keeping:
 - The role's ACL reads `{}`. That is correct — `setPublicReadAccess(false)`
   serialises to an empty ACL, so nothing is publicly readable.
 
-### 2. Seed the per-organization admins
+### 2. Seed the per-organization admins — DONE 2026-08-31
 
-Once staff exists, `/organization-admin` is reachable and the rest is UI. The
-seed is deliberately two-phase:
+**29 organizations have an admin.** Plus `zephyr-verification-group`, which
+already had one: 30 `org_<shortCode>_admin` roles now exist, verified by reading
+`_Role` back.
 
-```js
-Parse.Cloud.run('planOrgAdminSeed', {}, { useMasterKey: true });   // read-only
-Parse.Cloud.run('applyOrgAdminSeed', { confirm: true }, { useMasterKey: true });
-```
+**`applyOrgAdminSeed` was deliberately NOT used.** It is all-or-nothing — no
+subset parameter — and six of its 35 proposals are test accounts. Running it
+would have handed a partner's data to accounts called `TestAyuda` and
+`TestBlueMissionsHope`. Grants were made individually with `setOrgAdmin`
+instead, which derives the organization from the target's own record.
 
-`planOrgAdminSeed` writes nothing — read its output first. The last run proposed
-**8 organizations whose only candidate is a test account**, which is why apply
-requires `confirm: true` and why staff member management exists: those are
-promoted to real people through the screen afterwards, not by another script.
+**Six organizations were skipped and still need a real person appointed** — do
+it through the admin screen, which is what it was built for:
+
+| organization | proposed | why skipped |
+|---|---|---|
+| `everett-rotary-club` | `7777777777` | placeholder phone number |
+| `ryans-well` | `TestRyansWell` | test account |
+| `blue-missions` | `TestBlueMissionsHope` | test account, name "Test Test1" |
+| `ayuda` | `TestAyuda` | test account |
+| `georgia-state-university` | `GSUPuente@gmail.com` | firstname is literally "Test Account" |
+| `internal-test` | `basyukliliya` | the junk bucket, not a partner |
+
+Two organizations have **no members at all** and so cannot have an admin:
+`holy-family-mission`, `divine-agency-for-integrated-development`.
+
+**A screening note worth keeping.** The first pass flagged test accounts by
+username and missed `georgia-state-university`, whose proposed admin has the
+literal firstname "Test Account". Screen BOTH the username and the name fields;
+a test account is not obliged to announce itself in the field you happen to
+check.
+
+Grants are reversible: `setOrgAdmin` with `isAdmin: false`. The last-admin guard
+refuses to orphan an organization, but master and staff override it.
 
 ### 3. Cut the Collect release
 
