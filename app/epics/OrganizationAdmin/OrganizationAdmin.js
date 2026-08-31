@@ -24,6 +24,7 @@ const parseAliases = (value) => value
  */
 function OrganizationRow({
   organization, onEditAliases, members, membersUnavailable, onSetOrgAdmin, onSetUserActive,
+  onLoadMembers,
 }) {
   const { t } = useTranslation('common');
   const [draft, setDraft] = useState((organization.aliases || []).join(', '));
@@ -91,6 +92,18 @@ function OrganizationRow({
         </p>
       )}
 
+      {/* Loaded on demand: with dozens of organizations, fetching every member
+          list on page load is dozens of round-trips to answer a question about
+          one of them. */}
+      {!members && (
+        <span data-testid={`load-members-${organization.shortCode}`}>
+          <Button
+            text={t('org_admin_members_load')}
+            onClick={() => onLoadMembers(organization.shortCode)}
+          />
+        </span>
+      )}
+
       {members && (
         <MembersPanel
           shortCode={organization.shortCode}
@@ -109,6 +122,7 @@ OrganizationRow.defaultProps = {
   membersUnavailable: false,
   onSetOrgAdmin: () => {},
   onSetUserActive: () => {},
+  onLoadMembers: () => {},
 };
 
 OrganizationRow.propTypes = {
@@ -116,6 +130,7 @@ OrganizationRow.propTypes = {
   membersUnavailable: PropTypes.bool,
   onSetOrgAdmin: PropTypes.func,
   onSetUserActive: PropTypes.func,
+  onLoadMembers: PropTypes.func,
   organization: PropTypes.shape({
     name: PropTypes.string,
     shortCode: PropTypes.string,
@@ -284,6 +299,7 @@ UnresolvedQueue.propTypes = {
 
 export default function OrganizationAdmin({
   data, onCreate, onEditAliases, membersByShortCode, onSetOrgAdmin, onSetUserActive, access,
+  onLoadMembers,
 }) {
   const { t } = useTranslation('common');
   const {
@@ -317,6 +333,7 @@ export default function OrganizationAdmin({
               membersUnavailable={Boolean((membersByShortCode || {}).unavailable)}
               onSetOrgAdmin={onSetOrgAdmin}
               onSetUserActive={onSetUserActive}
+              onLoadMembers={onLoadMembers}
             />
           ))
         )}
@@ -346,6 +363,7 @@ OrganizationAdmin.defaultProps = {
   membersByShortCode: null,
   onSetOrgAdmin: () => {},
   onSetUserActive: () => {},
+  onLoadMembers: () => {},
   access: null,
 };
 
@@ -353,6 +371,7 @@ OrganizationAdmin.propTypes = {
   membersByShortCode: PropTypes.shape({}),
   onSetOrgAdmin: PropTypes.func,
   onSetUserActive: PropTypes.func,
+  onLoadMembers: PropTypes.func,
   access: PropTypes.shape({
     isStaff: PropTypes.bool,
     orgAdminOf: PropTypes.arrayOf(PropTypes.string),

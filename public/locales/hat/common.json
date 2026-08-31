@@ -171,5 +171,6 @@
   "org_admin_members_title": "Moun nan òganizasyon sa a",
   "org_admin_members_empty": "Poko gen moun nan òganizasyon sa a.",
   "org_admin_members_empty_sub": "Moun yo parèt isit la lè yo enskri ak òganizasyon sa a.",
-  "org_admin_members_unavailable": "Nou pa t kapab chaje moun nan òganizasyon sa a, kidonk lis sa a pa konplè. Tanpri eseye ankò nan kèk moman."
+  "org_admin_members_unavailable": "Nou pa t kapab chaje moun nan òganizasyon sa a, kidonk lis sa a pa konplè. Tanpri eseye ankò nan kèk moman.",
+  "org_admin_members_load": "Montre moun yo"
 }

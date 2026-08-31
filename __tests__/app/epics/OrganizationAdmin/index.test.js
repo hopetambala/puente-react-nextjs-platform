@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import OrganizationAdmin from 'app/epics/OrganizationAdmin/OrganizationAdmin';
 import React from 'react';
 
@@ -191,5 +191,75 @@ describe('OrganizationAdmin — what each viewer may see', () => {
     );
 
     expect(screen.queryByTestId('unresolved-denominator')).not.toBeInTheDocument();
+  });
+});
+
+describe('OrganizationAdmin — staff reaching any organization\'s people', () => {
+  // The gap this closes: staff saw the registry but loaded NO members, because
+  // member loading was keyed on orgAdminOf and staff have none. So the 8
+  // test-account admins the D5 seed would create were unfixable through the UI.
+  //
+  // Loaded on demand rather than fanned out: with 38 organizations, loading
+  // every member list on page load is 38 round-trips to answer a question about
+  // one of them.
+  const twoOrgs = {
+    ...baseData,
+    organizations: [
+      org('wof', 'World Outreach Fund', ['WOF']),
+      org('rayjon', 'Rayjon', ['Rayjon Eye Clinic']),
+    ],
+  };
+
+  const staff = { isStaff: true, orgAdminOf: [] };
+
+  it('offers staff a way into an organization whose people are not loaded', () => {
+    render(
+      <OrganizationAdmin
+        data={twoOrgs}
+        access={staff}
+        onCreate={jest.fn()}
+        onEditAliases={jest.fn()}
+        onLoadMembers={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByTestId('load-members-wof')).toBeInTheDocument();
+  });
+
+  it('asks for that organization by shortCode', () => {
+    const onLoadMembers = jest.fn();
+    render(
+      <OrganizationAdmin
+        data={twoOrgs}
+        access={staff}
+        onCreate={jest.fn()}
+        onEditAliases={jest.fn()}
+        onLoadMembers={onLoadMembers}
+      />,
+    );
+
+    // The control is the button inside the identified wrapper; the design
+    // system Button does not forward data-testid.
+    fireEvent.click(within(screen.getByTestId('load-members-rayjon')).getByRole('button'));
+
+    expect(onLoadMembers).toHaveBeenCalledWith('rayjon');
+  });
+
+  it('shows the people once they arrive, and stops offering to load them', () => {
+    render(
+      <OrganizationAdmin
+        data={twoOrgs}
+        access={staff}
+        membersByShortCode={{ wof: [{ objectId: 'u1', username: '809', isOrgAdmin: true }] }}
+        onCreate={jest.fn()}
+        onEditAliases={jest.fn()}
+        onLoadMembers={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByTestId('members-wof')).toBeInTheDocument();
+    expect(screen.queryByTestId('load-members-wof')).not.toBeInTheDocument();
+    // The other organization is untouched — one at a time is the point.
+    expect(screen.getByTestId('load-members-rayjon')).toBeInTheDocument();
   });
 });
