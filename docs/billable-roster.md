@@ -73,11 +73,11 @@ does not exclude it will show Puente as its own biggest customer.
 
 ## What this changes
 
-**The plan's "six customers" is low.** Eleven organizations have sustained
+**The plan's "six customers" is low.** Fifteen organizations have sustained
 usage. That is still small enough that Stripe's own dashboard may serve —
-eleven invoices is not a composer's worth of work — but it is nearly double the
+fifteen invoices is still not a composer's worth of work — but it is 2.5x the
 number the Step B reasoning assumed, and the Step B answer should be given
-against 11, not 6.
+against 15, not 6.
 
 **Volume is not the charge basis, and this table must not become one.** Billing
 §4 is explicit: flat tier per organization, usage is evidence only. This roster
@@ -85,12 +85,12 @@ is sorted by volume to show who is *real*, not to price them. A per-record
 charge would bill a health program for surveying more households, which is the
 behaviour the product exists to encourage.
 
-**The long tail is a pricing question, not an engineering one.** Fifteen
-organizations have four records or fewer. Charging a flat tier to an
+**The long tail is a pricing question, not an engineering one.** Fourteen
+organizations have six records or fewer. Charging a flat tier to an
 organization that collected one record is a relationship problem; excluding
 them needs a `no-charge` decision per organization. This is the
 "partner tier / `no-charge` partners" blocker the roadmap already names as
-needing a human — it is now quantified: **15 rows**.
+needing a human — it is now quantified: **14 rows**.
 
 > **Anti-pattern — the roster that prices itself.**
 > **Symptom:** a usage table sorted by volume becomes the invoice basis because
@@ -109,10 +109,13 @@ needing a human — it is now quantified: **15 rows**.
 | 1 | Every "established partner" is a paying relationship, not a grant-funded or in-kind one | Hope | Invoicing a partner who was never going to be billed |
 | 2 | `puente` and `internal-test` are the only internal collectors | Hope | An internal program invoiced as a customer |
 | 3 | The 15 dormant organizations should be `no-charge`, not invoiced | Hope | Either lost revenue or fifteen awkward conversations |
-| 4 | `SurveyData` volume is a fair proxy for "is this partner real" | — | A partner using only custom forms or Vitals looks dormant here |
+| 4 | ~~`SurveyData` volume is a fair proxy~~ | — | **CLOSED 2026-08-31 — tested and BROKEN.** See the correction above; the table now counts three classes. |
 
-Assumption 4 is the weakest and is cheap to close: the same count against
-`FormResults` and `Vitals` would confirm or break it.
+Assumption 4 was the weakest, was cheap to close, and broke. `HistoryMedical`
+and `HistoryEnvironmentalHealth` remain uncounted — the former has no
+`surveyingOrganization` field at all, the latter is 25% unattributed legacy.
+Neither changes the ranking materially, but a partner whose work is
+overwhelmingly environmental-health would still be undercounted here.
 
 ---
 
