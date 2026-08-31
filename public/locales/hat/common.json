@@ -172,5 +172,13 @@
   "org_admin_members_empty": "Poko gen moun nan òganizasyon sa a.",
   "org_admin_members_empty_sub": "Moun yo parèt isit la lè yo enskri ak òganizasyon sa a.",
   "org_admin_members_unavailable": "Nou pa t kapab chaje moun nan òganizasyon sa a, kidonk lis sa a pa konplè. Tanpri eseye ankò nan kèk moman.",
-  "org_admin_members_load": "Montre moun yo"
+  "org_admin_members_load": "Montre moun yo",
+  "billing_title": "Fakturasyon",
+  "billing_who_owes_what": "Kiyès ki dwe kisa",
+  "billing_organizations": "Òganizasyon",
+  "billing_nothing_outstanding": "Anyen ki poko peye",
+  "billing_nothing_outstanding_detail": "Tout fakti yo peye, oswa nou poko voye okenn.",
+  "billing_outstanding_unavailable": "Nou pa t kapab li sa ki poko peye. Sa pa vle di pa gen anyen ki dwe — eseye ankò.",
+  "billing_days_overdue": "{{count}} jou an reta",
+  "billing_no_plan": "Pa gen plan"
 }

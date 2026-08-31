@@ -1,0 +1,72 @@
+/*
+ * A money surface. The subject is the debt that is oldest, not the debt that is
+ * largest, so age gets the accent and the amount stays quiet — sorting by
+ * amount buries the invoice that actually needs a phone call.
+ *
+ * All values are --tk-dlite-* tokens. Logical properties throughout so this is
+ * not a rewrite in a right-to-left locale.
+ */
+
+.surface {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tk-dlite-semantic-spacing-lg);
+}
+
+.totals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--tk-dlite-semantic-spacing-md);
+  padding-block-end: var(--tk-dlite-semantic-spacing-sm);
+}
+
+.total {
+  font-family: var(--tk-dlite-semantic-typography-font-heading);
+  font-size: var(--tk-dlite-semantic-typography-size-lg);
+  color: var(--tk-dlite-semantic-color-text-primary);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--tk-dlite-semantic-spacing-sm);
+  padding-block: var(--tk-dlite-semantic-spacing-md);
+  border-block-end: 1px solid var(--tk-dlite-semantic-color-border);
+}
+
+.row:last-child {
+  border-block-end: none;
+}
+
+.rowMain {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tk-dlite-semantic-spacing-xxs);
+  min-inline-size: 0;
+}
+
+.orgName {
+  font-family: var(--tk-dlite-semantic-typography-font-heading);
+  color: var(--tk-dlite-semantic-color-text-primary);
+}
+
+.meta {
+  font-size: var(--tk-dlite-semantic-typography-size-sm);
+  color: var(--tk-dlite-semantic-color-text-secondary);
+}
+
+.amount {
+  font-family: var(--tk-dlite-semantic-typography-font-mono);
+  color: var(--tk-dlite-semantic-color-text-primary);
+}
+
+/* Age is the signal, so it is the only accent on the surface. */
+.overdue {
+  color: var(--tk-dlite-semantic-color-feedback-danger);
+  font-size: var(--tk-dlite-semantic-typography-size-sm);
+}
+
+.unavailable {
+  color: var(--tk-dlite-semantic-color-feedback-warning);
+  padding-block: var(--tk-dlite-semantic-spacing-md);
+}

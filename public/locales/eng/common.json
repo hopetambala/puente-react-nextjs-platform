@@ -172,5 +172,13 @@
   "org_admin_members_empty": "No people in this organization yet.",
   "org_admin_members_empty_sub": "People appear here once they register with this organization.",
   "org_admin_members_unavailable": "The people in this organization could not be loaded, so this list is not complete. Try again shortly.",
-  "org_admin_members_load": "Show people"
+  "org_admin_members_load": "Show people",
+  "billing_title": "Billing",
+  "billing_who_owes_what": "Who owes what",
+  "billing_organizations": "Organizations",
+  "billing_nothing_outstanding": "Nothing outstanding",
+  "billing_nothing_outstanding_detail": "Every invoice has been settled, or none has been sent yet.",
+  "billing_outstanding_unavailable": "We could not read what is outstanding. This is not the same as nothing being owed — try again.",
+  "billing_days_overdue": "{{count}} days overdue",
+  "billing_no_plan": "No plan set"
 }
