@@ -5,7 +5,7 @@ facts rather than re-deriving them. Companion to
 [billing-and-invoicing.md](billing-and-invoicing.md), whose phase plan is now
 partly stale — this file is the authority on what is *done*.
 
-**Last updated 2026-08-29.** Everything below was verified against production
+**Last updated 2026-08-30.** Everything below was verified against production
 (`vBdTHqQU31…`), not inferred. Testing against production is pre-authorised;
 credentials for read queries are `APP_ID` + `REST_API_KEY` in the flask repo's
 `secretz.py`. Assert the app id before trusting any result.
@@ -27,6 +27,28 @@ credentials for read queries are `APP_ID` + `REST_API_KEY` in the flask repo's
 | aggregator | #123, #124 | `short-code` export paths, including the custom-form one |
 | Collect | #613 | alias-set scoping for records, custom forms, assets, home stats |
 | Collect | #614, #615 | EAS build: Apple credentials + Node 22 |
+
+### Self-service organizations — the second wave (2026-08-30)
+
+| Repo | PR | What |
+|---|---|---|
+| cloudcode | #624 | `addToRole` closed to unprivileged callers. It wrote every change under the master key, so any caller could name a role and join it — demonstrated live against a running Parse server before it was closed |
+| cloudcode | #626 | `puente_staff` role, `isStaff`, and the authorization gate on `createOrganization` |
+| cloudcode | #627 | self-service creation in `signup`, with the fuzzy-match guard against tenant forking |
+| cloudcode | #628 | `createAdminRole` no longer grants public write; `lockLegacyRoleAcls` written for the role already in production |
+| cloudcode | #629 | org-admin Parse roles, `setOrgAdmin`, member listing, real deactivation (sign-in refusal **and** session destruction) |
+| cloudcode | #630 | members matched through the alias resolver, not the canonical name. The seed had been matching on `"DR Missions"` and finding **0 of 31** accounts, all of which store `"DRMT"` |
+| cloudcode | #631 | `signin` no longer crashes the Parse process on a failed login — the handler used the legacy `(request, response)` signature |
+| cloudcode | #632 | `seedPuenteStaff`, so the role can be created and populated in one master-key call |
+| Collect | #616–#620 | organization picker sourced from the `Organization` class and working pre-login; release tooling completed |
+| Manage | #95 | the org-admin PRD and the billing roadmap |
+| Manage | #98 | Review moved from Workspace to the Org section |
+| Manage | #101 | the self-service organizations spec — 13 decisions |
+| Manage | #102 | the `OrganizationAdmin` screen, scoped to the viewer |
+| Manage | #103 | staff can reach any organization's people, loaded on demand |
+
+**Nothing in this wave is reachable in production yet.** See step 1 below — the
+role it all hangs from has not been seeded.
 
 **Collect 15.6.1 (build 15.6.2) is on TestFlight**, tagged `v15.6.1`, carrying
 #613.
@@ -70,102 +92,92 @@ this work created.
 
 ---
 
-## Next, in order
+## What is left, in order
 
 > **The full remaining path — including everything past this near-term list, and
 > the evidence gate before the billing surface — is
 > [billing-roadmap.md](billing-roadmap.md).** This section is the near-term view;
 > that file is the whole route to invoices going out.
 
-### 1. `puente_staff` role + `OrganizationAdmin` screen — the only real blocker
+### 1. Seed `puente_staff` — the only thing standing between here and a working admin screen
 
-**Spec:** [organization-admin-prd.md](organization-admin-prd.md) — the buildable
-PRD (scope, cross-repo sequencing, stories, tests). Read it before starting.
+**This is a master-key action. It is the one step nobody but Hope can do, and
+until it runs everything below it is unreachable.**
 
-Creating a partner organization needs the master key and a console. There is no
-UI, and since the picker landed **this is the only way a new partner can
-exist** — a person can no longer create one by typing a novel name.
+`puente_staff` gates `createOrganization`, `editOrganizationAliases`,
+`setOrgAdmin`, the seed endpoints, and the `/organization-admin` route guard in
+Manage. The role **has never been created in production**. So today the screen
+exists, is fully built, and redirects every single person who opens it.
 
-- The data loader already exists:
-  `app/epics/OrganizationAdmin/loadOrganizationAdmin.js` (reports
-  `accountsChecked` alongside `unresolved`, newest-first, `truncated` when a read
-  saturates). No screen.
-- `createOrganization` is master-key only, so a browser cannot call it. The
-  TODO in `cloud/src/definer/organization.definer.js` names the extension:
-  `request.master || isStaff(request.user)`.
-- Scope this as the *minimal* tenancy role only — create the role, put staff in
-  it, check it on that one endpoint. **Not** the full §7 ACL migration, which is
-  the riskiest phase in the plan and goes last.
+One call does it (cloudcode #632):
 
-### 2. Collect's signup is still free text — and it is not a one-line fix
+```js
+Parse.Cloud.run('seedPuenteStaff', { userIds: ['<objectId>', '...'] },
+  { useMasterKey: true });
+```
 
-Investigated and corrected 2026-08-30. The earlier entry here was wrong in two
-places; both corrections are load-bearing.
+It creates the role if absent, adds the named accounts, and returns
+`{ granted, notFound, roleId }`. Re-running it is safe — check `notFound` is
+empty rather than assuming every id landed.
 
-**It is not a text field.** `domains/Auth/SignUp/index.js:225` renders an
-`Autofill` autocomplete. That component **falls back to a bare
-`react-native-paper` TextInput when its value list is empty**
-(`PaperInputPicker/AutoFill/index.js:123-138`), which is what a user sees. The
-picker is already there; it never turns on.
+Then confirm from the browser, signed in as one of those accounts, that
+`Parse.Cloud.run('isStaff')` returns `{ isStaff: true }`. **Do not verify this
+with the master key** — master is an override by design (D13), so it answers
+yes for everyone and proves nothing. That mistake has been made twice.
 
-**Why it never turns on.** `cacheAutofillData`
-(`modules/cached-resources/read.js:45`) builds `orgResults` correctly and then
-returns `orgs` — the enclosing arrow function — instead of it. `storeData`
-JSON-stringifies, and `JSON.stringify` **drops function-valued properties**, so
-the `organization` key never reaches storage. On read, `data[parameter].sort()`
-runs on `undefined`, throws, and the throw is swallowed by the catch at
-`AutoFill/index.js:63`. The list stays null and the field degrades to free text,
-with one `console.error` as the only trace.
+### 2. Seed the per-organization admins
 
-**Correction — the origin commit.** Previously attributed to `f5adb8b6`,
-Feb 2023. That commit is `chore: add prettier` and only re-indented the line.
-`git log -S "return orgs"` returns exactly one commit: **`dfc4cb6`,
-2022-01-18, "feat: unique communities"**, whose diff deletes
-`autofillData.organization = orgResults;` and adds `return orgs`. The bug is
-**four years and seven months old**, not three and a half.
+Once staff exists, `/organization-admin` is reachable and the rest is UI. The
+seed is deliberately two-phase:
 
-**Correction — Collect does query the `Organization` class.**
-`modules/organization/index.js:91` runs `new Parse.Query("Organization")`. What
-it does *not* do is use it here: the signup autofill sources from
-`customQueryService(0, 500, 'User', 'adminVerified', true)` and
-`user.get('organization')` (`read.js:26-32`) — the raw free-text user strings,
-which are exactly the junk the `Organization` class exists to replace.
+```js
+Parse.Cloud.run('planOrgAdminSeed', {}, { useMasterKey: true });   // read-only
+Parse.Cloud.run('applyOrgAdminSeed', { confirm: true }, { useMasterKey: true });
+```
 
-**So matching Manage is a rewrite of the data source, not a bug fix**, and it
-has two independent blockers:
+`planOrgAdminSeed` writes nothing — read its output first. The last run proposed
+**8 organizations whose only candidate is a test account**, which is why apply
+requires `confirm: true` and why staff member management exists: those are
+promoted to real people through the screen afterwards, not by another script.
 
-1. Fixing line 45 alone is not enough. `cacheAutofillData` runs only inside
-   `populateCache`, which is called post-login. **A fresh install has no cache at
-   all on the signup screen** — the exact moment the feature exists for.
-2. The source must move from `User.organization` strings to the curated
-   `Organization` class, read pre-authentication.
+### 3. Cut the Collect release
 
-**Why it survived four years: no test covers it.** No test file references
-`autofill_information`, `AutoFill`, or `Autofill`, and `.maestro/` has ten flows,
-none covering registration. A red test on `cacheAutofillData`'s return shape
-would have caught it on day one.
+Everything Collect needs is on `master`. It needs a store release to reach
+anyone — **Collect has no OTA** (`EXUpdatesEnabled` false on iOS,
+`expo.modules.updates.ENABLED` false on Android).
 
-cloudcode #620 makes this *safe* — no admin self-grant, server-side resolution —
-so it is UX, not security. **Needs a store release; Collect has no OTA**
-(`EXUpdatesEnabled` false on iOS, `expo.modules.updates.ENABLED` false on
-Android).
+**Run the Maestro harness first. Always.** The gate is in Collect's
+`CLAUDE.md`; Metro must be started before the flows or every assertion fails
+against a stale binary.
 
-### 3. Stamping the canonical name on write — needs a decision, not code
+**One known defect is unfixed:** the signup organization dropdown opens *under
+the keyboard*, because the field is last on a long form. The list renders and is
+correct — it is barely reachable. Found by the new
+`.maestro/signup-organization-picker.yaml` flow. Fix is open and marked DO NOT
+MERGE. Decide whether it blocks the release; it is a layout fix, not a data one.
+
+### 4. Stamping the canonical name on write — needs a decision, not code
 
 Collect still stamps `surveyingOrganization` from the account's own string, so
 the split keeps growing slowly. Reads handle it, so it costs nothing today.
 Changing it has provenance implications (`surveyingOrganization` is what the
 field actually collected) and deserves its own call.
 
-### 4. Deliberately not urgent
+### 5. Deliberately not urgent
 
 - **123 of 792 accounts do not resolve** — but **every one has zero records**.
   Dormant signups, 105 mostly-junk strings. Billing hygiene, not an outage.
   About a dozen look like real orgs that never collected (Peace Corps,
   University of Notre Dame, Timmy Global Health, DREAM Project, HANWASH).
 - **`updateUser` takes no auth** and runs under the master key — anyone can set
-  `adminVerified`, `role`, or `organization` on any account by objectId. Hope
-  said "don't worry about this" on 2026-08-29; it becomes real when §7 ships.
+  `adminVerified`, `role`, or `organization` on any account by objectId. This is
+  why authorization lives in Parse roles and never in `_User.role`. Hope said
+  "don't worry about this" on 2026-08-29 and again on 2026-08-30; it becomes
+  real when §7 ships.
+- **The legacy `admin` role is publicly writable in production**
+  (`{"*":{"read":true,"write":true}}`, created 2020-11-05). `lockLegacyRoleAcls`
+  is written and tested but has not been run. Hope: "not worried about it"
+  (2026-08-30). It is a one-line master-key call whenever that changes.
 
 ---
 
@@ -181,8 +193,9 @@ field actually collected) and deserves its own call.
 - **Version ≠ build number.** `CFBundleShortVersionString` is the train;
   `CFBundleVersion` only distinguishes builds inside it. Apple rejected a build
   because the train was closed (`90186`) even though the build number was higher.
-- **`standard-version` never touches `ios/Collect/Info.plist`**, which is the
-  file EAS reads. Sync it by hand.
+- **`standard-version` does not touch `ios/Collect/Info.plist` on its own** —
+  the postbump hook now does, and fails loudly if the file is missing (fixed
+  2026-08-30). Bump with `yarn release-minor`, never by hand.
 - **`eas build` rewrites `app.json` and `Info.plist`** via `autoIncrement`.
   Commit that churn or the next build starts stale.
 - **Absence of a code path is not evidence about data.** "No repo calls
