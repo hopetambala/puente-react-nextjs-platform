@@ -124,6 +124,82 @@ describe('CommunityAudit — apply canonical name', () => {
   });
 });
 
+describe('CommunityAudit — the rename must finish what the dialog promises', () => {
+  // Overriding Parse.Query is global to the module mock, so the original is
+  // captured and restored - otherwise the suites after this one see a Query
+  // rebuilt for a different assertion.
+  const defaultQuery = MockParse.Query.getMockImplementation();
+  afterEach(() => { MockParse.Query.mockImplementation(defaultQuery); });
+  beforeEach(() => jest.clearAllMocks());
+
+  // The dialog says "This updates every matching record and cannot be undone."
+  // The read path sets limit(1000); the rename path set NO limit, so Parse
+  // applied its server default of 100. For a community like La Islita - 10,439
+  // records across six spellings - that renamed 100 and silently left the rest,
+  // irreversibly, behind a success message.
+  //
+  // Note what is NOT asserted here: "1007 records got saved". The Parse mock
+  // returns whatever it is handed, so it cannot reproduce a server-side cap -
+  // such a test passes against the bug and proves nothing. These assert the
+  // mechanism that makes the cap impossible instead.
+
+  function openRenameWith(findImpl) {
+    mockFind.mockImplementation(findImpl);
+    render(<CommunityAudit orgValues={['TestOrg']} />);
+  }
+
+  it('sets an explicit limit rather than inheriting Parse\'s server default', async () => {
+    // Relying on the default is what made the cap invisible: nothing at the
+    // call site said "100".
+    const limitSpy = jest.fn().mockReturnThis();
+    MockParse.Query.mockImplementation(() => ({
+      equalTo: jest.fn().mockReturnThis(),
+      containedIn: jest.fn().mockReturnThis(),
+      select: jest.fn().mockReturnThis(),
+      limit: limitSpy,
+      find: mockFind,
+    }));
+    mockFind
+      .mockResolvedValueOnce(recordsFromNames(['Sabana Yegua', 'Sabana Yégua']))
+      .mockResolvedValue(recordsFromNames(['Sabana Yégua']));
+
+    render(<CommunityAudit orgValues={['TestOrg']} />);
+    await waitFor(() => screen.getByText(/apply/i));
+    limitSpy.mockClear();
+    fireEvent.click(screen.getByText(/apply/i));
+    fireEvent.click(screen.getByText('Rename records'));
+
+    await waitFor(() => expect(limitSpy).toHaveBeenCalled());
+  });
+
+  it('re-queries the SAME class while a full page comes back', async () => {
+    // Renamed records drop out of the filter, so the honest shape is to
+    // re-query until nothing matches - not one query and hope.
+    //
+    // Counted PER CLASS on purpose: the rename loops four audit classes, so a
+    // bare "find was called more than once" passes without any paging at all.
+    const PAGE = 1000;
+    let call = 0;
+    mockFind.mockImplementation(() => {
+      call += 1;
+      if (call <= 4) return Promise.resolve(recordsFromNames(['Sabana Yegua', 'Sabana Yégua']));
+      if (call === 5) return Promise.resolve(recordsFromNames(Array(PAGE).fill('Sabana Yégua')));
+      return Promise.resolve([]);
+    });
+    render(<CommunityAudit orgValues={['TestOrg']} />);
+    await waitFor(() => screen.getByText(/apply/i));
+
+    MockParse.Query.mockClear();
+    fireEvent.click(screen.getByText(/apply/i));
+    fireEvent.click(screen.getByText('Rename records'));
+
+    await waitFor(() => {
+      const surveyDataQueries = MockParse.Query.mock.calls.filter((c) => c[0] === 'SurveyData').length;
+      expect(surveyDataQueries).toBeGreaterThan(1);
+    });
+  });
+});
+
 // The audit samples community names per Parse class. A class name that is not in
 // schema/schema.json returns zero rows instead of erroring, so its communities
 // silently vanish from the audit — and from the rename that follows.
