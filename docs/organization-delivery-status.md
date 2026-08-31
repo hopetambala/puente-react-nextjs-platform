@@ -46,9 +46,11 @@ credentials for read queries are `APP_ID` + `REST_API_KEY` in the flask repo's
 | Manage | #101 | the self-service organizations spec — 13 decisions |
 | Manage | #102 | the `OrganizationAdmin` screen, scoped to the viewer |
 | Manage | #103 | staff can reach any organization's people, loaded on demand |
+| Collect | #621 | the organization dropdown is selectable — a list component whose identity changed every render was unmounting the row mid-press |
 
-**Nothing in this wave is reachable in production yet.** See step 1 below — the
-role it all hangs from has not been seeded.
+**The cloudcode and Manage halves are deployed but not reachable.** See step 1
+below — the role it all hangs from has not been seeded. Collect's half is merged
+but ships only with a store release; it has no OTA.
 
 **Collect 15.6.1 (build 15.6.2) is on TestFlight**, tagged `v15.6.1`, carrying
 #613.
@@ -150,20 +152,49 @@ anyone — **Collect has no OTA** (`EXUpdatesEnabled` false on iOS,
 `CLAUDE.md`; Metro must be started before the flows or every assertion fails
 against a stale binary.
 
-**One known defect is unfixed:** the signup organization dropdown opens *under
-the keyboard*, because the field is last on a long form. The list renders and is
-correct — it is barely reachable. Found by the new
-`.maestro/signup-organization-picker.yaml` flow. Fix is open and marked DO NOT
-MERGE. Decide whether it blocks the release; it is a layout fix, not a data one.
+**The dropdown defect is fixed and merged** (Collect #621). It was two bugs, not
+one, and the first was not the one anyone had guessed:
 
-### 4. Stamping the canonical name on write — needs a decision, not code
+- Formik builds a new `formikProps` object every render, `handleSelect` depended
+  on it, so the memoised list component changed identity and React unmounted the
+  whole list — a row remounted between touch-down and touch-up can never
+  complete a press. `onStartShouldSetResponderCapture` re-rendered the parent on
+  touch-down, so something almost always did. That is the "nearly" in "nearly
+  unclickable", and the same remount was eating keystrokes.
+- The list also opened under the keyboard, because Organization is the last
+  field on a nine-field form and nothing scrolled it clear.
+
+Verified on device against production, before and after on the same binary:
+tapping "Puente" left the field reading "Pu"; it now fills and closes. The
+Maestro flow that could not previously even type into the field runs all ten
+steps.
+
+### 4. What was never seeded, and what never existed
+
+Worth stating plainly, because it has been guessed wrong twice:
+
+- **The `Organization` class was never backfilled by this work.** Its 37 records
+  predate it. An early claim here that production had *zero* organizations was
+  fabricated from "no repo calls `createOrganization`" — see the traps below.
+  What this work did was make those 37 reachable through their aliases, which
+  looks like seeding from the outside and is not.
+- **No test organizations were created.** `testOrg1`, `testOrg2` and friends are
+  all REFUSED at signup: normalised they contain `testorg`, which collides with
+  `internal-test`'s alias `testORG`, so the near-duplicate guard routes them to
+  staff. That is the guard working. Pick a name with no "test" in it when a
+  create needs to succeed.
+- **`applyOrgAdminSeed` has never run**, and neither has the `puente_staff`
+  seed. Only `planOrgAdminSeed`, which writes nothing, has been run against
+  production — that is what exposed the DRMT matching bug fixed in #630.
+
+### 5. Stamping the canonical name on write — needs a decision, not code
 
 Collect still stamps `surveyingOrganization` from the account's own string, so
 the split keeps growing slowly. Reads handle it, so it costs nothing today.
 Changing it has provenance implications (`surveyingOrganization` is what the
 field actually collected) and deserves its own call.
 
-### 5. Deliberately not urgent
+### 6. Deliberately not urgent
 
 - **123 of 792 accounts do not resolve** — but **every one has zero records**.
   Dormant signups, 105 mostly-junk strings. Billing hygiene, not an outage.
