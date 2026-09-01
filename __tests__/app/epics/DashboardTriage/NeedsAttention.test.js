@@ -26,9 +26,12 @@ describe('NeedsAttention', () => {
   });
 
   it('shows the count for a row', () => {
-    render(<NeedsAttention rows={[row({ count: 12 })]} loading={false} />);
+    render(<NeedsAttention rows={[row({ count: 12 })]} total={43979} loading={false} />);
 
-    expect(screen.getByText('12')).toBeInTheDocument();
+    // The count is now rendered inside its quantity phrase ("12 of 43,979")
+    // rather than as a bare numerator, so assert it via the interpolation.
+    expect(screen.getByTestId('triage-row-missing-key-fields'))
+      .toHaveTextContent(/"count":12/);
   });
 
   it('uses the plain label for an exact count', () => {
@@ -125,5 +128,22 @@ describe('when the organization has no records yet', () => {
     expect(screen.getByTestId('triage-no-records')).toBeInTheDocument();
     expect(screen.getByTestId('triage-unavailable-note'))
       .toHaveTextContent(/triage_unavailable_form-drift/);
+  });
+});
+
+describe('NeedsAttention denominators', () => {
+  it('states the denominator alongside the count so the magnitude can be judged', () => {
+    render(<NeedsAttention rows={[row({ count: 12 })]} total={43979} loading={false} />);
+
+    expect(screen.getByTestId('triage-row-missing-key-fields'))
+      .toHaveTextContent(/triage_count_of_total:\{"count":12,"total":43979\}/);
+  });
+
+  it('says the total is unknown rather than implying a base rate when the total failed to load', () => {
+    render(<NeedsAttention rows={[row({ count: 12 })]} total={null} loading={false} />);
+
+    const el = screen.getByTestId('triage-row-missing-key-fields');
+    expect(el).toHaveTextContent(/triage_count_of_unknown/);
+    expect(el).not.toHaveTextContent(/triage_count_of_total/);
   });
 });

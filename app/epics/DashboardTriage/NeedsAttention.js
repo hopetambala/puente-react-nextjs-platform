@@ -22,9 +22,26 @@ import styles from './NeedsAttention.module.css';
 const SEVERITY_VARIANT = { critical: 'red', high: 'orange', medium: 'yellow' };
 
 export default function NeedsAttention({
-  rows, unavailable, recordState, loading,
+  rows, unavailable, recordState, total, loading,
 }) {
   const { t } = useTranslation('common');
+
+  /**
+   * A queue count is a numerator, and a numerator alone cannot be triaged: 12 of
+   * 43,979 means ignore this today, 12 of 15 means stop everything. Reading a
+   * count without its base rate is denominator neglect, and it produces
+   * systematically wrong severity judgements — on the one screen whose job is
+   * telling a coordinator what to trust.
+   *
+   * When the total failed to load we say so rather than dropping the phrase.
+   * A bare `12` does not read as "denominator unavailable", it reads as a
+   * complete answer, which is the exact misreading this row exists to prevent.
+   */
+  const quantity = (count) => (
+    total === null || total === undefined
+      ? t('triage_count_of_unknown', { count })
+      : t('triage_count_of_total', { count, total })
+  );
 
   const note = unavailable.length > 0 && (
     <p className={styles.unavailable} data-testid="triage-unavailable-note">
@@ -99,7 +116,7 @@ export default function NeedsAttention({
           <Link href={r.href} passHref>
             {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
             <a className={styles.row} data-testid={`triage-row-${r.id}`}>
-              <span className={styles.count}>{r.count}</span>
+              <span className={styles.count}>{quantity(r.count)}</span>
               <span className={styles.label}>
                 {t(r.approximate ? `${r.labelKey}_approx` : r.labelKey, { count: r.count })}
               </span>
@@ -122,7 +139,7 @@ export default function NeedsAttention({
 }
 
 NeedsAttention.defaultProps = {
-  rows: [], unavailable: [], recordState: 'some', loading: false,
+  rows: [], unavailable: [], recordState: 'some', total: null, loading: false,
 };
 
 NeedsAttention.propTypes = {
@@ -138,5 +155,11 @@ NeedsAttention.propTypes = {
   unavailable: PropTypes.arrayOf(PropTypes.string),
   /** Whether the organization has any records at all to check. */
   recordState: PropTypes.oneOf(['some', 'none', 'unknown']),
+  /**
+   * Org-wide record total — the denominator every queue count is read against.
+   * Null when that count could not be read; the row then says the total is
+   * unknown rather than showing a bare numerator.
+   */
+  total: PropTypes.number,
   loading: PropTypes.bool,
 };

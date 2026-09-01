@@ -205,4 +205,39 @@ describe('loadDashboardTriage', () => {
       countQueryReturnedZero: genuinelyZero.sync.recordsLast24h,
     }).toEqual({ countQueryRejected: null, countQueryReturnedZero: 0 });
   });
+
+  it('returns the exact org-scoped total record count as totalRecords', async () => {
+    // The queue counts are meaningless without their denominator: "8 missing key
+    // fields" reads very differently against 40 records than against 4,200. This
+    // is a real count(), not the capped sample, so it is exact.
+    const { Parse } = makeParse({ counts: { SurveyData: 4200 } });
+    const data = await loadDashboardTriage({ Parse, orgValues: ['Puente', 'Puentes'], now: NOW });
+
+    expect(data.totalRecords).toBe(4200);
+  });
+});
+
+describe('loadDashboardTriage sample denominator', () => {
+  it('reports how many records the account figure was actually sampled from, not the cap', async () => {
+    // This organization has fewer records than the sample cap. Saying "sampled
+    // from the last 1,000" when only 12 rows were ever read states a
+    // denominator nobody measured — the exact overclaim the sample disclosure
+    // exists to prevent.
+    const rows = Array.from({ length: 12 }, (_, i) => ({
+      id: `r${i}`,
+      createdAt: new Date('2026-08-20T00:00:00Z'),
+      get: (f) => ({
+        communityname: 'Batey 7',
+        householdId: `h${i}`,
+        surveyingUser: `u${i % 3}`,
+      }[f]),
+    }));
+
+    const { Parse } = makeParse({ finds: { SurveyData: rows } });
+
+    const data = await loadDashboardTriage({ Parse, orgValues: ['Puente'], now: NOW });
+
+    expect(data.accountsSynced.sampledFrom).toBe(12);
+    expect(data.accountsSynced.sampledFrom).not.toBe(SAMPLE_SIZE);
+  });
 });

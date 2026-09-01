@@ -11,13 +11,13 @@ import { detectFormDrift } from './formDrift';
  * for (the browser SDK has no Master Key).
  *
  * ── Known cost, stated plainly ──────────────────────────────────────────────
- * This fires 7 reads. That is over the one-round-trip budget for a page load,
+ * This fires 8 reads. That is over the one-round-trip budget for a page load,
  * and it is the deliberate stopgap the design spec allows: the alternative is
  * sampling the queue counts, which would put approximate numbers on the one
  * screen whose entire job is telling you what to trust.
  *
  * They run in `Promise.all`, so wall-clock is the slowest read rather than the
- * sum — but it is still 7 requests on a bad connection.
+ * sum — but it is still 8 requests on a bad connection.
  *
  * TODO(dashboard): replace with a single `dashboardTriage` Cloud Code function
  * in puente-node-cloudcode. Server-side the master key is legitimate, so the
@@ -88,16 +88,23 @@ export async function loadDashboardTriage({ Parse, orgValues = [], now = new Dat
   resultsQ.descending('createdAt');
   resultsQ.limit(SAMPLE_SIZE);
 
-  const [lastSyncRows, recordsLast24h, missingCount, orphanCount, sample, specs, results] =
-    await Promise.all([
-      soft(lastSyncQ.find()),
-      soft(recent24hQ.count()),
-      soft(missingQ.count()),
-      soft(orphanQ.count()),
-      soft(sampleQ.find()),
-      soft(specsQ.find()),
-      soft(resultsQ.find()),
-    ]);
+  // 8 — the denominator. The queue counts mean nothing without it: "8 missing
+  // key fields" reads very differently against 40 records than against 4,200.
+  // A real count, so it is exact — not the capped sample.
+  const totalQ = scoped('SurveyData');
+
+  const [
+    lastSyncRows, recordsLast24h, missingCount, orphanCount, sample, specs, results, totalRecords,
+  ] = await Promise.all([
+    soft(lastSyncQ.find()),
+    soft(recent24hQ.count()),
+    soft(missingQ.count()),
+    soft(orphanQ.count()),
+    soft(sampleQ.find()),
+    soft(specsQ.find()),
+    soft(resultsQ.find()),
+    soft(totalQ.count()),
+  ]);
 
   const rows = sample || [];
 
@@ -116,10 +123,18 @@ export async function loadDashboardTriage({ Parse, orgValues = [], now = new Dat
   const accountsSynced = {
     count: new Set(rows.map((r) => r.get('surveyingUser')).filter(Boolean)).size,
     exact: false,
+    // The rows this figure was ACTUALLY reduced from, which is the cap only
+    // when the sample saturated. Quoting SAMPLE_SIZE here instead would tell an
+    // organization holding 343 records that the number was "sampled from the
+    // last 1,000" — a denominator nobody measured, and the same overclaim the
+    // sampling disclosure exists to prevent.
+    sampledFrom: rows.length,
   };
 
   return {
     accountsSynced,
+    // null when the count failed — this module's word for "did not run".
+    totalRecords,
     sync: {
       lastSyncAt: lastSyncRows && lastSyncRows[0] ? lastSyncRows[0].createdAt : null,
       // A failed read also leaves lastSyncAt null, and an organization with no

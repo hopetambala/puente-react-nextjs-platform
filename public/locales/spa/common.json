@@ -97,10 +97,6 @@
   "coverage_unattributed": "{{count}} registros no tenían ninguna comunidad registrada.",
   "coverage_empty": "Ninguna comunidad se ha sincronizado todavía",
   "coverage_empty_sub": "Las comunidades aparecen aquí a medida que el personal de campo sincroniza desde la aplicación móvil.",
-  "context_records_synced": "Registros sincronizados",
-  "context_window_24h": "últimas 24 horas",
-  "context_accounts_synced": "Cuentas que sincronizaron",
-  "context_accounts_note": "muestreado de los 1.000 registros más recientes; cuenta las cuentas que sincronizaron, no las personas que recolectaron",
   "coverage_quiet_today": "sincronizado hoy",
   "coverage_quiet_days": "inactiva {{count}} d",
   "coverage_quiet_months": "inactiva {{count}} m",
@@ -405,5 +401,10 @@
   "form_creator_hint_single_select": "Selección única: quien responde elige una sola opción",
   "form_creator_hint_multi_select": "Selección múltiple: quien responde puede elegir varias opciones",
   "form_creator_hint_header": "Encabezado: una fila de título para tu formulario",
-  "form_creator_hint_geolocation": "Geolocalización: registra la longitud y la latitud del usuario"
+  "form_creator_hint_geolocation": "Geolocalización: registra la longitud y la latitud del usuario",
+  "triage_count_of_total": "{{count}} de {{total, number}}",
+  "triage_count_of_unknown": "{{count}} de un total desconocido",
+  "coverage_denominator": "de los {{count, number}} registros sincronizados más recientes",
+  "context_records_total": "registros sincronizados en total",
+  "context_accounts_synced_of": "cuentas · muestreado de los {{count, number}} registros más recientes sincronizados; cuenta las cuentas que sincronizaron, no las personas que recolectaron"
 }

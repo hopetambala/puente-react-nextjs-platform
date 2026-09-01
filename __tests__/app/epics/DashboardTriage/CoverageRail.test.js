@@ -105,3 +105,12 @@ describe('CoverageRail', () => {
     expect(screen.getByTestId('coverage-loading')).toBeInTheDocument();
   });
 });
+
+describe('CoverageRail denominator', () => {
+  it('states the denominator once for the whole rail rather than repeating it per row', () => {
+    render(<CoverageRail summary={summary({ counted: 610 })} loading={false} />);
+
+    expect(screen.getByTestId('coverage-denominator'))
+      .toHaveTextContent(/coverage_denominator:\{"count":610\}/);
+  });
+});

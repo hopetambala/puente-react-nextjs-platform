@@ -23,13 +23,19 @@
   background: var(--tk-dlite-semantic-color-surface-raised);
 }
 
-/* Fixed inline size so counts align down the column. In a records tool a
-   ragged numeric column reads as sloppy data, not sloppy CSS. */
+/* The quantity is now "12 of 43,979", not a bare numerator — a count without
+   its base rate cannot be triaged.
+
+   Right-aligning the whole phrase is what keeps the column honest-looking:
+   every row shares the same org total, so the identical "of 43,979" suffix
+   lines up exactly and the counts land right-aligned just left of it. In a
+   records tool a ragged numeric column reads as sloppy data, not sloppy CSS. */
 .count {
-  min-width: 3ch;
+  min-width: 12ch;
   text-align: end;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .label {

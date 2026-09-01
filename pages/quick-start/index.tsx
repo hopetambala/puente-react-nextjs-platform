@@ -23,7 +23,9 @@ import styles from './index.module.scss';
 type Signal = { count: number; exact: boolean } | null;
 
 type TriageData = {
-  accountsSynced: { count: number; exact: boolean };
+  accountsSynced: { count: number; exact: boolean; sampledFrom: number };
+  /** Org-wide record total — the denominator the queue counts are read against. */
+  totalRecords: number | null;
   sync: { lastSyncAt: Date | null; lastSyncAvailable: boolean; recordsLast24h: number | null };
   signals: {
     missingKeyFields: Signal;
@@ -136,6 +138,7 @@ export default function Dashboard() {
             rows={queue}
             unavailable={unavailable}
             recordState={recordState}
+            total={data ? data.totalRecords : null}
             loading={loading}
           />
         </section>
@@ -146,22 +149,25 @@ export default function Dashboard() {
         </aside>
       </div>
 
-      {/* Totals live here, demoted, each with its denominator and its caveat. */}
+      {/* Totals live here, demoted, each carrying its own denominator.
+          The 24h sync volume used to sit here too and has been removed: the
+          ribbon already states it at the top of the same screen, so the footer
+          copy was the identical value under a different label — which reads as
+          two independent facts that happen to agree. */}
       <footer className={styles.contextStrip} data-testid="context-strip">
         <span className={styles.contextItem}>
-          <span className={styles.contextValue}>{data?.sync.recordsLast24h ?? '—'}</span>
-          <span className={styles.contextLabel}>
-            {t('context_records_synced')}
-            {' · '}
-            {t('context_window_24h')}
-          </span>
+          <span className={styles.contextValue}>{data?.totalRecords ?? '—'}</span>
+          <span className={styles.contextLabel}>{t('context_records_total')}</span>
         </span>
         <span className={styles.contextItem}>
+          {/* The denominator moves INTO the label instead of trailing behind a
+              prose caveat: this is a count of accounts seen in a sample, and
+              "7" alone reads as the organization's entire staff. The figure is
+              the rows actually read, not the sample cap — an org with 343
+              records was never sampled from 1,000. */}
           <span className={styles.contextValue}>{data ? data.accountsSynced.count : '—'}</span>
           <span className={styles.contextLabel}>
-            {t('context_accounts_synced')}
-            {' · '}
-            {t('context_accounts_note')}
+            {t('context_accounts_synced_of', { count: data ? data.accountsSynced.sampledFrom : 0 })}
           </span>
         </span>
       </footer>

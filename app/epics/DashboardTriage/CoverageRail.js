@@ -44,7 +44,7 @@ export default function CoverageRail({ summary, loading }) {
     );
   }
 
-  const { communities, approximate, skippedNoCommunity } = summary;
+  const { communities, approximate, skippedNoCommunity, counted } = summary;
 
   if (communities.length === 0) {
     return (
@@ -61,6 +61,17 @@ export default function CoverageRail({ summary, loading }) {
 
   return (
     <div>
+      {/* The denominator for every count in this rail, stated ONCE.
+          A per-row "of 610" would repeat the same six words six times and
+          crowd out the community name, which is the thing being scanned;
+          units belong in the header, not the cell. Without it these are bare
+          integers — and a bare 412 reads as "this community has 412 records"
+          when it actually means "412 of the most recent 610 synced records
+          came from here". */}
+      <p className={styles.denominator} data-testid="coverage-denominator">
+        {t('coverage_denominator', { count: counted })}
+      </p>
+
       <ul className={styles.list}>
         {shown.map((c) => {
           const quiet = c.daysQuiet !== null && c.daysQuiet >= QUIET_DAYS;
@@ -109,6 +120,8 @@ CoverageRail.propTypes = {
     })).isRequired,
     approximate: PropTypes.bool,
     skippedNoCommunity: PropTypes.number,
+    /** Records this summary was reduced from — the denominator for every row. */
+    counted: PropTypes.number,
   }),
   loading: PropTypes.bool,
 };
