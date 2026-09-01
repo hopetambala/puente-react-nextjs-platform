@@ -52,7 +52,14 @@ export default function CSVButtonWrapper({ form, surveyingOrganization, shortCod
     setLoading(true);
     try {
       const CSVData = await fetchCSVData();
-      if (CSVData === undefined) {
+      // A blank body is not a file. The aggregator answers 200 with exactly
+      // "\n" when a form has no results, and `=== undefined` never caught it —
+      // so the coordinator got a correctly-named, completely empty CSV and was
+      // told nothing, which reads as "my data disappeared".
+      //
+      // A header-only CSV is NOT blank: zero rows is a real answer, and the
+      // aggregator emits those deliberately.
+      if (CSVData === undefined || String(CSVData).trim() === '') {
         alert('No data');
         return;
       }
