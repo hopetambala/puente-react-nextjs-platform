@@ -27,6 +27,11 @@ import {
 } from './organization-admin';
 
 export {
+  getRateCard, listInvoices, setOrganizationBilling, updateRateCard,
+} from './rate-card';
+
+
+export {
   countObject,
   createOrganization,
   customMultiParamCountService,
