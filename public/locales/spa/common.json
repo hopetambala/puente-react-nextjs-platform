@@ -406,5 +406,6 @@
   "triage_count_of_unknown": "{{count}} de un total desconocido",
   "coverage_denominator": "de los {{count, number}} registros sincronizados más recientes",
   "context_records_total": "registros sincronizados en total",
-  "context_accounts_synced_of": "cuentas · muestreado de los {{count, number}} registros más recientes sincronizados; cuenta las cuentas que sincronizaron, no las personas que recolectaron"
+  "context_accounts_synced_of": "cuentas · muestreado de los {{count, number}} registros más recientes sincronizados; cuenta las cuentas que sincronizaron, no las personas que recolectaron",
+  "number_value": "{{value, number}}"
 }

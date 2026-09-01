@@ -1,5 +1,6 @@
-/* Queue dominant, coverage as a rail. Logical properties so the Arabic locale
-   mirrors without a rewrite. */
+/* Queue dominant, coverage as a rail. Logical properties as the better
+   default — not for a right-to-left locale. This app ships eng/spa/hat only;
+   ara/deu/ind/prt/zho were retired 2026-08-28. */
 .body {
   display: grid;
   grid-template-columns: 65fr 35fr;
@@ -7,7 +8,9 @@
   padding: var(--tk-dlite-semantic-spacing-md);
 }
 
-/* German and Portuguese run long: stack rather than squeeze the columns. */
+/* Spanish runs ~20% longer than English and Creole longer still: stack rather
+   than squeeze the columns. (This used to cite German and Portuguese, which
+   this app has not shipped since 2026-08-28.) */
 @media (max-width: 900px) {
   .body {
     grid-template-columns: 1fr;

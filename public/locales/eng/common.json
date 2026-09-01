@@ -406,5 +406,6 @@
   "triage_count_of_unknown": "{{count}} of an unknown total",
   "coverage_denominator": "of the {{count, number}} most recently synced records",
   "context_records_total": "records synced in total",
-  "context_accounts_synced_of": "accounts · sampled from the last {{count, number}} records synced, not people who collected"
+  "context_accounts_synced_of": "accounts · sampled from the last {{count, number}} records synced, not people who collected",
+  "number_value": "{{value, number}}"
 }

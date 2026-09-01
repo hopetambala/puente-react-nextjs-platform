@@ -5,13 +5,25 @@ import { render, screen, waitFor } from '@testing-library/react';
 // single assertion below proves every key the page uses actually ships.
 // eslint-disable-next-line global-require
 const eng = require('public/locales/eng/common.json');
+// eslint-disable-next-line global-require
+const { defaultLocale } = require('next-i18next.config').i18n;
+
+// `{{n, number}}` is Intl formatting, not a literal placeholder name, so the
+// stand-in has to honour the format spec or every grouped figure on the screen
+// renders as the raw template and the assertions below pass over garbage.
+const format = (value, spec) => (
+  spec === 'number' ? new Intl.NumberFormat(defaultLocale).format(value) : String(value)
+);
 
 const translate = (key, opts) => {
   if (!(key in eng)) return `MISSING:${key}`;
   let out = eng[key];
   if (opts) {
     Object.entries(opts).forEach(([k, v]) => {
-      out = out.replace(new RegExp(`{{\\s*${k}\\s*}}`, 'g'), String(v));
+      out = out.replace(
+        new RegExp(`{{\\s*${k}\\s*(?:,\\s*([^}]+?)\\s*)?}}`, 'g'),
+        (_, spec) => format(v, spec),
+      );
     });
   }
   return out;
@@ -36,8 +48,13 @@ jest.mock('app/epics/DashboardTriage/loadTriage', () => ({
 // eslint-disable-next-line import/first
 import Dashboard from 'pages/quick-start';
 
+// Mirrors what loadDashboardTriage actually resolves with — `sampledFrom` and
+// `totalRecords` included. A payload thinner than the real one lets the screen
+// render em-dashes and unknown-total hedges that no production load produces,
+// which is how the denominator assertions below could pass over nothing.
 const payload = (over = {}) => ({
-  accountsSynced: { count: 7, exact: false },
+  accountsSynced: { count: 7, exact: false, sampledFrom: 2 },
+  totalRecords: 43979,
   sync: { lastSyncAt: new Date(Date.now() - 3 * 3600 * 1000), recordsLast24h: 47 },
   signals: {
     missingKeyFields: { count: 12, exact: true },
@@ -286,12 +303,17 @@ describe('Empty and failure states', () => {
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
   });
 
-  it('shows a placeholder in the context strip when the 24-hour count could not be read', async () => {
+  it('shows a placeholder where the 24-hour count could not be read', async () => {
     // The load SUCCEEDED — only the 24h count query failed — so `data` is
-    // present and every other figure on the strip is real. React renders that
-    // lone `null` as nothing, leaving an empty slot beside "Records synced ·
-    // last 24 hours", which reads as a broken screen rather than as a figure we
-    // could not read.
+    // present and every other figure on the screen is real. React renders that
+    // lone `null` as nothing, leaving an empty slot beside "records in the last
+    // 24h", which reads as a broken screen rather than as a figure we could not
+    // read.
+    //
+    // The assertion follows the count to the RIBBON, which is where it now
+    // lives: the strip's duplicate was removed, and pointing this at the strip
+    // instead let it pass on an em-dash belonging to a different figure
+    // entirely.
     mockLoad.mockResolvedValue(payload({
       sync: {
         lastSyncAt: new Date(Date.now() - 3 * 3600 * 1000),
@@ -300,15 +322,63 @@ describe('Empty and failure states', () => {
       },
     }));
     render(<Dashboard />);
+    const ribbon = await screen.findByTestId('sync-ribbon');
+
+    // The same em-dash the page shows when a whole load failed, so a value we
+    // could not read looks deliberate instead of missing.
+    expect(ribbon).toHaveTextContent('—');
+    // A zero that is not part of a longer number, so a fabricated count is the
+    // only thing that can match.
+    expect(ribbon).not.toHaveTextContent(/(?<!\d)0(?!\d)/);
+  });
+});
+
+// Every number on this screen states what it is out of. That is only an
+// improvement while each denominator is one the numerator was actually drawn
+// from — a base rate nobody measured reads as measured, which is a worse
+// failure than the bare numerator it replaced.
+describe('Denominators', () => {
+  it('reads the two exact record counts against the record total', async () => {
+    render(<Dashboard />);
+    await screen.findByTestId('triage-row-missing-key-fields');
+
+    expect(screen.getByTestId('triage-row-missing-key-fields'))
+      .toHaveTextContent('12 of 43,979');
+    expect(screen.getByTestId('triage-row-unresolved-parent'))
+      .toHaveTextContent('2 of 43,979');
+  });
+
+  it('never reads the form-drift or duplicate counts against the record total', async () => {
+    render(<Dashboard />);
+    await screen.findByTestId('triage-row-form-drift');
+
+    // Form drift counts FORM DEFINITIONS and duplicates come out of the capped
+    // sample. Neither is a slice of 43,979.
+    expect(screen.getByTestId('triage-row-form-drift')).not.toHaveTextContent('43,979');
+    expect(screen.getByTestId('triage-row-possible-duplicates')).not.toHaveTextContent('43,979');
+    // Both still disclose that they are estimates.
+    expect(screen.getByTestId('triage-row-form-drift')).toHaveTextContent(/estimated/i);
+  });
+
+  it('renders the record total the same way in the footer as in the queue', async () => {
+    render(<Dashboard />);
+    await screen.findByTestId('triage-row-missing-key-fields');
+
+    // One quantity, one rendering. An ungrouped "43979" under a queue reading
+    // "12 of 43,979" reads as two different figures — and in Spanish, where the
+    // grouping separator is '.', the raw form is simply wrong.
+    expect(screen.getByTestId('context-strip')).toHaveTextContent('43,979');
+  });
+
+  it('quotes the rows the account figure was really reduced from, not the sample cap', async () => {
+    render(<Dashboard />);
     await screen.findByTestId('sync-ribbon');
 
+    // The payload's sample holds 2 rows. Saying "the last 1,000 records synced"
+    // to an organization that has 2 is the same overclaim the sampling
+    // disclosure exists to prevent.
     const strip = screen.getByTestId('context-strip');
-    // The same em-dash the strip already shows when the whole load failed, so a
-    // value we could not read looks deliberate instead of missing.
-    expect(strip).toHaveTextContent('—');
-    // A zero that is not part of a longer number, so the zeros inside the
-    // "1,000 records" caveat cannot satisfy it and a bare "0" abutting the
-    // label still can: the only thing that matches is a fabricated count.
-    expect(strip).not.toHaveTextContent(/(?<!\d)0(?!\d)/);
+    expect(strip).toHaveTextContent('sampled from the last 2 records synced');
+    expect(strip).not.toHaveTextContent('1,000');
   });
 });

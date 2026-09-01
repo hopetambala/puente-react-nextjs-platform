@@ -25,6 +25,31 @@
  */
 const SEVERITY_ORDER = { critical: 0, high: 1, medium: 2 };
 
+/**
+ * Which denominator a row's count may honestly be read against.
+ *
+ * `'org-records'` means the numerator is a subset of the organization's total
+ * SurveyData count, so the UI may render "12 of 43,979". `null` means no
+ * denominator on this screen can be stated truthfully, and the row shows its
+ * count alone.
+ *
+ * This exists because a WRONG base rate is worse than a missing one — it is the
+ * same denominator-neglect failure the phrase was added to prevent, only now
+ * with a number attached that reads as measured. Two of the four signals cannot
+ * take the record total:
+ *
+ * - form drift counts FORM DEFINITIONS, not records. "1 of 43,979" compares
+ *   forms to records and reads as a vanishing rate for the one signal ranked
+ *   critical because it silently empties CSV columns.
+ * - duplicates are reduced from the capped sample (the browser SDK cannot
+ *   aggregate), so their base is the sampled rows, not the org total. Quoting
+ *   the org total understates the rate by the sampling ratio — up to ~44x at
+ *   production volume.
+ *
+ * Both already render an `estimated` marker; that discloses sampling, not the
+ * wrong base. See NeedsAttention for the render side.
+ */
+
 // A row that counted 12 records must land the user on those 12, so curation
 // rows carry their own signal id as `?signal=…` for the destination to filter
 // by — but only where the destination can honour it. A param the destination
@@ -37,6 +62,8 @@ const SIGNALS = [
     id: 'form-drift',
     labelKey: 'triage_form_drift',
     severity: 'critical',
+    // Counts forms, not records — the record total is not its base.
+    denominator: null,
     href: '/forms/form-manager',
   },
   {
@@ -44,6 +71,7 @@ const SIGNALS = [
     id: 'unresolved-parent',
     labelKey: 'triage_unresolved_parent',
     severity: 'high',
+    denominator: 'org-records',
     href: '/data/data-curation?signal=unresolved-parent',
   },
   {
@@ -51,6 +79,8 @@ const SIGNALS = [
     id: 'possible-duplicates',
     labelKey: 'triage_possible_duplicates',
     severity: 'medium',
+    // Reduced from the capped sample, so the org total is not its base.
+    denominator: null,
     // No param: `missing-key-fields` and `unresolved-parent` have exact
     // server-side predicates in app/modules/data-quality, but duplicates means
     // grouping by householdId + day — an aggregation the browser Parse SDK
@@ -64,6 +94,7 @@ const SIGNALS = [
     id: 'missing-key-fields',
     labelKey: 'triage_missing_key_fields',
     severity: 'medium',
+    denominator: 'org-records',
     href: '/data/data-curation?signal=missing-key-fields',
   },
 ];
@@ -79,6 +110,7 @@ export function buildTriageQueue(signals = {}) {
       count: value.count,
       severity: spec.severity,
       approximate: value.exact !== true,
+      denominator: spec.denominator,
       href: spec.href,
     }))
     .sort((a, b) => (

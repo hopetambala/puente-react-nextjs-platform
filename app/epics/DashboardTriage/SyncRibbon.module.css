@@ -1,6 +1,7 @@
 /* Provenance strip, organization scale. A band, not a card — so a single
-   bottom rule rather than elevation. Logical properties throughout so the
-   Arabic locale mirrors without a rewrite. */
+   bottom rule rather than elevation. Logical properties throughout — kept
+   because they are the better default, NOT for a right-to-left locale: this
+   app ships eng/spa/hat only, and ara was retired 2026-08-28. */
 .ribbon {
   display: flex;
   align-items: center;

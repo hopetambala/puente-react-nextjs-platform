@@ -63,6 +63,20 @@
   padding-inline: var(--tk-dlite-semantic-spacing-sm);
 }
 
+/* Holds the count column open at exactly the width the loaded row uses, so the
+   label does not slide inward when the data lands. Same min-width and the same
+   font metrics as `.count` — `ch` is font-relative, so the weight has to match
+   or the reserved box is narrower than the real one. Flex-end because the
+   loaded count is right-aligned; the placeholder should sit where the digits
+   will. */
+.skeletonCount {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 12ch;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
 /* The only transition here is the row hover. Honour reduced motion — the repo
    had zero coverage before this file; don't add to that debt. */
 @media (prefers-reduced-motion: reduce) {

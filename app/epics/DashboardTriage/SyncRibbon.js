@@ -27,7 +27,9 @@ export default function SyncRibbon({ state, loading }) {
 
   if (loading || !state) {
     return (
-      <div className={styles.ribbon} data-testid="sync-ribbon-loading">
+      // aria-busy: Skeleton is aria-hidden, so without it the provenance strip
+      // is absent rather than pending to a screen reader.
+      <div className={styles.ribbon} data-testid="sync-ribbon-loading" aria-busy="true">
         <Skeleton width={180} height={13} />
         <Skeleton width={90} height={13} />
       </div>
@@ -39,7 +41,14 @@ export default function SyncRibbon({ state, loading }) {
   // A `null` count means the 24h count query never ran. A bare `null` renders as
   // a gap and a `0` would claim nothing arrived — a claim the ribbon cannot
   // support — so it falls back to the em-dash the page's context strip uses.
-  const records = recordsLast24h === null ? '—' : recordsLast24h;
+  //
+  // A real count goes through the locale's number format rather than out as a
+  // raw JS integer: Spanish groups with '.', and every other figure on this
+  // screen is already formatted, so an unformatted one here made the same
+  // quantity render two different ways on one page.
+  const records = recordsLast24h === null || recordsLast24h === undefined
+    ? '—'
+    : t('number_value', { value: recordsLast24h });
 
   const recency = () => {
     // `never` has no sync to age, and `unknown` means we couldn't read the sync

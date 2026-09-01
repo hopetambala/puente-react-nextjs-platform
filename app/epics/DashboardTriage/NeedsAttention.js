@@ -33,15 +33,24 @@ export default function NeedsAttention({
    * systematically wrong severity judgements — on the one screen whose job is
    * telling a coordinator what to trust.
    *
-   * When the total failed to load we say so rather than dropping the phrase.
-   * A bare `12` does not read as "denominator unavailable", it reads as a
-   * complete answer, which is the exact misreading this row exists to prevent.
+   * But only a row whose numerator is genuinely a subset of the org record
+   * total may quote it (`denominator === 'org-records'`). Form drift counts
+   * FORM DEFINITIONS and duplicates are reduced from a capped sample, so
+   * pinning either to 43,979 states a rate nobody measured — a wrong base rate
+   * is worse than a missing one, because it reads as measured. Those rows show
+   * their count alone; their label already names its unit and their `estimated`
+   * marker already discloses the sampling. See SIGNALS in triageQueue.
+   *
+   * When an applicable total failed to load we say so rather than dropping the
+   * phrase. A bare `12` does not read as "denominator unavailable" there, it
+   * reads as a complete answer — the exact misreading this row prevents.
    */
-  const quantity = (count) => (
-    total === null || total === undefined
-      ? t('triage_count_of_unknown', { count })
-      : t('triage_count_of_total', { count, total })
-  );
+  const quantity = (row) => {
+    if (row.denominator !== 'org-records') return t('number_value', { value: row.count });
+    return total === null || total === undefined
+      ? t('triage_count_of_unknown', { count: row.count })
+      : t('triage_count_of_total', { count: row.count, total });
+  };
 
   const note = unavailable.length > 0 && (
     <p className={styles.unavailable} data-testid="triage-unavailable-note">
@@ -53,10 +62,19 @@ export default function NeedsAttention({
 
   if (loading) {
     return (
-      <div className={styles.list} data-testid="triage-loading">
+      // aria-busy because Skeleton is aria-hidden: without it this region is
+      // simply absent to a screen reader, which on a slow field connection is
+      // indistinguishable from an empty queue.
+      <div className={styles.list} data-testid="triage-loading" aria-busy="true">
         {[0, 1, 2].map((i) => (
           <div key={i} className={styles.skeletonRow}>
-            <Skeleton width={32} height={20} />
+            {/* Reserve the real count column, not a 32px stub. The column is
+                now a whole phrase ("12 of 43,979") rather than a bare integer,
+                so a stub-width placeholder let the label jump ~60px inward the
+                moment the data landed — on a screen people read for trust. The
+                wrapper carries .count's own min-width and font metrics so the
+                reserved box matches the loaded one. */}
+            <span className={styles.skeletonCount}><Skeleton width="9ch" height={20} /></span>
             <Skeleton width="55%" height={13} />
           </div>
         ))}
@@ -116,7 +134,7 @@ export default function NeedsAttention({
           <Link href={r.href} passHref>
             {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
             <a className={styles.row} data-testid={`triage-row-${r.id}`}>
-              <span className={styles.count}>{quantity(r.count)}</span>
+              <span className={styles.count}>{quantity(r)}</span>
               <span className={styles.label}>
                 {t(r.approximate ? `${r.labelKey}_approx` : r.labelKey, { count: r.count })}
               </span>
@@ -149,6 +167,12 @@ NeedsAttention.propTypes = {
     count: PropTypes.number.isRequired,
     severity: PropTypes.oneOf(['critical', 'high', 'medium']).isRequired,
     approximate: PropTypes.bool,
+    /**
+     * Which base rate this row's count may be read against. Only 'org-records'
+     * rows may quote `total`; null means no denominator on this screen is true
+     * for them. Set in triageQueue's SIGNALS, never guessed here.
+     */
+    denominator: PropTypes.oneOf(['org-records', null]),
     href: PropTypes.string.isRequired,
   })),
   /** Signal ids whose check could not run — see findUnavailableSignals. */

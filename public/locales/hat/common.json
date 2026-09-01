@@ -406,5 +406,6 @@
   "triage_count_of_unknown": "{{count}} sou yon total nou pa konnen",
   "coverage_denominator": "nan {{count, number}} dosye ki pi resan yo senkronize",
   "context_records_total": "dosye senkronize antou",
-  "context_accounts_synced_of": "kont · chwazi nan {{count, number}} dosye ki pi resan yo senkronize; li konte kont ki senkronize, pa moun ki te kolekte"
+  "context_accounts_synced_of": "kont · chwazi nan {{count, number}} dosye ki pi resan yo senkronize; li konte kont ki senkronize, pa moun ki te kolekte",
+  "number_value": "{{value, number}}"
 }
