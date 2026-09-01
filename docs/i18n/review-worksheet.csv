@@ -202,6 +202,8 @@ common,triage_unavailable_unresolved-parent,unresolved household links,vínculos
 common,triage_unresolved_parent,records with an unresolved household link,registros con un vínculo de hogar sin resolver,dosye ki gen yon lyen kay ki poko rezoud,,
 common,triage_unresolved_parent_approx,records may have an unresolved household link,registros podrían tener un vínculo de hogar sin resolver,dosye ki ka gen yon lyen kay ki poko rezoud,,
 common,your_forms,Your forms,Tus formularios,Fòm ou yo,,
+common,export_empty,This form has no records to export yet.,Este formulario todavía no tiene registros para exportar.,Fòm sa a poko gen okenn dosye pou ekspòte.,,
+common,export_failed,The export could not be completed. Please try again.,"No se pudo completar la descarga. Por favor, inténtelo de nuevo.",Nou pa t kapab fini ekspòtasyon an. Tanpri eseye ankò.,,
 saas-landing,banner_subtitle,Millions of happy users work better with our integrated Apps.,Millones de usuarios satisfechos trabajan mejor con nuestras aplicaciones integradas.,Plizyè milyon itilizatè kontan travay pi byen ak aplikasyon entegre nou yo.,,
 saas-landing,banner_title,Amazing company deserve,Las empresas extraordinarias merecen,Konpayi estwòdinè merite,,
 saas-landing,banner_titlestrong,amazing software,software extraordinario,lojisyèl estwòdinè,,

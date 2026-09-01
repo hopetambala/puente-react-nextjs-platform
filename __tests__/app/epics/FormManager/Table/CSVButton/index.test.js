@@ -22,6 +22,16 @@ jest.mock('app/impacto-design-system/button', () => ({
   default: ({ text, onClick }) => <button type="button" onClick={onClick}>{text}</button>,
 }));
 
+jest.mock('app/impacto-design-system/toast', () => ({
+  __esModule: true,
+  default: ({ text, isError }) => <div data-testid="toast" data-error={!!isError}>{text}</div>,
+}));
+
+const toastCalls = [];
+jest.mock('react-toastify', () => ({ toast: (node) => { toastCalls.push(node); } }));
+
+jest.mock('next-i18next', () => ({ useTranslation: () => ({ t: (key) => key }) }));
+
 const CSVButton = require('app/epics/FormManager/Table/CSVButton/index').default;
 
 describe('CSVButton export path', () => {
@@ -79,6 +89,7 @@ describe('CSVButton empty export', () => {
 
   beforeEach(() => {
     calls.length = 0;
+    toastCalls.length = 0;
     nextResponse = 'csv';
     createObjectURL = jest.fn(() => 'blob:fake');
     window.URL.createObjectURL = createObjectURL;
@@ -104,7 +115,7 @@ describe('CSVButton empty export', () => {
 
     fireEvent.click(screen.getByRole('button'));
 
-    await waitFor(() => expect(window.alert).toHaveBeenCalled());
+    await waitFor(() => expect(toastCalls).toHaveLength(1));
     expect(createObjectURL).not.toHaveBeenCalled();
     expect(anchorClick).not.toHaveBeenCalled();
   });
@@ -117,7 +128,35 @@ describe('CSVButton empty export', () => {
 
     await waitFor(() => expect(createObjectURL).toHaveBeenCalled());
     expect(anchorClick).toHaveBeenCalled();
+    expect(toastCalls).toHaveLength(0);
+  });
+
+  it('tells the coordinator in their own language instead of a raw alert', async () => {
+    // `alert('No data')` was untranslated English shown to Spanish- and
+    // Creole-speaking coordinators, in a browser dialog the design system does
+    // not own. The key is what must reach them; the locale files carry the copy.
+    nextResponse = '\n';
+    renderButton();
+
+    fireEvent.click(screen.getByRole('button'));
+
+    await waitFor(() => expect(toastCalls).toHaveLength(1));
+    expect(toastCalls[0].props.text).toBe('export_empty');
     expect(window.alert).not.toHaveBeenCalled();
+  });
+
+  it('distinguishes a failed export from an empty one', async () => {
+    // "No data" was shown for both. A coordinator whose export CRASHED was told
+    // their form was empty — which sends them looking for missing records
+    // instead of retrying.
+    nextResponse = Promise.reject(new Error('boom'));
+    renderButton();
+
+    fireEvent.click(screen.getByRole('button'));
+
+    await waitFor(() => expect(toastCalls).toHaveLength(1));
+    expect(toastCalls[0].props.text).toBe('export_failed');
+    expect(toastCalls[0].props.isError).toBe(true);
   });
 
   it('treats a header-only CSV as data, because zero rows is a real answer', async () => {
@@ -129,6 +168,6 @@ describe('CSVButton empty export', () => {
     fireEvent.click(screen.getByRole('button'));
 
     await waitFor(() => expect(createObjectURL).toHaveBeenCalled());
-    expect(window.alert).not.toHaveBeenCalled();
+    expect(toastCalls).toHaveLength(0);
   });
 });

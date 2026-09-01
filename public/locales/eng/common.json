@@ -201,5 +201,7 @@
   "billing_email_placeholder": "billing email",
   "billing_save_org": "Save",
   "billing_create_invoice": "Create draft invoice",
-  "billing_stripe_not_configured": "Stripe is not configured yet, so invoices cannot be created. Set STRIPE_SECRET_KEY once Products and Prices exist."
+  "billing_stripe_not_configured": "Stripe is not configured yet, so invoices cannot be created. Set STRIPE_SECRET_KEY once Products and Prices exist.",
+  "export_empty": "This form has no records to export yet.",
+  "export_failed": "The export could not be completed. Please try again."
 }

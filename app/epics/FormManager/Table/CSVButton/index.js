@@ -1,8 +1,11 @@
 import Button from 'app/impacto-design-system/button';
+import Toast from 'app/impacto-design-system/toast';
 import {
     CustomData, EnvironmentalHealth, EvaluationMedical, SurveyData, Vitals,
 } from 'app/modules/data-export/puente';
+import { useTranslation } from 'next-i18next';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 function openWindow(dataurl, filename) {
   const link = document.createElement('a');
@@ -21,6 +24,7 @@ const puenteMap = {
 export default function CSVButtonWrapper({ form, surveyingOrganization, shortCode }) {
   const { objectId: customFormId, customForm, name } = form;
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation('common');
 
   // Prefer the shortCode path: it covers every string the organization's
   // records carry. Verified in production — DR Missions exported 12 CSV lines
@@ -60,14 +64,17 @@ export default function CSVButtonWrapper({ form, surveyingOrganization, shortCod
       // A header-only CSV is NOT blank: zero rows is a real answer, and the
       // aggregator emits those deliberately.
       if (CSVData === undefined || String(CSVData).trim() === '') {
-        alert('No data');
+        toast(<Toast text={t('export_empty')} />);
         return;
       }
       const blob = new Blob([CSVData], { type: 'text/csv' });
       const csvUrl = window.URL.createObjectURL(blob);
       openWindow(csvUrl, `${name}-${new Date()}.csv`);
     } catch (error) {
-      alert('No data');
+      // Distinct from the empty case on purpose. Both used to say "No data",
+      // so a coordinator whose export CRASHED went looking for missing records
+      // instead of retrying.
+      toast(<Toast text={t('export_failed')} isError />);
     } finally {
       setLoading(false);
     }
