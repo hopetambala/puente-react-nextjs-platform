@@ -201,5 +201,7 @@
   "billing_email_placeholder": "imèl fakturasyon",
   "billing_save_org": "Anrejistre",
   "billing_create_invoice": "Kreye bouyon fakti",
-  "billing_stripe_not_configured": "Stripe poko konfigire, kidonk nou pa ka kreye fakti. Mete STRIPE_SECRET_KEY lè pwodwi ak pri yo egziste."
+  "billing_stripe_not_configured": "Stripe poko konfigire, kidonk nou pa ka kreye fakti. Mete STRIPE_SECRET_KEY lè pwodwi ak pri yo egziste.",
+  "export_empty": "Fòm sa a poko gen okenn dosye pou ekspòte.",
+  "export_failed": "Nou pa t kapab fini ekspòtasyon an. Tanpri eseye ankò."
 }
