@@ -6,6 +6,8 @@ import userEvent from '@testing-library/user-event';
 // If the Status column is removed from the Table, the green "Active" badge
 // disappears from every form row — caught before users see a bare table.
 
+jest.mock('next-i18next', () => ({ useTranslation: () => ({ t: (k) => k }) }));
+
 jest.mock('app/impacto-design-system', () => ({
   Button: ({ text, onClick, intent }) => (
     <button type="button" data-intent={intent} onClick={onClick}>{text}</button>
@@ -79,7 +81,7 @@ describe('Rendering', () => {
 
   it('renders a Status column header', () => {
     renderTable([makeRow()]);
-    expect(screen.getByText('Status')).toBeInTheDocument();
+    expect(screen.getByText('field_status')).toBeInTheDocument();
   });
 });
 
@@ -87,7 +89,7 @@ describe('Status badge', () => {
   it('renders a green Active badge for each form row', () => {
     renderTable([makeRow()]);
     expect(screen.getByTestId('badge-green')).toBeInTheDocument();
-    expect(screen.getByText('Active')).toBeInTheDocument();
+    expect(screen.getByText('form_manager_status_active')).toBeInTheDocument();
   });
 
   it('renders one badge per row', () => {
@@ -99,9 +101,9 @@ describe('Status badge', () => {
 describe('Actions — custom forms', () => {
   it('renders Edit, Duplicate, and Delete buttons', () => {
     renderTable([makeRow()]);
-    expect(screen.getByText('Edit')).toBeInTheDocument();
-    expect(screen.getByText('Duplicate')).toBeInTheDocument();
-    expect(screen.getByText('Delete')).toBeInTheDocument();
+    expect(screen.getByText('form_manager_edit')).toBeInTheDocument();
+    expect(screen.getByText('form_manager_duplicate')).toBeInTheDocument();
+    expect(screen.getByText('form_manager_delete')).toBeInTheDocument();
   });
 });
 
@@ -136,16 +138,44 @@ describe('Drill-in to records', () => {
 describe('Delete modal', () => {
   it('shows confirmation modal when Delete is clicked', async () => {
     renderTable([makeRow()]);
-    await userEvent.click(screen.getByText('Delete'));
+    await userEvent.click(screen.getByText('form_manager_delete'));
     expect(screen.getByTestId('modal')).toBeInTheDocument();
   });
 
   it('calls updateObject with active:false when deletion is confirmed', async () => {
     renderTable([makeRow({ objectId: 'form-99' })]);
-    await userEvent.click(screen.getByText('Delete'));
-    await userEvent.click(screen.getByText('Delete form'));
+    await userEvent.click(screen.getByText('form_manager_delete'));
+    await userEvent.click(screen.getByText('form_manager_delete_action'));
     expect(updateObject).toHaveBeenCalledWith(
       expect.objectContaining({ parseClassID: 'form-99', localObject: { active: 'false' } }),
     );
+  });
+});
+
+describe('FormManagerTable — copy', () => {
+  it('routes every column header through t()', () => {
+    renderTable([makeRow()]);
+    ['form_manager_col_name', 'form_manager_col_description', 'field_status',
+      'form_manager_col_updated', 'form_manager_col_actions'].forEach((key) => {
+      expect(screen.getByText(key)).toBeInTheDocument();
+    });
+  });
+
+  it('routes the caret column label through t()', () => {
+    renderTable([makeRow()]);
+    expect(screen.getByLabelText('form_manager_col_expand')).toBeInTheDocument();
+  });
+
+  // The two empty states are different: no data at all reaches this component
+  // as `undefined`, which is not the same as a filter excluding everything.
+  it('routes the no-data empty state through t()', () => {
+    renderTable(undefined);
+    expect(screen.getByText('form_manager_empty')).toBeInTheDocument();
+  });
+
+  it('routes the delete confirmation body through t()', async () => {
+    renderTable([makeRow()]);
+    await userEvent.click(screen.getAllByText('form_manager_delete')[0]);
+    expect(screen.getByText('form_manager_delete_confirm')).toBeInTheDocument();
   });
 });

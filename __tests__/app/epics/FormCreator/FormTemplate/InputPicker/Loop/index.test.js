@@ -2,6 +2,8 @@ import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import React from 'react';
 
+jest.mock('next-i18next', () => ({ useTranslation: () => ({ t: (k) => k }) }));
+
 jest.mock('app/impacto-design-system', () => ({
   Button: ({ text, onClick }) => <button type="button" onClick={onClick}>{text}</button>,
   Stack: ({ children }) => <div>{children}</div>,
@@ -30,7 +32,7 @@ describe('questions to repeat', () => {
     );
 
     // Repeat the two questions preceding the loop: "Name" and the geolocation field.
-    fireEvent.change(screen.getByPlaceholderText('eg. 3'), { target: { value: '2' } });
+    fireEvent.change(screen.getByPlaceholderText('form_creator_loop_count_example'), { target: { value: '2' } });
 
     expect(screen.getByText('Name')).toBeInTheDocument();
     expect(screen.getByText('geolocation')).toBeInTheDocument();
@@ -61,7 +63,7 @@ describe('loop label edit', () => {
     );
     mockSetFormItems.mockClear();
 
-    fireEvent.change(screen.getByPlaceholderText('Untitled Loop'), {
+    fireEvent.change(screen.getByPlaceholderText('form_creator_untitled_loop'), {
       target: { value: 'Keep going?', id: 'item-loop' },
     });
 
@@ -90,12 +92,39 @@ describe('loop label edit', () => {
     );
     mockSetFormItems.mockClear();
 
-    fireEvent.change(screen.getByPlaceholderText('Untitled Loop'), {
+    fireEvent.change(screen.getByPlaceholderText('form_creator_untitled_loop'), {
       target: { value: 'Keep going?', id: 'item-loop' },
     });
 
     const updated = mockSetFormItems.mock.calls[0][0][0];
     expect(updated.formikKey).toBe('Keep going');
     expect(updated.label).toBe('Keep going?');
+  });
+});
+
+describe('Loop block — copy', () => {
+  const item = { id: 'loop-1', fieldType: 'loop', label: '', numberQuestionsToRepeat: '' };
+  const props = {
+    item, formItems: [item], setFormItems: jest.fn(), removeValue: jest.fn(),
+  };
+
+  it('routes both headings through t()', () => {
+    render(<Loop {...props} />);
+    expect(screen.getByRole('heading', { name: 'form_creator_loop_title' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'form_creator_loop_repeat_count' })).toBeInTheDocument();
+  });
+
+  it('routes both placeholders through t()', () => {
+    render(<Loop {...props} />);
+    expect(screen.getByPlaceholderText('form_creator_untitled_loop')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('form_creator_loop_count_example')).toBeInTheDocument();
+  });
+
+  // Shouting was this block's alone — every sibling says "Remove question".
+  // One concept, one key, so a translator writes it once and the form builder
+  // reads the same word on every block.
+  it('shares the remove-question key with its sibling blocks', () => {
+    render(<Loop {...props} />);
+    expect(screen.getByRole('button', { name: 'form_creator_remove_question' })).toBeInTheDocument();
   });
 });

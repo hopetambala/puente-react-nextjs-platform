@@ -1,6 +1,16 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
+// `t` echoes the key, and appends its interpolation vars when given any. That
+// second half matters here: the rename confirmation embeds a community name,
+// and a template literal that concatenates the name into an English sentence
+// cannot be translated — word order differs by language.
+jest.mock('next-i18next', () => ({
+  useTranslation: () => ({
+    t: (k, vars) => (vars ? `${k} ${JSON.stringify(vars)}` : k),
+  }),
+}));
+
 jest.mock('app/impacto-design-system', () => ({
   Panel: ({ title, children }) => <div><h3>{title}</h3>{children}</div>,
   Button: ({ text, onClick, isDisabled }) => (
@@ -71,7 +81,29 @@ describe('CommunityAudit — grouping', () => {
   it('renders the Community Audit panel', async () => {
     mockFind.mockResolvedValue([]);
     render(<CommunityAudit orgValues={['TestOrg']} />);
-    await waitFor(() => expect(screen.getByText('Community Audit')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('data_curation_audit_title')).toBeInTheDocument());
+  });
+
+  it('routes the empty state through t()', async () => {
+    mockFind.mockResolvedValue([]);
+    render(<CommunityAudit orgValues={['TestOrg']} />);
+    await waitFor(() => expect(screen.getByText('data_curation_audit_empty')).toBeInTheDocument());
+  });
+
+  it('routes the Apply button label through t()', async () => {
+    mockFind.mockResolvedValue(recordsFromNames(['Sabana Yegua', 'Sabana Yégua']));
+    render(<CommunityAudit orgValues={['TestOrg']} />);
+    await waitFor(() => expect(screen.getByText('data_curation_audit_apply')).toBeInTheDocument());
+  });
+
+  it('interpolates the community name into the confirmation rather than concatenating it', async () => {
+    mockFind.mockResolvedValue(recordsFromNames(['Sabana Yegua', 'Sabana Yégua']));
+    render(<CommunityAudit orgValues={['TestOrg']} />);
+    await waitFor(() => screen.getByText('data_curation_audit_apply'));
+    fireEvent.click(screen.getByText('data_curation_audit_apply'));
+    expect(
+      screen.getByText(/^data_curation_audit_rename_confirm .*"target":"Sabana Yegua"/),
+    ).toBeInTheDocument();
   });
 
   it('shows grouped misspellings when similar names exist', async () => {
@@ -86,7 +118,7 @@ describe('CommunityAudit — grouping', () => {
   it('does not group names with distance > 2', async () => {
     mockFind.mockResolvedValue(recordsFromNames(['Nsanje', 'Blantyre']));
     render(<CommunityAudit orgValues={['TestOrg']} />);
-    await waitFor(() => screen.getByText('Community Audit'));
+    await waitFor(() => screen.getByText('data_curation_audit_title'));
     // Neither should be shown as a duplicate group
     expect(screen.queryByText(/apply/i)).not.toBeInTheDocument();
   });
@@ -119,7 +151,7 @@ describe('CommunityAudit — apply canonical name', () => {
     render(<CommunityAudit orgValues={['TestOrg']} />);
     await waitFor(() => screen.getByText(/apply/i));
     fireEvent.click(screen.getByText(/apply/i));
-    fireEvent.click(screen.getByText('Rename records'));
+    fireEvent.click(screen.getByText('data_curation_audit_rename_action'));
     await waitFor(() => expect(mockSave).toHaveBeenCalled());
   });
 });
@@ -167,7 +199,7 @@ describe('CommunityAudit — the rename must finish what the dialog promises', (
     await waitFor(() => screen.getByText(/apply/i));
     limitSpy.mockClear();
     fireEvent.click(screen.getByText(/apply/i));
-    fireEvent.click(screen.getByText('Rename records'));
+    fireEvent.click(screen.getByText('data_curation_audit_rename_action'));
 
     await waitFor(() => expect(limitSpy).toHaveBeenCalled());
   });
@@ -191,7 +223,7 @@ describe('CommunityAudit — the rename must finish what the dialog promises', (
 
     MockParse.Query.mockClear();
     fireEvent.click(screen.getByText(/apply/i));
-    fireEvent.click(screen.getByText('Rename records'));
+    fireEvent.click(screen.getByText('data_curation_audit_rename_action'));
 
     await waitFor(() => {
       const surveyDataQueries = MockParse.Query.mock.calls.filter((c) => c[0] === 'SurveyData').length;

@@ -126,7 +126,7 @@ export default function Dashboard() {
     : 'unknown';
 
   return (
-    <AppShell breadcrumb={['Dashboard']}>
+    <AppShell breadcrumb={[t('breadcrumb_dashboard')]}>
       <SyncRibbon state={syncState} loading={loading} />
 
       <div className={styles.body}>

@@ -1,6 +1,8 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 
+jest.mock('next-i18next', () => ({ useTranslation: () => ({ t: (k) => k }) }));
+
 jest.mock('react-beautiful-dnd', () => ({
   DragDropContext: ({ children }) => <>{children}</>,
   Droppable: ({ children }) => children({ innerRef: () => {}, droppableProps: {}, placeholder: null }, {}),
@@ -69,7 +71,7 @@ describe('drag handle refactor', () => {
 describe('drag handle accessibility', () => {
   it('drag handle is a button so it is keyboard-focusable and correctly announced by assistive tech', () => {
     renderComponent();
-    expect(screen.getByRole('button', { name: /drag to reorder/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'form_creator_drag_to_reorder' })).toBeInTheDocument();
   });
 });
 
@@ -119,5 +121,12 @@ describe('keyFrozen prop', () => {
         expect.anything(),
       );
     });
+  });
+});
+
+describe('InputPicker — copy', () => {
+  it('routes the drag-handle label through t()', () => {
+    renderComponent();
+    expect(screen.getByRole('button', { name: 'form_creator_drag_to_reorder' })).toBeInTheDocument();
   });
 });

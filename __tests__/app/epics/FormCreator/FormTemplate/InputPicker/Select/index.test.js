@@ -2,6 +2,14 @@ import '@testing-library/jest-dom';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import React from 'react';
 
+jest.mock('next-i18next', () => ({
+  useTranslation: () => ({
+    t: (k, vars) => (vars
+      ? `${k}(${Object.entries(vars).map(([n, v]) => `${n}=${v}`).join(',')})`
+      : k),
+  }),
+}));
+
 jest.mock('app/impacto-design-system', () => ({
   Button: ({ text, onClick }) => <button type="button" onClick={onClick}>{text}</button>,
   Stack: ({ children }) => <div>{children}</div>,
@@ -50,8 +58,8 @@ describe('option key props', () => {
       />
     );
 
-    expect(screen.getByText('Option 1')).toBeInTheDocument();
-    expect(screen.getByText('Option 2')).toBeInTheDocument();
+    expect(screen.getByText('form_creator_option_n(n=1)')).toBeInTheDocument();
+    expect(screen.getByText('form_creator_option_n(n=2)')).toBeInTheDocument();
 
     const keyWarningCalls = consoleErrorSpy.mock.calls.filter(
       (args) => typeof args[0] === 'string' && (
@@ -121,7 +129,7 @@ describe('removeOption', () => {
     mockSetFormItems.mockClear();
 
     // Click the first "Remove" button — this removes optionA
-    const removeButtons = screen.getAllByText('Remove');
+    const removeButtons = screen.getAllByText('form_creator_remove_option');
     fireEvent.click(removeButtons[0]);
 
     expect(mockSetFormItems).toHaveBeenCalled();
@@ -164,7 +172,7 @@ describe('question label edit', () => {
     );
     mockSetFormItems.mockClear();
 
-    fireEvent.change(screen.getByPlaceholderText('Enter your question here'), {
+    fireEvent.change(screen.getByPlaceholderText('form_creator_question_placeholder'), {
       target: { value: 'Keep going?', id: 'b58b0000-0000-4000-8000-000000000001' },
     });
 
@@ -203,7 +211,7 @@ describe('question label edit', () => {
     );
     mockSetFormItems.mockClear();
 
-    fireEvent.change(screen.getByPlaceholderText('Enter your question here'), {
+    fireEvent.change(screen.getByPlaceholderText('form_creator_question_placeholder'), {
       target: { value: 'Keep going?', id: 'item-saved' },
     });
 
@@ -242,7 +250,7 @@ describe('question label edit', () => {
     );
     mockSetFormItems.mockClear();
 
-    fireEvent.change(screen.getByPlaceholderText('Enter your question here'), {
+    fireEvent.change(screen.getByPlaceholderText('form_creator_question_placeholder'), {
       target: { value: 'Keep going?', id: 'item-new' },
     });
 
@@ -250,5 +258,63 @@ describe('question label edit', () => {
     expect(updated.formikKey).toBe('Keep going');
     expect(updated.label).toBe('Keep going?');
     expect(updated.options[0].textKey).toBe('__Keep going__Yes');
+  });
+});
+
+describe('Select block — copy', () => {
+  function renderType(fieldType, optionOverrides = {}) {
+    const item = {
+      id: `s-${fieldType}`,
+      fieldType,
+      label: '',
+      options: [{ id: 'opt-1', value: 'Option 1', text: false, ...optionOverrides }],
+    };
+    return render(
+      <Select
+        item={item}
+        formItems={[item]}
+        setFormItems={jest.fn()}
+        removeValue={jest.fn()}
+      />,
+    );
+  }
+
+  it.each([
+    ['select', 'form_creator_type_single_select'],
+    ['selectMulti', 'form_creator_type_multi_select'],
+  ])('routes the %s heading through t()', (fieldType, key) => {
+    renderType(fieldType);
+    expect(screen.getByRole('heading', { name: key })).toBeInTheDocument();
+  });
+
+  // The single- and multi-select branches are near-identical markup. They share
+  // the option-editing keys so the two cannot drift apart in translation while
+  // both still look right in English.
+  it.each(['select', 'selectMulti'])('routes the option controls on %s through t()', (fieldType) => {
+    renderType(fieldType);
+    expect(screen.getByRole('button', { name: 'form_creator_add_option' })).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: 'form_creator_remove_option' }).length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', { name: 'form_creator_add_followup' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'form_creator_remove_question' })).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('form_creator_question_placeholder')).toBeInTheDocument();
+  });
+
+  it('routes the remove-followup control through t()', () => {
+    renderType('select', { text: true, textQuestion: '' });
+    expect(screen.getByRole('button', { name: 'form_creator_remove_followup' })).toBeInTheDocument();
+  });
+
+  // Both of these built an English sentence around a number with a template
+  // literal, which no translator can reorder.
+  it('interpolates the option number rather than concatenating it', () => {
+    renderType('select');
+    expect(screen.getByRole('heading', { name: 'form_creator_option_n(n=1)' })).toBeInTheDocument();
+  });
+
+  it('interpolates the option number into the follow-up question heading', () => {
+    renderType('select', { text: true, textQuestion: '' });
+    expect(
+      screen.getByRole('heading', { name: 'form_creator_followup_question_n(n=1)' }),
+    ).toBeInTheDocument();
   });
 });

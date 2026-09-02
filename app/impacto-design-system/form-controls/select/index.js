@@ -2,12 +2,14 @@ import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
+import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { StyledInputLabel } from '../_styles';
 
 const MuiSelect = (props) => {
+  const { t } = useTranslation('common');
   const {
     label, name, options, required, errorobj,
   } = props;
@@ -27,7 +29,7 @@ const MuiSelect = (props) => {
       </StyledInputLabel>
       <Select id={name} {...props}>
         <MenuItem value="">
-          <em>None</em>
+          <em>{t('select_none')}</em>
         </MenuItem>
         {options.map((item) => (
           <MenuItem key={item.id} value={item.id}>
@@ -40,12 +42,11 @@ const MuiSelect = (props) => {
   );
 };
 
-function FormSelect(props) {
+const FormSelect = (props) => {
   const { control } = useFormContext();
   const { name, label } = props;
   return (
-    <>
-      <Controller
+    <Controller
         as={MuiSelect}
         control={control}
         name={name}
@@ -53,8 +54,7 @@ function FormSelect(props) {
         defaultValue=""
         {...props}
       />
-    </>
   );
-}
+};
 
 export default FormSelect;

@@ -9,6 +9,8 @@ import {
 } from 'app/impacto-design-system';
 import { sendMessage } from 'app/modules/cloud-code';
 import { queryUser, retrieveSignOutFunction } from 'app/modules/user';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -21,6 +23,7 @@ const validationSchema = yup.object().shape({
 });
 
 function ResetLogin() {
+  const { t } = useTranslation('common');
   const [notificationType, setNotificationType] = useState('email');
   const methods = useForm({
     resolver: yupResolver(validationSchema),
@@ -33,7 +36,7 @@ function ResetLogin() {
   const onSubmit = (data) => {
     const { usernameV } = data;
     return retrieveUser(usernameV).then(() => toast(
-      <Toast text="Request Sent!" />,
+      <Toast text={t('account_reset_sent')} />,
     )).catch(async (e) => {
       await retrieveSignOutFunction();
       return toast(
@@ -47,7 +50,7 @@ function ResetLogin() {
       <div className={styles.paper}>
         <Card padding="extraLarge">
           <Stack isVertical className={styles.stack}>
-            <Text text="Reset your account" element="h2" />
+            <Text text={t('account_reset_title')} element="h2" />
           </Stack>
           <FormProvider {...methods}>
             <Stack
@@ -57,7 +60,7 @@ function ResetLogin() {
             >
               <FormInput
                 name="usernameV"
-                label="Phone Number or Email Address"
+                label={t('account_reset_field')}
                 required
                 errorobj={errors}
               />
@@ -67,13 +70,13 @@ function ResetLogin() {
             <Button
               intent={notificationType === 'email' ? 'primary' : ''}
               onClick={() => setNotificationType('email')}
-              text="Send account reset email?"
+              text={t('account_reset_send_email')}
               isFullWidth
             />
             <Button
               intent={notificationType === 'text' ? 'primary' : ''}
               onClick={() => setNotificationType('text')}
-              text="Send account reset text?"
+              text={t('account_reset_send_text')}
               isFullWidth
             />
           </Stack>
@@ -91,3 +94,9 @@ function ResetLogin() {
 }
 
 export default ResetLogin;
+
+// Without this the page ships no catalog, so every `t()` under it — the shell's
+// navigation included — renders its own key instead of a word.
+export async function getStaticProps({ locale }) {
+  return { props: { ...(await serverSideTranslations(locale ?? 'eng', ['common'])) } };
+}

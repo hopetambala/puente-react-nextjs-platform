@@ -1,5 +1,6 @@
 import { retrieveCurrentUserAsyncFunction } from 'app/modules/user';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'next-i18next';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 
@@ -15,6 +16,7 @@ function initials(user) {
 }
 
 export default function TopBar({ breadcrumb, topBarActions }) {
+  const { t } = useTranslation('common');
   const [user, setUser] = useState(null);
   const router = useRouter();
 
@@ -40,7 +42,7 @@ export default function TopBar({ breadcrumb, topBarActions }) {
         <button
           type="button"
           className={styles.avatar}
-          aria-label="Account settings"
+          aria-label={t('topbar_account_settings')}
           onClick={() => router.push('/account/management')}
         >
           {initials(user)}

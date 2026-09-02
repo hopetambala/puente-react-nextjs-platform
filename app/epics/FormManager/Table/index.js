@@ -1,5 +1,6 @@
 import { Badge, Button, Modal } from 'app/impacto-design-system';
 import { updateObject } from 'app/modules/cloud-code';
+import { useTranslation } from 'next-i18next';
 import { useState } from 'react';
 
 import CSVButton from './CSVButton';
@@ -15,6 +16,7 @@ const FormManagerTable = ({
   puenteForm,
   onSelectForm,
 }) => {
+  const { t } = useTranslation('common');
   const [open, setOpen] = useState(false);
   const [selectedForm, setSelectedForm] = useState();
 
@@ -63,8 +65,8 @@ const FormManagerTable = ({
       <Modal
         open={open}
         handleClose={() => setOpen(!open)}
-        text="Do you want to remove this form?"
-        actionText="Delete form"
+        text={t('form_manager_delete_confirm')}
+        actionText={t('form_manager_delete_action')}
         intent="danger"
         action={handleRemove}
       />
@@ -73,12 +75,12 @@ const FormManagerTable = ({
         <table className={styles.table}>
           <thead>
             <tr>
-              <th className={styles.colCaret} aria-label="Expand" />
-              <th>Name</th>
-              <th>Description</th>
-              <th className={styles.colStatus}>Status</th>
-              <th className={styles.colDate}>Updated</th>
-              <th className={styles.colActions}>Actions</th>
+              <th className={styles.colCaret} aria-label={t('form_manager_col_expand')} />
+              <th>{t('form_manager_col_name')}</th>
+              <th>{t('form_manager_col_description')}</th>
+              <th className={styles.colStatus}>{t('field_status')}</th>
+              <th className={styles.colDate}>{t('form_manager_col_updated')}</th>
+              <th className={styles.colActions}>{t('form_manager_col_actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -106,24 +108,24 @@ const FormManagerTable = ({
                     {row.description || '—'}
                   </div>
                 </td>
-                <td><Badge variant="green">Active</Badge></td>
+                <td><Badge variant="green">{t('form_manager_status_active')}</Badge></td>
                 <td className={styles.colDate}>{row.updatedAt ? new Date(row.updatedAt).toLocaleDateString() : '—'}</td>
                 <td className={styles.colActions}>
                   <div className={styles.actions}>
                     {!puenteForm && (
                       <>
                         <Button
-                          text="Edit"
+                          text={t('form_manager_edit')}
                           isSmall
                           onClick={() => handleEdit(row)}
                         />
                         <Button
-                          text="Duplicate"
+                          text={t('form_manager_duplicate')}
                           isSmall
                           onClick={() => handleDuplicate(row)}
                         />
                         <Button
-                          text="Delete"
+                          text={t('form_manager_delete')}
                           intent="danger"
                           isSmall
                           onClick={() => handleModal(row)}
@@ -139,7 +141,7 @@ const FormManagerTable = ({
         </table>
         </div>
       ) : (
-        <p className={styles.empty}>No data available.</p>
+        <p className={styles.empty}>{t('form_manager_empty')}</p>
       )}
     </>
   );

@@ -1,14 +1,19 @@
+import { useTranslation } from 'next-i18next';
 import { Parse } from 'parse';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Select from 'react-select';
 
 import styles from './index.module.css';
 
+// Value and catalog key only — the label is resolved inside the component, so
+// it follows the reader's locale rather than being frozen at import time.
+// Each value names the Parse class the source reads from: `survey-data` is
+// SurveyData, which holds people despite its name.
 const FIXED_SOURCES = [
-  { value: 'survey-data',  label: 'People Records' },
-  { value: 'env-health',   label: 'Environmental Health' },
-  { value: 'eval-medical', label: 'Medical Evaluation' },
-  { value: 'vitals',       label: 'Vitals' },
+  { value: 'survey-data',  key: 'data_curation_source_survey_data' },
+  { value: 'env-health',   key: 'data_curation_source_env_health' },
+  { value: 'eval-medical', key: 'data_curation_source_eval_medical' },
+  { value: 'vitals',       key: 'data_curation_source_vitals' },
 ];
 
 // Selected outranks focused: the keyboard/pointer focus ring moves between
@@ -66,6 +71,7 @@ const selectStyles = {
 };
 
 export default function SourceSelector({ source, orgValues, onChange }) {
+  const { t } = useTranslation('common');
   const [customForms, setCustomForms] = useState([]);
 
   useEffect(() => {
@@ -74,32 +80,51 @@ export default function SourceSelector({ source, orgValues, onChange }) {
     q.containedIn('organizations', orgValues);
     q.notEqualTo('active', 'false');
     q.find()
+      // The name is field data, so it is shown as collected. Only the fallback
+      // for a form that has none is ours to translate.
       .then((forms) => setCustomForms(forms.map((f) => ({
         value: `form-results:${f.id}`,
-        label: f.get('name') || 'Untitled form',
+        name: f.get('name'),
       }))))
       .catch(() => setCustomForms([]));
   }, [orgValues]);
 
+  const fixedOptions = useMemo(
+    () => FIXED_SOURCES.map(({ value, key }) => ({ value, label: t(key) })),
+    [t],
+  );
+  const formOptions = useMemo(
+    () => customForms.map(({ value, name }) => ({
+      value,
+      label: name || t('data_curation_source_untitled_form'),
+    })),
+    [customForms, t],
+  );
+
   const grouped = [
     {
-      label: 'System Records',
-      options: FIXED_SOURCES,
+      label: t('data_curation_source_group_system'),
+      options: fixedOptions,
     },
-    ...(customForms.length > 0 ? [{ label: 'Custom Forms', options: customForms }] : []),
+    ...(formOptions.length > 0
+      ? [{ label: t('data_curation_source_group_custom'), options: formOptions }]
+      : []),
   ];
-  const currentValue = [...FIXED_SOURCES, ...customForms].find((o) => o.value === source) ?? null;
+  const currentValue = [...fixedOptions, ...formOptions].find((o) => o.value === source) ?? null;
 
   return (
     <div className={styles.wrapper}>
-      <span className={styles.label}>DATA SOURCE</span>
+      {/* Sentence case in the catalog; `.label` uppercases it in CSS. Storing
+          it shouting would make every locale hand-uppercase its own string,
+          and casing is not uniform across languages. */}
+      <span className={styles.label}>{t('data_curation_source_label')}</span>
       <Select
         inputId="source-select"
         options={grouped}
         value={currentValue}
         onChange={(opt) => onChange(opt.value)}
         isSearchable
-        placeholder="Search sources…"
+        placeholder={t('data_curation_source_placeholder')}
         styles={selectStyles}
       />
     </div>

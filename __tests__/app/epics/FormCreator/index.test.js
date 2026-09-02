@@ -3,6 +3,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 // ─── Mocks ───────────────────────────────────────────────────────────────────
+jest.mock('next-i18next', () => ({ useTranslation: () => ({ t: (k) => k }) }));
+
 jest.mock('app/modules/cloud-code', () => ({
   postObjectsToClass: jest.fn().mockResolvedValue({}),
   updateObject: jest.fn().mockResolvedValue({}),
@@ -108,14 +110,14 @@ describe('Context load on mount', () => {
     });
     render(<FormCreator context={ctx} user={mockUser} />);
     await waitFor(() => {
-      const nameInput = screen.getByPlaceholderText('Give your form a detailed name');
+      const nameInput = screen.getByPlaceholderText('form_creator_form_name_placeholder');
       expect(nameInput.value).toBe('WaSH Survey');
     });
   });
 
   it('starts with a blank form name when context store is empty', () => {
     render(<FormCreator context={makeContext()} user={mockUser} />);
-    const nameInput = screen.getByPlaceholderText('Give your form a detailed name');
+    const nameInput = screen.getByPlaceholderText('form_creator_form_name_placeholder');
     expect(nameInput.value).toBe('');
   });
 });
@@ -127,7 +129,7 @@ describe('Context load on mount', () => {
 describe('Submit routing — new form (no formId)', () => {
   it('calls postObjectsToClass and not updateObject', async () => {
     render(<FormCreator context={makeContext()} user={mockUser} />);
-    await userEvent.click(screen.getByText('Publish'));
+    await userEvent.click(screen.getByText('form_creator_publish'));
     await waitFor(() => {
       expect(postObjectsToClass).toHaveBeenCalledWith(
         expect.objectContaining({ parseClass: 'FormSpecificationsV2' }),
@@ -156,9 +158,9 @@ describe('Submit routing — edit mode', () => {
     });
     render(<FormCreator context={ctx} user={mockUser} />);
     await waitFor(() =>
-      expect(screen.getByPlaceholderText('Give your form a detailed name').value).toBe('Existing Form'),
+      expect(screen.getByPlaceholderText('form_creator_form_name_placeholder').value).toBe('Existing Form'),
     );
-    await userEvent.click(screen.getByText('Publish'));
+    await userEvent.click(screen.getByText('form_creator_publish'));
     await waitFor(() => {
       expect(updateObject).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -190,9 +192,9 @@ describe('Submit routing — Puente edit', () => {
     });
     render(<FormCreator context={ctx} user={mockUser} />);
     await waitFor(() =>
-      expect(screen.getByPlaceholderText('Give your form a detailed name').value).toBe('Puente Base Form'),
+      expect(screen.getByPlaceholderText('form_creator_form_name_placeholder').value).toBe('Puente Base Form'),
     );
-    await userEvent.click(screen.getByText('Publish'));
+    await userEvent.click(screen.getByText('form_creator_publish'));
     await waitFor(() => {
       expect(updateObject).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -221,9 +223,9 @@ describe('Submit routing — Puente edit', () => {
     });
     render(<FormCreator context={ctx} user={mockUser} />);
     await waitFor(() =>
-      expect(screen.getByPlaceholderText('Give your form a detailed name').value).toBe('Puente Base Form'),
+      expect(screen.getByPlaceholderText('form_creator_form_name_placeholder').value).toBe('Puente Base Form'),
     );
-    await userEvent.click(screen.getByText('Publish'));
+    await userEvent.click(screen.getByText('form_creator_publish'));
     await waitFor(() => {
       expect(postObjectsToClass).toHaveBeenCalled();
     });
@@ -275,12 +277,12 @@ describe('copy utility', () => {
 describe('Layout panels', () => {
   it('renders a "Blocks" panel for the block palette', () => {
     render(<FormCreator context={makeContext()} user={mockUser} />);
-    expect(screen.getByTestId('panel-blocks')).toBeInTheDocument();
+    expect(screen.getByTestId('panel-form_creator_blocks')).toBeInTheDocument();
   });
 
   it('renders an "Inspector" panel for block editing', () => {
     render(<FormCreator context={makeContext()} user={mockUser} />);
-    expect(screen.getByTestId('panel-inspector')).toBeInTheDocument();
+    expect(screen.getByTestId('panel-form_creator_inspector')).toBeInTheDocument();
   });
 
   it('shows an empty state in the inspector when no block is selected', () => {
@@ -444,9 +446,9 @@ describe('submitCustomForm payload contract', () => {
     });
     render(<FormCreator context={ctx} user={mockUser} />);
     await waitFor(() =>
-      expect(screen.getByPlaceholderText('Give your form a detailed name').value).toBe('Test form'),
+      expect(screen.getByPlaceholderText('form_creator_form_name_placeholder').value).toBe('Test form'),
     );
-    await userEvent.click(screen.getByText('Publish'));
+    await userEvent.click(screen.getByText('form_creator_publish'));
     await waitFor(() => {
       expect(updateObject).toHaveBeenCalled();
     });
@@ -479,9 +481,9 @@ describe('submitCustomForm payload contract', () => {
     });
     render(<FormCreator context={ctx} user={mockUser} />);
     await waitFor(() =>
-      expect(screen.getByPlaceholderText('Give your form a detailed name').value).toBe('Hydro Survey'),
+      expect(screen.getByPlaceholderText('form_creator_form_name_placeholder').value).toBe('Hydro Survey'),
     );
-    await userEvent.click(screen.getByText('Publish'));
+    await userEvent.click(screen.getByText('form_creator_publish'));
     await waitFor(() => {
       expect(updateObject).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -520,9 +522,9 @@ describe('submitCustomForm payload contract', () => {
     });
     render(<FormCreator context={ctx} user={mockUser} />);
     await waitFor(() =>
-      expect(screen.getByPlaceholderText('Give your form a detailed name').value).toBe('Sanitation Survey'),
+      expect(screen.getByPlaceholderText('form_creator_form_name_placeholder').value).toBe('Sanitation Survey'),
     );
-    await userEvent.click(screen.getByText('Publish'));
+    await userEvent.click(screen.getByText('form_creator_publish'));
     await waitFor(() => {
       expect(updateObject).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -537,5 +539,39 @@ describe('submitCustomForm payload contract', () => {
     });
     const [call] = updateObject.mock.calls;
     expect(Array.isArray(call[0].localObject.fields)).toBe(true);
+  });
+});
+
+describe('FormCreator — copy', () => {
+  it('routes the header actions through t()', async () => {
+    render(<FormCreator context={makeContext()} user={mockUser} />);
+    expect(await screen.findByText('form_creator_reset')).toBeInTheDocument();
+    expect(screen.getByText('form_creator_preview')).toBeInTheDocument();
+    expect(screen.getByText('form_creator_publish')).toBeInTheDocument();
+  });
+
+  it('routes the form-settings labels and placeholders through t()', async () => {
+    render(<FormCreator context={makeContext()} user={mockUser} />);
+    expect(await screen.findByText('form_creator_type_of_form')).toBeInTheDocument();
+    expect(screen.getByText('form_creator_form_name')).toBeInTheDocument();
+    expect(screen.getByText('form_creator_description')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('form_creator_form_name_placeholder')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('form_creator_description_placeholder')).toBeInTheDocument();
+  });
+
+  it('translates the form-type option labels while keeping their stored values', async () => {
+    render(<FormCreator context={makeContext()} user={mockUser} />);
+    const select = await screen.findByLabelText('form_creator_type_of_form');
+    expect(Array.from(select.options).map((o) => o.textContent))
+      .toEqual(['form_creator_form_type_custom', 'form_creator_form_type_assets']);
+    // The value is what gets written to the form specification, so it stays.
+    expect(Array.from(select.options).map((o) => o.value)).toEqual(['Custom', 'Assets']);
+  });
+
+  it('routes the sidebar panel titles and the empty inspector through t()', async () => {
+    render(<FormCreator context={makeContext()} user={mockUser} />);
+    expect(await screen.findByText('form_creator_blocks')).toBeInTheDocument();
+    expect(screen.getByText('form_creator_inspector')).toBeInTheDocument();
+    expect(screen.getByText('form_creator_select_block')).toBeInTheDocument();
   });
 });

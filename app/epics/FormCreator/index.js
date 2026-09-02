@@ -3,6 +3,7 @@ import {
     EmptyState, PageHeader, Panel, Toast
 } from 'app/impacto-design-system';
 import { postObjectsToClass, updateObject } from 'app/modules/cloud-code';
+import { useTranslation } from 'next-i18next';
 import { useCallback, useEffect, useState } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { v4 as uuid } from 'uuid';
@@ -75,6 +76,7 @@ const COLLECTION = [
 ];
 
 function FormCreator({ context, user }) {
+  const { t } = useTranslation('common');
   const [formName, setFormName] = useState('');
   const [formDescription, setFormDescription] = useState('');
   const [formItems, setFormItems] = useState([]);
@@ -249,19 +251,19 @@ function FormCreator({ context, user }) {
 
   return (
     <div>
-      {submission && <Toast text="Success!" />}
+      {submission && <Toast text={t('form_creator_success')} />}
       <NativeApplicationDrawer
         isOpen={previewOpen}
         onClose={() => setPreviewOpen(false)}
         formItems={formItems}
       />
       <PageHeader
-        title="Form Creator"
+        title={t('form_creator_title')}
         actions={
           <div className={styles.headerActions}>
-            <Button text="Reset form" intent="danger" onClick={clearForm} />
-            <Button text="Preview form" onClick={() => setPreviewOpen(!previewOpen)} />
-            <Button text="Publish" intent="primary" onClick={submitCustomForm} isLoading={submission} />
+            <Button text={t('form_creator_reset')} intent="danger" onClick={clearForm} />
+            <Button text={t('form_creator_preview')} onClick={() => setPreviewOpen(!previewOpen)} />
+            <Button text={t('form_creator_publish')} intent="primary" onClick={submitCustomForm} isLoading={submission} />
           </div>
         }
       />
@@ -271,7 +273,7 @@ function FormCreator({ context, user }) {
             {/* Form settings card */}
             <div className={styles.settingsCard}>
               <label className={styles.fieldGroup} htmlFor="formType">
-                <span className={styles.fieldLabel}>Type of form</span>
+                <span className={styles.fieldLabel}>{t('form_creator_type_of_form')}</span>
                 <select
                   id="formType"
                   name="formType"
@@ -279,31 +281,33 @@ function FormCreator({ context, user }) {
                   onChange={handleFormTypesChange}
                   className={styles.select}
                 >
-                  <option value="Custom">Custom</option>
-                  <option value="Assets">Assets</option>
+                  {/* The value is written to the form specification, so it
+                      stays in English; only the label is read by a person. */}
+                  <option value="Custom">{t('form_creator_form_type_custom')}</option>
+                  <option value="Assets">{t('form_creator_form_type_assets')}</option>
                 </select>
               </label>
 
               <label className={styles.fieldGroup} htmlFor="formName">
-                <span className={styles.fieldLabel}>Form name</span>
+                <span className={styles.fieldLabel}>{t('form_creator_form_name')}</span>
                 <input
                   id="formName"
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   type="text"
-                  placeholder="Give your form a detailed name"
+                  placeholder={t('form_creator_form_name_placeholder')}
                   className={styles.input}
                 />
               </label>
 
               <label className={styles.fieldGroup} htmlFor="formDescription">
-                <span className={styles.fieldLabel}>Description</span>
+                <span className={styles.fieldLabel}>{t('form_creator_description')}</span>
                 <input
                   id="formDescription"
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
                   type="text"
-                  placeholder="Describe how this form will be used"
+                  placeholder={t('form_creator_description_placeholder')}
                   className={styles.input}
                 />
               </label>
@@ -311,7 +315,7 @@ function FormCreator({ context, user }) {
 
             {/* Form builder canvas */}
             <div className={styles.builderSection}>
-              <span className={styles.builderLabel}>Form builder</span>
+              <span className={styles.builderLabel}>{t('form_creator_builder')}</span>
               <FormTemplate
                 formItems={formItems}
                 setFormItems={setFormItems}
@@ -323,10 +327,10 @@ function FormCreator({ context, user }) {
             </div>
           </div>
           <div className={styles.blocksSidebar}>
-            <Panel title="Blocks">
+            <Panel title={t('form_creator_blocks')}>
               <FormBlocks items={COLLECTION} />
             </Panel>
-            <Panel title="Inspector">
+            <Panel title={t('form_creator_inspector')}>
               {selectedBlock ? (
                 <Inspector
                   block={selectedBlock}
@@ -334,7 +338,7 @@ function FormCreator({ context, user }) {
                   onClose={() => setSelectedBlock(null)}
                 />
               ) : (
-                <EmptyState message="Select a block to edit." />
+                <EmptyState message={t('form_creator_select_block')} />
               )}
             </Panel>
           </div>

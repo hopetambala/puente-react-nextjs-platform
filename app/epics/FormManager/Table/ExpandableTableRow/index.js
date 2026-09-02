@@ -1,10 +1,12 @@
 import { Button, Stack, Text } from 'app/impacto-design-system';
 import { customMultiParamCountService } from 'app/modules/cloud-code';
+import { useTranslation } from 'next-i18next';
 import { useState } from 'react';
 
 import styles from './index.module.scss';
 
 const ExpandableTableRowDetail = ({ row, surveyingOrganization }) => {
+  const { t } = useTranslation('common');
   const [count, setCount] = useState(0);
 
   const { objectId } = row;
@@ -21,8 +23,8 @@ const ExpandableTableRowDetail = ({ row, surveyingOrganization }) => {
   return (
     <div className={styles.rowDetail}>
       <Stack spacing="extraLarge" isWrapDisabled>
-        <Text text={`Forms collected: ${count}`} element="h3" />
-        <Button text="Refresh" isSmall onClick={getCount} />
+        <Text text={t('form_manager_forms_collected', { count })} element="h3" />
+        <Button text={t('action_refresh')} isSmall onClick={getCount} />
       </Stack>
     </div>
   );
@@ -31,6 +33,7 @@ const ExpandableTableRowDetail = ({ row, surveyingOrganization }) => {
 const ExpandableTableRow = ({
   children, row, surveyingOrganization,
 }) => {
+  const { t } = useTranslation('common');
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -41,7 +44,9 @@ const ExpandableTableRow = ({
             type="button"
             className={styles.expandBtn}
             onClick={() => setIsExpanded(!isExpanded)}
-            aria-label={isExpanded ? 'Collapse row' : 'Expand row'}
+            aria-label={isExpanded
+              ? t('form_manager_collapse_row')
+              : t('form_manager_expand_row')}
           >
             {isExpanded ? '▲' : '▼'}
           </button>
@@ -64,6 +69,6 @@ const ExpandableTableRow = ({
       )}
     </>
   );
-};
+}
 
 export default ExpandableTableRow;

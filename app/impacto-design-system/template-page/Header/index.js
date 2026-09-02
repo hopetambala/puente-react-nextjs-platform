@@ -9,6 +9,7 @@ import StoreIcon from '@material-ui/icons/Store';
 import { retrieveCurrentUserAsyncFunction, retrieveSignOutFunction } from 'app/modules/user';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'next-i18next';
 import { useState } from 'react';
 
 import useStyles from './index.style';
@@ -39,6 +40,7 @@ function NavItem({ icon: Icon, label, onClick, active, danger, open, classes }) 
 }
 
 export default function Header({ children }) {
+  const { t } = useTranslation('common');
   const classes = useStyles();
   const [open, setDrawerOpen] = useState(true);
   const router = useRouter();
@@ -65,6 +67,7 @@ export default function Header({ children }) {
         }}
       >
         <div className={classes.brand}>
+          {/* Product name — not copy, never translated. */}
           {open && <span className={classes.brandName}>Puente</span>}
           <div
             role="button"
@@ -94,14 +97,14 @@ export default function Header({ children }) {
         <div className={classes.bottomSection}>
           <NavItem
             icon={PersonOutline}
-            label="Account"
+            label={t('nav_account')}
             onClick={manage}
             open={open}
             classes={classes}
           />
           <NavItem
             icon={ExitToAppIcon}
-            label="Log out"
+            label={t('nav_logout')}
             onClick={logout}
             danger
             open={open}

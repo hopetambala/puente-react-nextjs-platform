@@ -2,31 +2,34 @@ import { Badge, Button, Skeleton } from 'app/impacto-design-system';
 // Straight from the shared module, not from the parent epic: the epic imports
 // this table, so reaching back into it for these would be an import cycle.
 import { computeFormResultsCompleteness, scoreRecord, sourceHasClientPointer } from 'app/modules/data-quality';
+import { useTranslation } from 'next-i18next';
 
 import styles from './index.module.css';
 
 const PAGE_SIZE = 50;
 
 function CompletenessBar({ pct }) {
+  const { t } = useTranslation('common');
   let toneClass = styles.barHigh;
   if (pct < 60) toneClass = styles.barLow;
   else if (pct < 80) toneClass = styles.barMid;
   return (
-    <div className={styles.barTrack} aria-label={`${pct}% complete`}>
+    <div className={styles.barTrack} aria-label={t('data_curation_completeness_aria', { pct })}>
       <div className={`${styles.barFill} ${toneClass}`} style={{ width: `${pct}%` }} />
     </div>
   );
 }
 
 function FlagChips({ isDup, isAnomaly, onDupClick }) {
+  const { t } = useTranslation('common');
   return (
     <div className={styles.flags}>
       {isDup && (
         <button type="button" className={styles.dupChip} onClick={onDupClick}>
-          <Badge variant="yellow">Dup</Badge>
+          <Badge variant="yellow">{t('data_curation_flag_dup')}</Badge>
         </button>
       )}
-      {isAnomaly && <Badge variant="red">Low</Badge>}
+      {isAnomaly && <Badge variant="red">{t('data_curation_flag_low')}</Badge>}
     </div>
   );
 }
@@ -52,11 +55,14 @@ function community(record, source) {
 }
 
 function FormResultsCompleteness({ record, formDefinition }) {
+  const { t } = useTranslation('common');
   const s = computeFormResultsCompleteness(record, formDefinition);
+  // Through the catalog rather than `{n}%`: the completeness bar's aria-label
+  // states the same quantity, and one figure rendered two ways reads as two.
   return (
     <>
-      <td>{s.meta}%</td>
-      <td>{s.fields}%</td>
+      <td>{t('data_curation_percent', { pct: s.meta })}</td>
+      <td>{t('data_curation_percent', { pct: s.fields })}</td>
     </>
   );
 }
@@ -65,6 +71,7 @@ export default function RecordsTable({
   source, records, total, page, dups, anomalies,
   onSelectRecord, onPageChange, onDuplicateGroup, loading, formDefinition,
 }) {
+  const { t } = useTranslation('common');
   const isFormResults = source.startsWith('form-results:');
   const from = total === 0 ? 0 : page * PAGE_SIZE + 1;
   const to = Math.min((page + 1) * PAGE_SIZE, total);
@@ -76,19 +83,19 @@ export default function RecordsTable({
       <table className={styles.table}>
         <thead>
           <tr>
-            <th>{isFormResults ? 'Person' : 'Name'}</th>
-            {!isFormResults && <th>Community</th>}
-            <th>Surveyor</th>
-            <th>Submitted</th>
+            <th>{isFormResults ? t('data_curation_col_person') : t('data_curation_col_name')}</th>
+            {!isFormResults && <th>{t('field_community')}</th>}
+            <th>{t('field_surveyor')}</th>
+            <th>{t('field_submitted')}</th>
             {isFormResults ? (
               <>
-                <th>Metadata %</th>
-                <th>Fields %</th>
+                <th>{t('data_curation_col_metadata_pct')}</th>
+                <th>{t('data_curation_col_fields_pct')}</th>
               </>
             ) : (
-              <th>Completeness</th>
+              <th>{t('data_curation_col_completeness')}</th>
             )}
-            <th>Flags</th>
+            <th>{t('data_curation_col_flags')}</th>
           </tr>
         </thead>
         <tbody>
@@ -139,10 +146,15 @@ export default function RecordsTable({
       </table>
 
       <div className={styles.pagination}>
-        <span className={styles.pageInfo}>{`Showing ${from}–${to} of ${total}`}</span>
+        {/* Three numbers in one sentence, so all three are interpolated and
+            formatted by the catalog. Assembling this from fragments would fix
+            English word order for every locale. */}
+        <span className={styles.pageInfo}>
+          {t('pagination_showing', { from, to, total })}
+        </span>
         <div className={styles.pageButtons}>
-          <Button text="← Prev" isSmall isDisabled={!hasPrev} onClick={() => onPageChange(page - 1)} />
-          <Button text="Next →" isSmall isDisabled={!hasNext} onClick={() => onPageChange(page + 1)} />
+          <Button text={t('data_curation_prev')} isSmall isDisabled={!hasPrev} onClick={() => onPageChange(page - 1)} />
+          <Button text={t('data_curation_next')} isSmall isDisabled={!hasNext} onClick={() => onPageChange(page + 1)} />
         </div>
       </div>
     </div>

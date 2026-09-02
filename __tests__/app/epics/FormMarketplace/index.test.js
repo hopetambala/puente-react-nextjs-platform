@@ -12,6 +12,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 
 const mockRetrieve = jest.fn();
 
+jest.mock('next-i18next', () => ({ useTranslation: () => ({ t: (k) => k }) }));
+
 jest.mock('app/epics/FormMarketplace/_data', () => ({
   __esModule: true,
   default: (...args) => mockRetrieve(...args),
@@ -76,5 +78,14 @@ describe('Form cards', () => {
     mockRetrieve.mockReturnValueOnce(new Promise(() => {}));
     render(<FormMarketplace context={mockContext} router={mockRouter} />);
     expect(screen.getByTestId('spinner')).toBeInTheDocument();
+  });
+});
+
+describe('FormMarketplace — copy', () => {
+  it('routes the empty state through t()', async () => {
+    renderMarketplace([]);
+    await waitFor(() => {
+      expect(screen.getByTestId('empty-state')).toHaveTextContent('form_marketplace_empty');
+    });
   });
 });

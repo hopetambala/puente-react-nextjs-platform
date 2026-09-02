@@ -1,69 +1,87 @@
 import { Button, Modal, Toast } from 'app/impacto-design-system';
+import { useTranslation } from 'next-i18next';
 import { useMemo, useState } from 'react';
 
 import styles from './index.module.css';
 
-// SurveyData field layout — section → fields, with read-only flags
+// `sex` is stored as a code. The value below is what Collect wrote and what a
+// save writes back — only `labelKey` is ours to translate, which is why the two
+// are separate fields rather than one string doing both jobs.
+const SEX_OPTIONS = [
+  { value: '',                  labelKey: null },
+  { value: 'male',              labelKey: 'data_curation_sex_male' },
+  { value: 'female',            labelKey: 'data_curation_sex_female' },
+  { value: 'prefer_not_to_say', labelKey: 'data_curation_sex_prefer_not_to_say' },
+];
+
+// SurveyData field layout — section → fields, with read-only flags. Titles and
+// labels are catalog keys, resolved per render; a label baked in here would be
+// fixed at import, before the reader's locale is known.
 const SURVEY_SECTIONS = [
   {
-    title: 'Identity',
+    titleKey: 'data_curation_inspector_section_identity',
     fields: [
-      { key: 'fname', label: 'First name' },
-      { key: 'lname', label: 'Last name' },
-      { key: 'nickname', label: 'Nickname' },
-      { key: 'dob', label: 'Date of birth' },
-      { key: 'age', label: 'Age' },
-      { key: 'sex', label: 'Sex', type: 'select', options: ['', 'male', 'female', 'prefer_not_to_say'] },
+      { key: 'fname', labelKey: 'field_fname' },
+      { key: 'lname', labelKey: 'field_lname' },
+      { key: 'nickname', labelKey: 'data_curation_field_nickname' },
+      { key: 'dob', labelKey: 'data_curation_field_dob' },
+      { key: 'age', labelKey: 'data_curation_field_age' },
+      { key: 'sex', labelKey: 'data_curation_field_sex', type: 'select', options: SEX_OPTIONS },
     ],
   },
   {
-    title: 'Contact',
+    titleKey: 'data_curation_inspector_section_contact',
     fields: [
-      { key: 'telephoneNumber', label: 'Phone' },
-      { key: 'cedulaNumber', label: 'Cédula / ID' },
+      { key: 'telephoneNumber', labelKey: 'data_curation_field_telephone' },
+      { key: 'cedulaNumber', labelKey: 'data_curation_field_cedula' },
     ],
   },
   {
-    title: 'Location',
+    titleKey: 'data_curation_inspector_section_location',
     fields: [
-      { key: 'communityname', label: 'Community' },
-      { key: 'city', label: 'City' },
-      { key: 'province', label: 'Province' },
-      { key: 'country', label: 'Country' },
-      { key: 'latitude', label: 'Latitude', readOnly: true },
-      { key: 'longitude', label: 'Longitude', readOnly: true },
+      { key: 'communityname', labelKey: 'field_community' },
+      { key: 'city', labelKey: 'data_curation_field_city' },
+      { key: 'province', labelKey: 'data_curation_field_province' },
+      { key: 'country', labelKey: 'data_curation_field_country' },
+      { key: 'latitude', labelKey: 'data_curation_field_latitude', readOnly: true },
+      { key: 'longitude', labelKey: 'data_curation_field_longitude', readOnly: true },
     ],
   },
   {
-    title: 'Household',
+    titleKey: 'data_curation_inspector_section_household',
     fields: [
-      { key: 'householdId', label: 'Household ID' },
-      { key: 'numberofIndividualsLivingintheHouse', label: 'Household size' },
+      { key: 'householdId', labelKey: 'field_household_id' },
+      { key: 'numberofIndividualsLivingintheHouse', labelKey: 'data_curation_field_household_size' },
     ],
   },
   {
-    title: 'Audit',
+    titleKey: 'data_curation_inspector_section_audit',
     fields: [
-      { key: 'surveyingUser', label: 'Surveyor' },
-      { key: 'surveyingOrganization', label: 'Organization', readOnly: true },
-      { key: 'appVersion', label: 'App version', readOnly: true },
-      { key: 'phoneOS', label: 'Device OS', readOnly: true },
+      { key: 'surveyingUser', labelKey: 'field_surveyor' },
+      { key: 'surveyingOrganization', labelKey: 'data_curation_field_organization', readOnly: true },
+      { key: 'appVersion', labelKey: 'data_curation_field_app_version', readOnly: true },
+      { key: 'phoneOS', labelKey: 'data_curation_field_device_os', readOnly: true },
     ],
   },
 ];
 
 function FieldRow({ field, value, onChange }) {
+  const { t } = useTranslation('common');
+  // `labelKey` is a catalog key; `label` is field data (a form definition's own
+  // wording), which is shown as collected and never translated.
+  const label = field.labelKey ? t(field.labelKey) : field.label;
+
   if (field.readOnly) {
     return (
       <div className={styles.field}>
-        <span className={styles.fieldLabel}>{field.label}</span>
+        <span className={styles.fieldLabel}>{label}</span>
         <span className={styles.readOnly}>{value || '—'}</span>
       </div>
     );
   }
   return (
     <div className={styles.field}>
-      <label className={styles.fieldLabel} htmlFor={`insp-${field.key}`}>{field.label}</label>
+      <label className={styles.fieldLabel} htmlFor={`insp-${field.key}`}>{label}</label>
       {field.type === 'select' ? (
         <select
           id={`insp-${field.key}`}
@@ -73,7 +91,9 @@ function FieldRow({ field, value, onChange }) {
         >
           {field.options.map((o) => {
           const val = typeof o === 'object' ? (o.value || o.label || '') : o;
-          const lbl = typeof o === 'object' ? (o.label || o.value || '—') : (o || '—');
+          const lbl = typeof o === 'object'
+            ? ((o.labelKey && t(o.labelKey)) || o.label || o.value || '—')
+            : (o || '—');
           return <option key={val} value={val}>{lbl}</option>;
         })}
         </select>
@@ -90,6 +110,7 @@ function FieldRow({ field, value, onChange }) {
 }
 
 export default function RecordInspector({ record, source, formDefinition, onClose, onSaved }) {
+  const { t } = useTranslation('common');
   const isFormResults = source.startsWith('form-results:');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(false);
@@ -147,6 +168,9 @@ export default function RecordInspector({ record, source, formDefinition, onClos
   function toFieldDescriptor(f) {
     return {
       key: f.formikKey,
+      // Field data, not a catalog key: a form's own wording is shown as the
+      // person who built the form wrote it. The fallback to `formikKey` stays —
+      // a definition edited after collection can leave `label` unset.
       label: f.label || f.formikKey,
       type: f.fieldType === 'select' ? 'select' : undefined,
       options: f.fieldType === 'select' ? ['', ...(f.options || [])] : undefined,
@@ -155,32 +179,33 @@ export default function RecordInspector({ record, source, formDefinition, onClos
 
   return (
     <>
-      <button type="button" className={styles.overlay} aria-label="Close inspector overlay" onClick={dirty ? () => setDiscardOpen(true) : onClose} />
+      <button type="button" className={styles.overlay} aria-label={t('data_curation_inspector_close_overlay')} onClick={dirty ? () => setDiscardOpen(true) : onClose} />
       <aside className={styles.panel}>
         <header className={styles.header}>
           <span className={styles.title}>
             {isFormResults
-              ? (record.get('title') || 'Form Record')
-              : `${record.get('fname') || ''} ${record.get('lname') || ''}`.trim() || 'Record'}
+              ? (record.get('title') || t('data_curation_inspector_form_record'))
+              : `${record.get('fname') || ''} ${record.get('lname') || ''}`.trim()
+                || t('data_curation_inspector_record')}
           </span>
-          <button type="button" className={styles.closeBtn} aria-label="Close" onClick={dirty ? () => setDiscardOpen(true) : onClose}>✕</button>
+          <button type="button" className={styles.closeBtn} aria-label={t('action_close')} onClick={dirty ? () => setDiscardOpen(true) : onClose}>✕</button>
         </header>
 
         <div className={styles.body}>
-          {error && <Toast text="Save failed — try again" isError />}
+          {error && <Toast text={t('data_curation_inspector_save_failed')} isError />}
 
           {isFormResults ? (
             <>
               <section className={styles.section}>
-                <h4 className={styles.sectionTitle}>Metadata</h4>
-                <FieldRow field={{ key: 'surveyingUser', label: 'Surveyor' }} value={edits.surveyingUser ?? (record.get('surveyingUser') || '')} onChange={handleChange} />
+                <h4 className={styles.sectionTitle}>{t('data_curation_inspector_section_metadata')}</h4>
+                <FieldRow field={{ key: 'surveyingUser', labelKey: 'field_surveyor' }} value={edits.surveyingUser ?? (record.get('surveyingUser') || '')} onChange={handleChange} />
                 <div className={styles.field}>
-                  <span className={styles.fieldLabel}>Organization</span>
+                  <span className={styles.fieldLabel}>{t('data_curation_field_organization')}</span>
                   <span className={styles.readOnly}>{record.get('surveyingOrganization') || '—'}</span>
                 </div>
               </section>
               <section className={styles.section}>
-                <h4 className={styles.sectionTitle}>Fields</h4>
+                <h4 className={styles.sectionTitle}>{t('data_curation_inspector_section_fields')}</h4>
                 {formFields.map((f) => (
                   <FieldRow
                     key={f.formikKey}
@@ -193,8 +218,8 @@ export default function RecordInspector({ record, source, formDefinition, onClos
             </>
           ) : (
             SURVEY_SECTIONS.map((sec) => (
-              <section key={sec.title} className={styles.section}>
-                <h4 className={styles.sectionTitle}>{sec.title}</h4>
+              <section key={sec.titleKey} className={styles.section}>
+                <h4 className={styles.sectionTitle}>{t(sec.titleKey)}</h4>
                 {sec.fields.map((f) => (
                   <FieldRow
                     key={f.key}
@@ -209,16 +234,21 @@ export default function RecordInspector({ record, source, formDefinition, onClos
         </div>
 
         <footer className={styles.footer}>
-          <Button text={saving ? 'Saving…' : 'Save'} intent="primary" onClick={handleSave} isDisabled={saving} />
-          <Button text="Cancel" onClick={onClose} />
-          {dirty && <span className={styles.unsavedWarning}>Unsaved changes</span>}
+          <Button
+            text={saving ? t('data_curation_inspector_saving') : t('data_curation_save')}
+            intent="primary"
+            onClick={handleSave}
+            isDisabled={saving}
+          />
+          <Button text={t('data_curation_cancel')} onClick={onClose} />
+          {dirty && <span className={styles.unsavedWarning}>{t('data_curation_inspector_unsaved')}</span>}
         </footer>
       </aside>
       <Modal
         open={discardOpen}
         handleClose={() => setDiscardOpen(false)}
-        text="Discard unsaved changes?"
-        actionText="Discard"
+        text={t('data_curation_inspector_discard_confirm')}
+        actionText={t('data_curation_inspector_discard_action')}
         intent="danger"
         action={() => { setDiscardOpen(false); onClose(); }}
       />

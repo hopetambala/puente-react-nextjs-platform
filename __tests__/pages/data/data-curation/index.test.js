@@ -47,7 +47,7 @@ describe('DataCuration page', () => {
   it('renders inside AppShell with Data breadcrumb', () => {
     render(<DataCuration />);
     const shell = screen.getByTestId('appshell');
-    expect(JSON.parse(shell.dataset.breadcrumb)).toContain('Data');
+    expect(JSON.parse(shell.dataset.breadcrumb)).toContain('breadcrumb_data');
   });
 
   it('renders a Data Curation heading', () => {

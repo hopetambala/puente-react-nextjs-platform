@@ -2,6 +2,10 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 // ─── Mocks ───────────────────────────────────────────────────────────────────
+// `t` echoes the key: asserting on a key proves the string reached `t()`, and a
+// literal that never did renders English and fails.
+jest.mock('next-i18next', () => ({ useTranslation: () => ({ t: (k) => k }) }));
+
 jest.mock('app/modules/user', () => ({
   retrieveCurrentUserAsyncFunction: () => ({ get: (k) => ({ organization: 'TestOrg' }[k]) }),
 }));
@@ -35,7 +39,11 @@ jest.mock('react-select', () => ({ options, value, onChange, inputId, placeholde
     <option value="" disabled>{placeholder}</option>
     {options.map((group) =>
       group.options
-        ? group.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)
+        ? (
+          <optgroup key={group.label} label={group.label}>
+            {group.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </optgroup>
+        )
         : <option key={group.value} value={group.value}>{group.label}</option>
     )}
   </select>
@@ -55,7 +63,35 @@ describe('SourceSelector', () => {
   it('renders People Records as the default selected option', async () => {
     render(<SourceSelector source="survey-data" orgValues={['TestOrg']} onChange={mockOnChange} />);
     await waitFor(() => {
-      expect(screen.getByDisplayValue(/People Records/i)).toBeInTheDocument();
+      expect(screen.getByDisplayValue('data_curation_source_survey_data')).toBeInTheDocument();
+    });
+  });
+
+  it('routes the control label and the search placeholder through t()', async () => {
+    render(<SourceSelector source="survey-data" orgValues={['TestOrg']} onChange={mockOnChange} />);
+    await waitFor(() => screen.getByRole('combobox'));
+    expect(screen.getByText('data_curation_source_label')).toBeInTheDocument();
+    expect(screen.getByText('data_curation_source_placeholder')).toBeInTheDocument();
+  });
+
+  it('routes both option-group headings through t()', async () => {
+    mockFormsFindFn.mockResolvedValue([{ id: 'f1', get: () => 'WaSH Survey' }]);
+    const { container } = render(
+      <SourceSelector source="survey-data" orgValues={['TestOrg']} onChange={mockOnChange} />,
+    );
+    await waitFor(() => screen.getByText('WaSH Survey'));
+    const groups = Array.from(container.querySelectorAll('optgroup')).map((g) => g.label);
+    expect(groups).toEqual([
+      'data_curation_source_group_system',
+      'data_curation_source_group_custom',
+    ]);
+  });
+
+  it('routes the fallback label for a form with no name through t()', async () => {
+    mockFormsFindFn.mockResolvedValue([{ id: 'f1', get: () => undefined }]);
+    render(<SourceSelector source="survey-data" orgValues={['TestOrg']} onChange={mockOnChange} />);
+    await waitFor(() => {
+      expect(screen.getByText('data_curation_source_untitled_form')).toBeInTheDocument();
     });
   });
 
@@ -67,10 +103,10 @@ describe('SourceSelector', () => {
     });
     const options = screen.getAllByRole('option');
     const labels = options.map((o) => o.textContent);
-    expect(labels).toEqual(expect.arrayContaining(['People Records']));
-    expect(labels).toEqual(expect.arrayContaining(['Medical Evaluation']));
-    expect(labels).toEqual(expect.arrayContaining(['Vitals']));
-    expect(labels).toEqual(expect.arrayContaining(['Environmental Health']));
+    expect(labels).toEqual(expect.arrayContaining(['data_curation_source_survey_data']));
+    expect(labels).toEqual(expect.arrayContaining(['data_curation_source_eval_medical']));
+    expect(labels).toEqual(expect.arrayContaining(['data_curation_source_vitals']));
+    expect(labels).toEqual(expect.arrayContaining(['data_curation_source_env_health']));
   });
 
   it('renders one option per FormSpecificationsV2 returned from Parse', async () => {

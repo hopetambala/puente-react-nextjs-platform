@@ -51,6 +51,7 @@ function Login() {
       {/* ── left column: dark brand + quote ── */}
       <div className={styles.left}>
         <div className={styles.leftBrand}>
+          {/* Brand mark and product name — not copy, never translated. */}
           <div className={styles.leftBrandMark}>P</div>
           <span className={styles.leftBrandName}>Puente</span>
         </div>
@@ -69,7 +70,7 @@ function Login() {
         <div className={styles.leftFooter}>
           <span>v0.1.2</span>
           <span>·</span>
-          <span>Source available · BSL 1.1</span>
+          <span>{t('login_license')}</span>
         </div>
       </div>
 

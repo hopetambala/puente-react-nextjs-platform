@@ -9,6 +9,7 @@ import {
     updateUser,
 } from 'app/modules/user'
 import { useRouter } from 'next/router'
+import { useTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -27,6 +28,7 @@ const validationSchema = yup
   .required()
 
 function Management(props) {
+  const { t } = useTranslation('common');
   const { user, userId, router, loading } = props
   const methods = useForm({
     resolver: yupResolver(validationSchema),
@@ -78,8 +80,11 @@ function Management(props) {
   }
 
   return (
-    <AppShell breadcrumb={['Settings']}>
-      <PageHeader title="Account Settings" sub="Manage your profile, credentials, and account preferences." />
+    <AppShell breadcrumb={[t('breadcrumb_settings')]}>
+      <PageHeader
+        title={t('account_settings_title')}
+        sub={t('account_settings_sub')}
+      />
       <div className={styles.paper}>
         {loading ? (
           <div className={styles.loadingState}>
@@ -125,13 +130,13 @@ function Management(props) {
               <Stack isVertical spacing="large">
                 <Button
                   intent="primary"
-                  text="Update user"
+                  text={t('account_update_user')}
                   onClick={handleSubmit(onSubmit)}
                   isFullWidth
                 />
                 <Button
                   intent="danger"
-                  text="Delete user"
+                  text={t('account_delete_user')}
                   onClick={handleSubmit(onDelete)}
                   isFullWidth
                 />

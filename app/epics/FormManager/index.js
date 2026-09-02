@@ -1,6 +1,7 @@
 import { EmptyState, Panel, Skeleton } from 'app/impacto-design-system';
 import { retrieveCustomData } from 'app/modules/cloud-code';
 import { loadOrganizationIdentity } from 'app/modules/organization';
+import { useTranslation } from 'next-i18next';
 import { Parse } from 'parse';
 import { useEffect, useMemo, useState } from 'react';
 import { isArray } from 'underscore';
@@ -29,6 +30,7 @@ const puenteConfig = [
 ];
 
 function FormManager({ context, router, user }) {
+  const { t } = useTranslation('common');
   const [workflowData, setWorkflowData] = useState({});
   const [noWorkflowData, setNoWorkflowData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -129,9 +131,9 @@ function FormManager({ context, router, user }) {
               type="button"
               className={styles.backBtn}
               onClick={() => setSelectedForm(null)}
-              aria-label="Back to form catalog"
+              aria-label={t('form_manager_back_aria')}
             >
-              ← Back
+              {t('form_manager_back')}
             </button>
           </div>
           <RecordsTable form={selectedForm} />
@@ -152,7 +154,7 @@ function FormManager({ context, router, user }) {
                 <span className={styles.searchIcon}>⌕</span>
                 <input
                   type="text"
-                  placeholder="Search forms…"
+                  placeholder={t('form_manager_search_placeholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className={styles.searchInput}
@@ -176,7 +178,7 @@ function FormManager({ context, router, user }) {
           {!loading && (
           <>
           <div className={styles.section}>
-            <Panel title="Puente Forms" noPadding>
+            <Panel title={t('form_manager_puente_forms')} noPadding>
               <Table
                 data={puenteConfig}
                 retrieveCustomData={retrieveCustomData}
@@ -206,7 +208,9 @@ function FormManager({ context, router, user }) {
                 ))}
                 {filteredNoWorkflowData.length > 0 && (
                   <Panel
-                    title={Object.keys(filteredWorkflowData).length > 0 ? 'Other forms' : 'Custom forms'}
+                    title={Object.keys(filteredWorkflowData).length > 0
+                      ? t('form_manager_other_forms')
+                      : t('form_manager_custom_forms')}
                     noPadding
                   >
                     <Table
@@ -221,7 +225,7 @@ function FormManager({ context, router, user }) {
                 )}
               </>
             ) : (
-              <EmptyState message="No custom forms yet." />
+              <EmptyState message={t('form_manager_no_custom_forms')} />
             )}
           </div>
           </>

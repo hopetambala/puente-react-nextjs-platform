@@ -5,6 +5,14 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 // These tests will fail until app/epics/FormManager/RecordsTable/index.js exists
 // and FormManager wires the drill-in view.
 
+jest.mock('next-i18next', () => ({
+  useTranslation: () => ({
+    t: (k, vars) => (vars
+      ? `${k}(${Object.entries(vars).map(([n, v]) => `${n}=${v}`).join(',')})`
+      : k),
+  }),
+}));
+
 jest.mock('app/impacto-design-system', () => ({
   Badge: ({ children, variant }) => (
     <span data-testid={`badge-${variant}`}>{children}</span>
@@ -98,32 +106,32 @@ describe('RecordsTable — column headers', () => {
 
   it('renders Record ID column header', async () => {
     renderTable();
-    await waitFor(() => expect(screen.getByText('Record')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('form_manager_col_record')).toBeInTheDocument());
   });
 
   it('renders Household column header', async () => {
     renderTable();
-    await waitFor(() => expect(screen.getByText('Household')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('field_household')).toBeInTheDocument());
   });
 
   it('renders Surveyor column header', async () => {
     renderTable();
-    await waitFor(() => expect(screen.getByText('Surveyor')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('field_surveyor')).toBeInTheDocument());
   });
 
   it('renders Submitted column header', async () => {
     renderTable();
-    await waitFor(() => expect(screen.getByText('Submitted')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('field_submitted')).toBeInTheDocument());
   });
 
   it('renders Status column header', async () => {
     renderTable();
-    await waitFor(() => expect(screen.getByText('Status')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('field_status')).toBeInTheDocument());
   });
 
   it('renders Water source column header', async () => {
     renderTable();
-    await waitFor(() => expect(screen.getByText('Water source')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('form_manager_col_water_source')).toBeInTheDocument());
   });
 });
 
@@ -159,7 +167,7 @@ describe('RecordsTable — record rows', () => {
     await waitFor(() =>
       expect(screen.getByTestId('badge-green')).toBeInTheDocument(),
     );
-    expect(screen.getByTestId('badge-green')).toHaveTextContent('Synced');
+    expect(screen.getByTestId('badge-green')).toHaveTextContent('sync_ribbon_synced');
   });
 
   it('renders an orange Conflict badge for conflict records', async () => {
@@ -167,7 +175,7 @@ describe('RecordsTable — record rows', () => {
     await waitFor(() =>
       expect(screen.getByTestId('badge-orange')).toBeInTheDocument(),
     );
-    expect(screen.getByTestId('badge-orange')).toHaveTextContent('Conflict');
+    expect(screen.getByTestId('badge-orange')).toHaveTextContent('form_manager_status_conflict');
   });
 
   it('renders the household for each row', async () => {
@@ -282,7 +290,7 @@ describe('RecordsTable — pagination', () => {
   it('shows a "Showing X–Y of Z" summary', async () => {
     renderTable();
     await waitFor(() =>
-      expect(screen.getByText(/Showing 1/)).toBeInTheDocument(),
+      expect(screen.getByText(/^pagination_showing\(from=1,/)).toBeInTheDocument(),
     );
   });
 
@@ -313,6 +321,60 @@ describe('RecordsTable — pagination', () => {
     fireEvent.click(screen.getByRole('button', { name: /next/i }));
     await waitFor(() => {
       expect(Parse.Query._mockFind).toHaveBeenCalledTimes(2);
+    });
+  });
+});
+
+describe('FormManager RecordsTable — copy', () => {
+  const records = [
+    makeRecord({ id: 'EH-218', household: 'Sabana Yegua · Block 4', syncStatus: 'synced', waterSource: 'Bottled' }),
+  ];
+
+  function mockQuery(rows, total) {
+    Parse.Query._mockFind.mockResolvedValue(rows);
+    Parse.Query.mockImplementation(() => ({
+      equalTo: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockReturnThis(),
+      skip: jest.fn().mockReturnThis(),
+      count: jest.fn().mockResolvedValue(total),
+      find: Parse.Query._mockFind,
+    }));
+  }
+
+  it('routes the empty state through t()', async () => {
+    mockQuery([], 0);
+    renderTable();
+    await waitFor(() => expect(screen.getByTestId('empty-state')).toHaveTextContent('form_manager_records_empty'));
+  });
+
+  it("routes the synced badge through the ribbon's existing key", async () => {
+    mockQuery(records, 1);
+    renderTable();
+    await waitFor(() => expect(screen.getAllByText('sync_ribbon_synced').length).toBeGreaterThan(0));
+  });
+
+  it('interpolates the record id into the row checkbox label', async () => {
+    mockQuery(records, 1);
+    renderTable();
+    await waitFor(() => {
+      expect(screen.getByLabelText('form_manager_select_record(id=EH-218)')).toBeInTheDocument();
+    });
+  });
+
+  it('interpolates all three pagination numbers rather than concatenating them', async () => {
+    mockQuery(records, 1);
+    renderTable();
+    await waitFor(() => {
+      expect(screen.getByText('pagination_showing(from=1,to=1,total=1)')).toBeInTheDocument();
+    });
+  });
+
+  it('routes both page controls through t()', async () => {
+    mockQuery(records, 1);
+    renderTable();
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'pagination_prev_page' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'pagination_next_page' })).toBeInTheDocument();
     });
   });
 });

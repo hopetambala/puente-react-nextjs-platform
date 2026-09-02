@@ -35,3 +35,19 @@ describe('Sidebar grouping', () => {
     expect(groupOf('nav_settings')).toEqual('Org');
   });
 });
+
+describe('Sidebar — copy', () => {
+  it('leaves the brand name untranslated', () => {
+    render(<Sidebar activeRoute="dashboard" orgName="testORG" />);
+    // "Puente" is the product's name, not copy.
+    expect(screen.getByText('Puente')).toBeInTheDocument();
+  });
+
+  // The live-pulse tooltip is routed through t() but cannot be asserted here:
+  // no nav item sets `live`, so the branch never renders. Left covered by the
+  // routing itself rather than a test that would have to fake the flag.
+  it('renders no live pulse, because no nav item declares one', () => {
+    const { container } = render(<Sidebar activeRoute="dashboard" orgName="testORG" />);
+    expect(container.querySelector('[title]')).toBeNull();
+  });
+});

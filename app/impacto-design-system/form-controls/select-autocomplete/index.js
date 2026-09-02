@@ -1,4 +1,5 @@
 import FormHelperText from '@material-ui/core/FormHelperText';
+import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import Select, { createFilter } from 'react-select';
@@ -43,7 +44,7 @@ const stylesReactSelect = {
   }),
 };
 
-function Option(props) {
+const Option = (props) => {
   const { children } = props;
   const { onMouseMove, onMouseOver, ...newInnerProps } = props.innerProps; //eslint-disable-line
   return (
@@ -51,13 +52,14 @@ function Option(props) {
       {children}
     </div>
   );
-}
+};
 
 const components = {
   Option,
 };
 
 const ReactSelect = (props) => {
+  const { t } = useTranslation('common');
   const {
     label, options, required, errorobj, name,
   } = props;
@@ -68,8 +70,7 @@ const ReactSelect = (props) => {
     errorMessage = errorobj[name].message;
   }
   return (
-    <>
-      <StyledFormControl>
+    <StyledFormControl>
         <StyledAutoSelectInputLabel>
           <span className={isError ? styles['req-label'] : ''}>
             {label}
@@ -79,7 +80,7 @@ const ReactSelect = (props) => {
         </StyledAutoSelectInputLabel>
         <Select
           options={options}
-          placeholder="Please Select"
+          placeholder={t('select_placeholder')}
           valueKey="id"
           components={components}
           isClearable
@@ -93,11 +94,10 @@ const ReactSelect = (props) => {
           <FormHelperText error={isError}>{errorMessage}</FormHelperText>
         )}
       </StyledFormControl>
-    </>
   );
 };
 
-function FormSelectAutoComplete(props) {
+const FormSelectAutoComplete = (props) => {
   const { control } = useFormContext();
   const { name, label, options } = props;
 
@@ -112,8 +112,7 @@ function FormSelectAutoComplete(props) {
   }, [options]);
 
   return (
-    <>
-      <Controller
+    <Controller
         as={ReactSelect}
         name={name}
         control={control}
@@ -122,8 +121,7 @@ function FormSelectAutoComplete(props) {
         {...props}
         options={newData}
       />
-    </>
   );
-}
+};
 
 export default FormSelectAutoComplete;
