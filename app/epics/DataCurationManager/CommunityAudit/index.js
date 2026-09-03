@@ -1,4 +1,5 @@
 import { Button, Modal, Panel } from 'app/impacto-design-system';
+import { useTranslation } from 'next-i18next';
 import { Parse } from 'parse';
 import { useEffect, useState } from 'react';
 
@@ -59,6 +60,7 @@ const RENAME_MAX_PASSES = 200;
 const AUDIT_CLASSES = ['SurveyData', 'EvaluationMedical', 'Vitals', 'HistoryEnvironmentalHealth'];
 
 export default function CommunityAudit({ orgValues }) {
+  const { t } = useTranslation('common');
   const [groups, setGroups] = useState([]);
   const [canonical, setCanonical] = useState({});
   const [applying, setApplying] = useState(null);
@@ -137,17 +139,20 @@ export default function CommunityAudit({ orgValues }) {
     : '';
 
   return (
-    <Panel title="Community Audit">
+    <Panel title={t('data_curation_audit_title')}>
       <Modal
         open={pendingGroup !== null}
         handleClose={() => setPendingGroup(null)}
-        text={`Rename all records in this group to “${pendingTarget}”? This updates every matching record and cannot be undone.`}
-        actionText="Rename records"
+        // Interpolated, not concatenated: the community name has to be free to
+        // move within the sentence, and the quotation marks around it belong to
+        // the locale too.
+        text={t('data_curation_audit_rename_confirm', { target: pendingTarget })}
+        actionText={t('data_curation_audit_rename_action')}
         intent="primary"
         action={applyCanonical}
       />
       {groups.length === 0 ? (
-        <p className={styles.empty}>No similar community names detected.</p>
+        <p className={styles.empty}>{t('data_curation_audit_empty')}</p>
       ) : (
         <div className={styles.groups}>
           {groups.map((group, gi) => (
@@ -172,7 +177,9 @@ export default function CommunityAudit({ orgValues }) {
                 ))}
               </div>
               <Button
-                text={applying === gi ? 'Applying…' : 'Apply'}
+                text={applying === gi
+                  ? t('data_curation_audit_applying')
+                  : t('data_curation_audit_apply')}
                 isSmall
                 isDisabled={applying === gi}
                 onClick={() => setPendingGroup(gi)}

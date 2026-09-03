@@ -1,10 +1,12 @@
 import { CardAlt, EmptyState, Spinner } from 'app/impacto-design-system';
+import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 
 import retrieveAllFormSpecs from './_data';
 import styles from './index.module.scss';
 
 const FormMarketplace = ({ context, router }) => {
+  const { t } = useTranslation('common');
   const [formSpecs, setFormSpecs] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -42,7 +44,7 @@ const FormMarketplace = ({ context, router }) => {
       );
     }
     if (formSpecs.length === 0) {
-      return <EmptyState message="No forms available yet." />;
+      return <EmptyState message={t('form_marketplace_empty')} />;
     }
     return (
       <div className={styles.cards}>

@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import { useTranslation } from 'next-i18next';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -16,30 +17,34 @@ const Toast = ({
   text,
   shouldHideDismissButton,
   closeToast,
-}) => (
-  <div
-    className={classNames(styles.toast, {
-      [styles.error]: isError,
-      [styles.warning]: isWarning,
-      [styles.success]: isSuccess,
-    })}
-  >
-    <div className={styles.message}>
-      <Text text={text} />
+}) => {
+  const { t } = useTranslation('common');
+
+  return (
+    <div
+      className={classNames(styles.toast, {
+        [styles.error]: isError,
+        [styles.warning]: isWarning,
+        [styles.success]: isSuccess,
+      })}
+    >
+      <div className={styles.message}>
+        <Text text={text} />
+      </div>
+      {!shouldHideDismissButton && (
+        // The button is labelled: <Text> renders the dismiss word as the
+        // button's text content. jsx-a11y cannot follow a label passed through
+        // a component prop rather than as children, so it reports a false
+        // positive. Adding an aria-label here would duplicate a control that
+        // already has a visible, translated one.
+        // eslint-disable-next-line jsx-a11y/control-has-associated-label
+        <button className={styles.action} onClick={closeToast} type="button">
+          <Text text={t('action_dismiss')} />
+        </button>
+      )}
     </div>
-    {!shouldHideDismissButton && (
-    // The button is labelled: <Text text="Dismiss" /> renders "Dismiss" as the
-    // button's text content. jsx-a11y cannot follow a label passed through a
-    // component prop rather than as children, so it reports a false positive.
-    // Adding an aria-label here would introduce an untranslated user-facing
-    // string for a control that already has a visible one.
-    // eslint-disable-next-line jsx-a11y/control-has-associated-label
-    <button className={styles.action} onClick={closeToast} type="button">
-      <Text text="Dismiss" />
-    </button>
-    )}
-  </div>
-);
+  );
+};
 
 Toast.propTypes = {
   /** Auto-dismiss duration in ms. When set to `null`, Toast will not auto-dismiss.

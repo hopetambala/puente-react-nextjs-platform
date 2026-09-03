@@ -64,7 +64,7 @@ function Inspector({ block, onChange, onClose }) {
           className={styles.closeBtn}
           data-testid="inspector-close"
           onClick={onClose}
-          aria-label="Close inspector"
+          aria-label={t('inspector_close')}
         >
           ✕
         </button>
@@ -151,7 +151,10 @@ function Inspector({ block, onChange, onClose }) {
               {allowOther && (
                 <div className={styles.optionRow}>
                   <span className={styles.grip} aria-hidden="true">⋮⋮</span>
-                  <span>Other (with text)</span>
+                  <span>{t('inspector_other_with_text')}</span>
+                  {/* A sentinel the form engine matches on, not copy — it is
+                      shown verbatim so the author sees the key that will be
+                      written, and it must not be translated. */}
                   <span className={styles.otherChip}>__KEY__OTHER</span>
                 </div>
               )}

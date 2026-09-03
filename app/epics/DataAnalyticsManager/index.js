@@ -1,4 +1,5 @@
 import { Button, Stack, Table } from 'app/impacto-design-system';
+import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 
 import { fact } from '../../modules/django-etl';
@@ -13,11 +14,15 @@ const columns = [
     id: 'question_answer',
     cell: (info) => info.getValue(),
     header: function QuestionAnswerHeader() {
-      return <span>Answer to Question</span>;
+      // A component of its own, so it reads the catalog itself rather than
+      // closing over a `t` from a scope that is not a React render.
+      const { t } = useTranslation('common');
+      return <span>{t('analytics_answer_to_question')}</span>;
     },
   },
 ];
 const DataAnalyticsManager = () => {
+  const { t } = useTranslation('common');
   const [data, setData] = useState([]);
 
   const fetchData = async () => {
@@ -51,7 +56,7 @@ const DataAnalyticsManager = () => {
 
   return (
     <Stack isVertical spacing="medium">
-      <Button text="Retrieve" onClick={fetchData} />
+      <Button text={t('analytics_retrieve')} onClick={fetchData} />
       <Table data={data} columns={columns} />
     </Stack>
   );

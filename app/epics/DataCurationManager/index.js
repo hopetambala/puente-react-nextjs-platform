@@ -260,8 +260,8 @@ export default function DataCurationManager() {
       <div className={styles.viewTabs}>
         <SegmentedControl
           options={[
-            { label: 'Records', value: 'records' },
-            { label: 'Community Audit', value: 'community-audit' },
+            { label: t('data_curation_tab_records'), value: 'records' },
+            { label: t('data_curation_tab_community_audit'), value: 'community-audit' },
           ]}
           value={view}
           onChange={setView}

@@ -1,9 +1,11 @@
 import { Button } from 'app/impacto-design-system';
+import { useTranslation } from 'next-i18next';
 
 import styles from './index.module.css';
 import NativeApp from './NativeApp';
 
 const NativeApplicationDrawer = ({ formItems, isOpen, onClose }) => {
+  const { t } = useTranslation('common');
   if (!isOpen) return null;
 
   return (
@@ -12,7 +14,7 @@ const NativeApplicationDrawer = ({ formItems, isOpen, onClose }) => {
       className={`${styles.drawer} ${isOpen ? styles.drawerOpen : ''}`}
     >
       <div className={styles.drawerHeader}>
-        <Button text="Close" onClick={onClose} />
+        <Button text={t('action_close')} onClick={onClose} />
       </div>
       <div className={styles.drawerBody}>
         <NativeApp formItems={formItems} />

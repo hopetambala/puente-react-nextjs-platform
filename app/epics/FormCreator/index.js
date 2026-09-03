@@ -3,6 +3,7 @@ import {
     EmptyState, PageHeader, Panel, Toast
 } from 'app/impacto-design-system';
 import { postObjectsToClass, updateObject } from 'app/modules/cloud-code';
+import { useTranslation } from 'next-i18next';
 import { useCallback, useEffect, useState } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { v4 as uuid } from 'uuid';
@@ -14,67 +15,57 @@ import FormTemplate from './FormTemplate';
 import styles from './index.module.scss';
 import Inspector from './Inspector';
 
+// Catalog keys, not sentences. `textKey` deliberately reuses the key the
+// placed block renders, so the palette entry and the block it creates cannot
+// drift apart. Resolved at render — a label built here would be fixed at
+// import, before the reader's locale is known.
 const COLLECTION = [
   {
     id: uuid(),
-    text: 'Question - Number response',
+    textKey: 'form_creator_type_number',
     fieldType: 'numberInput',
-    infoText: 'Number Input: For questions requiring a numerical answer',
+    infoTextKey: 'form_creator_hint_number',
   },
   {
     id: uuid(),
-    text: 'Question - Text response',
+    textKey: 'form_creator_type_text',
     fieldType: 'input',
-    infoText: 'Text Input: For questions requiring text as an answer',
+    infoTextKey: 'form_creator_hint_text',
   },
   {
     id: uuid(),
-    text: 'Question (Side label) - Text or Number Response',
+    textKey: 'form_creator_type_side_label',
     fieldType: 'inputSideLabel',
-    infoText:
-      'Similar to number or text response but with additional label for adding units of measurement next to the input field',
+    infoTextKey: 'form_creator_hint_side_label',
   },
   {
     id: uuid(),
-    text: 'Question - Single select',
+    textKey: 'form_creator_type_single_select',
     fieldType: 'select',
-    infoText:
-      'Single Choice Select: For questions requiring one unique answer from a set of provided options',
+    infoTextKey: 'form_creator_hint_single_select',
   },
   {
     id: uuid(),
-    text: 'Question - Multi-select',
+    textKey: 'form_creator_type_multi_select',
     fieldType: 'selectMulti',
-    infoText:
-      'Multiple Choice Select: For questions allowing several possible answers from a set of provided options',
+    infoTextKey: 'form_creator_hint_multi_select',
   },
   {
     id: uuid(),
-    text: 'Input - Header',
+    textKey: 'form_creator_type_header',
     fieldType: 'header',
-    infoText: 'Header: A header row/title to your form',
+    infoTextKey: 'form_creator_hint_header',
   },
-
   {
     id: uuid(),
-    text: 'Geolocation',
+    textKey: 'form_creator_type_geolocation',
     fieldType: 'geolocation',
-    infoText: 'Geolocation: Collect longitude/latitude from a user',
+    infoTextKey: 'form_creator_hint_geolocation',
   },
-  /** { id: uuid(), text: 'Repeat Group - Multi Form Submission', fieldType: 'loop',
-   *  infoText: 'Multi Form Submission:
-   * 'An option that allows you to submit multiple records to multiple forms ' },
-   * */
-  // {
-  //   id: uuid(),
-  //   text: "Repeat Group - Single Form Submission",
-  //   fieldType: "loopSameForm",
-  //   infoText:
-  //     "Single Form Submission: An option that allows you to submit multiple records in the same form",
-  // },
 ];
 
 function FormCreator({ context, user }) {
+  const { t } = useTranslation('common');
   const [formName, setFormName] = useState('');
   const [formDescription, setFormDescription] = useState('');
   const [formItems, setFormItems] = useState([]);
@@ -249,19 +240,19 @@ function FormCreator({ context, user }) {
 
   return (
     <div>
-      {submission && <Toast text="Success!" />}
+      {submission && <Toast text={t('form_creator_success')} />}
       <NativeApplicationDrawer
         isOpen={previewOpen}
         onClose={() => setPreviewOpen(false)}
         formItems={formItems}
       />
       <PageHeader
-        title="Form Creator"
+        title={t('form_creator_title')}
         actions={
           <div className={styles.headerActions}>
-            <Button text="Reset form" intent="danger" onClick={clearForm} />
-            <Button text="Preview form" onClick={() => setPreviewOpen(!previewOpen)} />
-            <Button text="Publish" intent="primary" onClick={submitCustomForm} isLoading={submission} />
+            <Button text={t('form_creator_reset')} intent="danger" onClick={clearForm} />
+            <Button text={t('form_creator_preview')} onClick={() => setPreviewOpen(!previewOpen)} />
+            <Button text={t('form_creator_publish')} intent="primary" onClick={submitCustomForm} isLoading={submission} />
           </div>
         }
       />
@@ -271,7 +262,7 @@ function FormCreator({ context, user }) {
             {/* Form settings card */}
             <div className={styles.settingsCard}>
               <label className={styles.fieldGroup} htmlFor="formType">
-                <span className={styles.fieldLabel}>Type of form</span>
+                <span className={styles.fieldLabel}>{t('form_creator_type_of_form')}</span>
                 <select
                   id="formType"
                   name="formType"
@@ -279,31 +270,33 @@ function FormCreator({ context, user }) {
                   onChange={handleFormTypesChange}
                   className={styles.select}
                 >
-                  <option value="Custom">Custom</option>
-                  <option value="Assets">Assets</option>
+                  {/* The value is written to the form specification, so it
+                      stays in English; only the label is read by a person. */}
+                  <option value="Custom">{t('form_creator_form_type_custom')}</option>
+                  <option value="Assets">{t('form_creator_form_type_assets')}</option>
                 </select>
               </label>
 
               <label className={styles.fieldGroup} htmlFor="formName">
-                <span className={styles.fieldLabel}>Form name</span>
+                <span className={styles.fieldLabel}>{t('form_creator_form_name')}</span>
                 <input
                   id="formName"
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   type="text"
-                  placeholder="Give your form a detailed name"
+                  placeholder={t('form_creator_form_name_placeholder')}
                   className={styles.input}
                 />
               </label>
 
               <label className={styles.fieldGroup} htmlFor="formDescription">
-                <span className={styles.fieldLabel}>Description</span>
+                <span className={styles.fieldLabel}>{t('form_creator_description')}</span>
                 <input
                   id="formDescription"
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
                   type="text"
-                  placeholder="Describe how this form will be used"
+                  placeholder={t('form_creator_description_placeholder')}
                   className={styles.input}
                 />
               </label>
@@ -311,7 +304,7 @@ function FormCreator({ context, user }) {
 
             {/* Form builder canvas */}
             <div className={styles.builderSection}>
-              <span className={styles.builderLabel}>Form builder</span>
+              <span className={styles.builderLabel}>{t('form_creator_builder')}</span>
               <FormTemplate
                 formItems={formItems}
                 setFormItems={setFormItems}
@@ -323,10 +316,10 @@ function FormCreator({ context, user }) {
             </div>
           </div>
           <div className={styles.blocksSidebar}>
-            <Panel title="Blocks">
+            <Panel title={t('form_creator_blocks')}>
               <FormBlocks items={COLLECTION} />
             </Panel>
-            <Panel title="Inspector">
+            <Panel title={t('form_creator_inspector')}>
               {selectedBlock ? (
                 <Inspector
                   block={selectedBlock}
@@ -334,7 +327,7 @@ function FormCreator({ context, user }) {
                   onClose={() => setSelectedBlock(null)}
                 />
               ) : (
-                <EmptyState message="Select a block to edit." />
+                <EmptyState message={t('form_creator_select_block')} />
               )}
             </Panel>
           </div>

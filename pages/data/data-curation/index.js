@@ -7,9 +7,9 @@ export default function DataCuration() {
   const { t } = useTranslation('common');
 
   return (
-    <AppShell breadcrumb={['Data', t('nav_data_curation', { defaultValue: 'Data Curation' })]}>
+    <AppShell breadcrumb={[t('breadcrumb_data'), t('nav_data_curation', { defaultValue: 'Data Curation' })]}>
       <PageHeader
-        eyebrow="Data"
+        eyebrow={t('breadcrumb_data')}
         title={t('nav_data_curation', { defaultValue: 'Data Curation' })}
         sub={t('data_curation_sub', { defaultValue: 'Curate, clean, and review collected records.' })}
       />

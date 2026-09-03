@@ -23,6 +23,7 @@ const NativeApp = ({
         overflow: 'auto',
       }}
     >
+      {/* Product name — not copy, never translated. */}
       <h1 style={{ marginLeft: 20 }}>PUENTE</h1>
     </Box>
 

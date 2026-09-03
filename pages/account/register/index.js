@@ -96,6 +96,7 @@ function Register() {
       {/* ── left column: brand ── */}
       <div className={styles.left} data-testid="auth-brand">
         <div className={styles.leftBrand}>
+          {/* Brand mark and product name — not copy, never translated. */}
           <div className={styles.leftBrandMark}>P</div>
           <span className={styles.leftBrandName}>Puente</span>
         </div>

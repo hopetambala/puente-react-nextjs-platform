@@ -8,6 +8,8 @@ import {
     updateUser,
 } from 'app/modules/user'
 import { useRouter } from 'next/router'
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import * as yup from 'yup'
@@ -26,6 +28,7 @@ const validationSchema = yup
   .required()
 
 function Reset(props) {
+  const { t } = useTranslation('common');
   const { user, userId, router } = props
   const methods = useForm({
     resolver: yupResolver(validationSchema),
@@ -58,6 +61,7 @@ function Reset(props) {
     <div className={styles.auth}>
       <div className={styles.left} data-testid="auth-brand">
         <div className={styles.leftBrand}>
+          {/* Brand mark and product name — not copy, never translated. */}
           <div className={styles.leftBrandMark}>P</div>
           <span className={styles.leftBrandName}>Puente</span>
         </div>
@@ -66,7 +70,7 @@ function Reset(props) {
         <div className={styles.paper}>
           <Text text="PUENTE" element="h1" className={styles.stack} />
           <Stack isVertical className={styles.stack}>
-            <Text text="Account Details" element="h2" />
+            <Text text={t('account_details_title')} element="h2" />
           </Stack>
           <FormProvider {...methods}>
             <form>
@@ -86,7 +90,7 @@ function Reset(props) {
               </Stack>
               <Stack isVertical spacing="large">
                 <Button
-                  text="Continue"
+                  text={t('continue')}
                   onClick={handleSubmit(onSubmit)}
                   isFullWidth
                 />
@@ -126,3 +130,9 @@ function ResetWrapper() {
 }
 
 export default ResetWrapper
+
+// Without this the page ships no catalog, so every `t()` under it — the shell's
+// navigation included — renders its own key instead of a word.
+export async function getStaticProps({ locale }) {
+  return { props: { ...(await serverSideTranslations(locale ?? 'eng', ['common'])) } };
+}

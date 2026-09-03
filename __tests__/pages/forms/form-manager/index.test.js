@@ -5,6 +5,8 @@ import { render, screen } from '@testing-library/react';
 // If the page reverts to <Text element="h1"> the page-header testid disappears —
 // catches the heading pattern regression before any deploy.
 
+jest.mock('next-i18next', () => ({ useTranslation: () => ({ t: (k) => k }) }));
+
 jest.mock('next/router', () => ({
   useRouter: jest.fn(() => ({ pathname: '/forms/form-manager', push: jest.fn() })),
 }));
@@ -28,7 +30,9 @@ jest.mock('app/epics/FormManager', () =>
   jest.fn(() => <div data-testid="form-manager-epic" />));
 
 jest.mock('app/impacto-design-system', () => ({
-  AppShell: ({ children }) => <div data-testid="appshell">{children}</div>,
+  AppShell: ({ children, breadcrumb }) => (
+    <div data-testid="appshell" data-breadcrumb={JSON.stringify(breadcrumb)}>{children}</div>
+  ),
   PageHeader: ({ title, sub }) => (
     <div data-testid="page-header">
       <h1>{title}</h1>
@@ -55,12 +59,12 @@ describe('PageHeader', () => {
 
   it('displays "Form Manager" as the title', () => {
     render(<Manager />);
-    expect(screen.getByRole('heading', { name: 'Form Manager' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'page_form_manager_title' })).toBeInTheDocument();
   });
 
   it('renders a descriptive sub line', () => {
     render(<Manager />);
-    expect(screen.getByText(/manage.*forms/i)).toBeInTheDocument();
+    expect(screen.getByText('page_form_manager_sub')).toBeInTheDocument();
   });
 });
 
@@ -79,5 +83,14 @@ describe('Reactive user', () => {
       expect.objectContaining({ user: expect.objectContaining({ organization: 'hook-org' }) }),
       expect.anything(),
     );
+  });
+});
+
+describe('Form Manager page — copy', () => {
+  it('routes the breadcrumb and title through t()', () => {
+    render(<Manager />);
+    const shell = screen.getByTestId('appshell');
+    expect(JSON.parse(shell.dataset.breadcrumb)).toEqual(['breadcrumb_forms', 'page_form_manager_title']);
+    expect(screen.getByText('page_form_manager_title')).toBeInTheDocument();
   });
 });

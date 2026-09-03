@@ -1,6 +1,19 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 
+// A minimal stand-in for i18next interpolation. Echoing the key alone would let
+// `t('key') + pct + '%'` pass, which is the exact defect being guarded: values
+// must be interpolated INTO a key, because word and number order differ by
+// language and a sentence assembled from fragments cannot be translated.
+jest.mock('next-i18next', () => ({
+  useTranslation: () => ({
+    t: (k, vars) => (vars
+      ? `${k}(${Object.entries(vars).map(([n, v]) => `${n}=${v}`).join(',')})`
+      : k),
+  }),
+}));
+
+
 jest.mock('app/impacto-design-system', () => ({
   Badge: ({ children, variant }) => <span data-testid={`badge-${variant}`}>{children}</span>,
   Button: ({ text, onClick }) => <button type="button" onClick={onClick}>{text}</button>,
@@ -36,16 +49,16 @@ describe('RecordsTable — SurveyData columns', () => {
 
   it('renders Name column header', () => {
     render(<RecordsTable {...defaultProps} />);
-    expect(screen.getByText('Name')).toBeInTheDocument();
+    expect(screen.getByText('data_curation_col_name')).toBeInTheDocument();
   });
 
   it('renders Community, Surveyor, Submitted, Completeness, Flags headers', () => {
     render(<RecordsTable {...defaultProps} />);
-    expect(screen.getByText('Community')).toBeInTheDocument();
-    expect(screen.getByText('Surveyor')).toBeInTheDocument();
-    expect(screen.getByText('Submitted')).toBeInTheDocument();
-    expect(screen.getByText('Completeness')).toBeInTheDocument();
-    expect(screen.getByText('Flags')).toBeInTheDocument();
+    expect(screen.getByText('field_community')).toBeInTheDocument();
+    expect(screen.getByText('field_surveyor')).toBeInTheDocument();
+    expect(screen.getByText('field_submitted')).toBeInTheDocument();
+    expect(screen.getByText('data_curation_col_completeness')).toBeInTheDocument();
+    expect(screen.getByText('data_curation_col_flags')).toBeInTheDocument();
   });
 
   it('renders the record name in the row', () => {
@@ -65,7 +78,7 @@ describe('RecordsTable — flag chips', () => {
 
   it('shows Dup badge when record.id is in dups set', () => {
     render(<RecordsTable {...defaultProps} dups={new Set(['r1'])} />);
-    expect(screen.getByText('Dup')).toBeInTheDocument();
+    expect(screen.getByText('data_curation_flag_dup')).toBeInTheDocument();
   });
 
   it('does not show Dup badge when record is not in dups set', () => {
@@ -75,7 +88,7 @@ describe('RecordsTable — flag chips', () => {
 
   it('shows Low badge when record.id is in anomalies set', () => {
     render(<RecordsTable {...defaultProps} anomalies={new Set(['r1'])} />);
-    expect(screen.getByText('Low')).toBeInTheDocument();
+    expect(screen.getByText('data_curation_flag_low')).toBeInTheDocument();
   });
 });
 
@@ -84,18 +97,18 @@ describe('RecordsTable — pagination', () => {
 
   it('shows "Showing 1–1 of 1" when total=1 and page=0', () => {
     render(<RecordsTable {...defaultProps} />);
-    expect(screen.getByText(/showing 1/i)).toBeInTheDocument();
+    expect(screen.getByText('pagination_showing(from=1,to=1,total=1)')).toBeInTheDocument();
   });
 
   it('calls onPageChange(1) when Next is clicked', () => {
     render(<RecordsTable {...defaultProps} total={100} />);
-    fireEvent.click(screen.getByText(/next/i));
+    fireEvent.click(screen.getByText('data_curation_next'));
     expect(mockOnPageChange).toHaveBeenCalledWith(1);
   });
 
   it('calls onPageChange(0) when Prev is clicked on page 1', () => {
     render(<RecordsTable {...defaultProps} total={100} page={1} />);
-    fireEvent.click(screen.getByText(/prev/i));
+    fireEvent.click(screen.getByText('data_curation_prev'));
     expect(mockOnPageChange).toHaveBeenCalledWith(0);
   });
 });
@@ -103,8 +116,8 @@ describe('RecordsTable — pagination', () => {
 describe('RecordsTable — FormResults columns', () => {
   it('renders Metadata % and Fields % headers for form-results source', () => {
     render(<RecordsTable {...defaultProps} source="form-results:abc" records={[makeRecord()]} />);
-    expect(screen.getByText('Metadata %')).toBeInTheDocument();
-    expect(screen.getByText('Fields %')).toBeInTheDocument();
+    expect(screen.getByText('data_curation_col_metadata_pct')).toBeInTheDocument();
+    expect(screen.getByText('data_curation_col_fields_pct')).toBeInTheDocument();
   });
 });
 
@@ -146,7 +159,7 @@ describe('RecordsTable — FormResults completeness', () => {
       />
     );
     // At least one percentage should appear; the hardcoded "—" cells should be gone
-    const pctCells = screen.getAllByText(/\d+%/);
+    const pctCells = screen.getAllByText(/data_curation_percent\(pct=\d+\)/);
     expect(pctCells.length).toBeGreaterThan(0);
     // The "—" placeholder that currently exists for completeness cells must not be present
     // (only the name cell or surveyor cell may legitimately show "—" for other fields)
@@ -166,7 +179,7 @@ describe('RecordsTable — FormResults completeness', () => {
       />
     );
     // 1 of 2 fields answered → 50%
-    expect(screen.getByText('50%')).toBeInTheDocument();
+    expect(screen.getByText('data_curation_percent(pct=50)')).toBeInTheDocument();
   });
 });
 
@@ -217,32 +230,32 @@ describe('RecordsTable — completeness is scored per source', () => {
   it('scores a fully populated vitals row 100%', () => {
     const rec = pointerRecord('v1', FULL_VITALS, { fname: 'Juan', lname: 'Perez' });
     render(<RecordsTable {...defaultProps} source="vitals" records={[rec]} />);
-    expect(screen.getByLabelText('100% complete')).toBeInTheDocument();
+    expect(screen.getByLabelText('data_curation_completeness_aria(pct=100)')).toBeInTheDocument();
   });
 
   it('scores a vitals row with 4 of 6 readings 67%', () => {
     const partial = { bloodPressure: '120/80', pulse: '70', temp: '36.8', weight: '70' };
     const rec = pointerRecord('v2', partial, { fname: 'Juan', lname: 'Perez' });
     render(<RecordsTable {...defaultProps} source="vitals" records={[rec]} />);
-    expect(screen.getByLabelText('67% complete')).toBeInTheDocument();
+    expect(screen.getByLabelText('data_curation_completeness_aria(pct=67)')).toBeInTheDocument();
   });
 
   it('scores a fully populated eval-medical row 100%', () => {
     const rec = pointerRecord('e1', FULL_EVAL_MEDICAL, { fname: 'Juan', lname: 'Perez' });
     render(<RecordsTable {...defaultProps} source="eval-medical" records={[rec]} />);
-    expect(screen.getByLabelText('100% complete')).toBeInTheDocument();
+    expect(screen.getByLabelText('data_curation_completeness_aria(pct=100)')).toBeInTheDocument();
   });
 
   it('scores a fully populated env-health row 100%', () => {
     const rec = pointerRecord('h1', FULL_ENV_HEALTH, { fname: 'Juan', lname: 'Perez' });
     render(<RecordsTable {...defaultProps} source="env-health" records={[rec]} />);
-    expect(screen.getByLabelText('100% complete')).toBeInTheDocument();
+    expect(screen.getByLabelText('data_curation_completeness_aria(pct=100)')).toBeInTheDocument();
   });
 
   it('still scores a survey-data row against the SurveyData fields', () => {
     render(<RecordsTable {...defaultProps} />);
     // makeRecord() populates 4 of the 8 scored fields: fname, lname, communityname, surveyingUser
-    expect(screen.getByLabelText('50% complete')).toBeInTheDocument();
+    expect(screen.getByLabelText('data_curation_completeness_aria(pct=50)')).toBeInTheDocument();
   });
 });
 

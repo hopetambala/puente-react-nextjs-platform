@@ -36,7 +36,7 @@ describe('PageHeader', () => {
 
   it('displays "Form Marketplace" as the title', () => {
     render(<Marketplace />);
-    expect(screen.getByRole('heading', { name: 'Form Marketplace' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'page_form_marketplace_title' })).toBeInTheDocument();
   });
 });
 

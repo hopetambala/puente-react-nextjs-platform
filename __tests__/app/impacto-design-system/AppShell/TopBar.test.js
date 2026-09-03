@@ -93,14 +93,21 @@ describe('Avatar — with user', () => {
 describe('Phase 3 — Avatar navigation', () => {
   it('avatar has aria-label="Account settings"', () => {
     render(<TopBar breadcrumb={['Dashboard']} />);
-    expect(screen.getByRole('button', { name: 'Account settings' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'topbar_account_settings' })).toBeInTheDocument();
   });
 
   it('clicking avatar calls router.push("/account/management")', () => {
     const push = jest.fn();
     useRouter.mockReturnValue({ push });
     render(<TopBar breadcrumb={['Dashboard']} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Account settings' }));
+    fireEvent.click(screen.getByRole('button', { name: 'topbar_account_settings' }));
     expect(push).toHaveBeenCalledWith('/account/management');
+  });
+});
+
+describe('TopBar — copy', () => {
+  it('routes the account-settings label through t()', () => {
+    render(<TopBar breadcrumb={['Forms', 'Form Manager']} />);
+    expect(screen.getByLabelText('topbar_account_settings')).toBeInTheDocument();
   });
 });

@@ -2,10 +2,12 @@ import {
   Checkbox,
   FormControlLabel,
 } from '@material-ui/core';
+import { useTranslation } from 'next-i18next';
 
 const ActiveInput = ({
   activeInput, setActiveInput,
 }) => {
+  const { t } = useTranslation('common');
   const handleChange = () => {
     // LEAVING THIS HERE IF IT SHOULD BE CONSTRAINED,
     //  PERSONALLY BELIEVE USERS SHOULD BE ABLE TO EDIT PUENTE FORMS FOR THEIR PURPOSES
@@ -25,7 +27,7 @@ const ActiveInput = ({
         control={(
           <Checkbox onChange={() => handleChange()} />
           )}
-        label="Answer is required"
+        label={t('form_creator_answer_required')}
         checked={!activeInput}
       />
     </div>

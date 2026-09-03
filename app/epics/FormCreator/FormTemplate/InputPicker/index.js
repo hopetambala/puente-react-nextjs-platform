@@ -1,3 +1,5 @@
+import { useTranslation } from 'next-i18next';
+
 import Geolocation from './Geolocation';
 import Header from './Header';
 import styles from './index.module.scss';
@@ -6,6 +8,7 @@ import Loop from './Loop';
 import Select from './Select';
 
 const PaperInputPicker = (props) => {
+  const { t } = useTranslation('common');
   const {
     provided, innerRef,
     item,
@@ -37,7 +40,7 @@ const PaperInputPicker = (props) => {
         type="button"
         data-testid="drag-handle"
         className={styles.dragHandle}
-        aria-label="Drag to reorder"
+        aria-label={t('form_creator_drag_to_reorder')}
         onClick={(e) => e.stopPropagation()}
         {...provided.dragHandleProps}
       >⠿</button>

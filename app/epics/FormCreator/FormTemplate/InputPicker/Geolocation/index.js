@@ -1,10 +1,12 @@
 import { Button } from 'app/impacto-design-system';
+import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 
 import ActiveInput from '../Utils';
 import styles from './index.module.scss';
 
 const Input = (props) => {
+  const { t } = useTranslation('common');
   const {
     item,
     formItems, setFormItems,
@@ -35,9 +37,9 @@ const Input = (props) => {
       {item.fieldType === 'geolocation' && (
         <div key={item.id}>
           <div className="ids-flex-space-between">
-            <h4>Geolocation</h4>
+            <h4>{t('form_creator_type_geolocation')}</h4>
             <Button
-              text="Remove question"
+              text={t('form_creator_remove_question')}
               intent="danger"
               className={styles.remove}
               onClick={() => removeValue(item.id)}

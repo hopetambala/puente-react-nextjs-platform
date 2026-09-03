@@ -9,6 +9,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 const mockPush = jest.fn();
 let mockQuery = { objectId: 'user-123' };
 
+jest.mock('next-i18next', () => ({ useTranslation: () => ({ t: (k) => k }) }));
+
 jest.mock('next/router', () => ({
   useRouter: () => ({ query: mockQuery, push: mockPush }),
 }));
@@ -35,7 +37,9 @@ jest.mock('yup', () => ({
 }));
 
 jest.mock('app/impacto-design-system', () => ({
-  AppShell: ({ children }) => <div>{children}</div>,
+  AppShell: ({ children, breadcrumb }) => (
+    <div data-testid="appshell" data-breadcrumb={JSON.stringify(breadcrumb)}>{children}</div>
+  ),
   PageHeader: ({ title, sub }) => (
     <div data-testid="page-header">
       <h1>{title}</h1>
@@ -86,7 +90,7 @@ describe('PageHeader', () => {
   it('shows "Account Settings" as the title', async () => {
     render(<ManagementWrapper />);
     await waitFor(() =>
-      expect(screen.getByRole('heading', { name: 'Account Settings' })).toBeInTheDocument(),
+      expect(screen.getByRole('heading', { name: 'account_settings_title' })).toBeInTheDocument(),
     );
   });
 });
@@ -129,5 +133,15 @@ describe('Organization is not self-service', () => {
     render(<ManagementWrapper />);
 
     expect(await screen.findByTestId('organization-change-note')).toBeInTheDocument();
+  });
+});
+
+describe('Account Settings page — copy', () => {
+  it('routes the breadcrumb, title and subtitle through t()', () => {
+    render(<ManagementWrapper />);
+    const shell = screen.getByTestId('appshell');
+    expect(JSON.parse(shell.dataset.breadcrumb)).toEqual(['breadcrumb_settings']);
+    expect(screen.getByText('account_settings_title')).toBeInTheDocument();
+    expect(screen.getByText('account_settings_sub')).toBeInTheDocument();
   });
 });

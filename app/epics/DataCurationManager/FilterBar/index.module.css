@@ -2,6 +2,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  /* Spanish and Creole labels run longer than the English they were sized
+     against — "Todas las comunidades" against "All communities" — and the
+     strip clipped the community filter mid-word rather than reflowing. The
+     status pills drop to a second row instead of eating the selects. */
+  flex-wrap: wrap;
   gap: var(--tk-dlite-semantic-spacing-md);
   padding: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-md);
   background: var(--tk-dlite-semantic-color-surface-base);
@@ -14,7 +19,9 @@
   align-items: center;
   gap: var(--tk-dlite-semantic-spacing-sm);
   flex: 1;
-  min-width: 0;
+  /* fit-content, not 0: at 0 the group shrinks below its own controls and the
+     last select is truncated. This makes the row wrap instead. */
+  min-width: fit-content;
 }
 
 .filterRight {

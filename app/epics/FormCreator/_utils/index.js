@@ -35,8 +35,11 @@ const nextFormikKey = (existingKey, existingLabel, newLabel, keyFrozen) => {
   return toFormikKey(newLabel);
 };
 
-// This method is needed for rendering clones of draggables
-const getRenderItem = (items) => function getRenderItemSecond(provided, snapshot, rubric) {
+// This method is needed for rendering clones of draggables.
+// `t` is passed in rather than read from a hook: this is a react-beautiful-dnd
+// render prop, called as a plain function, so it is not a component and cannot
+// hold hooks of its own.
+const getRenderItem = (items, t) => function getRenderItemSecond(provided, snapshot, rubric) {
   const item = items[rubric.source.index];
   return (
     <div
@@ -46,7 +49,7 @@ const getRenderItem = (items) => function getRenderItemSecond(provided, snapshot
       style={provided.draggableProps.style}
       className={snapshot.isDragging ? styles.dragging : ''}
     >
-      <Card>{item.text}</Card>
+      <Card>{t(item.textKey)}</Card>
     </div>
   );
 };

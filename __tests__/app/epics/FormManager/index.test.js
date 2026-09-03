@@ -3,6 +3,8 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 // ─── Mocks ───────────────────────────────────────────────────────────────────
+jest.mock('next-i18next', () => ({ useTranslation: () => ({ t: (k) => k }) }));
+
 jest.mock('app/modules/cloud-code', () => ({
   retrieveCustomData: jest.fn(),
   updateObject: jest.fn().mockResolvedValue({}),
@@ -122,7 +124,7 @@ describe('Workflow grouping', () => {
   it('groups ungrouped forms under "Custom forms" (no jargon) when there are no workflows', async () => {
     renderManager([makeForm({ name: 'Lone Form', workflows: [] })]);
     await waitFor(() => expect(screen.getByText('Lone Form')).toBeInTheDocument());
-    expect(screen.getByText('Custom forms')).toBeInTheDocument();
+    expect(screen.getByText('form_manager_custom_forms')).toBeInTheDocument();
     expect(screen.queryByText('No Workflow Assigned')).not.toBeInTheDocument();
   });
 
@@ -132,14 +134,14 @@ describe('Workflow grouping', () => {
       makeForm({ objectId: 'b', name: 'Loose Form', workflows: [] }),
     ]);
     await waitFor(() => expect(screen.getByText('WaSH')).toBeInTheDocument());
-    expect(screen.getByText('Other forms')).toBeInTheDocument();
+    expect(screen.getByText('form_manager_other_forms')).toBeInTheDocument();
     expect(screen.queryByText('No Workflow Assigned')).not.toBeInTheDocument();
   });
 
   it('shows "No custom forms yet." when no active custom forms exist', async () => {
     renderManager([]);
     await waitFor(() =>
-      expect(screen.getByText('No custom forms yet.')).toBeInTheDocument(),
+      expect(screen.getByText('form_manager_no_custom_forms')).toBeInTheDocument(),
     );
   });
 
@@ -240,7 +242,7 @@ describe('Search filter', () => {
   it('renders a search input', async () => {
     renderManager([makeForm({ workflows: ['WaSH'] })]);
     await waitFor(() => expect(retrieveCustomData).toHaveBeenCalled());
-    expect(screen.getByPlaceholderText('Search forms…')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('form_manager_search_placeholder')).toBeInTheDocument();
   });
 
   it('hides forms not matching the search term', async () => {
@@ -252,7 +254,7 @@ describe('Search filter', () => {
       <FormManager context={mockContext} router={mockRouter} user={{ organization: 'test-org' }} />,
     );
     await waitFor(() => screen.getByText('WaSH Survey'));
-    await userEvent.type(screen.getByPlaceholderText('Search forms…'), 'Vitals');
+    await userEvent.type(screen.getByPlaceholderText('form_manager_search_placeholder'), 'Vitals');
     expect(screen.queryByText('WaSH Survey')).not.toBeInTheDocument();
     expect(screen.getByText('Vitals Form')).toBeInTheDocument();
   });
@@ -265,7 +267,7 @@ describe('Search filter', () => {
       <FormManager context={mockContext} router={mockRouter} user={{ organization: 'test-org' }} />,
     );
     await waitFor(() => screen.getByText('WaSH Survey'));
-    const input = screen.getByPlaceholderText('Search forms…');
+    const input = screen.getByPlaceholderText('form_manager_search_placeholder');
     await userEvent.type(input, 'xyz');
     expect(screen.queryByText('WaSH Survey')).not.toBeInTheDocument();
     await userEvent.clear(input);
@@ -368,7 +370,7 @@ describe('Loading resolves', () => {
       <FormManager context={mockContext} router={mockRouter} user={{ organization: '' }} />,
     );
     await waitFor(
-      () => expect(screen.getByText('Puente Forms')).toBeInTheDocument(),
+      () => expect(screen.getByText('form_manager_puente_forms')).toBeInTheDocument(),
       { timeout: 3000 },
     );
   });
@@ -379,7 +381,7 @@ describe('Loading resolves', () => {
       <FormManager context={mockContext} router={mockRouter} user={{ organization: 'test-org' }} />,
     );
     await waitFor(
-      () => expect(screen.getByText('Puente Forms')).toBeInTheDocument(),
+      () => expect(screen.getByText('form_manager_puente_forms')).toBeInTheDocument(),
       { timeout: 3000 },
     );
   });
@@ -401,5 +403,12 @@ describe('Phase 1 — Create form CTA', () => {
     await waitFor(() => expect(retrieveCustomData).toHaveBeenCalled());
     fireEvent.click(screen.getByRole('button', { name: /\+ create form/i }));
     expect(mockRouter.push).toHaveBeenCalledWith('/forms/form-creator');
+  });
+});
+
+describe('FormManager — copy', () => {
+  it('routes the Puente Forms panel title through t()', async () => {
+    renderManager();
+    await waitFor(() => expect(screen.getByText('form_manager_puente_forms')).toBeInTheDocument());
   });
 });

@@ -155,6 +155,16 @@ describe('Inspector — onClose', () => {
 // ─── __KEY__OTHER chip ────────────────────────────────────────────────────────
 
 describe('Inspector — Other chip', () => {
+  it('routes the close control through t()', () => {
+    renderInspector();
+    expect(screen.getByRole('button', { name: 'inspector_close' })).toBeInTheDocument();
+  });
+
+  it('routes the "Other (with text)" option row through t()', () => {
+    renderInspector({ ...baseBlock, allowOther: true });
+    expect(screen.getByText('inspector_other_with_text')).toBeInTheDocument();
+  });
+
   it('shows __KEY__OTHER chip when allowOther is true', () => {
     renderInspector({ ...baseBlock, allowOther: true });
     expect(screen.getByText('__KEY__OTHER')).toBeInTheDocument();

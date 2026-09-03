@@ -1,5 +1,6 @@
 import { nextFormikKey, toFormikKey } from 'app/epics/FormCreator/_utils';
 import { Button, Stack } from 'app/impacto-design-system';
+import { useTranslation } from 'next-i18next';
 import React, { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
@@ -7,6 +8,7 @@ import ActiveInput from '../Utils';
 import styles from './index.module.scss';
 
 const Select = (props) => {
+  const { t } = useTranslation('common');
   const {
     item, formItems, setFormItems, removeValue, keyFrozen,
   } = props;
@@ -140,9 +142,9 @@ const Select = (props) => {
       {item?.fieldType === 'select' && (
         <div key={item.id}>
           <div className="ids-flex-space-between">
-            <h4>Question - Single select</h4>
+            <h4>{t('form_creator_type_single_select')}</h4>
             <Button
-              text="Remove question"
+              text={t('form_creator_remove_question')}
               intent="danger"
               className={styles.remove}
               onClick={() => removeValue(item.id)}
@@ -156,12 +158,12 @@ const Select = (props) => {
             value={item.label || ''}
             id={item.id}
             onChange={setValue}
-            placeholder="Enter your question here"
+            placeholder={t('form_creator_question_placeholder')}
           />
           <div>
             {options.map((option, index) => (
               <div key={option.id}>
-                <h5>{`Option ${index + 1}`}</h5>
+                <h5>{t('form_creator_option_n', { n: index + 1 })}</h5>
                 <Stack spacing="small">
                   <input
                     type="text"
@@ -169,23 +171,23 @@ const Select = (props) => {
                     id={option.id}
                     onChange={(e) => editOption(e, item.id, 'optionValue')}
                   />
-                  <Button isSmall onClick={addOption} text="Add option" />
+                  <Button isSmall onClick={addOption} text={t('form_creator_add_option')} />
                   <Button
                     isSmall
                     onClick={() => removeOption(option.id)}
-                    text="Remove"
+                    text={t('form_creator_remove_option')}
                   />
                   {option.text === false && (
                     <Button
                       isSmall
                       onClick={() => editTextOption(option.id, true)}
-                      text="Add Text Question When Selected"
+                      text={t('form_creator_add_followup')}
                     />
                   )}
                   {option.text === true && (
                     <div>
                       <h4>
-                        {`Question to ask when Option ${index + 1} selected`}
+                        {t('form_creator_followup_question_n', { n: index + 1 })}
                       </h4>
                       <input
                         type="text"
@@ -196,7 +198,7 @@ const Select = (props) => {
                       <Button
                         isSmall
                         onClick={() => editTextOption(option.id, false)}
-                        text="Remove Text Question When Selected"
+                        text={t('form_creator_remove_followup')}
                       />
                     </div>
                   )}
@@ -214,9 +216,9 @@ const Select = (props) => {
       {item?.fieldType === 'selectMulti' && (
         <div key={item.id}>
           <div className="ids-flex-space-between">
-            <h4>Question - Multi-select</h4>
+            <h4>{t('form_creator_type_multi_select')}</h4>
             <Button
-              text="Remove question"
+              text={t('form_creator_remove_question')}
               intent="danger"
               className={styles.remove}
               onClick={() => removeValue(item.id)}
@@ -230,12 +232,12 @@ const Select = (props) => {
             value={item.label || ''}
             id={item.id}
             onChange={setValue}
-            placeholder="Enter your question here"
+            placeholder={t('form_creator_question_placeholder')}
           />
           <div>
             {options.map((option, index) => (
               <div key={option.id}>
-                <h5>{`Option ${index + 1}`}</h5>
+                <h5>{t('form_creator_option_n', { n: index + 1 })}</h5>
                 <Stack spacing="small">
                   <input
                     type="text"
@@ -243,17 +245,17 @@ const Select = (props) => {
                     id={option.id}
                     onChange={(e) => editOption(e, item.id, 'optionValue')}
                   />
-                  <Button isSmall onClick={addOption} text="Add option" />
+                  <Button isSmall onClick={addOption} text={t('form_creator_add_option')} />
 
                   <Button
                     isSmall
                     onClick={() => removeOption(option.id)}
-                    text="Remove"
+                    text={t('form_creator_remove_option')}
                   />
                   {option.text === false && (
                     <Button
                       onClick={() => editTextOption(option.id, true)}
-                      text="Add Text Question When Selected"
+                      text={t('form_creator_add_followup')}
                     />
                   )}
                   {option.text === true && (
@@ -270,7 +272,7 @@ const Select = (props) => {
                       <Button
                         intent="danger"
                         onClick={() => editTextOption(option.id, false)}
-                        text="Remove Text Question When Selected"
+                        text={t('form_creator_remove_followup')}
                       />
                     </div>
                   )}

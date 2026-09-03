@@ -1,11 +1,13 @@
 import { nextFormikKey } from 'app/epics/FormCreator/_utils';
 import { Button } from 'app/impacto-design-system';
+import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 
 import ActiveInput from '../Utils';
 import styles from './index.module.scss';
 
 const Header = (props) => {
+  const { t } = useTranslation('common');
   const {
     item,
     formItems, setFormItems,
@@ -45,9 +47,9 @@ const Header = (props) => {
       {item.fieldType === 'header' && (
         <div key={item.id}>
           <div className="ids-flex-space-between">
-            <h4>Input - Header</h4>
+            <h4>{t('form_creator_type_header')}</h4>
             <Button
-              text="Remove header"
+              text={t('form_creator_remove_header')}
               intent="danger"
               className={styles.remove}
               onClick={() => removeValue(item.id)}
@@ -61,7 +63,7 @@ const Header = (props) => {
             value={item.label || ''}
             id={item.id}
             onChange={setValue}
-            placeholder="Untitled Header"
+            placeholder={t('form_creator_untitled_header')}
           />
 
           <ActiveInput

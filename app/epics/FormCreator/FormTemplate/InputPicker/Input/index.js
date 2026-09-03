@@ -1,11 +1,13 @@
 import { nextFormikKey } from 'app/epics/FormCreator/_utils';
 import { Button, Text } from 'app/impacto-design-system';
+import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 
 import ActiveInput from '../Utils';
 import styles from './index.module.scss';
 
 const Input = (props) => {
+  const { t } = useTranslation('common');
   const {
     item,
     formItems, setFormItems,
@@ -53,9 +55,9 @@ const Input = (props) => {
       {item.fieldType === 'input' && (
         <div key={item.id}>
           <div className="ids-flex-space-between">
-            <Text text="Question - Text response" element="h4" />
+            <Text text={t('form_creator_type_text')} element="h4" />
             <Button
-              text="Remove question"
+              text={t('form_creator_remove_question')}
               intent="danger"
               className={styles.remove}
               onClick={() => removeValue(item.id)}
@@ -69,7 +71,7 @@ const Input = (props) => {
             value={item.label || ''}
             id={item.id}
             onChange={setValue}
-            placeholder="Enter your question here"
+            placeholder={t('form_creator_question_placeholder')}
           />
 
           <ActiveInput
@@ -81,9 +83,9 @@ const Input = (props) => {
       {item.fieldType === 'numberInput' && (
         <div key={item.id}>
           <div className="ids-flex-space-between">
-            <Text text="Question - Number response" element="h4" />
+            <Text text={t('form_creator_type_number')} element="h4" />
             <Button
-              text="Remove question"
+              text={t('form_creator_remove_question')}
               intent="danger"
               className={styles.remove}
               onClick={() => removeValue(item.id)}
@@ -97,7 +99,7 @@ const Input = (props) => {
             value={item.label || ''}
             id={item.id}
             onChange={setValue}
-            placeholder="Enter your question here"
+            placeholder={t('form_creator_question_placeholder')}
           />
 
           <ActiveInput
@@ -110,12 +112,12 @@ const Input = (props) => {
         <div key={item.id}>
           <div className="ids-flex-space-between">
             <Text
-              text="Question (Side label) - Text or Number Response"
+              text={t('form_creator_type_side_label')}
               element="h4"
             />
 
             <Button
-              text="Remove question"
+              text={t('form_creator_remove_question')}
               intent="danger"
               className={styles.remove}
               onClick={() => removeValue(item.id)}
@@ -129,7 +131,7 @@ const Input = (props) => {
             value={item.label || ''}
             id={item.id}
             onChange={setValue}
-            placeholder="Enter your question here"
+            placeholder={t('form_creator_question_placeholder')}
           />
           <input
             className={styles.input}
@@ -137,7 +139,7 @@ const Input = (props) => {
             value={item.sideLabel || ''}
             id={item.id}
             onChange={(e) => setValue(e, 'sideLabel')}
-            placeholder="Side Label"
+            placeholder={t('form_creator_side_label')}
           />
 
           <ActiveInput

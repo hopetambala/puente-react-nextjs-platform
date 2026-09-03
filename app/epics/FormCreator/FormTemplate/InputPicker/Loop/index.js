@@ -1,11 +1,13 @@
 import { nextFormikKey } from 'app/epics/FormCreator/_utils';
 import { Button } from 'app/impacto-design-system';
+import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 
 import ActiveInput from '../Utils';
 import styles from './index.module.scss';
 
 const Loop = (props) => {
+  const { t } = useTranslation('common');
   const {
     item,
     formItems, setFormItems,
@@ -86,11 +88,11 @@ const Loop = (props) => {
     <div className={styles.element}>
       {(item.fieldType === 'loop' || item.fieldType === 'loopSameForm') && (
         <div key={item.id}>
-          <h3>Repeat Group Element</h3>
-          <input className={styles.input} type="text" value={item.label || ''} id={item.id} onChange={setValue} placeholder="Untitled Loop" />
-          <h4>Number of Previous Questions to Repeat in Group</h4>
-          <input className={styles.input} type="text" value={item.numberQuestionsToRepeat || ''} id={item.id} onChange={setQuestionsToRepeatValue} placeholder="eg. 3" />
-          <Button text="REMOVE QUESTION" intent="danger" className={styles.remove} onClick={() => removeValue(item.id)} />
+          <h3>{t('form_creator_loop_title')}</h3>
+          <input className={styles.input} type="text" value={item.label || ''} id={item.id} onChange={setValue} placeholder={t('form_creator_untitled_loop')} />
+          <h4>{t('form_creator_loop_repeat_count')}</h4>
+          <input className={styles.input} type="text" value={item.numberQuestionsToRepeat || ''} id={item.id} onChange={setQuestionsToRepeatValue} placeholder={t('form_creator_loop_count_example')} />
+          <Button text={t('form_creator_remove_question')} intent="danger" className={styles.remove} onClick={() => removeValue(item.id)} />
 
           {doubleLoop === true && (
             <h5 className={styles.error}>

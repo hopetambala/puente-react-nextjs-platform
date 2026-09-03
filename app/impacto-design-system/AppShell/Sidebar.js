@@ -38,6 +38,7 @@ export default function Sidebar({ activeRoute, orgName }) {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.brand}>
+        {/* Brand mark and product name — not copy, never translated. */}
         <div className={styles.brandMark}>P</div>
         <div>
           <div className={styles.brandName}>Puente</div>
@@ -57,7 +58,7 @@ export default function Sidebar({ activeRoute, orgName }) {
                   <span className={styles.navIcon}>{item.icon}</span>
                   <span>{t(item.labelKey)}</span>
                   {item.live && (
-                    <span className={styles.navPulse} title="Surveyors active in field" />
+                    <span className={styles.navPulse} title={t('nav_surveyors_active')} />
                   )}
                 </a>
               </Link>
