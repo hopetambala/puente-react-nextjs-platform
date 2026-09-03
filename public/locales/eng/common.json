@@ -394,5 +394,7 @@
   "account_details_title": "Account Details",
   "account_hold_on": "Hold On",
   "login_license": "Source available · BSL 1.1",
-  "form_manager_no_custom_forms": "No custom forms yet."
+  "form_manager_no_custom_forms": "No custom forms yet.",
+  "account_reset_submit_email": "Send reset email",
+  "account_reset_submit_text": "Send reset text"
 }

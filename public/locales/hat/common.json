@@ -394,5 +394,7 @@
   "account_details_title": "Detay kont lan",
   "account_hold_on": "Tann yon ti moman",
   "login_license": "Kòd sous disponib · BSL 1.1",
-  "form_manager_no_custom_forms": "Poko gen fòm pèsonalize."
+  "form_manager_no_custom_forms": "Poko gen fòm pèsonalize.",
+  "account_reset_submit_email": "Voye imèl reinisyalizasyon an",
+  "account_reset_submit_text": "Voye mesaj reinisyalizasyon an"
 }

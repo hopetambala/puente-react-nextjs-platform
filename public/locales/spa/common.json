@@ -394,5 +394,7 @@
   "account_details_title": "Datos de la cuenta",
   "account_hold_on": "Un momento",
   "login_license": "Código disponible · BSL 1.1",
-  "form_manager_no_custom_forms": "Todavía no hay formularios personalizados."
+  "form_manager_no_custom_forms": "Todavía no hay formularios personalizados.",
+  "account_reset_submit_email": "Enviar el correo de restablecimiento",
+  "account_reset_submit_text": "Enviar el mensaje de restablecimiento"
 }

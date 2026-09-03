@@ -82,7 +82,12 @@ function ResetLogin() {
           </Stack>
           <Stack isVertical spacing="medium">
             <Button
-              text={`Send reset ${notificationType}`}
+              // A whole key per channel, not `Send reset ${type}`: "email" and
+              // "text" are stored codes, and the two sentences do not share a
+              // shape across languages.
+              text={notificationType === 'text'
+                ? t('account_reset_submit_text')
+                : t('account_reset_submit_email')}
               onClick={handleSubmit(onSubmit)}
               isFullWidth
             />

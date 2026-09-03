@@ -1,7 +1,11 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 jest.mock('next-i18next', () => ({ useTranslation: () => ({ t: (k) => k }) }));
+
+jest.mock('app/impacto-design-system', () => ({
+  ...jest.requireActual('app/impacto-design-system'),
+}));
 jest.mock('next-i18next/serverSideTranslations', () => ({
   serverSideTranslations: jest.fn().mockResolvedValue({ _nextI18Next: {} }),
 }));
@@ -25,6 +29,23 @@ describe('Reset login page — copy', () => {
     render(<ResetLogin />);
     expect(screen.getByText('account_reset_send_email')).toBeInTheDocument();
     expect(screen.getByText('account_reset_send_text')).toBeInTheDocument();
+  });
+
+  // The submit button read `Send reset ${notificationType}` — an English word
+  // concatenated with a stored code. It rendered "Send reset email" in Spanish,
+  // beneath two correctly translated buttons. The channel picks a whole key,
+  // rather than being interpolated, because "email"/"text" are codes and the
+  // two sentences do not share a shape across languages.
+  it('routes the submit button through t(), defaulting to the email channel', () => {
+    render(<ResetLogin />);
+    expect(screen.getByText('account_reset_submit_email')).toBeInTheDocument();
+  });
+
+  it('switches the submit key when the text channel is chosen', () => {
+    render(<ResetLogin />);
+    fireEvent.click(screen.getByText('account_reset_send_text'));
+    expect(screen.getByText('account_reset_submit_text')).toBeInTheDocument();
+    expect(screen.queryByText('account_reset_submit_email')).not.toBeInTheDocument();
   });
 
   it('loads the common catalog server-side', async () => {
