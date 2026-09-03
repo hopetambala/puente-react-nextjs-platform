@@ -396,5 +396,14 @@
   "login_license": "Código disponible · BSL 1.1",
   "form_manager_no_custom_forms": "Todavía no hay formularios personalizados.",
   "account_reset_submit_email": "Enviar el correo de restablecimiento",
-  "account_reset_submit_text": "Enviar el mensaje de restablecimiento"
+  "account_reset_submit_text": "Enviar el mensaje de restablecimiento",
+  "data_curation_tab_records": "Registros",
+  "data_curation_tab_community_audit": "Auditoría de comunidades",
+  "form_creator_hint_number": "Campo numérico: para preguntas cuya respuesta es un número",
+  "form_creator_hint_text": "Campo de texto: para preguntas cuya respuesta es texto",
+  "form_creator_hint_side_label": "Etiqueta lateral: una respuesta de texto o número con una etiqueta al lado",
+  "form_creator_hint_single_select": "Selección única: quien responde elige una sola opción",
+  "form_creator_hint_multi_select": "Selección múltiple: quien responde puede elegir varias opciones",
+  "form_creator_hint_header": "Encabezado: una fila de título para tu formulario",
+  "form_creator_hint_geolocation": "Geolocalización: registra la longitud y la latitud del usuario"
 }

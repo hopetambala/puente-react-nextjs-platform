@@ -15,64 +15,53 @@ import FormTemplate from './FormTemplate';
 import styles from './index.module.scss';
 import Inspector from './Inspector';
 
+// Catalog keys, not sentences. `textKey` deliberately reuses the key the
+// placed block renders, so the palette entry and the block it creates cannot
+// drift apart. Resolved at render — a label built here would be fixed at
+// import, before the reader's locale is known.
 const COLLECTION = [
   {
     id: uuid(),
-    text: 'Question - Number response',
+    textKey: 'form_creator_type_number',
     fieldType: 'numberInput',
-    infoText: 'Number Input: For questions requiring a numerical answer',
+    infoTextKey: 'form_creator_hint_number',
   },
   {
     id: uuid(),
-    text: 'Question - Text response',
+    textKey: 'form_creator_type_text',
     fieldType: 'input',
-    infoText: 'Text Input: For questions requiring text as an answer',
+    infoTextKey: 'form_creator_hint_text',
   },
   {
     id: uuid(),
-    text: 'Question (Side label) - Text or Number Response',
+    textKey: 'form_creator_type_side_label',
     fieldType: 'inputSideLabel',
-    infoText:
-      'Similar to number or text response but with additional label for adding units of measurement next to the input field',
+    infoTextKey: 'form_creator_hint_side_label',
   },
   {
     id: uuid(),
-    text: 'Question - Single select',
+    textKey: 'form_creator_type_single_select',
     fieldType: 'select',
-    infoText:
-      'Single Choice Select: For questions requiring one unique answer from a set of provided options',
+    infoTextKey: 'form_creator_hint_single_select',
   },
   {
     id: uuid(),
-    text: 'Question - Multi-select',
+    textKey: 'form_creator_type_multi_select',
     fieldType: 'selectMulti',
-    infoText:
-      'Multiple Choice Select: For questions allowing several possible answers from a set of provided options',
+    infoTextKey: 'form_creator_hint_multi_select',
   },
   {
     id: uuid(),
-    text: 'Input - Header',
+    textKey: 'form_creator_type_header',
     fieldType: 'header',
-    infoText: 'Header: A header row/title to your form',
+    infoTextKey: 'form_creator_hint_header',
   },
-
   {
     id: uuid(),
-    text: 'Geolocation',
+    textKey: 'form_creator_type_geolocation',
     fieldType: 'geolocation',
-    infoText: 'Geolocation: Collect longitude/latitude from a user',
+    infoTextKey: 'form_creator_hint_geolocation',
   },
-  /** { id: uuid(), text: 'Repeat Group - Multi Form Submission', fieldType: 'loop',
-   *  infoText: 'Multi Form Submission:
-   * 'An option that allows you to submit multiple records to multiple forms ' },
-   * */
-  // {
-  //   id: uuid(),
-  //   text: "Repeat Group - Single Form Submission",
-  //   fieldType: "loopSameForm",
-  //   infoText:
-  //     "Single Form Submission: An option that allows you to submit multiple records in the same form",
-  // },
 ];
 
 function FormCreator({ context, user }) {

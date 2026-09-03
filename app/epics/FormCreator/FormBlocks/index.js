@@ -2,17 +2,19 @@
 
 import { IconButton, Tooltip } from '@material-ui/core';
 import { InfoOutlined } from '@material-ui/icons';
+import { useTranslation } from 'next-i18next';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 
 import { getRenderItem } from '../_utils';
 import styles from './index.module.scss';
 
 const Copyable = (props) => {
+  const { t } = useTranslation('common');
   const { items, className, droppableId } = props;
 
   return (
     <Droppable
-      renderClone={getRenderItem(items, className)}
+      renderClone={getRenderItem(items, t)}
       droppableId={droppableId}
       isDropDisabled
     >
@@ -34,9 +36,9 @@ const Copyable = (props) => {
                         className={snapshoted.isDragging ? styles.dragging : styles.noDragging}
                       >
                         <p className={styles.nodragging}>
-                          {item.text}
+                          {t(item.textKey)}
                           <Tooltip
-                            title={item.infoText}
+                            title={t(item.infoTextKey)}
                             placement="top"
                             arrow
                           >

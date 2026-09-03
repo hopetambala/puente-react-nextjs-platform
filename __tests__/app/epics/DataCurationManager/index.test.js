@@ -316,8 +316,8 @@ describe('View tabs', () => {
   it('renders a Records tab and a Community Audit tab', async () => {
     render(<DataCurationManager />);
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /records/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /community audit/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'data_curation_tab_records' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'data_curation_tab_community_audit' })).toBeInTheDocument();
     });
   });
 
@@ -332,8 +332,8 @@ describe('View tabs', () => {
 
   it('switches to Community Audit view when the Community Audit tab is clicked', async () => {
     render(<DataCurationManager />);
-    await waitFor(() => screen.getByRole('button', { name: /community audit/i }));
-    fireEvent.click(screen.getByRole('button', { name: /community audit/i }));
+    await waitFor(() => screen.getByRole('button', { name: 'data_curation_tab_community_audit' }));
+    fireEvent.click(screen.getByRole('button', { name: 'data_curation_tab_community_audit' }));
     await waitFor(() => {
       expect(screen.getByTestId('community-audit')).toBeInTheDocument();
       expect(screen.queryByTestId('records-table')).not.toBeInTheDocument();
@@ -342,8 +342,8 @@ describe('View tabs', () => {
 
   it('hides FilterBar and RecordsTable when Community Audit is active', async () => {
     render(<DataCurationManager />);
-    await waitFor(() => screen.getByRole('button', { name: /community audit/i }));
-    fireEvent.click(screen.getByRole('button', { name: /community audit/i }));
+    await waitFor(() => screen.getByRole('button', { name: 'data_curation_tab_community_audit' }));
+    fireEvent.click(screen.getByRole('button', { name: 'data_curation_tab_community_audit' }));
     await waitFor(() => {
       expect(screen.queryByTestId('filter-bar')).not.toBeInTheDocument();
       expect(screen.queryByTestId('records-table')).not.toBeInTheDocument();
@@ -587,5 +587,17 @@ describe('form-results records are scored with the FormResults metric', () => {
   it('flags a form submission with no answers', () => {
     const rec = formResult('f2', []);
     expect(flagAnomalies([rec], 'form-results:abc123', formDefinition).has('f2')).toBe(true);
+  });
+});
+
+describe('DataCurationManager — view tabs', () => {
+  // Object-literal labels, the same shape the filter bar's option arrays had.
+  // The design-check detector cannot see them, and they rendered "Records" /
+  // "Community Audit" in English on the Spanish curation screen, above a table
+  // whose every column header was translated.
+  it('routes both view tab labels through t()', async () => {
+    render(<DataCurationManager />);
+    expect(await screen.findByText('data_curation_tab_records')).toBeInTheDocument();
+    expect(screen.getByText('data_curation_tab_community_audit')).toBeInTheDocument();
   });
 });

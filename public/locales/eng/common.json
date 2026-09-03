@@ -396,5 +396,14 @@
   "login_license": "Source available · BSL 1.1",
   "form_manager_no_custom_forms": "No custom forms yet.",
   "account_reset_submit_email": "Send reset email",
-  "account_reset_submit_text": "Send reset text"
+  "account_reset_submit_text": "Send reset text",
+  "data_curation_tab_records": "Records",
+  "data_curation_tab_community_audit": "Community Audit",
+  "form_creator_hint_number": "Number Input: For questions requiring a numerical answer",
+  "form_creator_hint_text": "Text Input: For questions requiring text as an answer",
+  "form_creator_hint_side_label": "Side label: A text or number answer with a label beside it",
+  "form_creator_hint_single_select": "Single select: The person answering picks one option",
+  "form_creator_hint_multi_select": "Multi-select: The person answering can pick several options",
+  "form_creator_hint_header": "Header: A header row/title to your form",
+  "form_creator_hint_geolocation": "Geolocation: Collect longitude/latitude from a user"
 }

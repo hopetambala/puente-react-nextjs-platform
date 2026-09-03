@@ -396,5 +396,14 @@
   "login_license": "Kòd sous disponib · BSL 1.1",
   "form_manager_no_custom_forms": "Poko gen fòm pèsonalize.",
   "account_reset_submit_email": "Voye imèl reinisyalizasyon an",
-  "account_reset_submit_text": "Voye mesaj reinisyalizasyon an"
+  "account_reset_submit_text": "Voye mesaj reinisyalizasyon an",
+  "data_curation_tab_records": "Dosye",
+  "data_curation_tab_community_audit": "Odit kominote",
+  "form_creator_hint_number": "Chan chif: pou kesyon ki mande yon repons an chif",
+  "form_creator_hint_text": "Chan tèks: pou kesyon ki mande yon repons an tèks",
+  "form_creator_hint_side_label": "Etikèt sou kote: yon repons tèks oswa chif ak yon etikèt akote l",
+  "form_creator_hint_single_select": "Yon sèl chwa: moun k ap reponn nan chwazi yon sèl opsyon",
+  "form_creator_hint_multi_select": "Plizyè chwa: moun k ap reponn nan ka chwazi plizyè opsyon",
+  "form_creator_hint_header": "Antèt: yon liy tit pou fòm ou an",
+  "form_creator_hint_geolocation": "Jeyolokalizasyon: pran lonjitid ak latitid itilizatè a"
 }
