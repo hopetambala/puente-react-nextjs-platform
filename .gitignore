@@ -44,4 +44,3 @@ nextenv/
 .claude/
 __tests__/claude/
 docs/README.md
-docs/design-direction.md
