@@ -20,15 +20,45 @@
   gap: var(--tk-dlite-semantic-spacing-xxs);
 }
 
-/* Weight and colour carry the label/value distinction — no size ramp. */
+/* Weight and colour carry the label/value distinction — no size ramp.
+   Labels take the label-s tracking so they read as field names framing the
+   values, rather than as prose the values interrupt. */
 .label {
   color: var(--tk-dlite-semantic-color-text-secondary);
+  letter-spacing: var(--tk-dlite-semantic-typography-type-label-s-letter-spacing);
 }
 
+/* THE SIGNATURE — mono, but only where the value is a bare numeral.
+
+   This band is the provenance strip at organization scale and it read as a
+   toolbar: same face, same size, same everything as the chrome around it.
+   Setting machine facts in the machine face is the one deliberate move on this
+   screen — the vernacular of the clinical and financial back-office tools this
+   product means to resemble, and the opposite of the marketing-analytics
+   dashboard it does not. Source Code Pro already ships (pages/_document.js) and
+   was loaded on every page while used on none. No new font, no accent colour.
+
+   The scope is narrow ON PURPOSE. Mono was first applied to every value in the
+   band, including the recency, and inspected at 3x: `sync_ribbon_days_ago` is
+   the PHRASE "{{count}}d ago", and a monospace space is full-width, so it
+   rendered as "50d  ago" — a gap that reads as a typo. Mono belongs on
+   identifiers and aligned numerals, not on a translated sentence. Splitting the
+   phrase to isolate the number is not an option either: assembling a sentence
+   from fragments breaks in every language with different word order.
+
+   So `.value` keeps the proportional face and `.numeral` takes mono. */
 .value {
   color: var(--tk-dlite-semantic-color-text-primary);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+}
+
+.numeral {
+  color: var(--tk-dlite-semantic-color-text-primary);
+  font-family: var(--tk-dlite-semantic-typography-font-mono), 'Source Code Pro', monospace;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--tk-dlite-primitive-dimension-letter-spacing-tight);
 }
 
 .separator {

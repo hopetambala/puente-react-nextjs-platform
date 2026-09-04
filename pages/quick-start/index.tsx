@@ -156,6 +156,10 @@ export default function Dashboard() {
 
   return (
     <AppShell breadcrumb={[t('breadcrumb_dashboard')]}>
+      {/* Three bands: trust, work, context. The wrapper exists so the middle
+          band can take the slack and the context strip anchors the bottom of
+          the frame, rather than the page ending in 400px of uncomposed grey. */}
+      <div className={styles.frame}>
       <SyncRibbon state={syncState} loading={loading} />
 
       <div className={styles.body}>
@@ -231,6 +235,7 @@ export default function Dashboard() {
           </>
         )}
       </footer>
+      </div>
     </AppShell>
   );
 }

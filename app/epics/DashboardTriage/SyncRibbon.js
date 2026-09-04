@@ -72,7 +72,7 @@ export default function SyncRibbon({ state, loading }) {
       <span className={styles.separator} aria-hidden="true">·</span>
 
       <span className={styles.group}>
-        <span className={styles.value}>{records}</span>
+        <span className={styles.numeral}>{records}</span>
         <span className={styles.label}>{t('sync_ribbon_records_24h')}</span>
       </span>
 
