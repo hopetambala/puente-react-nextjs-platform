@@ -33,10 +33,19 @@ jest.mock('next-i18next', () => ({ useTranslation: () => ({ t: translate }) }));
 jest.mock('next/router', () => ({ useRouter: () => ({ push: jest.fn(), pathname: '/quick-start' }) }));
 jest.mock('parse', () => ({ Parse: { Query: jest.fn(), Object: { extend: jest.fn() } } }));
 
+const mockUser = jest.fn();
 jest.mock('app/modules/user', () => ({
-  retrieveCurrentUserAsyncFunction: () => ({
-    get: (f) => ({ firstname: 'Yolanda', organization: 'Puente' }[f]),
-  }),
+  retrieveCurrentUserAsyncFunction: () => mockUser(),
+}));
+
+// Controllable so a test can make the ORG-SCOPE resolution fail. It resolves an
+// organization to every alias string its records were collected under; when it
+// fails we cannot scope a query correctly, and falling back to the raw name is
+// the documented live bug (a user whose org is "puente" matches no records
+// saying "Puente" and sees an empty app with no error).
+const mockOrgScope = jest.fn();
+jest.mock('app/modules/organization', () => ({
+  loadOrganizationScope: (...a) => mockOrgScope(...a),
 }));
 
 const mockLoad = jest.fn();
@@ -73,6 +82,10 @@ const payload = (over = {}) => ({
 });
 
 beforeEach(() => {
+  mockUser.mockReset();
+  mockUser.mockReturnValue({ get: (f) => ({ firstname: 'Yolanda', organization: 'Puente' }[f]) });
+  mockOrgScope.mockReset();
+  mockOrgScope.mockResolvedValue(['Puente']);
   mockLoad.mockReset();
   mockLoad.mockResolvedValue(payload());
 });
@@ -401,5 +414,55 @@ describe('Context strip while loading', () => {
     const strip = screen.getByTestId('context-strip');
     expect(strip).not.toHaveTextContent(/last 0 records/i);
     expect(strip).not.toHaveTextContent(/\b0\b/);
+  });
+});
+
+/**
+ * Found by cutting the network in a browser and watching the screen, not the
+ * source: with nothing to scope a query with, the page sat in its loading
+ * skeleton forever — `setLoading(false)` was never reached, so a shimmer read
+ * as "still working" when nothing was. Slow and failing connections are this
+ * product's stated design case, not its edge case.
+ */
+describe('Nothing to scope a query with', () => {
+  it('settles instead of shimmering forever when the account has no organization', async () => {
+    // Reachable today: `organization` is a free-text field on _User and an
+    // account can simply not have one.
+    mockUser.mockReturnValue({ get: (f) => ({ firstname: 'Yolanda' }[f]) });
+
+    render(<Dashboard />);
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('triage-loading')).not.toBeInTheDocument();
+    });
+  });
+
+  it('withholds the all-clear, because nothing was actually checked', async () => {
+    mockUser.mockReturnValue({ get: (f) => ({ firstname: 'Yolanda' }[f]) });
+
+    render(<Dashboard />);
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('triage-loading')).not.toBeInTheDocument();
+    });
+    expect(screen.queryByTestId('triage-clear')).not.toBeInTheDocument();
+  });
+
+  /**
+   * Defense in depth, and honest about it: `loadOrganizationScope` does NOT
+   * reject on a failed read today — `loadOrganizationIdentity` catches and
+   * falls back to `[organization]` so a flaky read narrows the view rather than
+   * blanking it (app/modules/organization/index.js). This asserts the page
+   * survives if that contract ever changes, rather than describing behaviour
+   * the module currently produces.
+   */
+  it('settles if the scope resolver ever starts rejecting', async () => {
+    mockOrgScope.mockRejectedValue(new Error('offline'));
+
+    render(<Dashboard />);
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('triage-loading')).not.toBeInTheDocument();
+    });
   });
 });

@@ -76,9 +76,14 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<TriageData | null>(null);
 
+  // Whether the account has been read yet. Without this the first render is
+  // indistinguishable from "this account has no organization", and the page
+  // would flash its empty state before the user is even known.
+  const [accountRead, setAccountRead] = useState(false);
   useEffect(() => {
     const user = retrieveCurrentUserAsyncFunction();
     if (user) setOrg(user.get('organization') || '');
+    setAccountRead(true);
   }, []);
 
   // Every string this organization's records may carry. Resolved once, then
@@ -89,13 +94,35 @@ export default function Dashboard() {
   // their own data with no error and no way to tell.
   const [orgValues, setOrgValues] = useState<string[]>([]);
   useEffect(() => {
-    if (!org) return undefined;
+    if (!accountRead) return undefined;
+    // Nothing to scope a query with. Stop, rather than leaving the skeleton up
+    // forever waiting for data that can never be requested.
+    if (!org) { setLoading(false); return undefined; }
+
     let ignore = false;
-    loadOrganizationScope(Parse, org).then((values: string[]) => {
-      if (!ignore) setOrgValues(values);
-    });
+    loadOrganizationScope(Parse, org)
+      .then((values: string[]) => {
+        if (ignore) return;
+        setOrgValues(values);
+        // Resolved, but to nothing to query. Same reasoning as above.
+        if (!values.length) setLoading(false);
+      })
+      // Scope resolution failed, so NO query below can be scoped correctly.
+      // Falling back to the raw organization name is not an option: a user whose
+      // organization is "puente" matches no records saying "Puente" and would
+      // see a fraction of their own data with no error, which is the documented
+      // live bug this resolver exists to fix. So the page stops loading and
+      // renders its "could not check" branches instead — which withhold the
+      // all-clear rather than implying the checks passed.
+      //
+      // Found by cutting the network in a browser: previously the effect below
+      // returned early on an empty orgValues, setLoading(false) was never
+      // reached, and the dashboard shimmered indefinitely. Slow and failing
+      // connections are this product's design case, not its edge case.
+      .catch(() => { if (!ignore) setLoading(false); });
+
     return () => { ignore = true; };
-  }, [org]);
+  }, [org, accountRead]);
 
   useEffect(() => {
     if (!orgValues.length) return;
