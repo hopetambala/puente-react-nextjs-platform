@@ -18,9 +18,26 @@
   transition: background-color var(--tk-dlite-semantic-duration-fast) ease-out;
 }
 
+/* Hover is a quiet background shift and nothing else.
+
+   These rows are anchors, and the global `a:hover` in
+   app/impacto-design-system/_css/root.css sets `color: var(--color-link-hover)`
+   plus a hardcoded `transition: color 0.3s`. Inherited, that turns the WHOLE
+   row link-blue — the label and, worse, the tabular count. On a records
+   instrument a number changing colour reads as a change in the data rather than
+   as a pointer affordance, and accent here is supposed to mean live-or-
+   actionable, not decorate a mouse position.
+
+   So both properties are pinned: colour held at rest, and the transition
+   restated so the 0.3s literal cannot ride in on the cascade. Measured in the
+   browser before the fix, the row text went from near-black to link-blue on
+   hover; after it, it holds. Only a real browser shows this — jsdom does not
+   compute hover, so re-check it in the browser rather than by reading a test. */
 .row:hover,
 .row:focus-visible {
   background: var(--tk-dlite-semantic-color-surface-raised);
+  color: var(--tk-dlite-semantic-color-text-primary);
+  transition: background-color var(--tk-dlite-semantic-duration-fast) ease-out;
 }
 
 /* The quantity is now "12 of 43,979", not a bare numerator — a count without
@@ -80,7 +97,9 @@
 /* The only transition here is the row hover. Honour reduced motion — the repo
    had zero coverage before this file; don't add to that debt. */
 @media (prefers-reduced-motion: reduce) {
-  .row {
+  .row,
+  .row:hover,
+  .row:focus-visible {
     transition: none;
   }
 }

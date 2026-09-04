@@ -5,7 +5,7 @@ import NeedsAttention from 'app/epics/DashboardTriage/NeedsAttention';
 import SyncRibbon from 'app/epics/DashboardTriage/SyncRibbon';
 import { summarizeSyncState } from 'app/epics/DashboardTriage/syncState';
 import { buildTriageQueue, findUnavailableSignals } from 'app/epics/DashboardTriage/triageQueue';
-import { AppShell } from 'app/impacto-design-system';
+import { AppShell, Skeleton } from 'app/impacto-design-system';
 import { loadOrganizationScope } from 'app/modules/organization';
 import { retrieveCurrentUserAsyncFunction } from 'app/modules/user';
 import { useTranslation } from 'next-i18next';
@@ -155,34 +155,54 @@ export default function Dashboard() {
           copy was the identical value under a different label — which reads as
           two independent facts that happen to agree. */}
       <footer className={styles.contextStrip} data-testid="context-strip">
-        <span className={styles.contextItem}>
-          {/* Formatted through i18next rather than emitted as a raw JS number.
-              This is the SAME quantity the queue rows quote as their
-              denominator, and the queue formats it — so unformatted here it
-              rendered "43979" directly under a queue reading "12 of 43,979",
-              which looks like two different figures on a screen whose whole
-              job is telling a coordinator what to trust. Spanish groups with
-              '.', so the raw form was wrong, not merely inconsistent. */}
-          <span className={styles.contextValue}>
-            {data?.totalRecords === null || data?.totalRecords === undefined
-              ? '—'
-              : t('number_value', { value: data.totalRecords })}
-          </span>
-          <span className={styles.contextLabel}>{t('context_records_total')}</span>
-        </span>
-        <span className={styles.contextItem}>
-          {/* The denominator moves INTO the label instead of trailing behind a
-              prose caveat: this is a count of accounts seen in a sample, and
-              "7" alone reads as the organization's entire staff. The figure is
-              the rows actually read, not the sample cap — an org with 343
-              records was never sampled from 1,000. */}
-          <span className={styles.contextValue}>
-            {data ? t('number_value', { value: data.accountsSynced.count }) : '—'}
-          </span>
-          <span className={styles.contextLabel}>
-            {t('context_accounts_synced_of', { count: data ? data.accountsSynced.sampledFrom : 0 })}
-          </span>
-        </span>
+        {loading || !data ? (
+          /* A designed loading state, like every other region on this page.
+             Without it the value showed an honest em-dash while the label beside
+             it interpolated a sample size of 0 — "sampled from the last 0
+             records synced" — asserting a denominator nobody measured on the one
+             screen whose job is telling a coordinator what to trust. Skeletons
+             hold the strip's height so the page does not shift when data lands. */
+          <>
+            <span className={styles.contextItem} data-testid="context-strip-loading">
+              <Skeleton width={40} height={14} />
+              <Skeleton width={120} height={12} />
+            </span>
+            <span className={styles.contextItem}>
+              <Skeleton width={28} height={14} />
+              <Skeleton width={200} height={12} />
+            </span>
+          </>
+        ) : (
+          <>
+            <span className={styles.contextItem}>
+              {/* Formatted through i18next rather than emitted as a raw JS number.
+                  This is the SAME quantity the queue rows quote as their
+                  denominator, and the queue formats it — so unformatted here it
+                  rendered "43979" directly under a queue reading "12 of 43,979",
+                  which looks like two different figures. Spanish groups with '.',
+                  so the raw form was wrong, not merely inconsistent. */}
+              <span className={styles.contextValue}>
+                {data.totalRecords === null || data.totalRecords === undefined
+                  ? '\u2014'
+                  : t('number_value', { value: data.totalRecords })}
+              </span>
+              <span className={styles.contextLabel}>{t('context_records_total')}</span>
+            </span>
+            <span className={styles.contextItem}>
+              {/* The denominator moves INTO the label instead of trailing behind a
+                  prose caveat: this is a count of accounts seen in a sample, and
+                  "7" alone reads as the organization's entire staff. The figure is
+                  the rows actually read, not the sample cap — an org with 343
+                  records was never sampled from 1,000. */}
+              <span className={styles.contextValue}>
+                {t('number_value', { value: data.accountsSynced.count })}
+              </span>
+              <span className={styles.contextLabel}>
+                {t('context_accounts_synced_of', { count: data.accountsSynced.sampledFrom })}
+              </span>
+            </span>
+          </>
+        )}
       </footer>
     </AppShell>
   );

@@ -382,3 +382,24 @@ describe('Denominators', () => {
     expect(strip).not.toHaveTextContent('1,000');
   });
 });
+
+/**
+ * Caught by looking at the rendered loading state, not the source: the footer's
+ * value correctly showed an em-dash while the label beside it interpolated a
+ * sample size of 0 — "sampled from the last 0 records synced". A fabricated
+ * denominator is the exact defect this screen exists to prevent, and it is
+ * worse than a missing one because it reads as measured.
+ */
+describe('Context strip while loading', () => {
+  it('never claims a sample size before the data has arrived', async () => {
+    // A load that never settles: the page stays in its loading state.
+    mockLoad.mockReturnValue(new Promise(() => {}));
+
+    render(<Dashboard />);
+    await screen.findByTestId('triage-loading');
+
+    const strip = screen.getByTestId('context-strip');
+    expect(strip).not.toHaveTextContent(/last 0 records/i);
+    expect(strip).not.toHaveTextContent(/\b0\b/);
+  });
+});
