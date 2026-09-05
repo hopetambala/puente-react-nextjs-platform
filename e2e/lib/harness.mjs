@@ -27,7 +27,7 @@ import { mkdirSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
-import { describeSelector, mayWrite, summarizeRuns, verdict } from './harness-lib.mjs';
+import { describeSelector, extractAppId, mayWrite, summarizeRuns, verdict } from './harness-lib.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, '..', '..');
@@ -80,9 +80,8 @@ export async function openSession({
   // a filename is not evidence.
   let observedAppId = null;
   page.on('request', (r) => {
-    if (observedAppId) return;
-    const h = r.headers();
-    const id = h['x-parse-application-id'] ?? h['X-Parse-Application-Id'];
+    if (observedAppId || !/parseapi|back4app/i.test(r.url())) return;
+    const id = extractAppId(r.postData(), r.headers());
     if (id) observedAppId = id;
   });
 

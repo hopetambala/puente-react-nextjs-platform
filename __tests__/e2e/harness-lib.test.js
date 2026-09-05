@@ -1,5 +1,6 @@
 import {
   describeSelector,
+  extractAppId,
   mayWrite,
   summarizeRuns,
   verdict,
@@ -145,5 +146,30 @@ describe('mayWrite — the production guard', () => {
     expect(mayWrite('').allowed).toBe(false);
     expect(mayWrite(undefined).allowed).toBe(false);
     expect(mayWrite(null).reason).toMatch(/unidentified|no parse app id/i);
+  });
+});
+
+/**
+ * The Parse JS SDK does NOT send `X-Parse-Application-Id`: it POSTs the app id
+ * in the request BODY as `_ApplicationId`, to avoid a CORS preflight. The first
+ * version of the guard looked only at headers, found nothing, and refused to
+ * run — correctly, but for the wrong reason. Verified against a real request.
+ */
+describe('extractAppId — where Parse actually puts the app id', () => {
+  it('reads _ApplicationId out of the request body', () => {
+    expect(extractAppId('{"username":"Test","_ApplicationId":"ZvGwjA7cem"}', {})).toBe('ZvGwjA7cem');
+  });
+
+  it('still accepts the header form, in case a caller uses REST directly', () => {
+    expect(extractAppId(null, { 'x-parse-application-id': 'ZvGwjA7cem' })).toBe('ZvGwjA7cem');
+  });
+
+  it('returns null rather than guessing when neither is present', () => {
+    expect(extractAppId('{"username":"Test"}', {})).toBeNull();
+    expect(extractAppId(null, {})).toBeNull();
+  });
+
+  it('survives a body that is not JSON', () => {
+    expect(extractAppId('not json at all', {})).toBeNull();
   });
 });

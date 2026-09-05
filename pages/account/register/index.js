@@ -187,14 +187,22 @@ function Register() {
               />
             </Stack>
             <Stack isVertical className={styles.stack}>
+              {/* type="password" so the browser masks the value and offers to
+                  save it. Without it these rendered as plain text: a password
+                  visible on screen to anyone nearby — which in a shared field
+                  office is most people — and invisible to password managers.
+                  The sign-in form already did this correctly; registration did
+                  not, and nothing compared them. Caught by e2e/suites/sign-up. */}
               <FormInput
                 name="password"
+                type="password"
                 label={t('register_field_password')}
                 required
                 errorobj={errors}
               />
               <FormInput
                 name="passwordconfirmation"
+                type="password"
                 label={t('register_field_password_confirm')}
                 required
                 errorobj={errors}

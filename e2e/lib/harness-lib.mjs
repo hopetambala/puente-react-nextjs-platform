@@ -153,3 +153,22 @@ export function mayWrite(appId) {
   }
   return { allowed: true, reason: `App id ${appId.slice(0, 10)}… is not a known production app.` };
 }
+
+/**
+ * Pull the Parse app id out of a request.
+ *
+ * The JS SDK POSTs it in the BODY as `_ApplicationId` rather than sending
+ * `X-Parse-Application-Id`, because a custom header would trigger a CORS
+ * preflight. Both forms are accepted; neither present returns null, and the
+ * guard treats null as "refuse", never as "probably fine".
+ */
+export function extractAppId(postData, headers = {}) {
+  const header = headers['x-parse-application-id'] ?? headers['X-Parse-Application-Id'];
+  if (header) return header;
+  try {
+    const body = JSON.parse(postData || '{}');
+    return body._ApplicationId ?? body.applicationId ?? null;
+  } catch {
+    return null;
+  }
+}
