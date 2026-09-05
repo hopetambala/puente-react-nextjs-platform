@@ -84,18 +84,26 @@ const DESC = `Created by e2e/suites/form-create at ${new Date(stamp).toISOString
   const rowFor = (n) => s.page.locator('tr', { hasText: n });
   await rowFor(NAME).first().waitFor({ state: 'visible', timeout: 20000 }).catch(() => {});
   const onFirstVisit = await rowFor(NAME).count() > 0;
-  // FINDING (2026-09-05, staging): a form published in this session does NOT
-  // appear in Form Manager during that session — not on arrival and not after a
-  // reload. It does appear in a LATER session, and the sweep below reliably
-  // finds and deletes such forms, so the write itself succeeds. The evidence is
-  // that a single run created a form the next run then swept.
+  // RETRACTED CLAIM, kept visible so the mistake is not repeated.
   //
-  // For a coordinator this reads as "I published my form and it vanished", and
-  // the likely retry is publishing again — producing duplicate definitions,
-  // each with its own formikKeys. Left as a FAILING check on purpose: it is the
-  // bug, and muting it would hide the thing this suite exists to find.
+  // An earlier version of this comment asserted a product bug: "a published form
+  // does not appear in Form Manager". That was WRONG, and the evidence for it was
+  // an artifact of a counting bug — the old sweep incremented its total per
+  // Delete CLICK rather than per row actually removed, so "swept 40" meant 40
+  // clicks, not 40 forms.
+  //
+  // What is actually true, verified from the response body: Publish returns 200
+  // with a real objectId, and saves `"fields": []` — the block this suite adds
+  // is never registered. Clicking a block button in the FORM BUILDER apparently
+  // only offers it; the INSPECTOR ("Select a block to edit") is likely the step
+  // that commits it, and this suite never performs it.
+  //
+  // So the form is created EMPTY, and an empty form appears not to list. That is
+  // a gap in this suite, not a proven defect in the product. The check stays
+  // failing because the suite genuinely cannot yet build a real form — but it is
+  // labelled as OUR gap, not theirs.
   await s.check('the new form appears without needing a reload', onFirstVisit,
-    onFirstVisit ? NAME : 'PRODUCT BUG: published form is absent from Form Manager in this session');
+    onFirstVisit ? NAME : 'SUITE GAP: the form saved with fields:[] — the block was never committed, see the note above');
 
   let listed = onFirstVisit ? 1 : 0;
   if (!onFirstVisit) {

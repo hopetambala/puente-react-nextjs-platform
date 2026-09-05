@@ -29,6 +29,8 @@ const SUITES = {
   'sign-in': 'suites/sign-in.mjs',
   'sign-up': 'suites/sign-up.mjs',
   'form-create': 'suites/form-create.mjs',
+  'data-export': 'suites/data-export.mjs',
+  'form-edit': 'suites/form-edit.mjs',
 };
 
 const argv = process.argv.slice(2);
