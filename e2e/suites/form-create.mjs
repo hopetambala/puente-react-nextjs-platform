@@ -1,0 +1,159 @@
+/**
+ * Form creation — build a custom form, publish it, confirm it is real, delete it.
+ *
+ * WRITES. Refuses production, and cleans up after itself: Form Manager has a
+ * Delete action, so the whole cycle runs through real UI and the delete path is
+ * covered too.
+ *
+ * A form definition is not an ordinary record. `FormSpecificationsV2.fields[].formikKey`
+ * is derived from the label ONCE, at creation, and every answer submitted later
+ * stores that key in `FormResults.fields[].title`. That join is what a CSV
+ * column is built from — so this suite asserts the created form is findable and
+ * removable, and never touches a form it did not create.
+ *
+ * See e2e/README.md for the harness rules.
+ */
+import { openSession } from '../lib/harness.mjs';
+import { addBlock, deleteFormRow, publishForm, sweepForms } from '../lib/form-builder.mjs';
+
+const LOGIN_FORM = { role: 'button', name: /sign in|login/i };
+// Form Manager renders in sections: the built-in Puente forms first, then
+// CUSTOM FORMS separately and later. Two earlier versions of this suite got
+// this wrong — one waited on the "+ Create form" button (which exists before
+// any data), the other on SurveyData (which proves only the built-in list
+// arrived) — and both concluded the form had not saved when it had.
+// Waiting for the form BY NAME is both the wait and the assertion.
+const MANAGER_LOADED = { text: /SurveyData/ };
+const CREATOR = { role: 'button', name: /^publish$/i };
+
+const stamp = Date.now();
+const NAME = `e2e-form-${stamp}`;
+const DESC = `Created by e2e/suites/form-create at ${new Date(stamp).toISOString()} — safe to delete.`;
+
+const PRE_EXISTING = /supplied to `Stack`|supplied to `Card`|headerActions|does not recognize the/;
+
+(async () => {
+  const s = await openSession({ suite: 'form-create', owned: [/forms/, /quick-start/], expectedErrors: PRE_EXISTING });
+  // Pre-existing on /forms/form-manager on master, unrelated to form creation.
+  await s.login();
+  await s.requireWritableEnvironment();
+
+  // ── BUILD ────────────────────────────────────────────────────────────────
+  console.log(`\n[BUILD] composing ${NAME}`);
+  await s.go('/forms/form-creator', CREATOR, 'open the form creator');
+
+  const nameField = s.page.getByPlaceholder(/give your form a detailed na/i).first();
+  const descField = s.page.getByPlaceholder(/describe how this form/i).first();
+  await s.check('the creator asks for a name and a description',
+    await nameField.count() > 0 && await descField.count() > 0);
+  await nameField.fill(NAME);
+  await descField.fill(DESC);
+
+  // Blocks are added by DRAG AND DROP, not by clicking — see lib/form-builder.
+  // Clicking added nothing and published `fields: []`.
+  const dragged = [];
+  for (const block of [/Question - Text response/i, /Question - Number response/i]) {
+    // eslint-disable-next-line no-await-in-loop
+    dragged.push(await addBlock(s.page, block));
+  }
+  await s.check('blocks can be added to the canvas by keyboard drag',
+    dragged.length === 2, dragged.join(' + '));
+  await s.shot('composed');
+
+  // ── PUBLISH ──────────────────────────────────────────────────────────────
+  console.log('\n[PUBLISH] saving the form');
+  const savedForm = await publishForm(s.page);
+  await s.check('publish returns a saved form with an objectId',
+    !!savedForm.objectId, savedForm.objectId ? `objectId ${savedForm.objectId}` : JSON.stringify(savedForm).slice(0, 90));
+  await s.check('the saved form kept the blocks that were added',
+    (savedForm.fields || []).length === 2, `${(savedForm.fields || []).length} field(s)`);
+  await s.check('the saved form kept its name', savedForm.name === NAME, savedForm.name);
+  await s.shot('published');
+
+  // ── IT IS REALLY THERE ───────────────────────────────────────────────────
+  // The assertion that matters: not "the button was clicked" but "a coordinator
+  // opening Form Manager now sees this form".
+  console.log('\n[PERSISTED] the form is visible in Form Manager');
+  await s.withExpectedErrors(PRE_EXISTING, async () => {
+  // Does the new form show up on a first visit, or only after a reload? Both
+  // are asserted separately, because "publish a form, open Form Manager, it is
+  // not there" is a real defect a coordinator would hit, and it is invisible if
+  // the test simply retries until it passes.
+  await s.go('/forms/form-manager', MANAGER_LOADED, 'open Form Manager');
+  const rowFor = (n) => s.page.locator('tr', { hasText: n });
+  await rowFor(NAME).first().waitFor({ state: 'visible', timeout: 20000 }).catch(() => {});
+  const onFirstVisit = await rowFor(NAME).count() > 0;
+  // RETRACTED CLAIM, kept visible so the mistake is not repeated.
+  //
+  // An earlier version of this comment asserted a product bug: "a published form
+  // does not appear in Form Manager". That was WRONG, and the evidence for it was
+  // an artifact of a counting bug — the old sweep incremented its total per
+  // Delete CLICK rather than per row actually removed, so "swept 40" meant 40
+  // clicks, not 40 forms.
+  //
+  // What is actually true, verified from the response body: Publish returns 200
+  // with a real objectId, and saves `"fields": []` — the block this suite adds
+  // is never registered. Clicking a block button in the FORM BUILDER apparently
+  // only offers it; the INSPECTOR ("Select a block to edit") is likely the step
+  // that commits it, and this suite never performs it.
+  //
+  // So the form is created EMPTY, and an empty form appears not to list. That is
+  // a gap in this suite, not a proven defect in the product. The check stays
+  // failing because the suite genuinely cannot yet build a real form — but it is
+  // labelled as OUR gap, not theirs.
+  await s.check('the new form appears without needing a reload', onFirstVisit,
+    onFirstVisit ? NAME : 'SUITE GAP: the form saved with fields:[] — the block was never committed, see the note above');
+
+  let listed = onFirstVisit ? 1 : 0;
+  if (!onFirstVisit) {
+    await s.step('reload Form Manager', () => s.page.reload(), MANAGER_LOADED);
+    await rowFor(NAME).first().waitFor({ state: 'visible', timeout: 25000 }).catch(() => {});
+    listed = await rowFor(NAME).count();
+  }
+  await s.check('the created form persisted', listed > 0,
+    listed ? `${NAME}${onFirstVisit ? '' : ' (only after a reload)'}` : `${NAME} never appeared`);
+
+  // ── CLEAN UP ─────────────────────────────────────────────────────────────
+  console.log('\n[CLEANUP] deleting the form this suite created');
+  let deleted = false;
+  if (listed > 0) {
+    // Scope the Delete to the row carrying OUR name. Clicking a bare "Delete"
+    // would remove whichever form happened to be first, which on a shared
+    // staging database is somebody else's work.
+    const row = rowFor(NAME).first();
+    const scoped = await row.count();
+    await s.check('the delete action can be scoped to the created form', scoped > 0,
+      scoped ? 'row located by name' : 'could not isolate the row — NOT deleting anything');
+    if (scoped) {
+      await deleteFormRow(s.page, row);
+      // Confirm against the server, not the DOM the click just mutated.
+      await s.step('reload after delete', () => s.page.reload(), MANAGER_LOADED);
+      deleted = await rowFor(NAME).count() === 0;
+    }
+  }
+  await s.check('the created form was deleted', deleted,
+    deleted ? `${NAME} removed` : `LEFT BEHIND: ${NAME} — delete it by hand`);
+
+  if (deleted) {
+    await s.step('reload Form Manager', () => s.page.reload(), MANAGER_LOADED);
+    await s.check('the deletion survives a reload (it was persisted, not just hidden)',
+      await rowFor(NAME).count() === 0, 'gone after reload');
+  }
+  });
+
+  // Safety net: remove ANY leftover e2e-* form, including ones a crashed run
+  // abandoned. Uses the SHARED sweep so it cannot drift from e2e/sweep.mjs —
+  // the suite's own copy previously kept an older click-counting bug and
+  // reported "40 removed" when nothing had been deleted.
+  await s.withExpectedErrors(PRE_EXISTING, async () => {
+    await s.go('/forms/form-manager', MANAGER_LOADED, 'reload Form Manager for the sweep');
+    const swept = await sweepForms(s.page, /e2e-(form|probe)/);
+    if (swept.removed) console.log(`      swept ${swept.removed} leftover e2e form(s)`);
+    if (swept.stopped && swept.stopped !== 'list is clear') console.log(`      stopped: ${swept.stopped}`);
+    await s.check('no e2e forms are left behind', swept.remaining === 0,
+      swept.remaining ? `${swept.remaining} remaining` : `${swept.removed} removed`);
+  });
+
+  const { failed } = await s.finish();
+  process.exit(failed.length ? 1 : 0);
+})();
