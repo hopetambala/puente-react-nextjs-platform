@@ -8,12 +8,16 @@ jest.mock('next-i18next', () => ({
 // eslint-disable-next-line import/first
 import NeedsAttention from 'app/epics/DashboardTriage/NeedsAttention';
 
+// Mirrors what buildTriageQueue actually emits, `denominator` included —
+// missing-key-fields is an exact count over every record, so it is one of the
+// two signals whose numerator may be read against the org record total.
 const row = (over = {}) => ({
   id: 'missing-key-fields',
   labelKey: 'triage_missing_key_fields',
   count: 12,
   severity: 'medium',
   approximate: false,
+  denominator: 'org-records',
   href: '/data/data-curation',
   ...over,
 });
@@ -26,9 +30,12 @@ describe('NeedsAttention', () => {
   });
 
   it('shows the count for a row', () => {
-    render(<NeedsAttention rows={[row({ count: 12 })]} loading={false} />);
+    render(<NeedsAttention rows={[row({ count: 12 })]} total={43979} loading={false} />);
 
-    expect(screen.getByText('12')).toBeInTheDocument();
+    // The count is now rendered inside its quantity phrase ("12 of 43,979")
+    // rather than as a bare numerator, so assert it via the interpolation.
+    expect(screen.getByTestId('triage-row-missing-key-fields'))
+      .toHaveTextContent(/"count":12/);
   });
 
   it('uses the plain label for an exact count', () => {
@@ -125,5 +132,69 @@ describe('when the organization has no records yet', () => {
     expect(screen.getByTestId('triage-no-records')).toBeInTheDocument();
     expect(screen.getByTestId('triage-unavailable-note'))
       .toHaveTextContent(/triage_unavailable_form-drift/);
+  });
+});
+
+describe('NeedsAttention denominators', () => {
+  it('states the denominator alongside the count so the magnitude can be judged', () => {
+    render(<NeedsAttention rows={[row({ count: 12 })]} total={43979} loading={false} />);
+
+    expect(screen.getByTestId('triage-row-missing-key-fields'))
+      .toHaveTextContent(/triage_count_of_total:\{"count":12,"total":43979\}/);
+  });
+
+  it('says the total is unknown rather than implying a base rate when the total failed to load', () => {
+    render(<NeedsAttention rows={[row({ count: 12 })]} total={null} loading={false} />);
+
+    const el = screen.getByTestId('triage-row-missing-key-fields');
+    expect(el).toHaveTextContent(/triage_count_of_unknown/);
+    expect(el).not.toHaveTextContent(/triage_count_of_total/);
+  });
+
+  // A wrong base rate is worse than a missing one: it reads as measured. Form
+  // drift counts FORM DEFINITIONS, so pinning it to the record total compares
+  // forms to records and makes the one critical signal look vanishingly rare.
+  it('never reads a form count against the record total', () => {
+    render(<NeedsAttention
+      rows={[row({
+        id: 'form-drift',
+        labelKey: 'triage_form_drift',
+        count: 1,
+        severity: 'critical',
+        approximate: true,
+        denominator: null,
+      })]}
+      total={43979}
+      loading={false}
+    />);
+
+    const el = screen.getByTestId('triage-row-form-drift');
+    expect(el).not.toHaveTextContent(/triage_count_of_total/);
+    expect(el).not.toHaveTextContent(/43979/);
+    // The count still renders — through the locale's number format, not raw.
+    expect(el).toHaveTextContent(/number_value:\{"value":1\}/);
+  });
+
+  // Duplicates are reduced from the capped sample, so their base is the sampled
+  // rows and not the org total — quoting 43,979 understates the rate ~44x.
+  it('never reads a sampled count against the record total', () => {
+    render(<NeedsAttention
+      rows={[row({
+        id: 'possible-duplicates',
+        labelKey: 'triage_possible_duplicates',
+        count: 3,
+        approximate: true,
+        denominator: null,
+      })]}
+      total={43979}
+      loading={false}
+    />);
+
+    const el = screen.getByTestId('triage-row-possible-duplicates');
+    expect(el).not.toHaveTextContent(/triage_count_of_total/);
+    expect(el).not.toHaveTextContent(/43979/);
+    // The sampling is still disclosed — suppressing the base rate must not
+    // quietly upgrade an estimate into an exact figure.
+    expect(el).toHaveTextContent(/triage_estimated/);
   });
 });

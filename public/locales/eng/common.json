@@ -97,10 +97,6 @@
   "coverage_unattributed": "{{count}} records had no community recorded.",
   "coverage_empty": "No community has synced yet",
   "coverage_empty_sub": "Communities appear here as field staff sync from the mobile app.",
-  "context_records_synced": "Records synced",
-  "context_window_24h": "last 24 hours",
-  "context_accounts_synced": "Accounts that synced",
-  "context_accounts_note": "sampled from the most recent 1,000 records; counts accounts that synced, not people who collected",
   "coverage_quiet_today": "synced today",
   "coverage_quiet_days": "quiet {{count}}d",
   "coverage_quiet_months": "quiet {{count}}mo",
@@ -405,5 +401,11 @@
   "form_creator_hint_single_select": "Single select: The person answering picks one option",
   "form_creator_hint_multi_select": "Multi-select: The person answering can pick several options",
   "form_creator_hint_header": "Header: A header row/title to your form",
-  "form_creator_hint_geolocation": "Geolocation: Collect longitude/latitude from a user"
+  "form_creator_hint_geolocation": "Geolocation: Collect longitude/latitude from a user",
+  "triage_count_of_total": "{{count}} of {{total, number}}",
+  "triage_count_of_unknown": "{{count}} of an unknown total",
+  "coverage_denominator": "of the {{count, number}} most recently synced records",
+  "context_records_total": "records synced in total",
+  "context_accounts_synced_of": "accounts · sampled from the last {{count, number}} records synced, not people who collected",
+  "number_value": "{{value, number}}"
 }

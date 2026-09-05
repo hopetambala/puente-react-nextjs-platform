@@ -72,3 +72,13 @@
   color: var(--tk-dlite-semantic-color-text-secondary);
   font-size: var(--tk-dlite-semantic-typography-size-100);
 }
+
+/* The rail's denominator. Secondary weight and size: it anchors the numbers
+   below without competing with the community names, which are what the eye
+   is scanning for. */
+.denominator {
+  margin: 0 0 var(--tk-dlite-semantic-spacing-xs);
+  padding-inline: var(--tk-dlite-semantic-spacing-sm);
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  font-size: var(--tk-dlite-semantic-typography-size-100);
+}

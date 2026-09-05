@@ -1,14 +1,31 @@
 /* Provenance strip, organization scale. A band, not a card — so a single
-   bottom rule rather than elevation. Logical properties throughout so the
-   Arabic locale mirrors without a rewrite. */
+   bottom rule rather than elevation. Logical properties throughout — kept
+   because they are the better default, NOT for a right-to-left locale: this
+   app ships eng/spa/hat only, and ara was retired 2026-08-28. */
 .ribbon {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: var(--tk-dlite-semantic-spacing-xs);
-  padding-block: var(--tk-dlite-semantic-spacing-xs);
+  padding-block: var(--tk-dlite-semantic-spacing-sm);
   padding-inline: var(--tk-dlite-semantic-spacing-md);
-  background: var(--tk-dlite-semantic-color-surface-raised);
+
+  /* No surface of its own. Measured: this band and the AppShell topbar rendered
+     with the SAME background and the SAME bottom rule, so the
+     signature was a second, thinner toolbar — chrome imitating chrome.
+
+     Surface cannot separate them: in the puente light theme
+     `surface-base` and `surface-raised` resolve to the same white, and
+     `surface-sunken` resolves to exactly the shell background, so a "raised"
+     band is invisible as elevation and a "sunken" one disappears into the page.
+     Flagged against style-dictionary-dlite-tokens rather than worked around
+     with a literal.
+
+     The direction is the way out: this strip appears on every record row and in
+     every record inspector, so it is a CONTENT pattern, not page furniture.
+     Sitting it on the page ground with a single closing rule is what it always
+     should have been — the first line of the page, not the last bar of the
+     header. */
   border-block-end: 1px solid var(--tk-dlite-semantic-color-border);
   font-size: var(--tk-dlite-semantic-typography-size-200);
 }
@@ -19,15 +36,44 @@
   gap: var(--tk-dlite-semantic-spacing-xxs);
 }
 
-/* Weight and colour carry the label/value distinction — no size ramp. */
+/* Weight and colour carry the label/value distinction — no size ramp.
+   Labels take the label-s tracking so they read as field names framing the
+   values, rather than as prose the values interrupt. */
 .label {
   color: var(--tk-dlite-semantic-color-text-secondary);
+  letter-spacing: var(--tk-dlite-semantic-typography-type-label-s-letter-spacing);
 }
 
+/* Mono on bare numerals, following the convention this codebase already set.
+
+   NOT because the face was unused — an earlier version of this comment claimed
+   Source Code Pro was "loaded on every page and used on none", and that was
+   simply wrong: OrganizationAdmin already sets shortCode, the typed
+   organization string, and usernames in it, and Billing sets amounts and the
+   price input. The established meaning there is "a value you copy or compare
+   character by character, without transcription error". A record count read off
+   a provenance strip is that kind of value, so it takes the same treatment for
+   the same reason — consistency with a convention, not novelty.
+
+   The scope is narrow on evidence. Mono was first applied to every value in the
+   band and inspected at 3x: `sync_ribbon_days_ago` is the PHRASE "{{count}}d
+   ago", and a monospace space is full-width, so it rendered "50d  ago" with a
+   gap that reads as a typo. Splitting the phrase to isolate the number is not an
+   option — a sentence assembled from fragments breaks in every language with
+   different word order. So `.value` keeps the proportional face and `.numeral`
+   takes mono. */
 .value {
   color: var(--tk-dlite-semantic-color-text-primary);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+}
+
+.numeral {
+  color: var(--tk-dlite-semantic-color-text-primary);
+  font-family: var(--tk-dlite-semantic-typography-font-mono), 'Source Code Pro', monospace;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--tk-dlite-primitive-dimension-letter-spacing-tight);
 }
 
 .separator {

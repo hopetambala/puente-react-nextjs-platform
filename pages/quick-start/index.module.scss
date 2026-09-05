@@ -1,5 +1,25 @@
-/* Queue dominant, coverage as a rail. Logical properties so the Arabic locale
-   mirrors without a rewrite. */
+/* The page composes as a FRAME, not as content followed by void.
+
+   Three bands: trust at the top (the sync ribbon), the work in the middle, and
+   context anchored at the bottom. Measured before this: the content ended with
+   400px of uncomposed grey beneath it, which reads as an unfinished screen
+   rather than a calm one. Space that is not composed is not restraint.
+
+   AppShell gives `.page` a full-height grid row, so filling it is a matter of
+   claiming the height and letting the middle band take the slack. */
+.frame {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.frame > .body {
+  flex: 1;
+}
+
+/* Queue dominant, coverage as a rail. Logical properties as the better
+   default — not for a right-to-left locale. This app ships eng/spa/hat only;
+   ara/deu/ind/prt/zho were retired 2026-08-28. */
 .body {
   display: grid;
   grid-template-columns: 65fr 35fr;
@@ -7,7 +27,9 @@
   padding: var(--tk-dlite-semantic-spacing-md);
 }
 
-/* German and Portuguese run long: stack rather than squeeze the columns. */
+/* Spanish runs ~20% longer than English and Creole longer still: stack rather
+   than squeeze the columns. (This used to cite German and Portuguese, which
+   this app has not shipped since 2026-08-28.) */
 @media (max-width: 900px) {
   .body {
     grid-template-columns: 1fr;
@@ -22,9 +44,21 @@
 .panelTitle {
   margin: 0 0 var(--tk-dlite-semantic-spacing-xs);
   padding-inline: var(--tk-dlite-semantic-spacing-sm);
-  color: var(--tk-dlite-semantic-color-text-secondary);
-  font-size: var(--tk-dlite-semantic-typography-size-200);
+  color: var(--tk-dlite-semantic-color-text-tertiary);
+
+  /* A real label treatment, from the label-s type token rather than a
+     hand-rolled size plus a weight. These titles previously sat at the same
+     600 weight as the counts they label and inherited the HEADING's negative
+     tracking, so chrome and data competed and nothing told the eye where to
+     start. On a records instrument the resolution is to demote the chrome, not
+     to inflate it: the data is the subject, and a section title is a field
+     name. Uppercase is applied in CSS, never in the copy, so translation and
+     the review worksheet are untouched. */
+  font-size: var(--tk-dlite-semantic-typography-type-label-s-size);
   font-weight: 600;
+  letter-spacing: var(--tk-dlite-semantic-typography-type-label-s-letter-spacing);
+  line-height: var(--tk-dlite-semantic-typography-type-label-s-line-height);
+  text-transform: uppercase;
 }
 
 .contextStrip {

@@ -5,7 +5,7 @@ import NeedsAttention from 'app/epics/DashboardTriage/NeedsAttention';
 import SyncRibbon from 'app/epics/DashboardTriage/SyncRibbon';
 import { summarizeSyncState } from 'app/epics/DashboardTriage/syncState';
 import { buildTriageQueue, findUnavailableSignals } from 'app/epics/DashboardTriage/triageQueue';
-import { AppShell } from 'app/impacto-design-system';
+import { AppShell, Skeleton } from 'app/impacto-design-system';
 import { loadOrganizationScope } from 'app/modules/organization';
 import { retrieveCurrentUserAsyncFunction } from 'app/modules/user';
 import { useTranslation } from 'next-i18next';
@@ -23,7 +23,9 @@ import styles from './index.module.scss';
 type Signal = { count: number; exact: boolean } | null;
 
 type TriageData = {
-  accountsSynced: { count: number; exact: boolean };
+  accountsSynced: { count: number; exact: boolean; sampledFrom: number };
+  /** Org-wide record total — the denominator the queue counts are read against. */
+  totalRecords: number | null;
   sync: { lastSyncAt: Date | null; lastSyncAvailable: boolean; recordsLast24h: number | null };
   signals: {
     missingKeyFields: Signal;
@@ -74,9 +76,14 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<TriageData | null>(null);
 
+  // Whether the account has been read yet. Without this the first render is
+  // indistinguishable from "this account has no organization", and the page
+  // would flash its empty state before the user is even known.
+  const [accountRead, setAccountRead] = useState(false);
   useEffect(() => {
     const user = retrieveCurrentUserAsyncFunction();
     if (user) setOrg(user.get('organization') || '');
+    setAccountRead(true);
   }, []);
 
   // Every string this organization's records may carry. Resolved once, then
@@ -87,13 +94,35 @@ export default function Dashboard() {
   // their own data with no error and no way to tell.
   const [orgValues, setOrgValues] = useState<string[]>([]);
   useEffect(() => {
-    if (!org) return undefined;
+    if (!accountRead) return undefined;
+    // Nothing to scope a query with. Stop, rather than leaving the skeleton up
+    // forever waiting for data that can never be requested.
+    if (!org) { setLoading(false); return undefined; }
+
     let ignore = false;
-    loadOrganizationScope(Parse, org).then((values: string[]) => {
-      if (!ignore) setOrgValues(values);
-    });
+    loadOrganizationScope(Parse, org)
+      .then((values: string[]) => {
+        if (ignore) return;
+        setOrgValues(values);
+        // Resolved, but to nothing to query. Same reasoning as above.
+        if (!values.length) setLoading(false);
+      })
+      // Scope resolution failed, so NO query below can be scoped correctly.
+      // Falling back to the raw organization name is not an option: a user whose
+      // organization is "puente" matches no records saying "Puente" and would
+      // see a fraction of their own data with no error, which is the documented
+      // live bug this resolver exists to fix. So the page stops loading and
+      // renders its "could not check" branches instead — which withhold the
+      // all-clear rather than implying the checks passed.
+      //
+      // Found by cutting the network in a browser: previously the effect below
+      // returned early on an empty orgValues, setLoading(false) was never
+      // reached, and the dashboard shimmered indefinitely. Slow and failing
+      // connections are this product's design case, not its edge case.
+      .catch(() => { if (!ignore) setLoading(false); });
+
     return () => { ignore = true; };
-  }, [org]);
+  }, [org, accountRead]);
 
   useEffect(() => {
     if (!orgValues.length) return;
@@ -127,6 +156,10 @@ export default function Dashboard() {
 
   return (
     <AppShell breadcrumb={[t('breadcrumb_dashboard')]}>
+      {/* Three bands: trust, work, context. The wrapper exists so the middle
+          band can take the slack and the context strip anchors the bottom of
+          the frame, rather than the page ending in 400px of uncomposed grey. */}
+      <div className={styles.frame}>
       <SyncRibbon state={syncState} loading={loading} />
 
       <div className={styles.body}>
@@ -136,6 +169,7 @@ export default function Dashboard() {
             rows={queue}
             unavailable={unavailable}
             recordState={recordState}
+            total={data ? data.totalRecords : null}
             loading={loading}
           />
         </section>
@@ -146,25 +180,62 @@ export default function Dashboard() {
         </aside>
       </div>
 
-      {/* Totals live here, demoted, each with its denominator and its caveat. */}
+      {/* Totals live here, demoted, each carrying its own denominator.
+          The 24h sync volume used to sit here too and has been removed: the
+          ribbon already states it at the top of the same screen, so the footer
+          copy was the identical value under a different label — which reads as
+          two independent facts that happen to agree. */}
       <footer className={styles.contextStrip} data-testid="context-strip">
-        <span className={styles.contextItem}>
-          <span className={styles.contextValue}>{data?.sync.recordsLast24h ?? '—'}</span>
-          <span className={styles.contextLabel}>
-            {t('context_records_synced')}
-            {' · '}
-            {t('context_window_24h')}
-          </span>
-        </span>
-        <span className={styles.contextItem}>
-          <span className={styles.contextValue}>{data ? data.accountsSynced.count : '—'}</span>
-          <span className={styles.contextLabel}>
-            {t('context_accounts_synced')}
-            {' · '}
-            {t('context_accounts_note')}
-          </span>
-        </span>
+        {loading || !data ? (
+          /* A designed loading state, like every other region on this page.
+             Without it the value showed an honest em-dash while the label beside
+             it interpolated a sample size of 0 — "sampled from the last 0
+             records synced" — asserting a denominator nobody measured on the one
+             screen whose job is telling a coordinator what to trust. Skeletons
+             hold the strip's height so the page does not shift when data lands. */
+          <>
+            <span className={styles.contextItem} data-testid="context-strip-loading">
+              <Skeleton width={40} height={14} />
+              <Skeleton width={120} height={12} />
+            </span>
+            <span className={styles.contextItem}>
+              <Skeleton width={28} height={14} />
+              <Skeleton width={200} height={12} />
+            </span>
+          </>
+        ) : (
+          <>
+            <span className={styles.contextItem}>
+              {/* Formatted through i18next rather than emitted as a raw JS number.
+                  This is the SAME quantity the queue rows quote as their
+                  denominator, and the queue formats it — so unformatted here it
+                  rendered "43979" directly under a queue reading "12 of 43,979",
+                  which looks like two different figures. Spanish groups with '.',
+                  so the raw form was wrong, not merely inconsistent. */}
+              <span className={styles.contextValue}>
+                {data.totalRecords === null || data.totalRecords === undefined
+                  ? '\u2014'
+                  : t('number_value', { value: data.totalRecords })}
+              </span>
+              <span className={styles.contextLabel}>{t('context_records_total')}</span>
+            </span>
+            <span className={styles.contextItem}>
+              {/* The denominator moves INTO the label instead of trailing behind a
+                  prose caveat: this is a count of accounts seen in a sample, and
+                  "7" alone reads as the organization's entire staff. The figure is
+                  the rows actually read, not the sample cap — an org with 343
+                  records was never sampled from 1,000. */}
+              <span className={styles.contextValue}>
+                {t('number_value', { value: data.accountsSynced.count })}
+              </span>
+              <span className={styles.contextLabel}>
+                {t('context_accounts_synced_of', { count: data.accountsSynced.sampledFrom })}
+              </span>
+            </span>
+          </>
+        )}
       </footer>
+      </div>
     </AppShell>
   );
 }

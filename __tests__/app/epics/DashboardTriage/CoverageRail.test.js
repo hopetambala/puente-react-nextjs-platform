@@ -24,7 +24,11 @@ describe('CoverageRail', () => {
     render(<CoverageRail summary={summary()} loading={false} />);
 
     expect(screen.getByText('Batey 7')).toBeInTheDocument();
-    expect(screen.getByText('198')).toBeInTheDocument();
+    // The count goes through the locale's number format rather than rendering
+    // as a raw JS integer, so 1,000 does not read as "1000" beside a rail
+    // caption that says "1.000" in Spanish.
+    expect(screen.getByTestId('coverage-row-Batey 7'))
+      .toHaveTextContent(/number_value:\{"value":198\}/);
   });
 
   it('flags a community that has gone quiet', () => {
@@ -103,5 +107,43 @@ describe('CoverageRail', () => {
     render(<CoverageRail summary={null} loading />);
 
     expect(screen.getByTestId('coverage-loading')).toBeInTheDocument();
+  });
+});
+
+describe('CoverageRail denominator', () => {
+  it('states the denominator once for the whole rail rather than repeating it per row', () => {
+    render(<CoverageRail summary={summary({ counted: 610 })} loading={false} />);
+
+    expect(screen.getByTestId('coverage-denominator'))
+      .toHaveTextContent(/coverage_denominator:\{"count":610\}/);
+  });
+
+  // Stating it once is only honest if it reaches everyone. A row read on its
+  // own is "Batey 7, 198, quiet 18 days" — no unit anywhere — so the caption
+  // has to be attached to the list, not merely positioned above it.
+  it('attaches the caption to the list so the unit reaches a screen reader too', () => {
+    render(<CoverageRail summary={summary()} loading={false} />);
+
+    const caption = screen.getByTestId('coverage-denominator');
+    const list = screen.getByRole('list');
+    expect(caption).toHaveAttribute('id');
+    expect(list).toHaveAttribute('aria-describedby', caption.getAttribute('id'));
+  });
+
+  // The caption exists only in the loaded state, so an unreserved one shoved
+  // the whole rail — and the context strip below it — down a line the instant
+  // the data arrived.
+  it('reserves the caption while loading so the rail does not jump when data lands', () => {
+    const { container } = render(<CoverageRail summary={null} loading />);
+
+    expect(container.querySelectorAll('p').length)
+      .toBe(render(<CoverageRail summary={summary()} loading={false} />)
+        .container.querySelectorAll('p').length);
+  });
+
+  it('marks the loading rail as busy, since the placeholders are hidden from assistive tech', () => {
+    render(<CoverageRail summary={null} loading />);
+
+    expect(screen.getByTestId('coverage-loading')).toHaveAttribute('aria-busy', 'true');
   });
 });

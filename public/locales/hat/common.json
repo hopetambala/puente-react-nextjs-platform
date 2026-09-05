@@ -97,10 +97,6 @@
   "coverage_unattributed": "{{count}} dosye pa te gen okenn kominote anrejistre.",
   "coverage_empty": "Okenn kominote poko senkronize",
   "coverage_empty_sub": "Kominote yo parèt isit la lè anplwaye sou teren an senkronize depi aplikasyon mobil la.",
-  "context_records_synced": "Dosye senkronize",
-  "context_window_24h": "24 dènye èdtan yo",
-  "context_accounts_synced": "Kont ki senkronize",
-  "context_accounts_note": "chwazi nan 1,000 dosye ki pi resan yo; li konte kont ki senkronize, pa moun ki te kolekte",
   "coverage_quiet_today": "senkronize jodi a",
   "coverage_quiet_days": "trankil {{count}} j",
   "coverage_quiet_months": "trankil {{count}} mwa",
@@ -405,5 +401,11 @@
   "form_creator_hint_single_select": "Yon sèl chwa: moun k ap reponn nan chwazi yon sèl opsyon",
   "form_creator_hint_multi_select": "Plizyè chwa: moun k ap reponn nan ka chwazi plizyè opsyon",
   "form_creator_hint_header": "Antèt: yon liy tit pou fòm ou an",
-  "form_creator_hint_geolocation": "Jeyolokalizasyon: pran lonjitid ak latitid itilizatè a"
+  "form_creator_hint_geolocation": "Jeyolokalizasyon: pran lonjitid ak latitid itilizatè a",
+  "triage_count_of_total": "{{count}} sou {{total, number}}",
+  "triage_count_of_unknown": "{{count}} sou yon total nou pa konnen",
+  "coverage_denominator": "nan {{count, number}} dosye ki pi resan yo senkronize",
+  "context_records_total": "dosye senkronize antou",
+  "context_accounts_synced_of": "kont · chwazi nan {{count, number}} dosye ki pi resan yo senkronize; li konte kont ki senkronize, pa moun ki te kolekte",
+  "number_value": "{{value, number}}"
 }

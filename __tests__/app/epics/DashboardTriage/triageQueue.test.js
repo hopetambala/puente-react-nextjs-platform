@@ -143,3 +143,41 @@ describe('buildTriageQueue row destinations', () => {
     });
   });
 });
+
+// A base rate is only honest when the numerator is drawn from it. Two of the
+// four signals are not: form drift counts form definitions, and duplicates are
+// reduced from the capped sample. Rendering either against the org record total
+// states a rate nobody measured — worse than showing no rate, because a number
+// reads as measured.
+describe('which counts may be read against the record total', () => {
+  const byId = (signals) => buildTriageQueue(signals)
+    .reduce((acc, r) => ({ ...acc, [r.id]: r }), {});
+
+  it('allows the record total only for counts that really are records out of it', () => {
+    const rows = byId({
+      missingKeyFields: { count: 12, exact: true },
+      unresolvedParent: { count: 2, exact: true },
+      possibleDuplicates: { count: 3, exact: false },
+      possibleFormDrift: { count: 1, exact: false },
+    });
+
+    expect(rows['missing-key-fields'].denominator).toBe('org-records');
+    expect(rows['unresolved-parent'].denominator).toBe('org-records');
+    // Counts forms, not records.
+    expect(rows['form-drift'].denominator).toBeNull();
+    // Counted inside the capped sample, not across the org.
+    expect(rows['possible-duplicates'].denominator).toBeNull();
+  });
+
+  it('gives every row an explicit denominator decision rather than leaving it undefined', () => {
+    const rows = buildTriageQueue({
+      missingKeyFields: { count: 12, exact: true },
+      unresolvedParent: { count: 2, exact: true },
+      possibleDuplicates: { count: 3, exact: false },
+      possibleFormDrift: { count: 1, exact: false },
+    });
+
+    rows.forEach((r) => expect(r).toHaveProperty('denominator'));
+  });
+});
+
