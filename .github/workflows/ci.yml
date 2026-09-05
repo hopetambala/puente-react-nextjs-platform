@@ -84,3 +84,79 @@ jobs:
             exit 1
           fi
           echo "✅ All tests passed"
+
+  # ── E2E ────────────────────────────────────────────────────────────────────
+  # NON-BLOCKING on purpose. These drive a real browser against a real Parse
+  # backend, so they are flaky by nature — and a suite that blocks merges before
+  # it has earned trust is how an E2E suite ends up deleted. It reports; it does
+  # not gate. Promote it to blocking only once `--repeat 3` is consistently
+  # PROMOTABLE in CI, which is what the stability gate exists to tell you.
+  #
+  # Requires two repo secrets pointing at STAGING (never production — the write
+  # guard refuses the production app id and the job will fail closed):
+  #   E2E_PARSE_APP_ID, E2E_PARSE_JS_KEY
+  # Without them the job skips rather than pretending to pass.
+  e2e:
+    runs-on: ubuntu-latest
+    needs: lint
+    if: always()
+    continue-on-error: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Check for staging credentials
+        id: creds
+        run: |
+          if [ -n "${{ secrets.E2E_PARSE_APP_ID }}" ] && [ -n "${{ secrets.E2E_PARSE_JS_KEY }}" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::E2E skipped — set E2E_PARSE_APP_ID and E2E_PARSE_JS_KEY (STAGING) to enable."
+          fi
+
+      - name: Install Playwright browser
+        if: steps.creds.outputs.present == 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Write the staging environment
+        if: steps.creds.outputs.present == 'true'
+        run: |
+          cat > .env.development.local <<EOF
+          NEXT_PUBLIC_parseAppId=${{ secrets.E2E_PARSE_APP_ID }}
+          NEXT_PUBLIC_parseJavascriptKey=${{ secrets.E2E_PARSE_JS_KEY }}
+          NEXT_PUBLIC_parseServerUrl="https://parseapi.back4app.com/"
+          EOF
+
+      - name: Start the dev server
+        if: steps.creds.outputs.present == 'true'
+        run: |
+          yarn dev &
+          npx wait-on http://localhost:3000 --timeout 120000
+
+      # Read-only suites only. The write suites stay out of CI until someone
+      # decides that a shared staging database should be mutated on every push.
+      - name: Run E2E (read-only suites, stability gate)
+        if: steps.creds.outputs.present == 'true'
+        run: node e2e/run-e2e.mjs sign-in dashboard craft features --repeat 2
+        env:
+          PARSE_USERNAME: ${{ secrets.E2E_PARSE_USERNAME || 'Test' }}
+          PARSE_PASSWORD: ${{ secrets.E2E_PARSE_PASSWORD || 'test' }}
+
+      - name: Upload failure artifacts
+        if: always() && steps.creds.outputs.present == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-artifacts
+          path: .e2e-artifacts/
+          retention-days: 7
+          if-no-files-found: ignore
