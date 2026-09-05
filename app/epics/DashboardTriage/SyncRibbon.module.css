@@ -7,9 +7,25 @@
   align-items: center;
   flex-wrap: wrap;
   gap: var(--tk-dlite-semantic-spacing-xs);
-  padding-block: var(--tk-dlite-semantic-spacing-xs);
+  padding-block: var(--tk-dlite-semantic-spacing-sm);
   padding-inline: var(--tk-dlite-semantic-spacing-md);
-  background: var(--tk-dlite-semantic-color-surface-raised);
+
+  /* No surface of its own. Measured: this band and the AppShell topbar rendered
+     with the SAME background and the SAME bottom rule, so the
+     signature was a second, thinner toolbar — chrome imitating chrome.
+
+     Surface cannot separate them: in the puente light theme
+     `surface-base` and `surface-raised` resolve to the same white, and
+     `surface-sunken` resolves to exactly the shell background, so a "raised"
+     band is invisible as elevation and a "sunken" one disappears into the page.
+     Flagged against style-dictionary-dlite-tokens rather than worked around
+     with a literal.
+
+     The direction is the way out: this strip appears on every record row and in
+     every record inspector, so it is a CONTENT pattern, not page furniture.
+     Sitting it on the page ground with a single closing rule is what it always
+     should have been — the first line of the page, not the last bar of the
+     header. */
   border-block-end: 1px solid var(--tk-dlite-semantic-color-border);
   font-size: var(--tk-dlite-semantic-typography-size-200);
 }
@@ -28,25 +44,24 @@
   letter-spacing: var(--tk-dlite-semantic-typography-type-label-s-letter-spacing);
 }
 
-/* THE SIGNATURE — mono, but only where the value is a bare numeral.
+/* Mono on bare numerals, following the convention this codebase already set.
 
-   This band is the provenance strip at organization scale and it read as a
-   toolbar: same face, same size, same everything as the chrome around it.
-   Setting machine facts in the machine face is the one deliberate move on this
-   screen — the vernacular of the clinical and financial back-office tools this
-   product means to resemble, and the opposite of the marketing-analytics
-   dashboard it does not. Source Code Pro already ships (pages/_document.js) and
-   was loaded on every page while used on none. No new font, no accent colour.
+   NOT because the face was unused — an earlier version of this comment claimed
+   Source Code Pro was "loaded on every page and used on none", and that was
+   simply wrong: OrganizationAdmin already sets shortCode, the typed
+   organization string, and usernames in it, and Billing sets amounts and the
+   price input. The established meaning there is "a value you copy or compare
+   character by character, without transcription error". A record count read off
+   a provenance strip is that kind of value, so it takes the same treatment for
+   the same reason — consistency with a convention, not novelty.
 
-   The scope is narrow ON PURPOSE. Mono was first applied to every value in the
-   band, including the recency, and inspected at 3x: `sync_ribbon_days_ago` is
-   the PHRASE "{{count}}d ago", and a monospace space is full-width, so it
-   rendered as "50d  ago" — a gap that reads as a typo. Mono belongs on
-   identifiers and aligned numerals, not on a translated sentence. Splitting the
-   phrase to isolate the number is not an option either: assembling a sentence
-   from fragments breaks in every language with different word order.
-
-   So `.value` keeps the proportional face and `.numeral` takes mono. */
+   The scope is narrow on evidence. Mono was first applied to every value in the
+   band and inspected at 3x: `sync_ribbon_days_ago` is the PHRASE "{{count}}d
+   ago", and a monospace space is full-width, so it rendered "50d  ago" with a
+   gap that reads as a typo. Splitting the phrase to isolate the number is not an
+   option — a sentence assembled from fragments breaks in every language with
+   different word order. So `.value` keeps the proportional face and `.numeral`
+   takes mono. */
 .value {
   color: var(--tk-dlite-semantic-color-text-primary);
   font-weight: 600;
