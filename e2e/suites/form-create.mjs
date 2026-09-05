@@ -14,7 +14,7 @@
  * See e2e/README.md for the harness rules.
  */
 import { openSession } from '../lib/harness.mjs';
-import { addBlock } from '../lib/form-builder.mjs';
+import { addBlock, deleteFormRow, publishForm } from '../lib/form-builder.mjs';
 
 const LOGIN_FORM = { role: 'button', name: /sign in|login/i };
 // Form Manager renders in sections: the built-in Puente forms first, then
@@ -61,13 +61,12 @@ const DESC = `Created by e2e/suites/form-create at ${new Date(stamp).toISOString
 
   // ── PUBLISH ──────────────────────────────────────────────────────────────
   console.log('\n[PUBLISH] saving the form');
-  await s.page.getByRole('button', { name: /^publish$/i }).first().click();
-  await s.page.waitForLoadState('networkidle').catch(() => {});
-  await s.page.waitForFunction(
-    (n) => document.body.innerText.includes(n)
-      || /publish|saved|success|created/i.test(document.body.innerText),
-    NAME, { timeout: 40000 },
-  ).catch(() => {});
+  const savedForm = await publishForm(s.page);
+  await s.check('publish returns a saved form with an objectId',
+    !!savedForm.objectId, savedForm.objectId ? `objectId ${savedForm.objectId}` : JSON.stringify(savedForm).slice(0, 90));
+  await s.check('the saved form kept the blocks that were added',
+    (savedForm.fields || []).length === 2, `${(savedForm.fields || []).length} field(s)`);
+  await s.check('the saved form kept its name', savedForm.name === NAME, savedForm.name);
   await s.shot('published');
 
   // ── IT IS REALLY THERE ───────────────────────────────────────────────────
@@ -125,11 +124,9 @@ const DESC = `Created by e2e/suites/form-create at ${new Date(stamp).toISOString
     await s.check('the delete action can be scoped to the created form', scoped > 0,
       scoped ? 'row located by name' : 'could not isolate the row — NOT deleting anything');
     if (scoped) {
-      s.page.once('dialog', (d) => d.accept());
-      await row.getByRole('button', { name: /delete/i }).first().click();
-      await s.page.waitForLoadState('networkidle').catch(() => {});
-      await s.page.waitForFunction((n) => !document.body.innerText.includes(n), NAME, { timeout: 30000 })
-        .catch(() => {});
+      await deleteFormRow(s.page, row);
+      // Confirm against the server, not the DOM the click just mutated.
+      await s.step('reload after delete', () => s.page.reload(), MANAGER_LOADED);
       deleted = await rowFor(NAME).count() === 0;
     }
   }

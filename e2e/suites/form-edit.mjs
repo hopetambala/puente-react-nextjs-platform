@@ -19,11 +19,11 @@
  * See e2e/README.md for the harness rules.
  */
 import { openSession } from '../lib/harness.mjs';
-import { addBlock } from '../lib/form-builder.mjs';
+import { addBlock, deleteFormRow, publishForm } from '../lib/form-builder.mjs';
 
 const MANAGER_LOADED = { text: /SurveyData/ };
 const CREATOR = { role: 'button', name: /^publish$/i };
-const PRE_EXISTING = /supplied to `Stack`|headerActions|does not recognize the/;
+const PRE_EXISTING = /supplied to `Stack`|supplied to `Card`|headerActions|does not recognize the/;
 
 const stamp = Date.now();
 const NAME = `e2e-form-${stamp}`;
@@ -39,19 +39,17 @@ const rowFor = (page, n) => page.locator('tr', { hasText: n });
   await a.requireWritableEnvironment();
 
   console.log(`\n[CREATE] session 1 publishes ${NAME}`);
+  a.expectPreExisting = true;
+  await a.withExpectedErrors(PRE_EXISTING, async () => {
   await a.go('/forms/form-creator', CREATOR, 'open the form creator');
   await a.page.getByPlaceholder(/give your form a detailed na/i).first().fill(NAME);
   await a.page.getByPlaceholder(/describe how this form/i).first().fill(DESC_BEFORE);
   await addBlock(a.page, /Question - Text response/i);
-  await a.page.getByRole('button', { name: /^publish$/i }).first().click();
-  await a.page.waitForLoadState('networkidle').catch(() => {});
-  await a.page.waitForFunction(
-    () => /publish|saved|success|created/i.test(document.body.innerText)
-      || !document.querySelector('input[value]'),
-    null, { timeout: 40000 },
-  ).catch(() => {});
-  await a.check('session 1 published a form', true, NAME);
+  const created = await publishForm(a.page);
+  await a.check('session 1 published a form that saved', !!created.objectId,
+    created.objectId ? `${NAME} → ${created.objectId}` : JSON.stringify(created).slice(0, 80));
   await a.shot('session1-published');
+  });
   await a.finish();
 
   // ── SESSION 2: FIND, EDIT, VERIFY, DELETE ────────────────────────────────
@@ -85,14 +83,17 @@ const rowFor = (page, n) => page.locator('tr', { hasText: n });
       loaded.includes(DESC_BEFORE), JSON.stringify(loaded.slice(0, 50)));
 
     await descField.fill(DESC_AFTER);
-    await s.page.getByRole('button', { name: /^publish$/i }).first().click();
-    await s.page.waitForLoadState('networkidle').catch(() => {});
+    const edited = await publishForm(s.page);
+    await s.check('the edit saved', !!edited.objectId || !!edited.updatedAt,
+      JSON.stringify(edited).slice(0, 80));
     await s.shot('edited');
 
     // ── VERIFY ─────────────────────────────────────────────────────────────
     // Against the server, not the DOM the edit just mutated.
     console.log('\n[VERIFY] the change survives a reload');
-    await s.step('reload Form Manager', () => s.page.reload(), MANAGER_LOADED);
+    // Navigate, do not reload: clicking Edit moved us to the form creator, so a
+    // reload here reloads the creator and never finds Form Manager.
+    await s.go('/forms/form-manager', MANAGER_LOADED, 'return to Form Manager');
     await rowFor(s.page, NAME).first().waitFor({ state: 'visible', timeout: 30000 }).catch(() => {});
     const rowText = await rowFor(s.page, NAME).first().innerText().catch(() => '');
 
@@ -109,21 +110,10 @@ const rowFor = (page, n) => page.locator('tr', { hasText: n });
 
     // ── DELETE ─────────────────────────────────────────────────────────────
     console.log('\n[CLEANUP] deleting the form this suite created');
-    for (let i = 0; i < 5; i += 1) {
-      // eslint-disable-next-line no-await-in-loop
-      const before = await rowFor(s.page, NAME).count();
-      if (before === 0) break;
-      s.page.once('dialog', (d) => d.accept());
-      // eslint-disable-next-line no-await-in-loop
-      await rowFor(s.page, NAME).first().getByRole('button', { name: /^delete$/i }).first()
-        .click().catch(() => {});
-      // eslint-disable-next-line no-await-in-loop
-      await s.page.waitForLoadState('networkidle').catch(() => {});
-      // eslint-disable-next-line no-await-in-loop
-      if (await rowFor(s.page, NAME).count() >= before) break; // no progress — stop
+    if (await rowFor(s.page, NAME).count() > 0) {
+      await deleteFormRow(s.page, rowFor(s.page, NAME).first());
     }
-    await s.step('reload to confirm the delete against the server',
-      () => s.page.reload(), MANAGER_LOADED);
+    await s.go('/forms/form-manager', MANAGER_LOADED, 'confirm the delete against the server');
     deleted = await rowFor(s.page, NAME).count() === 0;
     await s.check('the form this suite created was deleted', deleted,
       deleted ? `${NAME} removed` : `LEFT BEHIND: ${NAME} — run e2e/sweep.mjs --delete`);

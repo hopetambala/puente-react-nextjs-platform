@@ -14,6 +14,7 @@
  */
 import { openSession } from './lib/harness.mjs';
 import { sweepProgress } from './lib/harness-lib.mjs';
+import { deleteFormRow } from './lib/form-builder.mjs';
 
 const E2E_FORM = /e2e-(form|probe)/;
 const MANAGER_LOADED = { text: /SurveyData/ };
@@ -43,26 +44,30 @@ const APPLY = process.argv.includes('--delete');
 
     let removed = 0;
     let stopped = '';
-    for (let pass = 0; pass < 200; pass += 1) {
-      // eslint-disable-next-line no-await-in-loop
-      const count = await s.page.locator('tr', { hasText: E2E_FORM }).count();
-      if (count === 0) { stopped = 'list is clear'; break; }
-
+    for (let pass = 0; pass < 100; pass += 1) {
       const row = s.page.locator('tr', { hasText: E2E_FORM }).first();
-      s.page.once('dialog', (d) => d.accept());
       // eslint-disable-next-line no-await-in-loop
-      await row.getByRole('button', { name: /delete/i }).first().click().catch(() => {});
+      if (await row.count() === 0) { stopped = 'list is clear'; break; }
       // eslint-disable-next-line no-await-in-loop
-      await s.page.waitForLoadState('networkidle').catch(() => {});
-      // eslint-disable-next-line no-await-in-loop
-      const after = await s.page.locator('tr', { hasText: E2E_FORM }).count();
+      const name = ((await row.innerText()).match(/e2e-[\w-]+/) || ['?'])[0];
 
-      // Ask whether that delete achieved anything. Without this the loop
-      // hammered two undeletable rows thirty times over.
-      const p = sweepProgress(count, after);
-      if (after < count) removed += count - after;
-      if (!p.continue) { stopped = p.reason; break; }
-      if (removed % 10 === 0) console.log(`    removed ${removed}…`);
+      // eslint-disable-next-line no-await-in-loop
+      await deleteFormRow(s.page, row).catch(() => {});
+
+      // Reload and re-count. The table re-renders after a delete, so both
+      // comparing counts in place and waiting for the old row to "detach"
+      // misreported a delete that had in fact succeeded. This tool is a
+      // maintenance utility; a reload per row is cheap and unambiguous.
+      // eslint-disable-next-line no-await-in-loop
+      await s.page.reload();
+      // eslint-disable-next-line no-await-in-loop
+      await s.see(MANAGER_LOADED);
+      // eslint-disable-next-line no-await-in-loop
+      const gone = await s.page.locator('tr', { hasText: name }).count() === 0;
+
+      if (!gone) { stopped = `"${name}" did not disappear after its delete was confirmed`; break; }
+      removed += 1;
+      if (removed % 5 === 0) console.log(`    removed ${removed}…`);
     }
     if (stopped) console.log(`\n  stopped: ${stopped}`);
 

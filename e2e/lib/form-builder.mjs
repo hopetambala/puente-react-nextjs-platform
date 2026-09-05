@@ -59,3 +59,57 @@ export async function addBlock(page, nameRe, { steps = 2 } = {}) {
   await page.waitForLoadState('networkidle').catch(() => {});
   return label;
 }
+
+/**
+ * Publish the form and wait for the SAVE to land.
+ *
+ * The wait is the whole point. An earlier version waited for
+ * `/publish|saved|success/` in the page text — but "Publish" is the button's own
+ * label, so the condition was already true, the wait returned instantly, and the
+ * suite navigated away mid-request. The form then genuinely did not exist yet
+ * when Form Manager was queried, which I twice misread as a product bug.
+ *
+ * Waiting on the Cloud Code response is deterministic and cannot be satisfied by
+ * chrome that happens to contain the word.
+ */
+export async function publishForm(page, { timeout = 60000 } = {}) {
+  const saved = page.waitForResponse(
+    (r) => /postObjectsToClass|updateObject/i.test(r.url()) && r.status() === 200,
+    { timeout },
+  );
+  await page.getByRole('button', { name: /^publish$/i }).first().click();
+  const res = await saved;
+  const body = await res.json().catch(() => ({}));
+  await page.waitForLoadState('networkidle').catch(() => {});
+  return body.result ?? body;
+}
+
+/**
+ * Delete the form in `row`, including the confirmation step.
+ *
+ * "Delete" only OPENS an in-page confirmation — "Do you want to remove this
+ * form?" with a "Delete form" button. Clicking Delete alone produces no network
+ * activity at all, which I mistook first for a broken delete and then for
+ * forms that could not be removed. The confirm is the actual delete.
+ *
+ * Note for whoever owns this surface: the confirmation is NOT exposed as a
+ * dialog — `getByRole('dialog')` finds nothing — so a screen reader will not
+ * announce it as one, and focus is not trapped. Worth fixing; not this suite's
+ * job to work around beyond clicking the button.
+ */
+export async function deleteFormRow(page, row, { timeout = 60000 } = {}) {
+  // A native dialog is not used, but accept one harmlessly if that ever changes.
+  page.once('dialog', (d) => d.accept().catch(() => {}));
+  await row.getByRole('button', { name: /^delete$/i }).first().click();
+
+  const confirm = page.getByRole('button', { name: /^delete form$/i }).first();
+  await confirm.waitFor({ state: 'visible', timeout: 15000 });
+
+  const done = page.waitForResponse(
+    (r) => /parseapi|back4app/i.test(r.url()) && r.request().method() !== 'GET',
+    { timeout },
+  ).catch(() => null);
+  await confirm.click();
+  await done;
+  await page.waitForLoadState('networkidle').catch(() => {});
+}
