@@ -28,9 +28,16 @@ const PRE_EXISTING = /supplied to `Stack`|headerActions|does not recognize the/;
   const s = await openSession({ suite: 'data-export', owned: [/forms/], expectedErrors: PRE_EXISTING });
   await s.login();
 
+  // This suite downloads a COMPLETE household CSV out of whichever database the
+  // dev server points at, and it was the only suite with no environment
+  // assertion at all. It reads rather than writes, but pulling real household
+  // data onto a laptop is the more consequential half.
+  await s.requireWritableEnvironment();
+
   const dir = mkdtempSync(join(tmpdir(), 'puente-e2e-export-'));
   let saved = null;
 
+  try {
   await s.withExpectedErrors(PRE_EXISTING, async () => {
     await s.go('/forms/form-manager', MANAGER_LOADED, 'open Form Manager');
 
@@ -107,10 +114,12 @@ const PRE_EXISTING = /supplied to `Stack`|headerActions|does not recognize the/;
     }
   });
 
-  // ── CLEAN UP ─────────────────────────────────────────────────────────────
-  // Real household data was downloaded. It does not stay on this machine.
-  console.log('\n[CLEANUP] deleting the downloaded export');
-  rmSync(dir, { recursive: true, force: true });
+  } finally {
+    // finally, not a trailing statement: any throw above previously left the
+    // downloaded household CSV sitting in /tmp.
+    console.log('\n[CLEANUP] deleting the downloaded export');
+    rmSync(dir, { recursive: true, force: true });
+  }
   await s.check('the downloaded export was deleted from disk',
     !saved || !existsSync(saved), saved ? `${saved} removed` : 'nothing downloaded');
 

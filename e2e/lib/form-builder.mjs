@@ -1,3 +1,5 @@
+import { sweepProgress } from './harness-lib.mjs';
+
 /**
  * Driving the Form Creator's block palette.
  *
@@ -123,7 +125,7 @@ export async function deleteFormRow(page, row, { timeout = 60000 } = {}) {
  *
  * Returns { removed, remaining, stopped }.
  */
-export async function sweepForms(page, pattern, { managerPath = '/forms/form-manager', max = 100 } = {}) {
+export async function sweepForms(page, pattern, { base, managerPath = '/forms/form-manager', max = 100 } = {}) {
   let removed = 0;
   let stopped = '';
   for (let pass = 0; pass < max; pass += 1) {
@@ -131,18 +133,33 @@ export async function sweepForms(page, pattern, { managerPath = '/forms/form-man
     // eslint-disable-next-line no-await-in-loop
     if (await row.count() === 0) { stopped = 'list is clear'; break; }
     // eslint-disable-next-line no-await-in-loop
-    const name = ((await row.innerText()).match(/e2e-[\w-]+/) || ['?'])[0];
+    const parsed = (await row.innerText()).match(/e2e-[\w-]+/);
+    if (!parsed) {
+      // Refuse to delete a row we cannot name. The previous version used '?' as
+      // the name, which made the survival check query a different row set
+      // entirely — so the delete was counted as successful with no evidence.
+      stopped = 'a matching row could not be named — refusing to delete it';
+      break;
+    }
+    const name = parsed[0];
     // eslint-disable-next-line no-await-in-loop
-    await deleteFormRow(page, row).catch(() => {});
+    const before = await page.locator('tr', { hasText: pattern }).count();
     // eslint-disable-next-line no-await-in-loop
-    await page.goto(`${page.url().split('/forms')[0]}${managerPath}`);
+    await deleteFormRow(page, row).catch((e) => { stopped = `delete threw: ${String(e).slice(0, 80)}`; });
+    if (stopped) break;
+    // eslint-disable-next-line no-await-in-loop
+    await page.goto(`${base ?? new URL(page.url()).origin}${managerPath}`);
     // eslint-disable-next-line no-await-in-loop
     await page.getByText(/SurveyData/).first().waitFor({ state: 'visible', timeout: 30000 }).catch(() => {});
     // eslint-disable-next-line no-await-in-loop
+    // eslint-disable-next-line no-await-in-loop
+    const after = await page.locator('tr', { hasText: pattern }).count();
+    const progress = sweepProgress(before, after);
     if (await page.locator('tr', { hasText: name }).count() > 0) {
       stopped = `"${name}" survived its delete`; break;
     }
     removed += 1;
+    if (!progress.continue && after > 0) { stopped = progress.reason; break; }
   }
   const remaining = await page.locator('tr', { hasText: pattern }).count();
   return { removed, remaining, stopped };

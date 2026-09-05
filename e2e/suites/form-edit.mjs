@@ -4,10 +4,16 @@
  *
  * WRITES. Refuses production, and only ever touches a form it created itself.
  *
- * TWO SESSIONS ON PURPOSE. `form-create` established that a form published in a
- * session does not appear in Form Manager during that session. So this suite
- * creates in session 1, closes the browser, and edits in session 2 — which is
- * both the workaround and a second demonstration of the finding.
+ * TWO SESSIONS ON PURPOSE, but NOT for the reason an earlier version of this
+ * comment gave. It claimed a published form does not appear in its creating
+ * session. That claim was RETRACTED: the cause was a test racing its own save
+ * (the post-publish wait matched the Publish button's own label), and
+ * form-create now asserts the form appears immediately, without a reload.
+ *
+ * The two sessions are kept because editing a form in a FRESH session is the
+ * more realistic scenario — a coordinator returns the next day and edits — and
+ * it exercises the load-from-server path rather than whatever state the creator
+ * happened to leave in memory.
  *
  * It edits the DESCRIPTION, never a field LABEL. `formikKey` is derived from a
  * label once, at creation, and every answer already submitted stores that key in

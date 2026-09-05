@@ -2,7 +2,7 @@
  * Pure logic for the E2E harness — the part that decides whether a run can be
  * trusted, kept free of Playwright so it can be unit-tested.
  *
- * Unit-tested by __tests__/claude/hooks/e2e-harness-lib.test.js.
+ * Unit-tested by __tests__/e2e/harness-lib.test.js.
  *
  * Shaped by Shopify's mobile E2E write-up (shopify.engineering/mobile-e2e-testing).
  * Their suite degraded until it was "blocking more good PRs than bad ones" and
@@ -143,25 +143,43 @@ export function verdict(summary) {
  */
 export const PRODUCTION_APP_ID_PREFIXES = ['vBdTHqQU31'];
 
+/** App ids a write suite may safely target. An ALLOWLIST, not a denylist. */
+export const WRITABLE_APP_ID_PREFIXES = (process.env.E2E_WRITABLE_APP_IDS || 'ZvGwjA7cem')
+  .split(',').map((p) => p.trim()).filter(Boolean);
+
 /**
  * Whether a write-performing suite may run against this Parse app.
  *
- * Fails CLOSED: an unknown or absent app id is refused, because "I could not
- * tell which database this is" is not a reason to create records in it.
+ * ALLOWLIST, and genuinely fail-closed. It used to be a one-entry denylist while
+ * its own docstring, the README and a test name all claimed otherwise — so an
+ * unrecognised id was ALLOWED. A second production app, a restored instance or a
+ * Back4App rename would each have passed. Found by review, not by me.
+ *
+ * Widen it deliberately with E2E_WRITABLE_APP_IDS, or per-call with
+ * `{ allowUnknown: true }`. Both are explicit; neither is the default.
  */
-export function mayWrite(appId) {
-  if (!appId) {
-    return { allowed: false, reason: 'No Parse app id visible — refusing to write to an unidentified database.' };
+export function mayWrite(appId, { allowUnknown = false } = {}) {
+  if (typeof appId !== 'string' || !appId) {
+    return { allowed: false, reason: 'No usable Parse app id — refusing to write to an unidentified database.' };
   }
-  const hit = PRODUCTION_APP_ID_PREFIXES.find((p) => appId.startsWith(p));
-  if (hit) {
+  const prod = PRODUCTION_APP_ID_PREFIXES.find((p) => appId.startsWith(p));
+  if (prod) {
     return {
       allowed: false,
-      reason: `App id starts with ${hit} — that is PRODUCTION. Write suites are refused. `
+      reason: `App id starts with ${prod} — that is PRODUCTION. Write suites are refused. `
         + 'Point the dev server at staging (.env.development.local) and retry.',
     };
   }
-  return { allowed: true, reason: `App id ${appId.slice(0, 10)}… is not a known production app.` };
+  const safe = WRITABLE_APP_ID_PREFIXES.find((p) => appId.startsWith(p));
+  if (safe) return { allowed: true, reason: `App id ${appId.slice(0, 10)}… is on the writable allowlist.` };
+  if (allowUnknown) {
+    return { allowed: true, reason: `App id ${appId.slice(0, 10)}… allowed by explicit opt-in.` };
+  }
+  return {
+    allowed: false,
+    reason: `App id ${appId.slice(0, 10)}… is not a recognised writable database. `
+      + 'Add it to E2E_WRITABLE_APP_IDS if it is safe to write to. Refusing by default.',
+  };
 }
 
 /**
@@ -202,4 +220,29 @@ export function sweepProgress(before, after) {
     };
   }
   return { continue: true, reason: `${before - after} removed, ${after} remaining` };
+}
+
+/**
+ * Parse the runner's arguments.
+ *
+ * Extracted and tested because the inline version silently dropped the FIRST
+ * positional argument whenever `--repeat` was absent: `indexOf` returned -1, so
+ * `repeatAt + 1` was 0, and index 0 was always filtered out. `run-e2e.mjs craft`
+ * therefore ran ALL EIGHT suites — including the writers and a full household
+ * CSV export — against whatever database the dev server pointed at.
+ */
+export function parseRunArgs(argv = []) {
+  const suites = [];
+  let repeat = 1;
+  for (let i = 0; i < argv.length; i += 1) {
+    const a = argv[i];
+    if (a === '--repeat') {
+      const n = Number(argv[i + 1]);
+      if (Number.isFinite(n) && n > 0) repeat = n;
+      i += 1;
+    } else if (!a.startsWith('--')) {
+      suites.push(a);
+    }
+  }
+  return { suites, repeat };
 }

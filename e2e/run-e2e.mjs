@@ -19,7 +19,7 @@ import { tmpdir } from 'os';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
-import { summarizeRuns, verdict } from './lib/harness-lib.mjs';
+import { parseRunArgs, summarizeRuns, verdict } from './lib/harness-lib.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SUITES = {
@@ -33,10 +33,7 @@ const SUITES = {
   'form-edit': 'suites/form-edit.mjs',
 };
 
-const argv = process.argv.slice(2);
-const repeatAt = argv.indexOf('--repeat');
-const repeat = repeatAt >= 0 ? Number(argv[repeatAt + 1]) : 1;
-const wanted = argv.filter((a, i) => !a.startsWith('--') && i !== repeatAt + 1);
+const { suites: wanted, repeat } = parseRunArgs(process.argv.slice(2));
 const names = wanted.length ? wanted : Object.keys(SUITES);
 
 const unknown = names.filter((n) => !SUITES[n]);

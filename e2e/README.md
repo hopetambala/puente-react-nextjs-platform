@@ -25,6 +25,8 @@ Artifacts land in `.e2e-artifacts/` (gitignored).
 | `craft` | no | Keyboard, focus ring, colour-independence, signature, hierarchy, composition, failed-connection state |
 | `features` | no | Round-trip cost, every queue row's dispatch, rail affordance, nav, reload, unmount leak |
 | `form-create` | **yes** | Build → publish → find → delete, and sweeps leftover `e2e-*` forms |
+| `form-edit` | **yes** | Create, edit in a fresh session, verify against the server, confirm no duplicate, delete |
+| `data-export` | reads real data | Really downloads the CSV, checks it is not an error body, deletes it |
 
 ---
 
@@ -37,12 +39,16 @@ credentials. A filename is not evidence here.
 `.env.development.local` (gitignored) points local dev at **staging**, and Next
 gives it precedence over `.env.local` in development. Keep it.
 
-Any suite that writes calls `requireWritableEnvironment()`, which reads the app
-id the browser **actually sends to Parse** (`_ApplicationId`, in the POST body —
-the JS SDK does not send an `X-Parse-Application-Id` header) and refuses to
-continue against a known production app. It **fails closed**: an unknown or
-absent app id is refused, because "I could not tell which database this is" is
-not a reason to create records in it.
+Any suite that writes — and `data-export`, which pulls a complete household CSV —
+calls `requireWritableEnvironment()`. It reads the app id the browser **actually
+sends to Parse** (`_ApplicationId`, in the POST body; the JS SDK sends no
+`X-Parse-Application-Id` header) and checks it against an **allowlist**.
+
+It fails closed: production is named and refused, and anything not on the
+allowlist is *also* refused. An earlier version was a one-entry denylist while
+claiming to fail closed — so an unrecognised id was allowed, and a second
+production app or a renamed instance would have passed. Widen it deliberately
+with `E2E_WRITABLE_APP_IDS`.
 
 ---
 
@@ -125,8 +131,10 @@ Where cleanup is *impossible*, the write is opt-in and says so:
   admin surface can remove it either. There is no UI path to undo a
   registration. `E2E_ALLOW_ORPHAN_USER=1` performs the real write and reports
   the account a human must delete. The flag is the consent.
-- **`form-create`** sweeps every `e2e-*` form at the end, scoped to that prefix
-  so it can never touch a form a person made.
+- **`form-create`** sweeps every `e2e-*` form at the end. The scoping is a
+  substring match on the whole row, so a human form whose name *or description*
+  contained `e2e-form` would be in range — unlikely, but not "never". A row whose
+  name cannot be parsed is refused rather than deleted.
 
 ---
 
@@ -169,10 +177,14 @@ changing those tests first.
 
 Left failing on purpose where they are real. Muting them would defeat the point.
 
-- **A published form does not appear in Form Manager in the session that created
-  it** (`form-create`). It appears in a later session, and the write succeeds —
-  so to a coordinator it reads as "my form vanished", and the natural response is
-  to publish again, creating duplicate definitions.
+- **RETRACTED — there was no such bug.** An earlier version of this file
+  reported that a published form does not appear in Form Manager in its creating
+  session. That was wrong: the suite's post-publish wait matched the Publish
+  button's own label, so it returned instantly and the suite queried Form Manager
+  mid-request. `form-create` now asserts the form appears immediately, with no
+  reload. Recorded here rather than deleted, because the retraction is the more
+  useful lesson: a wait satisfied by chrome is indistinguishable from a product
+  defect until you look at the network.
 - **Pre-existing React warnings**, reported not failed: `Stack` propTypes on
   `/forms/form-manager` and `/account/register`, a `forwardRef` warning, and a
   `does not recognize the prop` warning caused by `FormInput` spreading

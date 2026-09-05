@@ -2,6 +2,7 @@ import {
   describeSelector,
   extractAppId,
   mayWrite,
+  parseRunArgs,
   summarizeRuns,
   sweepProgress,
   verdict,
@@ -221,5 +222,61 @@ describe('verdict — a suite that produced nothing', () => {
 
   it('still promotes a real run', () => {
     expect(verdict(summarizeRuns([{ results: { a: true } }, { results: { a: true } }])).promotable).toBe(true);
+  });
+});
+
+/**
+ * Both of these were found by an independent review, and both were things this
+ * file previously claimed were already true.
+ */
+describe('parseRunArgs — the first suite name must not be swallowed', () => {
+  it('runs the one suite that was named', () => {
+    // `run-e2e.mjs craft` silently ran ALL EIGHT suites, because with no
+    // --repeat the filter excluded index 0. On a machine whose .env.local points
+    // at production that meant the write suites and a full household CSV export.
+    expect(parseRunArgs(['craft'])).toEqual({ suites: ['craft'], repeat: 1 });
+  });
+
+  it('keeps every named suite', () => {
+    expect(parseRunArgs(['sign-in', 'dashboard']).suites).toEqual(['sign-in', 'dashboard']);
+  });
+
+  it('reads --repeat without eating a suite name', () => {
+    expect(parseRunArgs(['craft', '--repeat', '3'])).toEqual({ suites: ['craft'], repeat: 3 });
+    expect(parseRunArgs(['--repeat', '2', 'craft'])).toEqual({ suites: ['craft'], repeat: 2 });
+  });
+
+  it('means "everything" only when no suite is named', () => {
+    expect(parseRunArgs([]).suites).toEqual([]);
+    expect(parseRunArgs(['--repeat', '2']).suites).toEqual([]);
+  });
+});
+
+describe('mayWrite — genuinely fail closed', () => {
+  it('refuses an app id it does not recognise', () => {
+    // It previously ALLOWED anything not on a one-entry denylist, while its
+    // docstring, the README and a test name all said "fails closed". A second
+    // production app, a restored instance or a rename would have sailed through.
+    const v = mayWrite('TOTALLY_UNKNOWN_APP_ID');
+
+    expect(v.allowed).toBe(false);
+    expect(v.reason).toMatch(/not a recognised|unknown|allowlist/i);
+  });
+
+  it('allows a known-safe (staging) app id', () => {
+    expect(mayWrite('ZvGwjA7cemXYZ').allowed).toBe(true);
+  });
+
+  it('still names production explicitly when it sees it', () => {
+    expect(mayWrite('vBdTHqQU31abc').reason).toMatch(/production/i);
+  });
+
+  it('refuses a non-string instead of throwing', () => {
+    expect(mayWrite(5).allowed).toBe(false);
+    expect(mayWrite({}).allowed).toBe(false);
+  });
+
+  it('can be widened deliberately, by explicit opt-in', () => {
+    expect(mayWrite('SomeOtherStaging', { allowUnknown: true }).allowed).toBe(true);
   });
 });

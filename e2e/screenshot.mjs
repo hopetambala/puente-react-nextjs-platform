@@ -1,6 +1,6 @@
 /**
  * Puente Manage — visual QA screenshot runner
- * Usage: node .claude/skills/visual-qa/screenshot.mjs [--url http://localhost:3000]
+ * Usage: node e2e/screenshot.mjs [--url http://localhost:3000]
  *
  * Logs in with Parse credentials, then screenshots every authenticated page.
  * Saves PNGs to .claude/screenshots/ with a timestamp prefix.
@@ -12,8 +12,11 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = join(__dirname, '..', '..', '..');
-const OUT = join(ROOT, '.claude', 'screenshots');
+const ROOT = join(__dirname, '..');
+// Was '../../..' + .claude/screenshots, correct at its old path; after the
+// move that resolved THREE levels above the repo, beside the sibling Puente
+// repos and outside every .gitignore.
+const OUT = process.env.E2E_ARTIFACTS ?? join(ROOT, '.e2e-artifacts');
 
 const BASE_URL = process.argv.find((a) => a.startsWith('--url='))?.split('=')[1] ?? 'http://localhost:3000';
 const USERNAME = process.env.PARSE_USERNAME ?? 'Test';

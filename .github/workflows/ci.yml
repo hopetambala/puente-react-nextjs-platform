@@ -152,11 +152,9 @@ jobs:
           PARSE_USERNAME: ${{ secrets.E2E_PARSE_USERNAME || 'Test' }}
           PARSE_PASSWORD: ${{ secrets.E2E_PARSE_PASSWORD || 'test' }}
 
-      - name: Upload failure artifacts
-        if: always() && steps.creds.outputs.present == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: e2e-artifacts
-          path: .e2e-artifacts/
-          retention-days: 7
-          if-no-files-found: ignore
+      # NO ARTIFACT UPLOAD. This repository is PUBLIC, and .e2e-artifacts/
+      # contains full-page screenshots of the authenticated app plus 1200
+      # characters of visible body text per failure — i.e. real field-data
+      # records. Publishing that to a world-readable artifact must be a
+      # deliberate decision, not a debugging convenience. Read failures from the
+      # job log, or reproduce locally where the artifacts are written.

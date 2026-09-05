@@ -12,9 +12,8 @@
  * Scoped to names beginning `e2e-` and refused against production, so it can
  * never touch a form a person made.
  */
-import { openSession } from './lib/harness.mjs';
-import { sweepProgress } from './lib/harness-lib.mjs';
-import { deleteFormRow } from './lib/form-builder.mjs';
+import { openSession, BASE } from './lib/harness.mjs';
+import { sweepForms } from './lib/form-builder.mjs';
 
 const E2E_FORM = /e2e-(form|probe)/;
 const MANAGER_LOADED = { text: /SurveyData/ };
@@ -42,34 +41,11 @@ const APPLY = process.argv.includes('--delete');
       return;
     }
 
-    let removed = 0;
-    let stopped = '';
-    for (let pass = 0; pass < 100; pass += 1) {
-      const row = s.page.locator('tr', { hasText: E2E_FORM }).first();
-      // eslint-disable-next-line no-await-in-loop
-      if (await row.count() === 0) { stopped = 'list is clear'; break; }
-      // eslint-disable-next-line no-await-in-loop
-      const name = ((await row.innerText()).match(/e2e-[\w-]+/) || ['?'])[0];
-
-      // eslint-disable-next-line no-await-in-loop
-      await deleteFormRow(s.page, row).catch(() => {});
-
-      // Reload and re-count. The table re-renders after a delete, so both
-      // comparing counts in place and waiting for the old row to "detach"
-      // misreported a delete that had in fact succeeded. This tool is a
-      // maintenance utility; a reload per row is cheap and unambiguous.
-      // eslint-disable-next-line no-await-in-loop
-      await s.page.reload();
-      // eslint-disable-next-line no-await-in-loop
-      await s.see(MANAGER_LOADED);
-      // eslint-disable-next-line no-await-in-loop
-      const gone = await s.page.locator('tr', { hasText: name }).count() === 0;
-
-      if (!gone) { stopped = `"${name}" did not disappear after its delete was confirmed`; break; }
-      removed += 1;
-      if (removed % 5 === 0) console.log(`    removed ${removed}…`);
-    }
-    if (stopped) console.log(`\n  stopped: ${stopped}`);
+    // The SHARED loop. This file previously carried its own copy, which drifted
+    // from the suite's and imported a progress guard it never called.
+    const res = await sweepForms(s.page, E2E_FORM, { base: BASE });
+    const removed = res.removed;
+    if (res.stopped && res.stopped !== 'list is clear') console.log(`\n  stopped: ${res.stopped}`);
 
     await s.step('reload to confirm against the server, not the DOM',
       () => s.page.reload(), MANAGER_LOADED);
