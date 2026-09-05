@@ -14,6 +14,7 @@
  * See e2e/README.md for the harness rules.
  */
 import { openSession } from '../lib/harness.mjs';
+import { addBlock } from '../lib/form-builder.mjs';
 
 const LOGIN_FORM = { role: 'button', name: /sign in|login/i };
 // Form Manager renders in sections: the built-in Puente forms first, then
@@ -47,17 +48,15 @@ const DESC = `Created by e2e/suites/form-create at ${new Date(stamp).toISOString
   await nameField.fill(NAME);
   await descField.fill(DESC);
 
-  // One block of each of the two commonest kinds, so the form has real fields
-  // whose labels become formikKeys.
+  // Blocks are added by DRAG AND DROP, not by clicking — see lib/form-builder.
+  // Clicking added nothing and published `fields: []`.
+  const dragged = [];
   for (const block of [/Question - Text response/i, /Question - Number response/i]) {
     // eslint-disable-next-line no-await-in-loop
-    await s.page.getByRole('button', { name: block }).first().click();
-    // eslint-disable-next-line no-await-in-loop
-    await s.page.waitForLoadState('networkidle').catch(() => {});
+    dragged.push(await addBlock(s.page, block));
   }
-  const canvasText = (await s.page.locator('body').innerText()).replace(/\s+/g, ' ');
-  await s.check('added blocks appear on the canvas',
-    /text response|number response/i.test(canvasText), 'blocks rendered');
+  await s.check('blocks can be added to the canvas by keyboard drag',
+    dragged.length === 2, dragged.join(' + '));
   await s.shot('composed');
 
   // ── PUBLISH ──────────────────────────────────────────────────────────────

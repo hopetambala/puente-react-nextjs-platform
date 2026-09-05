@@ -19,6 +19,7 @@
  * See e2e/README.md for the harness rules.
  */
 import { openSession } from '../lib/harness.mjs';
+import { addBlock } from '../lib/form-builder.mjs';
 
 const MANAGER_LOADED = { text: /SurveyData/ };
 const CREATOR = { role: 'button', name: /^publish$/i };
@@ -41,8 +42,7 @@ const rowFor = (page, n) => page.locator('tr', { hasText: n });
   await a.go('/forms/form-creator', CREATOR, 'open the form creator');
   await a.page.getByPlaceholder(/give your form a detailed na/i).first().fill(NAME);
   await a.page.getByPlaceholder(/describe how this form/i).first().fill(DESC_BEFORE);
-  await a.page.getByRole('button', { name: /Question - Text response/i }).first().click();
-  await a.page.waitForLoadState('networkidle').catch(() => {});
+  await addBlock(a.page, /Question - Text response/i);
   await a.page.getByRole('button', { name: /^publish$/i }).first().click();
   await a.page.waitForLoadState('networkidle').catch(() => {});
   await a.page.waitForFunction(
