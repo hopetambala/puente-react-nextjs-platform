@@ -3,6 +3,7 @@ import {
   extractAppId,
   mayWrite,
   summarizeRuns,
+  sweepProgress,
   verdict,
 } from '../../e2e/lib/harness-lib.mjs';
 
@@ -171,5 +172,35 @@ describe('extractAppId — where Parse actually puts the app id', () => {
 
   it('survives a body that is not JSON', () => {
     expect(extractAppId('not json at all', {})).toBeNull();
+  });
+});
+
+/**
+ * The sweep clicked Delete 30+ times on two rows that never went away, because
+ * it re-read the list each pass but never asked whether the LAST delete had
+ * achieved anything. A retry loop with no progress check is an infinite loop
+ * with a cap on it.
+ */
+describe('sweepProgress — stop when deleting stops working', () => {
+  it('continues while the count is falling', () => {
+    expect(sweepProgress(5, 4).continue).toBe(true);
+  });
+
+  it('stops when a delete changed nothing', () => {
+    const p = sweepProgress(2, 2);
+
+    expect(p.continue).toBe(false);
+    expect(p.reason).toMatch(/no progress|could not be deleted/i);
+  });
+
+  it('stops when everything is gone', () => {
+    const p = sweepProgress(1, 0);
+
+    expect(p.continue).toBe(false);
+    expect(p.reason).toMatch(/clear|done|nothing/i);
+  });
+
+  it('stops if the count somehow grew, rather than looping harder', () => {
+    expect(sweepProgress(2, 3).continue).toBe(false);
   });
 });

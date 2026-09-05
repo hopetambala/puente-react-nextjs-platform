@@ -172,3 +172,24 @@ export function extractAppId(postData, headers = {}) {
     return null;
   }
 }
+
+/**
+ * Whether a sweep should keep deleting.
+ *
+ * Written after the sweep clicked Delete thirty-odd times on two rows that never
+ * disappeared: it re-read the list each pass but never asked whether the last
+ * delete had achieved anything. A retry loop with no progress check is an
+ * infinite loop with a cap on it — and against a real backend it is also thirty
+ * pointless writes.
+ */
+export function sweepProgress(before, after) {
+  if (after === 0) return { continue: false, reason: 'list is clear — nothing left to remove' };
+  if (after >= before) {
+    return {
+      continue: false,
+      reason: `no progress: ${after} row(s) could not be deleted. They may be owned by `
+        + 'another organization, or the delete may be failing silently. Stopping rather than retrying.',
+    };
+  }
+  return { continue: true, reason: `${before - after} removed, ${after} remaining` };
+}
