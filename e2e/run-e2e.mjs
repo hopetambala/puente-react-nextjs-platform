@@ -28,6 +28,7 @@ const SUITES = {
   features: 'suites/dashboard-features.mjs',
   'sign-in': 'suites/sign-in.mjs',
   'sign-up': 'suites/sign-up.mjs',
+  'form-create': 'suites/form-create.mjs',
 };
 
 const argv = process.argv.slice(2);
