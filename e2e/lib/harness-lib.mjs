@@ -107,6 +107,16 @@ export function verdict(summary) {
       reason: `Only one run. Stability is a claim about repetition — run it at least twice.`,
     };
   }
+  // A suite that produced NO checks did not pass — it almost certainly crashed
+  // before reaching its first assertion. Reporting that as green is the gate
+  // failing at its own job.
+  if (!summary.names.length) {
+    return {
+      promotable: false,
+      reason: 'No checks were recorded — the suite produced nothing and most likely crashed. '
+        + 'Run it directly to see the error.',
+    };
+  }
   if (failed.length) {
     return {
       promotable: false,

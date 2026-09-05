@@ -25,7 +25,7 @@ const MANAGER_LOADED = { text: /SurveyData/ };
 const PRE_EXISTING = /supplied to `Stack`|headerActions|does not recognize the/;
 
 (async () => {
-  const s = await openSession({ suite: 'data-export', owned: [/forms/] });
+  const s = await openSession({ suite: 'data-export', owned: [/forms/], expectedErrors: PRE_EXISTING });
   await s.login();
 
   const dir = mkdtempSync(join(tmpdir(), 'puente-e2e-export-'));

@@ -113,3 +113,37 @@ export async function deleteFormRow(page, row, { timeout = 60000 } = {}) {
   await done;
   await page.waitForLoadState('networkidle').catch(() => {});
 }
+
+/**
+ * Remove every form whose name matches `pattern`, reloading between deletes.
+ *
+ * Shared so the inline sweep in a suite and the standalone recovery tool cannot
+ * drift apart — they did, and the suite's copy kept the old click-counting bug
+ * that reported "40 removed" when nothing had been deleted at all.
+ *
+ * Returns { removed, remaining, stopped }.
+ */
+export async function sweepForms(page, pattern, { managerPath = '/forms/form-manager', max = 100 } = {}) {
+  let removed = 0;
+  let stopped = '';
+  for (let pass = 0; pass < max; pass += 1) {
+    const row = page.locator('tr', { hasText: pattern }).first();
+    // eslint-disable-next-line no-await-in-loop
+    if (await row.count() === 0) { stopped = 'list is clear'; break; }
+    // eslint-disable-next-line no-await-in-loop
+    const name = ((await row.innerText()).match(/e2e-[\w-]+/) || ['?'])[0];
+    // eslint-disable-next-line no-await-in-loop
+    await deleteFormRow(page, row).catch(() => {});
+    // eslint-disable-next-line no-await-in-loop
+    await page.goto(`${page.url().split('/forms')[0]}${managerPath}`);
+    // eslint-disable-next-line no-await-in-loop
+    await page.getByText(/SurveyData/).first().waitFor({ state: 'visible', timeout: 30000 }).catch(() => {});
+    // eslint-disable-next-line no-await-in-loop
+    if (await page.locator('tr', { hasText: name }).count() > 0) {
+      stopped = `"${name}" survived its delete`; break;
+    }
+    removed += 1;
+  }
+  const remaining = await page.locator('tr', { hasText: pattern }).count();
+  return { removed, remaining, stopped };
+}

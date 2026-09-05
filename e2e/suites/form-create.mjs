@@ -14,7 +14,7 @@
  * See e2e/README.md for the harness rules.
  */
 import { openSession } from '../lib/harness.mjs';
-import { addBlock, deleteFormRow, publishForm } from '../lib/form-builder.mjs';
+import { addBlock, deleteFormRow, publishForm, sweepForms } from '../lib/form-builder.mjs';
 
 const LOGIN_FORM = { role: 'button', name: /sign in|login/i };
 // Form Manager renders in sections: the built-in Puente forms first, then
@@ -30,10 +30,11 @@ const stamp = Date.now();
 const NAME = `e2e-form-${stamp}`;
 const DESC = `Created by e2e/suites/form-create at ${new Date(stamp).toISOString()} — safe to delete.`;
 
+const PRE_EXISTING = /supplied to `Stack`|supplied to `Card`|headerActions|does not recognize the/;
+
 (async () => {
-  const s = await openSession({ suite: 'form-create', owned: [/forms/, /quick-start/] });
+  const s = await openSession({ suite: 'form-create', owned: [/forms/, /quick-start/], expectedErrors: PRE_EXISTING });
   // Pre-existing on /forms/form-manager on master, unrelated to form creation.
-  const PRE_EXISTING = /supplied to `Stack`/;
   await s.login();
   await s.requireWritableEnvironment();
 
@@ -140,29 +141,17 @@ const DESC = `Created by e2e/suites/form-create at ${new Date(stamp).toISOString
   }
   });
 
-  // Safety net: remove ANY leftover e2e-* form, including ones a previous
-  // crashed run abandoned. Scoped to the e2e- prefix so it can never touch a
-  // form a person made.
+  // Safety net: remove ANY leftover e2e-* form, including ones a crashed run
+  // abandoned. Uses the SHARED sweep so it cannot drift from e2e/sweep.mjs —
+  // the suite's own copy previously kept an older click-counting bug and
+  // reported "40 removed" when nothing had been deleted.
   await s.withExpectedErrors(PRE_EXISTING, async () => {
-    await s.step('reload Form Manager for the sweep', () => s.page.reload(), MANAGER_LOADED);
-    let swept = 0;
-    for (let i = 0; i < 40; i += 1) {
-      // eslint-disable-next-line no-await-in-loop
-      const row = s.page.locator('tr', { hasText: /e2e-(form|probe)/ }).first();
-      // eslint-disable-next-line no-await-in-loop
-      if (await row.count() === 0) break;
-      s.page.once('dialog', (d) => d.accept());
-      // eslint-disable-next-line no-await-in-loop
-      await row.getByRole('button', { name: /delete/i }).first().click().catch(() => {});
-      // eslint-disable-next-line no-await-in-loop
-      await s.page.waitForLoadState('networkidle').catch(() => {});
-      swept += 1;
-    }
-    if (swept) console.log(`      swept ${swept} leftover e2e form(s)`);
-    await s.step('reload after the sweep', () => s.page.reload(), MANAGER_LOADED);
-    await s.check('no e2e forms are left behind',
-      await s.page.locator('tr', { hasText: /e2e-(form|probe)/ }).count() === 0,
-      `${swept} removed`);
+    await s.go('/forms/form-manager', MANAGER_LOADED, 'reload Form Manager for the sweep');
+    const swept = await sweepForms(s.page, /e2e-(form|probe)/);
+    if (swept.removed) console.log(`      swept ${swept.removed} leftover e2e form(s)`);
+    if (swept.stopped && swept.stopped !== 'list is clear') console.log(`      stopped: ${swept.stopped}`);
+    await s.check('no e2e forms are left behind', swept.remaining === 0,
+      swept.remaining ? `${swept.remaining} remaining` : `${swept.removed} removed`);
   });
 
   const { failed } = await s.finish();

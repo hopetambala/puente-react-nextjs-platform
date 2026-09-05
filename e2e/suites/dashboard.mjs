@@ -21,13 +21,15 @@ const QUEUE = { role: 'heading', name: /needs attention|requiere atenci/i };
   const readRow = async (name) => (await (await s.see(row(name))).loc.innerText()).replace(/\s+/g, ' ');
 
   const missing = await readRow(/missing key fields/i);
-  const orphan = await readRow(/unresolved household/i);
   const dupes = await readRow(/duplicate households/i);
-  [missing, orphan, dupes].forEach((t) => console.log(`      ${t}`));
+  [missing, dupes].forEach((t) => console.log(`      ${t}`));
 
+  // Only the rows whose numerator really is a subset of the org record total
+  // may quote it. Which signals exist differs by environment — staging has no
+  // unresolved-parent rows — so assert on the row that is always present rather
+  // than hardcoding a production-only signal.
   await s.check('record-based rows quote the org total',
-    / of [\d.,]+/.test(missing) && / of [\d.,]+/.test(orphan),
-    `${missing.slice(0, 24)} | ${orphan.slice(0, 24)}`);
+    / of [\d.,]+/.test(missing), missing.slice(0, 40));
 
   // The base rate must be TRUE, not merely present: duplicates come from a
   // capped sample and form drift counts forms, so neither may quote a record
@@ -50,7 +52,7 @@ const QUEUE = { role: 'heading', name: /needs attention|requiere atenci/i };
   // tabular count turns link-blue — a NUMBER changing colour reads as a change
   // in the data, not a pointer affordance.
   console.log('\n[HOVER] a quiet background shift, not a colour change');
-  const { loc: hoverRow } = await s.see(row(/unresolved household/i));
+  const { loc: hoverRow } = await s.see(row(/missing key fields/i));
   const colour = () => hoverRow.evaluate((n) => getComputedStyle(n).color);
   const resting = await colour();
   await hoverRow.hover();
@@ -67,16 +69,16 @@ const QUEUE = { role: 'heading', name: /needs attention|requiere atenci/i };
 
   // ── DISPATCH ─────────────────────────────────────────────────────────────
   console.log('\n[DISPATCH] the screen ends with the coordinator somewhere else');
-  await s.click(row(/unresolved household/i), { text: /record|curation|filter|search/i },
-    'click the unresolved-household row');
+  await s.click(row(/missing key fields/i), { text: /record|curation|filter|search/i },
+    'click the missing-key-fields row');
   await s.check('lands on curation with the signal filter',
-    s.page.url().includes('/data/data-curation') && s.page.url().includes('signal=unresolved-parent'),
+    s.page.url().includes('/data/data-curation') && s.page.url().includes('signal=missing-key-fields'),
     s.page.url());
 
   // ── SPANISH ──────────────────────────────────────────────────────────────
   console.log('\n[SPANISH] longer strings and a different grouping separator');
   await s.go('/spa/quick-start', QUEUE);
-  const spa = await readRow(/vínculo de hogar|hogar sin resolver/i);
+  const spa = await readRow(/campos clave|faltan/i);
   await s.check('Spanish is translated, not English', /\bde\b/.test(spa), spa.slice(0, 50));
   await s.check('no raw interpolation tokens leaked', !/\{\{|\}\}/.test(spa), 'checked {{n, number}}');
   await s.shot('spanish');

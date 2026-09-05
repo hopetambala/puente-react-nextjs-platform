@@ -42,6 +42,12 @@ export { summarizeRuns, verdict, mayWrite };
 export async function openSession({
   suite,
   owned = DEFAULT_OWNED,
+  // Warnings this suite's surfaces already emit on master. Declared ONCE for
+  // the whole session rather than wrapped around each phase — scoping them
+  // per-block meant a warning fired during setup slipped past the wrapper and
+  // failed the run. Listed explicitly, never a blanket mute, so a NEW error
+  // still fails.
+  expectedErrors = null,
   viewport = { width: 1440, height: 900 },
   deviceScaleFactor = 1,
 } = {}) {
@@ -66,7 +72,7 @@ export async function openSession({
   // Errors a suite DELIBERATELY causes — e.g. aborting every request to reach
   // the offline state. Without this the suite fails on the very condition it
   // set up, which trains the reader to ignore the console check.
-  let expected = null;
+  let expected = expectedErrors;
   const noteError = (t) => {
     if (/favicon/i.test(t)) return;
     const line = `${safePath(page.url())}: ${t.slice(0, 140)}`;
@@ -189,8 +195,9 @@ export async function openSession({
    * owned. Scoped, so the tolerance cannot leak past the scenario that needs it.
    */
   const withExpectedErrors = async (re, fn) => {
+    const prev = expected;
     expected = re;
-    try { return await fn(); } finally { expected = null; }
+    try { return await fn(); } finally { expected = prev; }
   };
 
   /**
@@ -212,11 +219,27 @@ export async function openSession({
   };
 
   const login = async (username = process.env.PARSE_USERNAME ?? 'Test', password = process.env.PARSE_PASSWORD ?? 'test') => {
-    await page.goto(`${BASE}/account/login`);
+    // The Next dev server recompiles between suites, and a cold route can take
+    // well over the 30s default — one gate run crashed here for that reason,
+    // which the stability gate then reported as thirteen 50%-flaky checks.
+    // A generous timeout plus ONE announced retry, so genuine slowness does not
+    // read as a product failure and a real outage still surfaces.
+    const open = async (attempt) => {
+      try {
+        await page.goto(`${BASE}/account/login`, { timeout: 90000, waitUntil: 'domcontentloaded' });
+      } catch (err) {
+        if (attempt > 1) throw err;
+        console.log('      (login page slow to compile — retrying once)');
+        await page.goto(`${BASE}/account/login`, { timeout: 90000, waitUntil: 'domcontentloaded' });
+      }
+    };
+    await open(1);
+    await page.locator('input[name="usernameV"], input[name="username"], input[type="email"]')
+      .first().waitFor({ state: 'visible', timeout: 60000 });
     await page.locator('input[name="usernameV"], input[name="username"], input[type="email"]').first().fill(username);
     await page.locator('input[name="passwordV"], input[name="password"], input[type="password"]').first().fill(password);
     await page.locator('button[type="submit"], button:has-text("Sign in"), button:has-text("Login")').first().click();
-    await page.waitForURL((u) => !u.pathname.includes('/account/login'), { timeout: 20000 });
+    await page.waitForURL((u) => !u.pathname.includes('/account/login'), { timeout: 60000 });
   };
 
   const finish = async () => {

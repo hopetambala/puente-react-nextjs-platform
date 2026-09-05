@@ -12,8 +12,10 @@ const QUEUE = { role: 'heading', name: /needs attention/i };
 // A heading renders before the fetch resolves, so waiting on it is not waiting
 // for data — the ribbon is still its loading <div> at that point. Wait for a
 // row, which only exists once the queue has real counts.
-const LOADED = { role: 'link', name: /unresolved household|missing key fields/i };
-const ROW = { role: 'link', name: /unresolved household/i };
+const LOADED = { role: 'link', name: /missing key fields|unresolved household/i };
+// Which signals exist differs by environment; missing-key-fields is present
+// in both staging and production.
+const ROW = { role: 'link', name: /missing key fields/i };
 
 (async () => {
   const s = await openSession({ suite: 'craft-check' });

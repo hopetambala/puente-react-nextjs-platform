@@ -34,7 +34,7 @@ const rowFor = (page, n) => page.locator('tr', { hasText: n });
 
 (async () => {
   // ── SESSION 1: CREATE ────────────────────────────────────────────────────
-  const a = await openSession({ suite: 'form-edit', owned: [/forms/] });
+  const a = await openSession({ suite: 'form-edit', owned: [/forms/], expectedErrors: PRE_EXISTING });
   await a.login();
   await a.requireWritableEnvironment();
 
@@ -53,7 +53,7 @@ const rowFor = (page, n) => page.locator('tr', { hasText: n });
   await a.finish();
 
   // ── SESSION 2: FIND, EDIT, VERIFY, DELETE ────────────────────────────────
-  const s = await openSession({ suite: 'form-edit-s2', owned: [/forms/] });
+  const s = await openSession({ suite: 'form-edit-s2', owned: [/forms/], expectedErrors: PRE_EXISTING });
   await s.login();
   await s.requireWritableEnvironment();
 

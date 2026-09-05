@@ -204,3 +204,22 @@ describe('sweepProgress — stop when deleting stops working', () => {
     expect(sweepProgress(2, 3).continue).toBe(false);
   });
 });
+
+/**
+ * The gate called three suites PROMOTABLE that had produced NO checks at all —
+ * they crashed on startup and wrote no results. A suite that ran nothing is not
+ * a suite that passed, and reporting it green is the worst failure a gate can
+ * have: it is the exact thing the gate exists to prevent, one level up.
+ */
+describe('verdict — a suite that produced nothing', () => {
+  it('refuses to promote a run with zero checks', () => {
+    const v = verdict(summarizeRuns([{ results: {} }, { results: {} }]));
+
+    expect(v.promotable).toBe(false);
+    expect(v.reason).toMatch(/no checks|zero checks|produced nothing|did not run/i);
+  });
+
+  it('still promotes a real run', () => {
+    expect(verdict(summarizeRuns([{ results: { a: true } }, { results: { a: true } }])).promotable).toBe(true);
+  });
+});

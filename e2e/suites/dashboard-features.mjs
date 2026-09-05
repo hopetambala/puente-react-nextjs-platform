@@ -8,11 +8,10 @@
 import { openSession, BASE } from '../lib/harness.mjs';
 
 const LOADED = { role: 'link', name: /unresolved household|missing key fields/i };
-const ROWS = [
-  { name: /unresolved household/i, id: 'unresolved-parent' },
-  { name: /missing key fields/i, id: 'missing-key-fields' },
-  { name: /duplicate households/i, id: 'possible-duplicates' },
-];
+// Discovered at runtime rather than hardcoded: which triage signals exist
+// depends on the data, and staging has no unresolved-parent rows. A suite that
+// assumes production's signals fails in staging for a reason that has nothing
+// to do with the code under test.
 const ON_CURATION = { text: /record|curation|filter|search/i };
 
 (async () => {
@@ -37,16 +36,31 @@ const ON_CURATION = { text: /record|curation|filter|search/i };
 
   // ── DISPATCH ─────────────────────────────────────────────────────────────
   console.log('\n[DISPATCH] every row delivers the records it counted');
+  // Read the queue that actually rendered, so the suite covers whatever signals
+  // this environment has rather than the ones production happened to show.
+  const ROWS = await s.page.getByRole('link', { name: /records|households|form/i })
+    .evaluateAll((ns) => ns
+      .map((n) => n.innerText.replace(/\s+/g, ' ').trim())
+      .filter((t) => /^[\d.,]+( of [\d.,]+)?\s/.test(t))
+      .map((t) => ({ label: t.slice(0, 46) })));
+  await s.check('the queue rendered rows to exercise', ROWS.length > 0,
+    ROWS.map((r) => r.label.slice(0, 26)).join(' | ') || 'queue is empty in this environment');
+
   for (const r of ROWS) {
+    // eslint-disable-next-line no-await-in-loop
     await s.go('/quick-start', LOADED);
-    const { loc } = await s.see({ role: 'link', name: r.name });
-    const label = (await loc.innerText()).replace(/\s+/g, ' ').slice(0, 46);
-    await s.click({ role: 'link', name: r.name }, ON_CURATION, `click "${label}"`);
+    const words = r.label.replace(/^[\d.,]+( of [\d.,]+)?\s+/, '').split(' ').slice(0, 4).join(' ');
+    const spec = { role: 'link', name: new RegExp(words.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') };
+    // eslint-disable-next-line no-await-in-loop
+    await s.click(spec, ON_CURATION, `click "${r.label}"`);
+    // eslint-disable-next-line no-await-in-loop
     const body = (await s.page.locator('body').innerText()).replace(/\s+/g, ' ');
-    await s.check(`row "${r.id}" lands on a working destination`,
+    // eslint-disable-next-line no-await-in-loop
+    await s.check(`row "${words}" lands on a working destination`,
       s.page.url().includes('/data/data-curation') && body.length > 200,
       `${new URL(s.page.url()).search || '(no filter)'} · ${body.length} chars`);
-    await s.check(`row "${r.id}" destination shows no error`,
+    // eslint-disable-next-line no-await-in-loop
+    await s.check(`row "${words}" destination shows no error`,
       !/something went wrong|failed to|cannot read|undefined is not/i.test(body.slice(0, 600)));
   }
 
