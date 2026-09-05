@@ -27,7 +27,7 @@ import { mkdirSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
-import { describeSelector, summarizeRuns, verdict } from './harness-lib.mjs';
+import { describeSelector, mayWrite, summarizeRuns, verdict } from './harness-lib.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, '..', '..');
@@ -37,7 +37,7 @@ export const BASE = process.env.E2E_BASE ?? 'http://localhost:3000';
 /** Surfaces a suite is allowed to fail on. Errors elsewhere are reported, not failed. */
 const DEFAULT_OWNED = [/quick-start/, /data-curation/];
 
-export { summarizeRuns, verdict };
+export { summarizeRuns, verdict, mayWrite };
 
 export async function openSession({
   suite,
@@ -74,6 +74,18 @@ export async function openSession({
     if (UNATTRIBUTABLE.test(t) || !isOwned()) foreign.push(line);
     else consoleLog.push(line);
   };
+  // Ground truth for which database we are talking to: the app id the browser
+  // ACTUALLY sends, not what an env file claims. This repo's `.env.local` points
+  // at production and the sibling repo's `.env.prod` is mislabelled staging, so
+  // a filename is not evidence.
+  let observedAppId = null;
+  page.on('request', (r) => {
+    if (observedAppId) return;
+    const h = r.headers();
+    const id = h['x-parse-application-id'] ?? h['X-Parse-Application-Id'];
+    if (id) observedAppId = id;
+  });
+
   page.on('console', (m) => { if (m.type() === 'error') noteError(m.text()); });
   page.on('pageerror', (e) => noteError(`PAGEERROR: ${String(e)}`));
 
@@ -182,6 +194,24 @@ export async function openSession({
     try { return await fn(); } finally { expected = null; }
   };
 
+  /**
+   * Refuse to continue unless this is a database a suite may write to.
+   *
+   * Call it AFTER login, so a real Parse request has been observed. Exits
+   * non-zero rather than throwing, so a guarded suite fails loudly in the runner
+   * instead of looking like a crash.
+   */
+  const requireWritableEnvironment = async () => {
+    const v = mayWrite(observedAppId);
+    await check('environment is safe for a suite that writes', v.allowed, v.reason);
+    if (!v.allowed) {
+      console.error(`\n  REFUSING TO WRITE. ${v.reason}`);
+      await browser.close();
+      process.exit(3);
+    }
+    return observedAppId;
+  };
+
   const login = async (username = process.env.PARSE_USERNAME ?? 'Test', password = process.env.PARSE_PASSWORD ?? 'test') => {
     await page.goto(`${BASE}/account/login`);
     await page.locator('input[name="usernameV"], input[name="username"], input[type="email"]').first().fill(username);
@@ -211,6 +241,7 @@ export async function openSession({
 
   return {
     page, results, check, see, find, step, go, click, UNSAFE_pause, login, shot, finish,
-    withExpectedErrors, consoleLog, foreign,
+    withExpectedErrors, requireWritableEnvironment, consoleLog, foreign,
+    get appId() { return observedAppId; },
   };
 }

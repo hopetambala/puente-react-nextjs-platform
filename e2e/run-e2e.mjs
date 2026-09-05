@@ -26,6 +26,7 @@ const SUITES = {
   dashboard: 'suites/dashboard.mjs',
   craft: 'suites/craft.mjs',
   features: 'suites/dashboard-features.mjs',
+  'sign-in': 'suites/sign-in.mjs',
 };
 
 const argv = process.argv.slice(2);
