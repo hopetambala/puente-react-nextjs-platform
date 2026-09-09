@@ -5,7 +5,7 @@
  *
  * See e2e/README.md for the harness rules.
  */
-import { openSession, BASE } from '../lib/harness.mjs';
+import { BASE,openSession } from '../lib/harness.mjs';
 
 const LOADED = { role: 'link', name: /unresolved household|missing key fields/i };
 // Discovered at runtime rather than hardcoded: which triage signals exist
@@ -46,23 +46,36 @@ const ON_CURATION = { text: /record|curation|filter|search/i };
   await s.check('the queue rendered rows to exercise', ROWS.length > 0,
     ROWS.map((r) => r.label.slice(0, 26)).join(' | ') || 'queue is empty in this environment');
 
+  // One check per row would put DATA in the check name, and the stability gate
+  // keys on names: a signal that drops out of staging between run 1 and run 2
+  // then reads as a check that vanished, which the gate correctly — and
+  // uselessly — calls a failure. So every row is still exercised, but the two
+  // check names are fixed and the rows are named in the detail instead.
+  const dispatched = [];
   for (const r of ROWS) {
-    // eslint-disable-next-line no-await-in-loop
     await s.go('/quick-start', LOADED);
     const words = r.label.replace(/^[\d.,]+( of [\d.,]+)?\s+/, '').split(' ').slice(0, 4).join(' ');
     const spec = { role: 'link', name: new RegExp(words.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') };
-    // eslint-disable-next-line no-await-in-loop
     await s.click(spec, ON_CURATION, `click "${r.label}"`);
-    // eslint-disable-next-line no-await-in-loop
     const body = (await s.page.locator('body').innerText()).replace(/\s+/g, ' ');
-    // eslint-disable-next-line no-await-in-loop
-    await s.check(`row "${words}" lands on a working destination`,
-      s.page.url().includes('/data/data-curation') && body.length > 200,
-      `${new URL(s.page.url()).search || '(no filter)'} · ${body.length} chars`);
-    // eslint-disable-next-line no-await-in-loop
-    await s.check(`row "${words}" destination shows no error`,
-      !/something went wrong|failed to|cannot read|undefined is not/i.test(body.slice(0, 600)));
+    dispatched.push({
+      words,
+      arrived: s.page.url().includes('/data/data-curation') && body.length > 200,
+      clean: !/something went wrong|failed to|cannot read|undefined is not/i.test(body.slice(0, 600)),
+      where: `${new URL(s.page.url()).search || '(no filter)'} · ${body.length} chars`,
+    });
   }
+
+  const stranded = dispatched.filter((d) => !d.arrived);
+  await s.check('every queue row lands on a working destination', stranded.length === 0,
+    stranded.length
+      ? `stranded: ${stranded.map((d) => `"${d.words}" → ${d.where}`).join('; ')}`
+      : dispatched.map((d) => `"${d.words}" → ${d.where}`).join('; ') || 'no rows to dispatch');
+
+  const broken = dispatched.filter((d) => !d.clean);
+  await s.check('no queue row destination shows an error', broken.length === 0,
+    broken.length ? `errored: ${broken.map((d) => `"${d.words}"`).join(', ')}`
+      : `${dispatched.length} destination(s) clean`);
 
   // ── RAIL ─────────────────────────────────────────────────────────────────
   console.log('\n[RAIL] coverage is informational and says what it missed');
@@ -81,16 +94,32 @@ const ON_CURATION = { text: /record|curation|filter|search/i };
 
   // ── NAVIGATION ───────────────────────────────────────────────────────────
   console.log('\n[NAV] the view survives leaving and returning');
+  // Count what is on screen BEFORE leaving, so "restored" can mean restored to
+  // the same thing rather than merely "a page rendered". Both checks below used
+  // to assert `true`: the step()'s own wait had already proved the page loaded,
+  // so the checks restated it and padded the stable count.
+  const queueRows = () => s.page.getByRole('link', { name: /records|households|form/i })
+    .evaluateAll((ns) => ns.map((n) => n.innerText.replace(/\s+/g, ' ').trim())
+      .filter((t) => /^[\d.,]+( of [\d.,]+)?\s/.test(t)));
+  const before = await queueRows();
+
   await s.click({ role: 'link', name: /^.?\s*Manage$/i }, { text: /form|record|name/i }, 'click Manage in the sidebar');
   await s.check('sidebar navigation works from this view',
     !s.page.url().includes('/quick-start'), s.page.url());
+
   await s.step('browser back to the dashboard', () => s.page.goBack(), LOADED);
-  await s.check('back-navigation restores the dashboard with data', true, 'queue rows present');
+  const back = await queueRows();
+  await s.check('back-navigation restores the dashboard with data',
+    s.page.url().includes('/quick-start') && back.length === before.length && back.length > 0,
+    `${before.length} row(s) before → ${back.length} after back`);
 
   // ── RELOAD ───────────────────────────────────────────────────────────────
   console.log('\n[RELOAD] a hard reload lands in the same place');
   await s.step('hard reload', () => s.page.reload(), LOADED);
-  await s.check('reload re-renders the queue', true, 'queue present after reload');
+  const reloaded = await queueRows();
+  await s.check('reload re-renders the queue',
+    reloaded.length === before.length && reloaded.length > 0,
+    `${before.length} row(s) before → ${reloaded.length} after reload`);
 
   // ── LEAK ─────────────────────────────────────────────────────────────────
   // Dashboard only, no other page's code involved. "State update on an

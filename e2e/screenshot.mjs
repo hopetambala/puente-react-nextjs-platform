@@ -7,8 +7,8 @@
  */
 
 import { chromium } from '@playwright/test';
-import { existsSync, mkdirSync } from 'fs';
-import { join, dirname } from 'path';
+import { mkdirSync } from 'fs';
+import { dirname,join } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -70,7 +70,7 @@ const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
   }
 
   // ── Screenshot every page ─────────────────────────────────────────────────
-  for (const { name, path, auth } of PAGES) {
+  for (const { name, path } of PAGES) {
     console.log(`→ ${name}  (${path})`);
     await page.goto(`${BASE_URL}${path}`);
     await page.waitForLoadState('networkidle').catch(() => {});

@@ -126,8 +126,8 @@ export function verdict(summary) {
   if (flaky.length) {
     return {
       promotable: false,
-      reason: `${flaky.length} check(s) are flaky across ${runs} runs: `
-        + flaky.map((n) => `${n} (${Math.round(summary.rates[n] * 100)}%)`).join(', '),
+      reason: `${flaky.length} check(s) are flaky across ${runs} runs: ${
+         flaky.map((n) => `${n} (${Math.round(summary.rates[n] * 100)}%)`).join(', ')}`,
     };
   }
   return { promotable: true, reason: `All checks passed all ${runs} runs.` };
@@ -245,4 +245,39 @@ export function parseRunArgs(argv = []) {
     }
   }
   return { suites, repeat };
+}
+
+/**
+ * Combine the results of two sessions in the same suite.
+ *
+ * `form-edit` opens two browser sessions on purpose — one creates a form, a
+ * cold second one finds and edits it. Both called `finish()`, and `finish()`
+ * WROTE the results file, so session 2 silently overwrote session 1. The
+ * stability gate therefore never saw session 1's checks, and a failed publish
+ * in session 1 was invisible to it: the suite could report a clean sheet while
+ * its first half had failed.
+ *
+ * Colliding names — both sessions emit the console check and the write guard —
+ * are namespaced by the LATER session's label rather than overwritten, because
+ * overwriting is exactly how session 2's pass would mask session 1's failure.
+ * The first session keeps the bare names and the suite identity, so the keys
+ * are identical from run to run; the gate keys on names, and a name that moves
+ * reads to it as a check that disappeared.
+ */
+export function mergeResults(prior, incoming) {
+  if (!prior || !prior.results) {
+    return { suite: incoming.suite, results: { ...incoming.results } };
+  }
+  const results = { ...prior.results };
+  Object.entries(incoming.results ?? {}).forEach(([name, pass]) => {
+    if (!(name in results)) {
+      results[name] = pass;
+      return;
+    }
+    // Same session writing twice is a bug, not a second session: keep the
+    // first answer rather than inventing a phantom check name.
+    if (incoming.suite === prior.suite) return;
+    results[`${incoming.suite}: ${name}`] = pass;
+  });
+  return { suite: prior.suite, results };
 }

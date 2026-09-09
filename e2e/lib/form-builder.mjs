@@ -19,6 +19,28 @@ import { sweepProgress } from './harness-lib.mjs';
  * form, which is a real regression a mouse-driven test would never notice.
  */
 
+/**
+ * The Form Manager page-loaded signal, shared so the suites and the standalone
+ * sweep cannot drift apart — they did once already, and the copies disagreeing
+ * is what let a stale wait survive in one file after being fixed in another.
+ *
+ * "SurveyData" is one of the four BUILT-IN form names, hardcoded in a local
+ * const in app/epics/FormManager/index.js. It is not organization data, so no
+ * rename or deletion in the database can move it. And it renders only inside
+ * that component's `!loading` branch, which is what makes waiting on it mean
+ * "the custom-form fetch has settled" rather than merely "a page appeared".
+ *
+ * It is deliberately NOT the "Puente Forms" panel heading. That string comes
+ * from i18n — spa "Formularios de Puente", hat "Fòm Puente yo" — so any suite
+ * that ever runs in another locale would fail on the WAIT instead of on the
+ * behaviour under test, and the failure would name the wrong culprit.
+ *
+ * One caveat worth knowing: a FAILED custom-forms fetch also clears `loading`,
+ * so this signal means "settled", not "succeeded". A suite that counts rows
+ * after it cannot tell an empty organization from a broken request.
+ */
+export const MANAGER_LOADED = { text: /SurveyData/ };
+
 /** Drag handles, in palette order, with their visible labels. */
 export async function paletteBlocks(page) {
   return page.locator('[data-rbd-drag-handle-draggable-id]')
@@ -39,7 +61,6 @@ export async function addBlock(page, nameRe, { steps = 2 } = {}) {
   let target = null;
   let label = '';
   for (let i = 0; i < count; i += 1) {
-    // eslint-disable-next-line no-await-in-loop
     const text = (await handles.nth(i).innerText()).replace(/\s+/g, ' ').trim();
     if (nameRe.test(text)) { target = handles.nth(i); label = text; break; }
   }
@@ -52,9 +73,7 @@ export async function addBlock(page, nameRe, { steps = 2 } = {}) {
   await page.waitForFunction(() => !!document.querySelector('[data-rbd-drag-handle-draggable-id][aria-pressed="true"], [data-rbd-placeholder-context-id]'),
     null, { timeout: 5000 }).catch(() => {});
   for (let i = 0; i < steps; i += 1) {
-    // eslint-disable-next-line no-await-in-loop
     await page.keyboard.press('ArrowLeft');
-    // eslint-disable-next-line no-await-in-loop
     await page.waitForTimeout(250);
   }
   await page.keyboard.press('Space');
@@ -130,9 +149,7 @@ export async function sweepForms(page, pattern, { base, managerPath = '/forms/fo
   let stopped = '';
   for (let pass = 0; pass < max; pass += 1) {
     const row = page.locator('tr', { hasText: pattern }).first();
-    // eslint-disable-next-line no-await-in-loop
     if (await row.count() === 0) { stopped = 'list is clear'; break; }
-    // eslint-disable-next-line no-await-in-loop
     const parsed = (await row.innerText()).match(/e2e-[\w-]+/);
     if (!parsed) {
       // Refuse to delete a row we cannot name. The previous version used '?' as
@@ -142,17 +159,14 @@ export async function sweepForms(page, pattern, { base, managerPath = '/forms/fo
       break;
     }
     const name = parsed[0];
-    // eslint-disable-next-line no-await-in-loop
     const before = await page.locator('tr', { hasText: pattern }).count();
-    // eslint-disable-next-line no-await-in-loop
-    await deleteFormRow(page, row).catch((e) => { stopped = `delete threw: ${String(e).slice(0, 80)}`; });
-    if (stopped) break;
-    // eslint-disable-next-line no-await-in-loop
+    // Return the message rather than assigning `stopped` from inside a .catch()
+    // closure declared in the loop. That was safe only because the next line
+    // breaks immediately; returning it removes the need to know that.
+    const threw = await deleteFormRow(page, row).then(() => '').catch((e) => String(e).slice(0, 80));
+    if (threw) { stopped = `delete threw: ${threw}`; break; }
     await page.goto(`${base ?? new URL(page.url()).origin}${managerPath}`);
-    // eslint-disable-next-line no-await-in-loop
-    await page.getByText(/SurveyData/).first().waitFor({ state: 'visible', timeout: 30000 }).catch(() => {});
-    // eslint-disable-next-line no-await-in-loop
-    // eslint-disable-next-line no-await-in-loop
+    await page.getByText(MANAGER_LOADED.text).first().waitFor({ state: 'visible', timeout: 30000 }).catch(() => {});
     const after = await page.locator('tr', { hasText: pattern }).count();
     const progress = sweepProgress(before, after);
     if (await page.locator('tr', { hasText: name }).count() > 0) {

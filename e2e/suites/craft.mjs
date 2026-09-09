@@ -6,7 +6,7 @@
  * These are the checks that cannot be satisfied by a glance, which is why they
  * are a script. See e2e/README.md for the harness rules.
  */
-import { openSession, BASE } from '../lib/harness.mjs';
+import { BASE,openSession } from '../lib/harness.mjs';
 
 const QUEUE = { role: 'heading', name: /needs attention/i };
 // A heading renders before the fetch resolves, so waiting on it is not waiting

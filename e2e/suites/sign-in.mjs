@@ -4,7 +4,7 @@
  * Read-only: creates nothing, so it is safe against any environment.
  * See e2e/README.md for the harness rules.
  */
-import { openSession, BASE } from '../lib/harness.mjs';
+import { openSession } from '../lib/harness.mjs';
 
 const DASHBOARD = { role: 'link', name: /unresolved household|missing key fields|records/i };
 const LOGIN_FORM = { role: 'button', name: /sign in|login/i };
@@ -62,7 +62,16 @@ const LOGIN_FORM = { role: 'button', name: /sign in|login/i };
   console.log('\n[ACCEPT] the real credentials reach the data');
   await s.login();
   await s.go('/quick-start', DASHBOARD, 'load the dashboard as a signed-in user');
-  await s.check('signing in reaches real record data', true, s.page.url());
+  // `true` used to stand here, which asserted nothing: the go() above had
+  // already waited on DASHBOARD, so the check restated the wait and padded the
+  // stable count. What signing in is FOR is reaching data, so assert on data —
+  // a real quantity rendered on the page, not merely a URL that changed.
+  const quantities = await s.page.locator('main, body').first().innerText()
+    .then((t) => (t.match(/\b\d[\d,]*\b/g) ?? []).filter((n) => Number(n.replace(/,/g, '')) > 0));
+  await s.check('signing in reaches real record data',
+    quantities.length > 0 && !s.page.url().includes('/account/login'),
+    quantities.length ? `${quantities.length} quantities rendered, e.g. ${quantities.slice(0, 3).join(', ')}`
+      : 'signed in but the dashboard rendered no numbers at all');
 
   // ── THE SESSION SURVIVES A RELOAD ────────────────────────────────────────
   console.log('\n[SESSION] a reload does not throw the coordinator out');

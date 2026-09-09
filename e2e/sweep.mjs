@@ -12,11 +12,10 @@
  * Scoped to names beginning `e2e-` and refused against production, so it can
  * never touch a form a person made.
  */
-import { openSession, BASE } from './lib/harness.mjs';
-import { sweepForms } from './lib/form-builder.mjs';
+import { MANAGER_LOADED, sweepForms } from './lib/form-builder.mjs';
+import { BASE,openSession } from './lib/harness.mjs';
 
 const E2E_FORM = /e2e-(form|probe)/;
-const MANAGER_LOADED = { text: /SurveyData/ };
 const APPLY = process.argv.includes('--delete');
 
 (async () => {
@@ -44,7 +43,7 @@ const APPLY = process.argv.includes('--delete');
     // The SHARED loop. This file previously carried its own copy, which drifted
     // from the suite's and imported a progress guard it never called.
     const res = await sweepForms(s.page, E2E_FORM, { base: BASE });
-    const removed = res.removed;
+    const {removed} = res;
     if (res.stopped && res.stopped !== 'list is clear') console.log(`\n  stopped: ${res.stopped}`);
 
     await s.step('reload to confirm against the server, not the DOM',

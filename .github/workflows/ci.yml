@@ -26,6 +26,17 @@ jobs:
         run: yarn lint
         continue-on-error: true
 
+      # The E2E harness is .mjs and lives outside next.config.js's lint dirs,
+      # so `next lint` never saw a line of it. It reported 47 errors the first
+      # time it was pointed at this directory.
+      #
+      # Deliberately NOT continue-on-error, unlike the step above: app/ still
+      # carries a warning backlog that would drown a real signal, but e2e/ is
+      # at zero errors and zero warnings as of this commit, so anything new is
+      # something a person just introduced. `yarn lint:e2e --fix` fixes most.
+      - name: Run ESLint on the E2E harness
+        run: yarn lint:e2e
+
   unit-tests:
     runs-on: ubuntu-latest
     needs: lint

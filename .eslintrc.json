@@ -66,5 +66,45 @@
     // https://typescript-eslint.io/rules/no-shadow
     "no-shadow": "off",
     "@typescript-eslint/no-shadow": "error"
-  }
+  },
+  "overrides": [
+    {
+      // The E2E harness is Node + Playwright dev tooling, not app code, and it
+      // was linted by nothing at all until now: `next lint` only reads the
+      // dirs in next.config.js, and .mjs is not in its default extension set.
+      // Six of airbnb's rules are structurally wrong for a browser-driving
+      // script. Left on they reported 85 warnings and 15 errors that nobody
+      // could ever act on, which is exactly how a lint report stops being
+      // read. Everything else here stays an error.
+      "files": ["e2e/**/*.mjs"],
+      "rules": {
+        // The harness's whole report — every check, every failure diagnosis —
+        // is stdout. console IS the interface in this directory.
+        "no-console": "off",
+        // E2E steps are sequential by nature: you cannot click the next thing
+        // before the previous page has settled. This was suppressed inline at
+        // nine separate sites before this override replaced them.
+        "no-await-in-loop": "off",
+        // airbnb bans four constructs here; only `for...of` is wrong for this
+        // directory, because sequential awaits require it and array iteration
+        // methods cannot sequence them. The other three stay banned — turning
+        // the whole rule off would quietly re-permit `with` and labels too.
+        "no-restricted-syntax": [
+          "error",
+          { "selector": "ForInStatement", "message": "for..in iterates the prototype chain. Use Object.{keys,values,entries} and iterate the result." },
+          { "selector": "LabeledStatement", "message": "Labels are a form of GOTO; they make code confusing and hard to maintain." },
+          { "selector": "WithStatement", "message": "`with` is disallowed in strict mode and makes scope ambiguous." }
+        ],
+        // @playwright/test is a devDependency, and this directory is tooling.
+        "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
+        // Two specific names, not a blanket exemption: Parse's own wire field
+        // and the ESM reconstruction of Node's `__dirname`.
+        "no-underscore-dangle": ["error", { "allow": ["_ApplicationId", "__dirname"] }],
+        // `UNSAFE_pause` and `UNSAFE_testId` are named to shout. That casing is
+        // the mechanism that keeps shortcuts visible in review, not a slip — so
+        // exempt that prefix only, and keep camelCase enforced everywhere else.
+        "camelcase": ["error", { "allow": ["^UNSAFE_"] }]
+      }
+    }
+  ]
 }
