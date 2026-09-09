@@ -13,6 +13,18 @@
   );
   background-size: 1200px 100%;
   animation: shimmer 1.6s ease-in-out infinite;
-  border-radius: 4px;
+  border-radius: var(--tk-dlite-semantic-border-radius-sm);
   flex-shrink: 0;
+}
+
+/* The shimmer runs `infinite`, and it is the FIRST thing painted on every
+   fetching surface — Form Manager now shows it on first load, and for the whole
+   duration of a failing request, which is the longest it will ever run. An
+   indefinite animation is exactly what a vestibular-sensitive reader asks the OS
+   to stop. Hold the shape and the layout; drop only the movement. */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+    background: var(--tk-dlite-semantic-color-border);
+  }
 }
