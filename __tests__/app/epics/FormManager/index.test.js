@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import userEvent from '@testing-library/user-event';
 
 // ─── Mocks ───────────────────────────────────────────────────────────────────
@@ -410,5 +411,160 @@ describe('FormManager — copy', () => {
   it('routes the Puente Forms panel title through t()', async () => {
     renderManager();
     await waitFor(() => expect(screen.getByText('form_manager_puente_forms')).toBeInTheDocument());
+  });
+});
+
+// ─── RED: first paint must be the skeleton, never the empty state ────────────
+// A coordinator whose organization HAS forms sees "No custom forms yet." flash
+// before their forms appear, which reads as "your data is missing" when it is
+// not. The empty state is only truthful once the custom-forms request has come
+// back with nothing, so the very first thing painted for the custom-forms area
+// must be the loading skeleton.
+//
+// This has to be asserted on the *initial* render, before any effect runs —
+// that is literally the markup Next.js serves and the browser paints first.
+// (An RTL `render()` cannot see it: RTL flushes effects inside `render`, so by
+// the time it returns the flash is already over.)
+
+describe('First paint — custom forms area', () => {
+  // The markup is attached to the document so `toBeInTheDocument` reports
+  // honestly, and removed afterwards: RTL's auto-cleanup only clears its own
+  // container, so left attached this would collide with any later test in this
+  // file that queries the search input or the "+ Create form" button.
+  let firstPaint;
+  afterEach(() => {
+    firstPaint?.remove();
+    firstPaint = undefined;
+  });
+
+  it('paints the loading skeleton, not "no custom forms", for a user with an organization', () => {
+    firstPaint = document.createElement('div');
+    firstPaint.innerHTML = renderToStaticMarkup(
+      <FormManager context={mockContext} router={mockRouter} user={{ organization: 'test-org' }} />,
+    );
+    document.body.appendChild(firstPaint);
+
+    expect(
+      within(firstPaint).queryByText('form_manager_no_custom_forms'),
+    ).not.toBeInTheDocument();
+    expect(firstPaint.querySelectorAll('.skeleton').length).toBeGreaterThan(0);
+  });
+});
+
+// ─── RED: a failed request is not an empty database ──────────────────────────
+// A coordinator whose organization HAS custom forms, but whose custom-forms
+// request failed, is currently told "No custom forms yet." — the app reports a
+// broken request as an empty database. A failed fetch must say so, so the
+// coordinator retries instead of believing their forms are gone.
+
+describe('Custom forms — request failure', () => {
+  it('shows an error state, not the empty state, when retrieveCustomData rejects', async () => {
+    retrieveCustomData.mockRejectedValue(new Error('fetch failed'));
+    render(
+      <FormManager context={mockContext} router={mockRouter} user={{ organization: 'test-org' }} />,
+    );
+
+    await waitFor(
+      () => expect(screen.getByText('form_manager_custom_forms_error')).toBeInTheDocument(),
+      { timeout: 3000 },
+    );
+    expect(screen.getByText('form_manager_custom_forms_error_sub')).toBeInTheDocument();
+    expect(screen.queryByText('form_manager_no_custom_forms')).not.toBeInTheDocument();
+  });
+});
+
+// ─── RED: the error state must offer a way forward ───────────────────────────
+// Telling a coordinator "we couldn't load your forms" and leaving them there
+// means the only way out is a full page reload. A transient network blip should
+// cost one click: the error state needs a "Try again" control that re-runs the
+// custom-forms request, and on success the forms appear and the error is gone.
+
+describe('Custom forms — retry after failure', () => {
+  it('re-runs the request when "Try again" is clicked, then shows the forms and clears the error', async () => {
+    retrieveCustomData
+      .mockRejectedValueOnce(new Error('fetch failed'))
+      .mockResolvedValueOnce([
+        makeForm({ objectId: 'r1', name: 'Recovered Survey', workflows: ['WaSH'] }),
+      ]);
+
+    render(
+      <FormManager context={mockContext} router={mockRouter} user={{ organization: 'test-org' }} />,
+    );
+
+    await waitFor(
+      () => expect(screen.getByText('form_manager_custom_forms_error')).toBeInTheDocument(),
+      { timeout: 3000 },
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'form_manager_retry' }));
+
+    await waitFor(() => expect(screen.getByText('Recovered Survey')).toBeInTheDocument());
+    expect(screen.queryByText('form_manager_custom_forms_error')).not.toBeInTheDocument();
+  });
+});
+
+// ─── RED: the retry must not cost the coordinator their place ────────────────
+// An accessibility probe against this component measured three defects that all
+// share one cause: the retry set the same `loading` flag as a first load, so the
+// whole region — including the button the user had just pressed — unmounted.
+//   FOCUS_BEFORE_CLICK: BUTTON  →  FOCUS_DURING_RETRY: BODY
+// A keyboard user's next Tab therefore restarts at the top of the page, seconds
+// later, on the slow connection that caused the failure in the first place. The
+// screen reader gets nothing at all, because the swap has no live region.
+
+describe('Custom forms — the retry keeps the coordinator in place', () => {
+  const deferred = () => {
+    let settle;
+    const promise = new Promise((resolve, reject) => { settle = { resolve, reject }; });
+    return { promise, ...settle };
+  };
+
+  it('announces the failure to assistive tech', async () => {
+    retrieveCustomData.mockRejectedValue(new Error('fetch failed'));
+    render(
+      <FormManager context={mockContext} router={mockRouter} user={{ organization: 'test-org' }} />,
+    );
+
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent('form_manager_custom_forms_error');
+  });
+
+  it('keeps the error and the already-loaded Puente forms on screen while retrying', async () => {
+    const second = deferred();
+    retrieveCustomData
+      .mockRejectedValueOnce(new Error('fetch failed'))
+      .mockReturnValueOnce(second.promise);
+
+    render(
+      <FormManager context={mockContext} router={mockRouter} user={{ organization: 'test-org' }} />,
+    );
+    await screen.findByText('form_manager_custom_forms_error');
+
+    fireEvent.click(screen.getByRole('button', { name: 'form_manager_retry' }));
+
+    // In flight: the request has not settled, and the region must still be here.
+    expect(screen.getByText('form_manager_custom_forms_error')).toBeInTheDocument();
+    expect(screen.getByText('form_manager_puente_forms')).toBeInTheDocument();
+
+    await act(async () => { second.resolve([]); });
+  });
+
+  it('leaves focus on the retry control when the retry also fails', async () => {
+    retrieveCustomData.mockRejectedValue(new Error('fetch failed'));
+    render(
+      <FormManager context={mockContext} router={mockRouter} user={{ organization: 'test-org' }} />,
+    );
+    await screen.findByText('form_manager_custom_forms_error');
+
+    const retry = screen.getByRole('button', { name: 'form_manager_retry' });
+    retry.focus();
+    expect(document.activeElement).toBe(retry);
+
+    await act(async () => { fireEvent.click(retry); });
+
+    // Not <body>. The control the user pressed is still there to press again.
+    expect(document.activeElement).toBe(
+      screen.getByRole('button', { name: 'form_manager_retry' }),
+    );
   });
 });

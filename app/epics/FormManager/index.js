@@ -1,4 +1,4 @@
-import { EmptyState, Panel, Skeleton } from 'app/impacto-design-system';
+import { Button, EmptyState, Panel, Skeleton } from 'app/impacto-design-system';
 import { retrieveCustomData } from 'app/modules/cloud-code';
 import { loadOrganizationIdentity } from 'app/modules/organization';
 import { useTranslation } from 'next-i18next';
@@ -31,13 +31,29 @@ const puenteConfig = [
 
 function FormManager({ context, router, user }) {
   const { t } = useTranslation('common');
+
+  // The organization every fetch on this screen is scoped to. Empty string
+  // until the auth layer resolves one, which is what the fetch guards test.
+  const organization = user?.organization || '';
+
   const [workflowData, setWorkflowData] = useState({});
   const [noWorkflowData, setNoWorkflowData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(false);
+  // Starts true whenever there is an organization to fetch for, so the very
+  // first paint of the custom-forms area is the skeleton and never
+  // "no custom forms yet" — that empty state is only truthful once the request
+  // has come back empty. With no organization there is no fetch, so it starts
+  // false and the content paints straight away.
+  const [loading, setLoading] = useState(Boolean(organization));
   const [selectedForm, setSelectedForm] = useState(null);
-
-  const organization = user?.organization || '';
+  // A failed custom-forms request is not an empty organization: without this the
+  // coordinator is told "no custom forms yet" and believes their forms are gone.
+  const [customFormsError, setCustomFormsError] = useState(false);
+  // A RETRY is not a first load, and must not raise `loading`. Doing so unmounted
+  // this whole region — including the button the user had just pressed — so focus
+  // fell to <body> and their next Tab restarted at the top of the page, seconds
+  // later, on the slow connection that caused the failure. Measured, not guessed.
+  const [isRetrying, setIsRetrying] = useState(false);
 
   // The CSV exporter keys on shortCode so an export covers every string the
   // organization's records carry. Null until resolved, and null for an
@@ -72,13 +88,20 @@ function FormManager({ context, router, user }) {
     return list.filter((f) => f.name.toLowerCase().includes(term));
   }, [noWorkflowData, searchTerm]);
 
+  // This section has three mutually exclusive states — failed, has forms, empty.
+  // Naming the middle one keeps them three flat conditions in the JSX instead of
+  // a ternary nested inside a guard, which is what they were.
+  const hasCustomForms = Object.keys(filteredWorkflowData).length > 0
+    || filteredNoWorkflowData.length > 0;
+
   const appendToCategory = (map, key, record) => {
     // eslint-disable-next-line no-param-reassign
     map[key] = key in map ? map[key].concat([record]) : [record];
   };
 
-  const refreshWorkflowData = async () => {
-    setLoading(true);
+  const refreshWorkflowData = async ({ isRetry = false } = {}) => {
+    if (isRetry) setIsRetrying(true);
+    else setLoading(true);
     try {
       const records = await retrieveCustomData(organization);
       const tableDataByCategory = {};
@@ -97,12 +120,18 @@ function FormManager({ context, router, user }) {
       delete tableDataByCategory['No Workflow Assigned'];
       delete tableDataByCategory.Puente;
       setWorkflowData(tableDataByCategory);
+      setCustomFormsError(false);
     } catch {
-      // network / parse error — loading flag is cleared in finally; content remains visible
+      // network / parse error — say so, rather than reporting it as an empty org
+      setCustomFormsError(true);
     } finally {
       setLoading(false);
+      setIsRetrying(false);
     }
   };
+
+  // Named, not an inline arrow: react/jsx-no-bind is on in this repo.
+  const handleRetry = () => refreshWorkflowData({ isRetry: true });
 
   useEffect(() => {
     if (!organization) return;
@@ -192,7 +221,25 @@ function FormManager({ context, router, user }) {
           </div>
 
           <div className={styles.section}>
-            {(Object.keys(filteredWorkflowData).length > 0 || filteredNoWorkflowData.length > 0) ? (
+            {customFormsError && (
+              // role="alert" because the swap happens after an async failure with
+              // no other cue: a screen-reader user watching the skeleton go away
+              // otherwise gets silence.
+              <div role="alert" className="cl-dlite-text-center cl-dlite-sem-py-xxl cl-dlite-sem-px-lg">
+                <p className={styles.errorStateTitle}>{t('form_manager_custom_forms_error')}</p>
+                <p className={styles.errorStateSub}>{t('form_manager_custom_forms_error_sub')}</p>
+                <div className="cl-dlite-sem-mt-md">
+                  <Button
+                    text={t('form_manager_retry')}
+                    onClick={handleRetry}
+                    intent="primary"
+                    isSmall
+                    isLoading={isRetrying}
+                  />
+                </div>
+              </div>
+            )}
+            {!customFormsError && hasCustomForms && (
               <>
                 {Object.keys(filteredWorkflowData).map((key) => (
                   <Panel key={key} title={key} noPadding>
@@ -224,7 +271,8 @@ function FormManager({ context, router, user }) {
                   </Panel>
                 )}
               </>
-            ) : (
+            )}
+            {!customFormsError && !hasCustomForms && (
               <EmptyState message={t('form_manager_no_custom_forms')} />
             )}
           </div>
