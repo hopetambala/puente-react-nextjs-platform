@@ -2,6 +2,7 @@ import {
   describeSelector,
   extractAppId,
   mayWrite,
+  mergeResults,
   parseRunArgs,
   summarizeRuns,
   sweepProgress,
@@ -278,5 +279,80 @@ describe('mayWrite — genuinely fail closed', () => {
 
   it('can be widened deliberately, by explicit opt-in', () => {
     expect(mayWrite('SomeOtherStaging', { allowUnknown: true }).allowed).toBe(true);
+  });
+});
+
+describe('mergeResults — a suite with two sessions must not lose the first', () => {
+  /**
+   * form-edit runs two browser sessions on purpose: session 1 creates a form,
+   * session 2 finds and edits it in a cold session. Each called finish(), and
+   * finish() WROTE the results file — so session 2 overwrote session 1's, and
+   * the stability gate never saw session 1's checks at all. A publish that
+   * failed in session 1 was invisible to the gate.
+   */
+  it('keeps checks from both sessions', () => {
+    const merged = mergeResults(
+      { suite: 'form-edit', results: { 'session 1 published a form that saved': true } },
+      { suite: 'form-edit-s2', results: { 'the edit saved': true } },
+    );
+
+    expect(merged.results['session 1 published a form that saved']).toBe(true);
+    expect(merged.results['the edit saved']).toBe(true);
+  });
+
+  it('keeps the first session as the suite identity', () => {
+    const merged = mergeResults(
+      { suite: 'form-edit', results: { a: true } },
+      { suite: 'form-edit-s2', results: { b: true } },
+    );
+
+    expect(merged.suite).toBe('form-edit');
+  });
+
+  it('namespaces a colliding name instead of letting the later session win', () => {
+    // Both sessions emit "no console errors on owned surfaces" and the
+    // environment guard. Merging them naively would let session 2's pass mask
+    // session 1's failure — the exact thing this merge exists to prevent.
+    const merged = mergeResults(
+      { suite: 'form-edit', results: { 'no console errors on owned surfaces': false } },
+      { suite: 'form-edit-s2', results: { 'no console errors on owned surfaces': true } },
+    );
+
+    expect(merged.results['no console errors on owned surfaces']).toBe(false);
+    expect(merged.results['form-edit-s2: no console errors on owned surfaces']).toBe(true);
+  });
+
+  it('produces names that are identical from run to run', () => {
+    const once = mergeResults(
+      { suite: 'form-edit', results: { shared: true, only1: true } },
+      { suite: 'form-edit-s2', results: { shared: true, only2: true } },
+    );
+    const twice = mergeResults(
+      { suite: 'form-edit', results: { shared: true, only1: true } },
+      { suite: 'form-edit-s2', results: { shared: true, only2: true } },
+    );
+
+    // The gate keys on check names. A name that varies between runs reads as a
+    // check that vanished, which the gate correctly calls a failure.
+    expect(Object.keys(once.results).sort()).toEqual(Object.keys(twice.results).sort());
+  });
+
+  it('returns the incoming session unchanged when there is nothing prior', () => {
+    const merged = mergeResults(null, { suite: 'dashboard', results: { a: true } });
+
+    expect(merged.suite).toBe('dashboard');
+    expect(merged.results).toEqual({ a: true });
+  });
+
+  it('does not namespace when the same session writes twice', () => {
+    // A single session calling finish() twice is a bug, but it must not invent
+    // a second set of check names and make the gate see a phantom regression.
+    const merged = mergeResults(
+      { suite: 'dashboard', results: { a: false } },
+      { suite: 'dashboard', results: { a: true } },
+    );
+
+    expect(Object.keys(merged.results)).toEqual(['a']);
+    expect(merged.results.a).toBe(false);
   });
 });

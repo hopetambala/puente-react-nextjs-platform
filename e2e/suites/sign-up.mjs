@@ -18,8 +18,15 @@
  *
  * See e2e/README.md for the harness rules.
  */
-import { openSession, BASE } from '../lib/harness.mjs';
+import { appendFileSync, mkdirSync, readFileSync } from 'fs';
+import { join } from 'path';
 
+import { ARTIFACTS,openSession } from '../lib/harness.mjs';
+
+// The named inputs registration requires. A fixed list, so the per-field check
+// names are stable for the gate, and so 'ready to submit' can read back the
+// exact same set it asserted the existence of.
+const FIELDS = ['firstname', 'lastname', 'email', 'phonenumber', 'password', 'passwordconfirmation'];
 const LOGIN_FORM = { role: 'button', name: /sign in|login/i };
 const REGISTER_FORM = { role: 'button', name: /^register$/i };
 
@@ -52,8 +59,7 @@ const NEW = {
     await s.go('/account/register', REGISTER_FORM, 'open the registration form');
 
     const byName = (n) => s.page.locator(`input[name="${n}"]`).first();
-    for (const f of ['firstname', 'lastname', 'email', 'phonenumber', 'password', 'passwordconfirmation']) {
-      // eslint-disable-next-line no-await-in-loop
+    for (const f of FIELDS) {
       await s.check(`the ${f} field exists`, await byName(f).count() > 0);
     }
 
@@ -108,8 +114,23 @@ const NEW = {
     // ── THE WRITE, ONLY ON EXPLICIT CONSENT ──────────────────────────────────
     await byName('passwordconfirmation').fill(NEW.password);
     if (process.env.E2E_ALLOW_ORPHAN_USER !== '1') {
-      await s.check('form is complete and ready to submit (write skipped by default)', true,
-        'set E2E_ALLOW_ORPHAN_USER=1 to actually register — the account cannot be deleted afterwards');
+      // This is the last check most runs reach, and it used to assert `true` —
+      // so the default path of this suite ended on a check that could not fail.
+      // Read the form back instead: every field holds what was typed, and the
+      // button that would submit it is actually enabled. That is the real claim
+      // "ready to submit" makes, and it can fail.
+      const filled = await Promise.all(FIELDS.map(async (f) => ({
+        field: f,
+        value: await byName(f).inputValue().catch(() => ''),
+      })));
+      const empty = filled.filter((f) => !f.value);
+      const submit = s.page.getByRole('button', { name: /^register$/i }).first();
+      const enabled = await submit.isEnabled().catch(() => false);
+      await s.check('form is complete and ready to submit (write skipped by default)',
+        empty.length === 0 && enabled,
+        empty.length ? `still empty: ${empty.map((f) => f.field).join(', ')}`
+          : `${filled.length} field(s) filled, Register ${enabled ? 'enabled' : 'DISABLED'}`
+            + ' — set E2E_ALLOW_ORPHAN_USER=1 to actually register');
       console.log('\n  [skipped] registration NOT submitted. Nothing was created.');
       const { failed: f0 } = await s.finish();
       process.exit(f0.length ? 1 : 0);
@@ -119,7 +140,7 @@ const NEW = {
     await s.page.getByRole('button', { name: /^register$/i }).first().click();
     await s.page.waitForLoadState('networkidle').catch(() => {});
     await s.page.waitForFunction(
-      () => !location.pathname.includes('/account/register')
+      () => !window.location.pathname.includes('/account/register')
         || /verif|check your email|confirm|already|error|invalid/i.test(document.body.innerText),
       null, { timeout: 30000 },
     ).catch(() => {});
@@ -143,9 +164,24 @@ const NEW = {
     await s.check('an unverified account is refused, and told why', blocked,
       blocked ? 'held at sign-in pending verification' : `signed in without verifying: ${s.page.url()}`);
 
+    // A console line scrolls away, and this one asserted `true` — so the suite's
+    // record of an account it could not delete was the weakest thing in the run.
+    // Append it to a ledger and assert the ledger really holds it: an orphan
+    // this suite creates must survive as something a person can act on later.
+    const ledger = join(ARTIFACTS, 'orphaned-users.log');
+    let recorded = false;
+    try {
+      mkdirSync(ARTIFACTS, { recursive: true });
+      appendFileSync(ledger, `${new Date().toISOString()}\t${NEW.email}\tapp=${s.appId ?? 'unknown'}`
+        + '\tdelete by hand: Parse _User, master key required\n');
+      recorded = readFileSync(ledger, 'utf8').includes(NEW.email);
+    } catch (err) {
+      console.log(`      could not write the orphan ledger: ${String(err).slice(0, 120)}`);
+    }
     console.log(`\n  ⚠ LEFT BEHIND: ${NEW.email}`);
-    console.log('    Registration cannot be undone through the UI — delete this user by hand.');
-    await s.check('the orphaned account is reported for manual removal', true, NEW.email);
+    console.log(`    Registration cannot be undone through the UI — recorded in ${ledger}`);
+    await s.check('the orphaned account is recorded where it can be cleaned up',
+      recorded, recorded ? `${NEW.email} → ${ledger}` : `NOT RECORDED — ${NEW.email} is untracked`);
   });
 
   const { failed } = await s.finish();

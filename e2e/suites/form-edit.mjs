@@ -24,10 +24,9 @@
  *
  * See e2e/README.md for the harness rules.
  */
+import { addBlock, deleteFormRow, MANAGER_LOADED, publishForm } from '../lib/form-builder.mjs';
 import { openSession } from '../lib/harness.mjs';
-import { addBlock, deleteFormRow, publishForm } from '../lib/form-builder.mjs';
 
-const MANAGER_LOADED = { text: /SurveyData/ };
 const CREATOR = { role: 'button', name: /^publish$/i };
 const PRE_EXISTING = /supplied to `Stack`|supplied to `Card`|headerActions|does not recognize the/;
 
@@ -56,7 +55,10 @@ const rowFor = (page, n) => page.locator('tr', { hasText: n });
     created.objectId ? `${NAME} → ${created.objectId}` : JSON.stringify(created).slice(0, 80));
   await a.shot('session1-published');
   });
-  await a.finish();
+  // Keep session 1's verdict. It used to be discarded — `finish()` overwrote
+  // the results file and only session 2's exit code was consulted, so a failed
+  // publish here exited 0 and the gate saw nothing.
+  const { failed: failed1 } = await a.finish();
 
   // ── SESSION 2: FIND, EDIT, VERIFY, DELETE ────────────────────────────────
   const s = await openSession({ suite: 'form-edit-s2', owned: [/forms/], expectedErrors: PRE_EXISTING });
@@ -126,5 +128,5 @@ const rowFor = (page, n) => page.locator('tr', { hasText: n });
   });
 
   const { failed } = await s.finish();
-  process.exit(failed.length ? 1 : 0);
+  process.exit(failed1.length + failed.length ? 1 : 0);
 })();

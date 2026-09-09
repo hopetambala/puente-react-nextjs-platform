@@ -13,17 +13,17 @@
  *
  * See e2e/README.md for the harness rules.
  */
+import { addBlock, deleteFormRow, MANAGER_LOADED, publishForm, sweepForms } from '../lib/form-builder.mjs';
 import { openSession } from '../lib/harness.mjs';
-import { addBlock, deleteFormRow, publishForm, sweepForms } from '../lib/form-builder.mjs';
 
-const LOGIN_FORM = { role: 'button', name: /sign in|login/i };
 // Form Manager renders in sections: the built-in Puente forms first, then
 // CUSTOM FORMS separately and later. Two earlier versions of this suite got
 // this wrong — one waited on the "+ Create form" button (which exists before
-// any data), the other on SurveyData (which proves only the built-in list
-// arrived) — and both concluded the form had not saved when it had.
-// Waiting for the form BY NAME is both the wait and the assertion.
-const MANAGER_LOADED = { text: /SurveyData/ };
+// any data), the other on SurveyData — and both concluded the form had not
+// saved when it had. Waiting for the form BY NAME is both the wait and the
+// assertion, so that is what the custom-form checks below do.
+//
+// The page-loaded signal itself is shared — see MANAGER_LOADED in lib/form-builder.mjs.
 const CREATOR = { role: 'button', name: /^publish$/i };
 
 const stamp = Date.now();
@@ -53,7 +53,6 @@ const PRE_EXISTING = /supplied to `Stack`|supplied to `Card`|headerActions|does 
   // Clicking added nothing and published `fields: []`.
   const dragged = [];
   for (const block of [/Question - Text response/i, /Question - Number response/i]) {
-    // eslint-disable-next-line no-await-in-loop
     dragged.push(await addBlock(s.page, block));
   }
   await s.check('blocks can be added to the canvas by keyboard drag',

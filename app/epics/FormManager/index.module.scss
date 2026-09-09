@@ -154,6 +154,28 @@
   font-size: var(--font-size-body);
 }
 
+/* This block occupies the SAME slot as the shared <EmptyState>, so it is scaled
+   to match it — otherwise the panel visibly resizes when a load fails, which
+   reads as the page breaking rather than as one state replacing another.
+   The reference is app/impacto-design-system/empty-state/empty-state.module.css
+   (13px/500 message, 11px sub, xxl/lg padding), NOT the `.emptyState` rule below
+   in this file — that rule is dead and paints nothing.
+   Padding and layout live on the element as cl-dlite-* utilities. */
+.errorStateTitle {
+  /* Colour is the ONLY thing that distinguishes this from the empty state.
+     That is deliberate: same weight, same slot, same rhythm — one is not an
+     error because it is louder, it is an error because it says so. */
+  color: var(--tk-dlite-semantic-color-feedback-danger);
+  font-size: var(--tk-dlite-semantic-typography-size-300);
+  font-weight: var(--tk-dlite-primitive-fontWeight-medium);
+  margin-bottom: var(--tk-dlite-semantic-spacing-xs);
+}
+
+.errorStateSub {
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  font-size: var(--tk-dlite-semantic-typography-size-200);
+}
+
 .formButtons {
   display: flex;
   flex-direction: row;

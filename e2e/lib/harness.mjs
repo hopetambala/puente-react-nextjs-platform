@@ -23,21 +23,23 @@
  * Pure logic lives in harness-lib.mjs and is unit-tested.
  */
 import { chromium } from '@playwright/test';
-import { mkdirSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
-import { describeSelector, extractAppId, mayWrite, summarizeRuns, verdict } from './harness-lib.mjs';
+import { describeSelector, extractAppId, mayWrite, mergeResults, summarizeRuns, verdict } from './harness-lib.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, '..', '..');
 const OUT = process.env.E2E_ARTIFACTS ?? join(ROOT, '.e2e-artifacts');
+/** Where screenshots, failure notes and the orphan ledger are written. */
+export const ARTIFACTS = OUT;
 export const BASE = process.env.E2E_BASE ?? 'http://localhost:3000';
 
 /** Surfaces a suite is allowed to fail on. Errors elsewhere are reported, not failed. */
 const DEFAULT_OWNED = [/quick-start/, /data-curation/];
 
-export { summarizeRuns, verdict, mayWrite };
+export { mayWrite,summarizeRuns, verdict };
 
 export async function openSession({
   suite,
@@ -73,6 +75,10 @@ export async function openSession({
   // the offline state. Without this the suite fails on the very condition it
   // set up, which trains the reader to ignore the console check.
   let expected = expectedErrors;
+  // Defined BEFORE noteError, which calls it. It used to sit twenty lines
+  // lower, so a console error arriving before that line executed would have
+  // thrown ReferenceError from inside the error handler itself.
+  const safePath = (u) => { try { return new URL(u).pathname; } catch { return u; } };
   const noteError = (t) => {
     if (/favicon/i.test(t)) return;
     const line = `${safePath(page.url())}: ${t.slice(0, 140)}`;
@@ -94,7 +100,6 @@ export async function openSession({
   page.on('console', (m) => { if (m.type() === 'error') noteError(m.text()); });
   page.on('pageerror', (e) => noteError(`PAGEERROR: ${String(e)}`));
 
-  const safePath = (u) => { try { return new URL(u).pathname; } catch { return u; } };
 
   const shot = async (label) => {
     const f = join(OUT, `${ts}_${suite}-${label}.png`);
@@ -257,7 +262,17 @@ export async function openSession({
     const failedNames = order.filter((n) => !results[n]);
     console.log(`\n${'='.repeat(60)}\n${order.length - failedNames.length}/${order.length} checks passed  [${suite}]`);
     failedNames.forEach((n) => console.log(`  ✗ ${n}`));
-    if (process.env.E2E_JSON) writeFileSync(process.env.E2E_JSON, JSON.stringify({ suite, results }, null, 1));
+    // MERGE, never overwrite. A suite with two sessions (form-edit) called
+    // finish() twice; the second write replaced the first, so the gate never
+    // saw session 1's checks and a failure there was invisible.
+    if (process.env.E2E_JSON) {
+      const path = process.env.E2E_JSON;
+      let prior = null;
+      if (existsSync(path)) {
+        try { prior = JSON.parse(readFileSync(path, 'utf8')); } catch { prior = null; }
+      }
+      writeFileSync(path, JSON.stringify(mergeResults(prior, { suite, results }), null, 1));
+    }
     return { results, failed: failedNames, unsafeUses };
   };
 

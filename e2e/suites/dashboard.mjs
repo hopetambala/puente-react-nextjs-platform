@@ -4,9 +4,8 @@
  * Every query here is behavioural: if a coordinator could not find or read the
  * thing, the check fails. See e2e/README.md for the harness rules.
  */
-import { openSession, BASE } from '../lib/harness.mjs';
+import { openSession } from '../lib/harness.mjs';
 
-const RIBBON = { role: 'region', name: /sync/i };
 const QUEUE = { role: 'heading', name: /needs attention|requiere atenci/i };
 
 (async () => {
@@ -56,7 +55,7 @@ const QUEUE = { role: 'heading', name: /needs attention|requiere atenci/i };
   const colour = () => hoverRow.evaluate((n) => getComputedStyle(n).color);
   const resting = await colour();
   await hoverRow.hover();
-  await hoverRow.evaluate((n) => new Promise((r) => {
+  await hoverRow.evaluate(() => new Promise((r) => {
     // Settle on the computed colour rather than sleeping past a guessed duration.
     const start = performance.now();
     const tick = () => (performance.now() - start > 600 ? r() : requestAnimationFrame(tick));

@@ -15,13 +15,13 @@
  *
  * See e2e/README.md for the harness rules.
  */
-import { openSession } from '../lib/harness.mjs';
-import { existsSync, readFileSync, rmSync, statSync } from 'fs';
-import { mkdtempSync } from 'fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, statSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 
-const MANAGER_LOADED = { text: /SurveyData/ };
+import { MANAGER_LOADED } from '../lib/form-builder.mjs';
+import { openSession } from '../lib/harness.mjs';
+
 const PRE_EXISTING = /supplied to `Stack`|headerActions|does not recognize the/;
 
 (async () => {
