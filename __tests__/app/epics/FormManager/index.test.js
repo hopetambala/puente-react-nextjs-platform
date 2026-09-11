@@ -393,16 +393,19 @@ describe('Loading resolves', () => {
 // primary entry point to Form Creator — caught before discoverability regresses.
 
 describe('Phase 1 — Create form CTA', () => {
-  it('renders a "+ Create form" button in the catalog view', async () => {
+  // The label is asserted as its KEY: the `t` mock returns keys, so this also
+  // holds the button to going through translation. It shipped hardcoded as
+  // "+ Create form" and rendered English on the Spanish page.
+  it('renders a translated Create form button in the catalog view', async () => {
     renderManager([]);
     await waitFor(() => expect(retrieveCustomData).toHaveBeenCalled());
-    expect(screen.getByRole('button', { name: /\+ create form/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'form_manager_create' })).toBeInTheDocument();
   });
 
-  it('clicking "+ Create form" navigates to /forms/form-creator', async () => {
+  it('clicking Create form navigates to /forms/form-creator', async () => {
     renderManager([]);
     await waitFor(() => expect(retrieveCustomData).toHaveBeenCalled());
-    fireEvent.click(screen.getByRole('button', { name: /\+ create form/i }));
+    fireEvent.click(screen.getByRole('button', { name: 'form_manager_create' }));
     expect(mockRouter.push).toHaveBeenCalledWith('/forms/form-creator');
   });
 });

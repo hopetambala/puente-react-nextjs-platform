@@ -78,10 +78,14 @@ overlap is greetings and buttons.
 
 ## Reviewing
 
-[`review-worksheet.csv`](./review-worksheet.csv) — 166 rows, English alongside
+[`review-worksheet.csv`](./review-worksheet.csv) — 454 rows, English alongside
 both translations, with a `reviewed_by` column and a `notes` column flagging
 the 19 strings where Collect already has a human translation of the same
-English.
+English (plus one number-format row with no prose to translate).
+
+The count is enforced, not maintained by hand: `__tests__/locales/translations.test.js`
+fails if a key exists in a catalog and not in this file, so adding a string and
+regenerating are the same change.
 
 Corrections go directly into `public/locales/<locale>/<namespace>.json`. Change
 values, never keys: a renamed key fails the build twice, once as a key English
