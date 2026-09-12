@@ -177,7 +177,7 @@ function FormManager({ context, router, user }) {
                 className={styles.createFormBtn}
                 onClick={() => router.push('/forms/form-creator')}
               >
-                + Create form
+                {t('form_manager_create')}
               </button>
               <div className={styles.search}>
                 <span className={styles.searchIcon}>⌕</span>

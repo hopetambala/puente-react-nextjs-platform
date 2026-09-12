@@ -84,7 +84,7 @@ export default function CSVButtonWrapper({ form, surveyingOrganization, shortCod
     <Button
       isSmall
       isLoading={loading}
-      text={loading ? 'Loading…' : 'Export'}
+      text={loading ? t('export_loading') : t('export_button')}
       onClick={fetchData}
     />
   );

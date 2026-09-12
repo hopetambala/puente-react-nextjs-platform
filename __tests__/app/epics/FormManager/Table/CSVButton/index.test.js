@@ -171,3 +171,46 @@ describe('CSVButton empty export', () => {
     expect(toastCalls).toHaveLength(0);
   });
 });
+
+/**
+ * The button's own label, not just its toasts.
+ *
+ * #124 routed "every user-visible string through t()" and the locale parity
+ * test proved the catalogs agree — but parity only compares catalogs to each
+ * other. A string that never entered a catalog is invisible to it, and this
+ * one never did: `text={loading ? 'Loading…' : 'Export'}`.
+ *
+ * Caught by photographing the Spanish page for the export guide, where the
+ * heading read "Gestor de formularios" above a row of buttons reading
+ * "Export". A reader on the Spanish page is the reader least able to map an
+ * English button onto the one in front of them.
+ *
+ * The `t` mock returns the key, so a key here IS the assertion that the label
+ * goes through translation at all.
+ */
+describe('CSVButton label', () => {
+  it('translates its label rather than hardcoding English', () => {
+    render(<CSVButton
+      form={{ name: 'SurveyData', objectId: 'x' }}
+      surveyingOrganization="Example Health Trust"
+      shortCode="example-health-trust"
+    />);
+
+    expect(screen.getByRole('button')).toHaveTextContent('export_button');
+  });
+
+  it('translates the label it shows while the download is running', async () => {
+    let release;
+    nextResponse = new Promise((resolve) => { release = resolve; });
+
+    render(<CSVButton
+      form={{ name: 'SurveyData', objectId: 'x' }}
+      surveyingOrganization="Example Health Trust"
+      shortCode="example-health-trust"
+    />);
+    fireEvent.click(screen.getByRole('button'));
+
+    await waitFor(() => expect(screen.getByRole('button')).toHaveTextContent('export_loading'));
+    release('csv');
+  });
+});
