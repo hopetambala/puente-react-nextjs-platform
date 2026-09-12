@@ -21,10 +21,10 @@
  * hazard that e2e/run-e2e.mjs exists to prevent; anything needing an assertion
  * belongs in a suite.
  */
-import { chromium } from '@playwright/test';
-import { mkdirSync } from 'fs';
+import {
+  BASE, captureBothLocales, clip, json, stubbedPage,
+} from './capture-lib.mjs';
 
-const BASE = 'http://localhost:3000';
 const ROOT = process.env.OUT
   || '/Users/hopetambala/Documents/development/puente/puente-react-nextjs-platform/docs/img/organizations';
 
@@ -63,8 +63,6 @@ const MEMBERS_BY_ORG = {
   'demo-outreach': [],
 };
 
-const json = (route, body) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
-
 async function installStubs(ctx, { isStaff }) {
   await ctx.addInitScript(() => {
     localStorage.setItem('user', JSON.stringify({
@@ -89,20 +87,8 @@ async function installStubs(ctx, { isStaff }) {
   });
 }
 
-const clip = async (page, selector, name, OUT) => {
-  const el = page.locator(selector).first();
-  if (!(await el.count())) { console.log(`  ! ${selector} not found — skipped ${name}`); return; }
-  await el.screenshot({ path: `${OUT}/${name}.png` });
-  console.log(`  ✓ ${name}.png`);
-};
-
-async function captureLocale(browser, { prefix, OUT, label }) {
-  mkdirSync(OUT, { recursive: true });
-  const ctx = await browser.newContext({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 2 });
-  await installStubs(ctx, { isStaff: true });
-  const page = await ctx.newPage();
-
-  console.log(`\n=== ${label} → ${OUT} ===`);
+async function walk({ browser, prefix, out: OUT }) {
+  const { ctx, page } = await stubbedPage(browser, (c) => installStubs(c, { isStaff: true }));
   await page.goto(`${BASE}${prefix}/organization-admin`);
   await page.waitForLoadState('networkidle');
   await page.waitForTimeout(2500);
@@ -171,10 +157,4 @@ async function captureLocale(browser, { prefix, OUT, label }) {
   await ctx.close();
 }
 
-(async () => {
-  const browser = await chromium.launch({ headless: true });
-  await captureLocale(browser, { prefix: '', OUT: ROOT, label: 'English' });
-  await captureLocale(browser, { prefix: '/spa', OUT: `${ROOT}/es`, label: 'Español' });
-  await browser.close();
-  console.log(`\nSaved to ${ROOT} and ${ROOT}/es`);
-})();
+captureBothLocales(ROOT, walk);

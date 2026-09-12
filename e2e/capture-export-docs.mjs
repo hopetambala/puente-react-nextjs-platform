@@ -21,16 +21,12 @@
  * screen", so it is not the hand-rolled-Playwright hazard run-e2e.mjs exists to
  * prevent; anything needing a real assertion belongs in a suite.
  */
-import { chromium } from '@playwright/test';
-import { mkdirSync } from 'fs';
+import {
+  BASE, captureBothLocales, clip, json, shot, stubbedPage,
+} from './capture-lib.mjs';
 
-const BASE = 'http://localhost:3000';
 const ROOT = process.env.OUT
   || '/Users/hopetambala/Documents/development/puente/puente-react-nextjs-platform/docs/img/export';
-
-const json = (route, body) => route.fulfill({
-  status: 200, contentType: 'application/json', body: JSON.stringify(body),
-});
 
 /** Invented forms, invented organization. Nothing here exists. */
 const CUSTOM_FORMS = [
@@ -123,32 +119,15 @@ async function installStubs(ctx, csvMode) {
   );
 }
 
-const shot = async (page, name, out) => {
-  await page.screenshot({ path: `${out}/${name}.png`, fullPage: false });
-  console.log(`  ✓ ${name}.png`);
-};
-
-const clip = async (page, selector, name, out) => {
-  const el = page.locator(selector).first();
-  if (!(await el.count())) { console.log(`  ! ${selector} not found — skipped ${name}`); return; }
-  await el.screenshot({ path: `${out}/${name}.png` });
-  console.log(`  ✓ ${name}.png`);
-};
-
 /** The Export button on a given row, found by the row's visible name. */
 function exportButtonNear(page, rowText) {
   return page.locator('tr', { hasText: rowText }).locator('button', { hasText: /Export|Exportar/i }).first();
 }
 
-async function captureLocale(browser, { prefix, out, label }) {
-  mkdirSync(out, { recursive: true });
-  console.log(`\n=== ${label} → ${out} ===`);
-
+async function walk({ browser, prefix, out }) {
   // ── the screen itself, and where the button lives ────────────────────────
   {
-    const ctx = await browser.newContext({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 2 });
-    await installStubs(ctx, 'rows');
-    const page = await ctx.newPage();
+    const { ctx, page } = await stubbedPage(browser, (c) => installStubs(c, 'rows'));
     await page.goto(`${BASE}${prefix}/forms/form-manager`);
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2500);
@@ -160,9 +139,7 @@ async function captureLocale(browser, { prefix, out, label }) {
 
   // ── a form with no results yet: a 200 whose body is one newline ──────────
   {
-    const ctx = await browser.newContext({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 2 });
-    await installStubs(ctx, 'empty');
-    const page = await ctx.newPage();
+    const { ctx, page } = await stubbedPage(browser, (c) => installStubs(c, 'empty'));
     await page.goto(`${BASE}${prefix}/forms/form-manager`);
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2500);
@@ -181,9 +158,7 @@ async function captureLocale(browser, { prefix, out, label }) {
 
   // ── the export that failed, which is NOT the same as having no data ──────
   {
-    const ctx = await browser.newContext({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 2 });
-    await installStubs(ctx, 'fail');
-    const page = await ctx.newPage();
+    const { ctx, page } = await stubbedPage(browser, (c) => installStubs(c, 'fail'));
     await page.goto(`${BASE}${prefix}/forms/form-manager`);
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2500);
@@ -201,10 +176,4 @@ async function captureLocale(browser, { prefix, out, label }) {
   }
 }
 
-(async () => {
-  const browser = await chromium.launch({ headless: true });
-  await captureLocale(browser, { prefix: '', out: ROOT, label: 'English' });
-  await captureLocale(browser, { prefix: '/spa', out: `${ROOT}/es`, label: 'Español' });
-  await browser.close();
-  console.log(`\nSaved to ${ROOT} and ${ROOT}/es`);
-})();
+captureBothLocales(ROOT, walk);
