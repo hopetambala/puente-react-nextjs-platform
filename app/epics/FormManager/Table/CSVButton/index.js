@@ -85,7 +85,9 @@ export default function CSVButtonWrapper({ form, surveyingOrganization, shortCod
       // Distinct from the empty case on purpose. Both used to say "No data",
       // so a coordinator whose export CRASHED went looking for missing records
       // instead of retrying.
-      toast(<Toast text={t('export_failed')} isError />);
+      // A 401 is a session that expired or was revoked: retrying can't help,
+      // signing in again does.
+      toast(<Toast text={t(error && error.status === 401 ? 'export_signed_out' : 'export_failed')} isError />);
     } finally {
       setLoading(null);
     }

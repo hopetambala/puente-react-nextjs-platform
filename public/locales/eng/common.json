@@ -420,5 +420,6 @@
   "form_manager_research_file_contents": "Research file: a study ID, age, sex, community and this form's answers. No names, ID numbers, phone numbers, birth dates or locations. This is the only file to send to a research partner.",
   "form_manager_full_records_contents": "Full records: every answer with the person's name, ID number, phone number, birth date and location. Keep this file inside Puente.",
   "form_creator_allow_research_export": "Allow research export",
-  "form_creator_allow_research_export_hint": "Adds an Export research file button to this form: a file without names, ID numbers, phone numbers, birth dates or locations, for a research partner with ethics approval. Location questions in this form are left out of it."
+  "form_creator_allow_research_export_hint": "Adds an Export research file button to this form: a file without names, ID numbers, phone numbers, birth dates or locations, for a research partner with ethics approval. Location questions in this form are left out of it.",
+  "export_signed_out": "Your sign-in has expired. Sign in again to export."
 }

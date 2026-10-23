@@ -16,7 +16,11 @@ const fetchData = async (path) => fetch(`${process.env.NEXT_PUBLIC_PUENTE_DATA_E
     ...sessionHeader(),
   },
 }).then(async (resp) => {
-  if (!resp.ok) throw new Error(`Request failed with status ${resp.status}`);
+  if (!resp.ok) {
+    // The status rides on the error: a 401 means "sign in again", which a
+    // caller can only tell apart from a broken export by this number.
+    throw Object.assign(new Error(`Request failed with status ${resp.status}`), { status: resp.status });
+  }
   return resp.text();
 });
 

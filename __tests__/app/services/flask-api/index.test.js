@@ -49,4 +49,10 @@ describe('flask-api fetchData', () => {
     const [, options] = global.fetch.mock.calls[0];
     expect(options.headers).not.toHaveProperty('X-Parse-Session-Token');
   });
+
+  it('carries the HTTP status on the error, so callers can tell signed-out from broken', async () => {
+    global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 401, text: async () => '{}' });
+
+    await expect(fetchData('v3/records/short-code/puente')).rejects.toMatchObject({ status: 401 });
+  });
 });
