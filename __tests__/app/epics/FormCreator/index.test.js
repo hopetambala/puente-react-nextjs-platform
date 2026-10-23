@@ -619,4 +619,20 @@ describe('Allow research export', () => {
     render(<FormCreator context={makeContext()} user={mockUser} />);
     expect(screen.getByText('form_creator_allow_research_export_hint')).toBeInTheDocument();
   });
+
+  it('is not offered when editing a Puente form, which has no research file', async () => {
+    const ctx = makeContext({
+      action: 'edit puente form',
+      data: {
+        name: 'Vitals', description: '', fields: [], typeOfForm: ['Custom'],
+        organizations: ['test-org'], objectId: 'pf-1',
+      },
+    });
+    render(<FormCreator context={ctx} user={mockUser} />);
+    await waitFor(() => expect(screen.getByPlaceholderText('form_creator_form_name_placeholder').value).toBe('Vitals'));
+    expect(screen.queryByRole('checkbox', { name: /form_creator_allow_research_export/ })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByText('form_creator_publish'));
+    await waitFor(() => expect(updateObject).toHaveBeenCalled());
+    expect(savedObject(updateObject)).not.toHaveProperty('allowResearchExport');
+  });
 });

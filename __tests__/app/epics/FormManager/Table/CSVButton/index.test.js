@@ -285,3 +285,48 @@ describe('CSVButton on a form with research export turned on', () => {
     expect(screen.getAllByRole('button').map((b) => b.textContent)).toEqual(['export_button']);
   });
 });
+
+// One rule decides "this form has a research file", so the badge, the notes and
+// the button can never disagree (review of #130).
+describe('offersResearchExport', () => {
+  const offersResearchExport = require('app/modules/data-export/offersResearchExport').default;
+
+  it.each([
+    [{ customForm: true, allowResearchExport: true }, 'mcmaster', true],
+    [{ customForm: true, allowResearchExport: true }, null, false],
+    [{ customForm: true, allowResearchExport: false }, 'mcmaster', false],
+    [{ customForm: false, allowResearchExport: true }, 'mcmaster', false],
+    [{ allowResearchExport: 'true' }, 'mcmaster', false],
+  ])('%o with short code %s → %s', (form, shortCode, expected) => {
+    expect(offersResearchExport(form, shortCode)).toBe(expected);
+  });
+});
+
+// The file is named with the coordinator's own date. In the Dominican Republic
+// (UTC−4) a UTC date reads as tomorrow after 8pm (review of #130).
+describe('research file name date', () => {
+  it('uses the local calendar date, not UTC', async () => {
+    jest.useFakeTimers().setSystemTime(new Date(2026, 10, 10, 23, 30));
+    const clicked = [];
+    const realCreate = document.createElement.bind(document);
+    jest.spyOn(document, 'createElement').mockImplementation((tag) => {
+      const el = realCreate(tag);
+      if (tag === 'a') el.click = () => clicked.push(el.download);
+      return el;
+    });
+    window.URL.createObjectURL = jest.fn(() => 'blob:x');
+    nextResponse = 'study_id\nP-1\n';
+    render(<CSVButton
+      form={{ name: 'Vision exam', objectId: 'v', customForm: true, allowResearchExport: true }}
+      surveyingOrganization="McMaster"
+      shortCode="mcmaster"
+    />);
+
+    fireEvent.click(screen.getByText('export_research_button'));
+
+    await waitFor(() => expect(clicked).toHaveLength(1));
+    expect(clicked[0]).toBe('Vision exam - research - 2026-11-10.csv');
+    document.createElement.mockRestore();
+    jest.useRealTimers();
+  });
+});

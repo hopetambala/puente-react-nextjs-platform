@@ -14,19 +14,22 @@
 .colDate { width: 96px; white-space: nowrap; }
 .colActions { width: 1%; text-align: right; white-space: nowrap; }
 
-// Below a wide laptop the table is wider than its card, and the actions (the
-// one column a coordinator came to use) start off-screen. Description is
-// already truncated to a few words and is the column to give up; the full
-// text is still one Edit away. Measured at 1280px: the Delete and Export
-// buttons were cut off on every custom-form row.
-@media (max-width: 1365px) {
+// Below 1440px the table is wider than its card and the actions (the one
+// column a coordinator came to use) start off-screen. Description is already
+// truncated to a few words and is the column to give up; the full text is one
+// Edit away. Measured, not a token: CSS variables can't be used in @media, and
+// --breakpoint-xl (1280px) would miss 1366px laptops. With Description shown,
+// the table overflowed by 22px (eng) and 59px (spa) at 1366, and first fit at
+// 1400 (eng) and 1430 (spa); hidden below 1440, it fits at every width in
+// eng, spa and hat.
+@media (max-width: 1439px) {
   .colDescription { display: none; }
 }
 
 .nameBadge {
   display: block;
   margin-top: var(--spacer-xs);
-  font-weight: normal;
+  font-weight: var(--font-weight-regular);
 }
 
 .nameCell {

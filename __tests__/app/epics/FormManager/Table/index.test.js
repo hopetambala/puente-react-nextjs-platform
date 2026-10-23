@@ -187,9 +187,20 @@ describe('FormManagerTable — research export', () => {
     <FormManagerTable data={rows} organization="McMaster" shortCode="mcmaster" {...mockFns} />,
   );
 
-  it('labels a research-enabled form in its status cell', () => {
-    renderRows([makeRow({ allowResearchExport: true })]);
+  it('labels a research-enabled form under its name', () => {
+    renderRows([makeRow({ customForm: true, allowResearchExport: true })]);
     expect(screen.getByText('form_manager_research_badge')).toBeInTheDocument();
+  });
+
+  it('claims no research file the row cannot download (no short code)', () => {
+    render(<FormManagerTable
+      data={[makeRow({ customForm: true, allowResearchExport: true })]}
+      organization="Unresolved"
+      shortCode={null}
+      {...mockFns}
+    />);
+    expect(screen.queryByText('form_manager_research_badge')).not.toBeInTheDocument();
+    expect(require('app/epics/FormManager/Table/ExpandableTableRow').mock.calls[0][0].offersResearch).toBe(false);
   });
 
   it('labels no other form', () => {

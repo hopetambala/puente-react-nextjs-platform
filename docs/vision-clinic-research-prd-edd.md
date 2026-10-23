@@ -631,7 +631,24 @@ what an account can see. Three ways forward, Hope's call:
 | New code live | `/v2/research/...` answers its own 403 ("not turned on for this form"). The EB log shows `export_auth: missing, mode: log` for tokenless downloads, and serves them. |
 | Manage hopetambala/puente-react-nextjs-platform#130 | All checks green: the e2e stability gate flagged a login-page 404 as flaky once, and the rerun passed. **Waiting on a human review and merge.** |
 | Guides puente-dr/puente-dr.github.io#7 | Open. Merge after Manage, so the guides never describe buttons production doesn't have yet. |
-| Scripts hopetambala/puente-node-cloudcode#641 | Open; CI green. |
+| Scripts hopetambala/puente-node-cloudcode#641 | Open, CI green (jest 18.x and 20.x). **Merge whenever convenient:** `scripts/` isn't loaded by Cloud Code, so merging has no deploy effect. It records how McMaster and its forms were made. Until it merges, the scripts live only on branch `scripts/mcmaster-vision-clinic`. |
 | Test form | `PRUEBA - Examen de la vista (Vision exam)` created for McMaster (`RpblSpOpvj`), research export on, one invented community. Delete it after W5. |
-| McMaster org + TestMcMaster | Waiting on Hope: `create-mcmaster-org.js` creates both in one `signup` call. Claude does not create production accounts. |
+| McMaster org + TestMcMaster | **Done (Hope, 2026-10-23):** `create-mcmaster-org.js` → "Created TestMcMaster: organization "McMaster", role administrator." Short code `mcmaster`. Username `TestMcMaster`, following the existing `Test` account. Claude does not create production accounts. |
 | `enforce` | After Manage is merged and W5 shows signed-in downloads pass in `log` mode. |
+
+## C8. Staff-engineer review of hopetambala/puente-react-nextjs-platform#130, before merge
+
+Run at Hope's request (senior-engineer + staff-engineer-review), with fixes test-first on the branch.
+
+| # | Finding | Severity | Resolution |
+|---|---|---|---|
+| 1 | The custom `X-Parse-Session-Token` header makes every export a CORS preflight. If production Flask rejected it, **every export would break** on merge. | Checked first | Production preflight answers `access-control-allow-headers: content-type, x-parse-session-token`. No change needed. |
+| 2 | `Parse.User.current()` is empty unless Manage signs in through the SDK, and then `enforce` would 401 every export. | Checked first | Manage signs in with `Parse.User.logIn` (`app/modules/user/index.js:32`), so the SDK holds the session. No change needed. |
+| 3 | The badge and the expanded-row notes checked only `allowResearchExport`, but the button also needs a short code. On an organization with no short code, the page claimed a research file it couldn't offer. | Blocker | One rule, `app/modules/data-export/offersResearchExport.js`, now drives the badge, notes, stacking and buttons. Tests cover all five combinations plus the no-short-code row. |
+| 4 | The 1365px breakpoint was a guess. **Measured, the table still overflowed at 1366px** (22px eng, 59px spa), the most common laptop width. | Blocker | Measured eng/spa/hat at 1280–1536. Description now hides below 1440px: zero overflow at every width in all three languages. The measurement is in the CSS comment, because CSS variables can't be used in `@media`. |
+| 5 | The research file name used `toISOString()` (UTC). In the DR (UTC−4) an evening download is named with tomorrow's date. | Important | Local calendar date. The test fails with the old code under `TZ=America/Santo_Domingo`. |
+| 6 | The research checkbox showed, and was saved, when editing a Puente form, which has no research file. | Important | Hidden and not saved for `edit puente form`; tested. |
+| 7 | Nit: `font-weight: normal` | Nit | `var(--font-weight-regular)`. |
+| 8 | Nit: `eslint-disable class-methods-use-this` on `getResearchRecordsByShortCode`. | Kept | The suppression is justified in its comment: the method deliberately doesn't use `this.endpoint`, because the research route has no identified mode, and it sits beside the identified export its callers replace. |
+
+After the fixes: jest 940/940 (also green under the DR timezone), `next lint` clean, `yarn build` clean.

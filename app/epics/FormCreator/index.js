@@ -148,7 +148,11 @@ function FormCreator({ context, user }) {
     formObject.class = '';
     formObject.description = formDescription;
     formObject.customForm = true;
-    formObject.allowResearchExport = allowResearchExport;
+    // Puente's own forms have no research file (the route serves custom forms
+    // only), so a Puente-form edit never carries the setting.
+    if (submissionType !== 'edit puente form') {
+      formObject.allowResearchExport = allowResearchExport;
+    }
 
     const postParams = {
       parseClass: 'FormSpecificationsV2',
@@ -308,6 +312,7 @@ function FormCreator({ context, user }) {
                 />
               </label>
 
+              {submissionType !== 'edit puente form' && (
               <div className={styles.checkboxGroup}>
                 <label className={styles.checkboxLabel} htmlFor="allowResearchExport">
                   <input
@@ -323,6 +328,7 @@ function FormCreator({ context, user }) {
                   {t('form_creator_allow_research_export_hint')}
                 </span>
               </div>
+              )}
             </div>
 
             {/* Form builder canvas */}

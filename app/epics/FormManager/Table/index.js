@@ -1,5 +1,6 @@
 import { Badge, Button, Modal } from 'app/impacto-design-system';
 import { updateObject } from 'app/modules/cloud-code';
+import offersResearchExport from 'app/modules/data-export/offersResearchExport';
 import { useTranslation } from 'next-i18next';
 import { useState } from 'react';
 
@@ -7,7 +8,7 @@ import CSVButton from './CSVButton';
 import ExpandableTableRow from './ExpandableTableRow';
 import styles from './index.module.scss';
 
-const FormManagerTable = ({
+function FormManagerTable({
   data,
   retrieveCustomData,
   passDataToFormCreator,
@@ -15,7 +16,7 @@ const FormManagerTable = ({
   shortCode,
   puenteForm,
   onSelectForm,
-}) => {
+}) {
   const { t } = useTranslation('common');
   const [open, setOpen] = useState(false);
   const [selectedForm, setSelectedForm] = useState();
@@ -84,11 +85,14 @@ const FormManagerTable = ({
             </tr>
           </thead>
           <tbody>
-            {data.map((row) => (
+            {data.map((row) => {
+              const offersResearch = offersResearchExport(row, shortCode);
+              return (
               <ExpandableTableRow
                 row={row}
                 key={row.name}
                 surveyingOrganization={organization}
+                offersResearch={offersResearch}
               >
                 <td className={styles.nameCell}>
                   {onSelectForm ? (
@@ -104,7 +108,7 @@ const FormManagerTable = ({
                   )}
                   {/* Under the name, not in Status: the name column wraps, and a
                       long Spanish badge in Status widened the whole table. */}
-                  {row.allowResearchExport && (
+                  {offersResearch && (
                     <span className={styles.nameBadge}>
                       <Badge variant="blue">{t('form_manager_research_badge')}</Badge>
                     </span>
@@ -120,7 +124,7 @@ const FormManagerTable = ({
                 <td className={styles.colActions}>
                   {/* A research-enabled row carries two export buttons; stacking the
                       groups keeps them on screen instead of past the table edge. */}
-                  <div className={row.allowResearchExport
+                  <div className={offersResearch
                     ? `${styles.actions} ${styles.actionsStacked}` : styles.actions}
                   >
                     {!puenteForm && (
@@ -149,7 +153,8 @@ const FormManagerTable = ({
                   </div>
                 </td>
               </ExpandableTableRow>
-            ))}
+              );
+            })}
           </tbody>
         </table>
         </div>
@@ -158,6 +163,6 @@ const FormManagerTable = ({
       )}
     </>
   );
-};
+}
 
 export default FormManagerTable;
