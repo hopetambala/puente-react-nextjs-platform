@@ -626,15 +626,15 @@ what an account can see. Three ways forward, Hope's call:
 | Step | State |
 |---|---|
 | Flask hopetambala/puente-flask-rest-aggregator#129 | **Merged (`199457f`) and live** on `flask-api-40-env`, Ready/Green. |
-| EB environment | `EXPORT_AUTH_MODE=log`, `RESEARCH_ID_SECRET` set. The secret's backup copy is in SSM Parameter Store, `/puente/flask-api/RESEARCH_ID_SECRET` (SecureString, us-east-1). It was never printed. |
+| EB environment | `EXPORT_AUTH_MODE=log` and `RESEARCH_ID_SECRET` **set and read back at 21:31 UTC**. The first attempt (20:12) failed and was reverted; see C9. The secret's backup copy is in SSM Parameter Store, `/puente/flask-api/RESEARCH_ID_SECRET` (SecureString, us-east-1). It has never been printed. |
 | Production pre/post | The 24 exports snapshotted from production just before the merge and again after the new version went live: **24/24 byte-identical**. |
 | New code live | `/v2/research/...` answers its own 403 ("not turned on for this form"). The EB log shows `export_auth: missing, mode: log` for tokenless downloads, and serves them. |
 | Manage hopetambala/puente-react-nextjs-platform#130 | All checks green: the e2e stability gate flagged a login-page 404 as flaky once, and the rerun passed. **Waiting on a human review and merge.** |
 | Guides puente-dr/puente-dr.github.io#7 | Open. Merge after Manage, so the guides never describe buttons production doesn't have yet. |
 | Scripts hopetambala/puente-node-cloudcode#641 | Open, CI green (jest 18.x and 20.x). **Merge whenever convenient:** `scripts/` isn't loaded by Cloud Code, so merging has no deploy effect. It records how McMaster and its forms were made. Until it merges, the scripts live only on branch `scripts/mcmaster-vision-clinic`. |
-| Test form | `PRUEBA - Examen de la vista (Vision exam)` created for McMaster (`RpblSpOpvj`), research export on, one invented community. Delete it after W5. |
-| McMaster org + TestMcMaster | **Done (Hope, 2026-10-23):** `create-mcmaster-org.js` → "Created TestMcMaster: organization "McMaster", role administrator." Short code `mcmaster`. Username `TestMcMaster`, following the existing `Test` account. Claude does not create production accounts. |
-| `enforce` | After Manage is merged and W5 shows signed-in downloads pass in `log` mode. |
+| Test form | **Production:** `PRUEBA - Examen de la vista (Vision exam)` (`lFCAmx84Jz`), research export on, one invented community, with two invented patients (SurveyData `4ErVIgFT7U`, `i19lmf7M4F`; FormResults `eZzIExw6kK`, `lsTGMwCPiv`). Delete all of these after W5. Staging has an earlier copy (`RpblSpOpvj` and two patients); see C9. |
+| McMaster org + TestMcMaster | **Production, done (Hope):** the script printed `Writing to Parse app 07059151` (production), then "Created TestMcMaster: organization "McMaster", role administrator." Short code `mcmaster`. Username `TestMcMaster`, following the existing `Test` account. The first run went to staging; see C9. Claude does not create production accounts. |
+| `enforce` | **Not yet.** Gate: one signed-in download in production, observed passing in `log` mode (C9). |
 
 ## C8. Staff-engineer review of hopetambala/puente-react-nextjs-platform#130, before merge
 
@@ -652,3 +652,54 @@ Run at Hope's request (senior-engineer + staff-engineer-review), with fixes test
 | 8 | Nit: `eslint-disable class-methods-use-this` on `getResearchRecordsByShortCode`. | Kept | The suppression is justified in its comment: the method deliberately doesn't use `this.endpoint`, because the research route has no identified mode, and it sits beside the identified export its callers replace. |
 
 After the fixes: jest 940/940 (also green under the DR timezone), `next lint` clean, `yarn build` clean.
+
+## C9. Production verification and what went wrong, 2026-10-23 evening
+
+### Staging and production were mixed up (fixed)
+
+`puente-node-cloudcode/.env.prod` holds the **staging** Parse app id: its sha1 prefix is `f7e6fde6`, the same as `.env.staging`. Production Manage's live bundle, Flask's `secretz.py` and Manage's `.env.local` are all `07059151`. Everything first run with cloudcode's `.env.prod` landed on staging: TestMcMaster, the McMaster org, the first PRUEBA form, two test patients, and the first "is McMaster distinct?" check. Sign-in on production then failed with Parse 101 (no such user).
+
+- **Fixed:** both scripts take Manage's production keys, print the app they write to by hash, and refuse `f7e6fde6` unless `ALLOW_STAGING=1` (hopetambala/puente-node-cloudcode#641).
+- **Re-done on production**, and the McMaster check re-run against production's 59 orgs: still distinct.
+- **Left on staging, harmless:** McMaster, TestMcMaster, form `RpblSpOpvj` and its two patients.
+- **Open:** `.env.prod` should be renamed, or pointed at production. Whoever owns cloudcode's deploy config should decide; nothing in this work changed it.
+
+Every write now states its target environment, with proof, before it runs.
+
+### The first secret was never set (fixed)
+
+The 20:12 `update-environment` **failed and was reverted**. The Auto Scaling group had just launched an instance (a load alarm, triggered by the 24-export snapshot downloads), and EB applied the config change to it while it was still bootstrapping; dependency install failed mid-setup. The waiter reported Ready/Green because the *revert* succeeded. The research route correctly refused with "not configured" rather than falling back to raw ids. Re-applied at 21:31 with no scaling in progress, and **read back**: both variables present.
+
+Lesson: after any EB config change, read the settings back and read the event log; never rely on the waiter alone. The snapshot runs scaled the environment out four times (19:16, 19:46, 20:11, 20:18).
+
+### Server end-to-end on production: passes
+
+| Check | Result |
+|---|---|
+| `GET /v2/research/short-code/mcmaster/lFCAmx84Jz` | 200, `research.csv`, 2 rows, 24 columns: the allow-list plus the form's question labels |
+| Identifiers | none; the patients' names appear nowhere |
+| Ages | patient born 12/26/1983 → `age_at_visit` 42 on 2026-10-23; patient with `00/00/0000` and a typed 67 → `age_as_reported` 67 |
+| Consent | the "no" row is present (removed by hand, per the sharing guide) |
+| Full records | 200, names present |
+| Audit | `research_export` line written (form, short code, 2 rows; `user` null because the request was tokenless) |
+
+### Who calls the export service (EB logs, full bundle)
+
+- No browser export has happened since Manage started sending the token (#130 merged 20:47 UTC). The only browser export, at 20:26, ran on the old code.
+- Bots probing the service (`visionheight.com/scan`, `awscan-agent`, generic crawlers) requested only `/robots.txt` and `/favicon.ico`.
+- So production has **not yet observed** a valid session passing the check. That is the one remaining gate before `enforce`.
+
+### Also fixed today
+
+hopetambala/puente-react-nextjs-platform#131 (merged, live): Enter didn't submit any account form, and their fields had no accessible names. That's why the first sign-in attempts "did nothing".
+
+### Remaining
+
+| # | What | Who |
+|---|---|---|
+| 1 | Sign in as TestMcMaster in Manage and press **Export research file** on the PRUEBA form. One signed-in download is the proof `enforce` needs. | Hope (sign-in); Claude checks the log |
+| 2 | `EXPORT_AUTH_MODE=enforce`, read back; verify tokenless → 401, another org's short code with TestMcMaster's session → 403, signed-in download → 200. | Claude |
+| 3 | Delete the production PRUEBA form and its two patients. | Claude, after #2 |
+| 4 | Merge hopetambala/puente-node-cloudcode#641 (scripts; no deploy effect). Needs a review or an explicit admin merge. | Hope |
+| 5 | Coordinator's community list → `create-vision-exam-form.js` (production keys) for the real form. | Coordinator / Hope |
+| 6 | Rename or fix cloudcode's `.env.prod`. | Cloudcode owner |
