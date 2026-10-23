@@ -81,31 +81,37 @@ function Login() {
           <h1 className={styles.title}>Puente Manage</h1>
           <p className={styles.sub}>{t('login_sub')}</p>
 
-          <FormProvider {...methods}>
-            <div className={styles.fields}>
-              <FormInput
-                name="usernameV"
-                label={t('login_field_email')}
-                required
-                errorobj={errors}
-              />
-              <FormInput
-                name="passwordV"
-                label={t('login_field_password')}
-                type="password"
-                required
-                errorobj={errors}
-              />
-            </div>
-          </FormProvider>
+          {/* A real form, so Enter signs in and password managers recognise
+              it. Without one, Enter did nothing: no error, no request. */}
+          <form onSubmit={handleSubmit(onSubmit)} noValidate>
+            <FormProvider {...methods}>
+              <div className={styles.fields}>
+                <FormInput
+                  name="usernameV"
+                  label={t('login_field_email')}
+                  autoComplete="username"
+                  required
+                  errorobj={errors}
+                />
+                <FormInput
+                  name="passwordV"
+                  label={t('login_field_password')}
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  errorobj={errors}
+                />
+              </div>
+            </FormProvider>
 
-          <Button
-            text={t('sign_in')}
-            intent="primary"
-            onClick={handleSubmit(onSubmit)}
-            isFullWidth
-            isLoading={loading}
-          />
+            <Button
+              type="submit"
+              text={t('sign_in')}
+              intent="primary"
+              isFullWidth
+              isLoading={loading}
+            />
+          </form>
 
           <div className={styles.divider}>{t('divider_or')}</div>
 

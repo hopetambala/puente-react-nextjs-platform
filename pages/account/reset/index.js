@@ -73,13 +73,13 @@ function Reset(props) {
             <Text text={t('account_details_title')} element="h2" />
           </Stack>
           <FormProvider {...methods}>
-            <form>
+            <form onSubmit={handleSubmit(onSubmit)} noValidate>
               <Stack isVertical spacing="large" className={styles.stack} fill>
                 {user &&
                   Object.keys(user).map((attr) => (
-                    <Stack isVertical fill>
+                    <Stack isVertical fill key={attr}>
                       <label htmlFor={attr}>{attr}</label>
-                      <input name={attr} ref={register} />
+                      <input id={attr} name={attr} ref={register} />
                       {errors[`${attr}`]?.message && (
                         <p className={styles.errorText}>
                           {errors[`${attr}`]?.message}
@@ -90,8 +90,8 @@ function Reset(props) {
               </Stack>
               <Stack isVertical spacing="large">
                 <Button
+                  type="submit"
                   text={t('continue')}
-                  onClick={handleSubmit(onSubmit)}
                   isFullWidth
                 />
               </Stack>

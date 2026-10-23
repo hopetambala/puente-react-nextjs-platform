@@ -66,7 +66,7 @@ jest.mock('app/impacto-design-system/form-controls/select-autocomplete', () => (
 }));
 
 jest.mock('app/impacto-design-system', () => ({
-  Button: ({ text, onClick }) => <button type="button" onClick={onClick}>{text}</button>,
+  Button: ({ text, onClick, type = 'button' }) => <button type={type} onClick={onClick}>{text}</button>,
   Card: ({ children }) => <div data-testid="card">{children}</div>,
   FormInput: ({ name, label }) => <input aria-label={label || name} name={name} />,
   Page: ({ children }) => <div data-testid="page">{children}</div>,
@@ -274,5 +274,18 @@ describe('Register — confirmation is email only', () => {
     await waitFor(() => expect(screen.getByTestId('auth-form')).toBeInTheDocument());
     expect(screen.queryByText(/via email/i)).not.toBeInTheDocument();
     expect(screen.queryByText('register_confirm_email')).not.toBeInTheDocument();
+  });
+});
+
+// Every account form submits like a form: its main action is the form's submit
+// button, so Enter works and nothing depends on a click handler. The sign-in
+// page shipped without this and Enter silently did nothing.
+describe('form semantics', () => {
+  it('Register is the submit button of a form', async () => {
+    mockLoad.mockResolvedValue({ options: ORGS, unavailable: false });
+    render(<Register />);
+    const button = await screen.findByRole('button', { name: 'Register' });
+    expect(button).toHaveAttribute('type', 'submit');
+    expect(button.closest('form')).not.toBeNull();
   });
 });

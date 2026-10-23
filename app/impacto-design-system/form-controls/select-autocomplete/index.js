@@ -69,9 +69,12 @@ const ReactSelect = (props) => {
     isError = true;
     errorMessage = errorobj[name].message;
   }
+  // Same id convention as FormInput, so the label names react-select's search
+  // box. Without it the picker was an unnamed combobox to a screen reader.
+  const inputId = `field-${name}`;
   return (
     <StyledFormControl>
-        <StyledAutoSelectInputLabel>
+        <StyledAutoSelectInputLabel htmlFor={inputId}>
           <span className={isError ? styles['req-label'] : ''}>
             {label}
             {' '}
@@ -88,6 +91,7 @@ const ReactSelect = (props) => {
           isSearchable
           filterOption={createFilter({ ignoreAccents: false })}
           error={isError}
+          inputId={inputId}
           {...props}
         />
         {isError && (

@@ -9,7 +9,7 @@ import Text from '../text';
 import Tooltip from '../tooltip';
 import styles from './css/button.module.css';
 
-const Button = ({
+function Button({
   href,
   icon,
   id,
@@ -23,7 +23,8 @@ const Button = ({
   onClick,
   text,
   shouldOpenHrefInNewTab,
-}) => {
+  type,
+}) {
   const classname = classNames({
     [styles.button]: !isIconOnly,
     [styles.iconButton]: isIconOnly,
@@ -70,7 +71,7 @@ const Button = ({
       onClick={onClick}
       className={classname}
       disabled={!!isDisabled || !!isLoading}
-      type="button"
+      type={type === 'submit' ? 'submit' : 'button'}
     >
       {contents}
     </button>
@@ -85,7 +86,7 @@ const Button = ({
   ) : (
     button
   );
-};
+}
 
 Button.defaultProps = {
   href: null,
@@ -101,6 +102,7 @@ Button.defaultProps = {
   isSmall: false,
   onClick: undefined,
   text: '',
+  type: 'button',
 };
 
 Button.propTypes = {
@@ -147,6 +149,12 @@ Button.propTypes = {
    * Prefer using a FormattedMessage object unless rendering dynamic, user-generated content.
    */
   text: PropTypes.string,
+
+  /**
+   * `submit` for a form's main action, so pressing Enter in a field submits it.
+   * Defaults to `button` so a button never submits a form by accident.
+   */
+  type: PropTypes.oneOf(['button', 'submit']),
 };
 
 export default Button;

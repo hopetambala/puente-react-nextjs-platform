@@ -7,7 +7,7 @@ import styles from './index.module.scss';
 function FormInput(props) {
   const { control } = useFormContext();
   const {
-    name, label, required, errorobj, errorMessage,
+    id, name, label, required, errorobj, errorMessage,
   } = props;
   let isError = false;
   let errMsg = errorMessage || '';
@@ -23,6 +23,10 @@ function FormInput(props) {
       control={control}
       defaultValue=""
       label={label}
+      // MUI links the <label> to the <input> only through an id. Without one
+      // the field has no accessible name: screen readers say "edit text" and
+      // password managers can't tell the username from anything else.
+      id={id || `field-${name}`}
       fullWidth
       InputLabelProps={{
         className: required ? styles['required-label'] : '',

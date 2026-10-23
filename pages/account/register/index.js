@@ -109,15 +109,18 @@ function Register() {
             <Text text={t('register_heading')} element="h2" />
             <Text text={t('register_required_note')} element="p" />
           </Stack>
+          <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <FormProvider {...methods}>
             <Stack isVertical className={styles.stack}>
               <FormInput
                 name="firstname"
+                autoComplete="given-name"
                 label={t('register_field_first_name')}
                 errorobj={errors}
               />
               <FormInput
                 name="lastname"
+                autoComplete="family-name"
                 label={t('register_field_last_name')}
                 errorobj={errors}
               />
@@ -171,6 +174,8 @@ function Register() {
               )}
               <FormInput
                 name="email"
+                type="email"
+                autoComplete="email"
                 label={t('register_field_email')}
                 required
                 errorobj={errors}
@@ -182,6 +187,8 @@ function Register() {
                   being the username. */}
               <FormInput
                 name="phonenumber"
+                type="tel"
+                autoComplete="tel"
                 label={t('register_field_phone')}
                 errorobj={errors}
               />
@@ -196,6 +203,7 @@ function Register() {
               <FormInput
                 name="password"
                 type="password"
+                autoComplete="new-password"
                 label={t('register_field_password')}
                 required
                 errorobj={errors}
@@ -203,6 +211,7 @@ function Register() {
               <FormInput
                 name="passwordconfirmation"
                 type="password"
+                autoComplete="new-password"
                 label={t('register_field_password_confirm')}
                 required
                 errorobj={errors}
@@ -211,8 +220,8 @@ function Register() {
           </FormProvider>
           <Stack isVertical spacing="medium">
             <Button
+              type="submit"
               intent="primary"
-              onClick={handleSubmit(onSubmit)}
               text={t('register_submit')}
               isFullWidth
             />
@@ -222,6 +231,7 @@ function Register() {
               isFullWidth
             />
           </Stack>
+          </form>
         </div>
       </div>
     </div>

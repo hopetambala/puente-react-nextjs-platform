@@ -31,7 +31,7 @@ jest.mock('react-hook-form', () => ({
 }));
 
 jest.mock('app/impacto-design-system', () => ({
-  Button: ({ text, onClick }) => <button type="button" onClick={onClick}>{text}</button>,
+  Button: ({ text, onClick, type = 'button' }) => <button type={type} onClick={onClick}>{text}</button>,
   Card: ({ children }) => <div data-testid="card">{children}</div>,
   Page: ({ children }) => <div data-testid="page">{children}</div>,
   Stack: ({ children }) => <div>{children}</div>,
@@ -57,5 +57,18 @@ describe('Phase 8 — Reset page redesign', () => {
     render(<Reset />);
     expect(clearSpy).not.toHaveBeenCalled();
     clearSpy.mockRestore();
+  });
+});
+
+// Every account form submits like a form, so Enter works (see login tests).
+describe('form semantics', () => {
+  it('Continue is the submit button of the form, and the fields have their labels', async () => {
+    const { container } = render(<Reset />);
+    const button = await screen.findByRole('button', { name: 'continue' });
+    expect(button).toHaveAttribute('type', 'submit');
+    expect(button.closest('form')).not.toBeNull();
+    container.querySelectorAll('label[for]').forEach((label) => {
+      expect(container.querySelector(`#${CSS.escape(label.htmlFor)}`)).not.toBeNull();
+    });
   });
 });
