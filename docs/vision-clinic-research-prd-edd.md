@@ -693,13 +693,29 @@ Lesson: after any EB config change, read the settings back and read the event lo
 
 hopetambala/puente-react-nextjs-platform#131 (merged, live): Enter didn't submit any account form, and their fields had no accessible names. That's why the first sign-in attempts "did nothing".
 
-### Remaining
+## C10. Final state, 2026-10-23 (enforce live)
+
+| What | State |
+|---|---|
+| Export service | `EXPORT_AUTH_MODE=enforce` since **21:44 UTC**, read back after every change; `RESEARCH_ID_SECRET` set (SSM backup `/puente/flask-api/RESEARCH_ID_SECRET`). Running `2ba744b`. |
+| Signed-in downloads | TestMcMaster's research and full-records files (14:41 PDT in `log` mode, 14:45 PDT under `enforce`) are valid CSVs, byte-identical across the two runs, and the research file matches the server copy: same study ids, no identifiers. |
+| Tokenless and forged requests | 401 on every export family; `/health` 200. |
+| Real accounts | **All 787 production accounts with an organization** (346 of them in Puente, WOF, Constanza Medical Mission and One World Surgery) pass every export Manage would make for them, run through the merged `decide()`. 11 accounts have no organization; Manage never calls the export service for them. |
+| Four biggest orgs' files | People, env-health, vitals and medical exports plus each org's two most-collected custom forms (24 files, up to 16,867 rows): **24/24 byte-identical** between the code that was on production and the merged code, and every file well-formed. |
+| Accent matching | Flask now folds accents like Manage (hopetambala/puente-flask-rest-aggregator#130). It was latent: 0 accounts affected. |
+| Contract tests | `tests/test_export_auth_contract.py` pins Manage's seven call shapes (member 200, other org 403, no session 401). Each was shown to fail against a deliberately broken check (8 / 8 / 15 red). |
+| Signed-out message | A 401 now tells the coordinator to sign in again (hopetambala/puente-react-nextjs-platform#133). |
+| Sign-in forms | Enter submits; fields labelled (#131). |
+| Test data | Production PRUEBA form `lFCAmx84Jz` retired (`active: false`, as Manage's Delete does). Its two invented patients (SurveyData `4ErVIgFT7U`, `i19lmf7M4F`; FormResults `eZzIExw6kK`, `lsTGMwCPiv`) are left in place: nothing exports them, and Claude does not hard-delete records. Remove them in the Back4App dashboard if wanted. |
+
+**Known flake.** The e2e sign-in suite's "no console errors" check fails about one run in two. When Parse rejects a sign-in it answers `POST /login` with HTTP 404, and that check sometimes catches it. It has nothing to do with this work, and a rerun passes. It's worth teaching the harness to treat that response as expected.
+
+**Still open**
 
 | # | What | Who |
 |---|---|---|
-| 1 | Sign in as TestMcMaster in Manage and press **Export research file** on the PRUEBA form. One signed-in download is the proof `enforce` needs. | Hope (sign-in); Claude checks the log |
-| 2 | `EXPORT_AUTH_MODE=enforce`, read back; verify tokenless → 401, another org's short code with TestMcMaster's session → 403, signed-in download → 200. | Claude |
-| 3 | Delete the production PRUEBA form and its two patients. | Claude, after #2 |
-| 4 | Merge hopetambala/puente-node-cloudcode#641 (scripts; no deploy effect). Needs a review or an explicit admin merge. | Hope |
-| 5 | Coordinator's community list → `create-vision-exam-form.js` (production keys) for the real form. | Coordinator / Hope |
-| 6 | Rename or fix cloudcode's `.env.prod`. | Cloudcode owner |
+| 1 | The coordinator's community list, then `create-vision-exam-form.js` with production keys for the real form | Coordinator / Hope |
+| 2 | Rayjon and McMaster sign off on the B5 form spec, and the ethics consent wording | Bob |
+| 3 | Rename or fix cloudcode's `.env.prod` (it's staging) | Cloudcode owner |
+| 4 | Decide C4: researchers in Manage vs. sending them the file | Hope |
+| 5 | Mark the e2e harness's login 404 as expected | Eng |
