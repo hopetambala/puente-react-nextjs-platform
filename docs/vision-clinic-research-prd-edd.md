@@ -620,3 +620,18 @@ what an account can see. Three ways forward, Hope's call:
    on and a staff token: 24/24 match a pre-enforce snapshot (allowing for the
    two known row-order cases).
 6. Delete the duplicate form.
+
+## C7. Deploy log, 2026-10-23
+
+| Step | State |
+|---|---|
+| Flask hopetambala/puente-flask-rest-aggregator#129 | **Merged (`199457f`) and live** on `flask-api-40-env`, Ready/Green. |
+| EB environment | `EXPORT_AUTH_MODE=log`, `RESEARCH_ID_SECRET` set. The secret's backup copy is in SSM Parameter Store, `/puente/flask-api/RESEARCH_ID_SECRET` (SecureString, us-east-1). It was never printed. |
+| Production pre/post | The 24 exports snapshotted from production just before the merge and again after the new version went live: **24/24 byte-identical**. |
+| New code live | `/v2/research/...` answers its own 403 ("not turned on for this form"). The EB log shows `export_auth: missing, mode: log` for tokenless downloads, and serves them. |
+| Manage hopetambala/puente-react-nextjs-platform#130 | All checks green: the e2e stability gate flagged a login-page 404 as flaky once, and the rerun passed. **Waiting on a human review and merge.** |
+| Guides puente-dr/puente-dr.github.io#7 | Open. Merge after Manage, so the guides never describe buttons production doesn't have yet. |
+| Scripts hopetambala/puente-node-cloudcode#641 | Open; CI green. |
+| Test form | `PRUEBA - Examen de la vista (Vision exam)` created for McMaster (`RpblSpOpvj`), research export on, one invented community. Delete it after W5. |
+| McMaster org + TestMcMaster | Waiting on Hope: `create-mcmaster-org.js` creates both in one `signup` call. Claude does not create production accounts. |
+| `enforce` | After Manage is merged and W5 shows signed-in downloads pass in `log` mode. |
