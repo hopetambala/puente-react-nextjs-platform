@@ -32,6 +32,11 @@ async function walk({ browser, prefix, out }) {
     await page.locator('tr', { hasText: 'Vision exam' }).getByRole('button', { name: /expand|expandir/i }).click();
     await page.getByText(/Research file:|Archivo de investigación:/).waitFor({ timeout: 15000 });
     await clip(page, 'table:has(tr:has-text("Vision exam"))', 'research-02-what-each-file-contains', out);
+
+    // ── after Refresh: how many forms reached Puente (the evening check) ───
+    await page.getByRole('button', { name: /^(Refresh|Actualizar)$/ }).click();
+    await page.getByText(/37/).first().waitFor({ timeout: 15000 });
+    await clip(page, 'table:has(tr:has-text("Vision exam"))', 'research-04-forms-collected', out);
     await ctx.close();
   }
 
