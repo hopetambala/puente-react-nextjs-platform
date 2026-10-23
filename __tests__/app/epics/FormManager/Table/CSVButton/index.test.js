@@ -160,6 +160,20 @@ describe('CSVButton empty export', () => {
     expect(toastCalls[0].props.isError).toBe(true);
   });
 
+  it('asks the coordinator to sign in again when the session is no longer valid', async () => {
+    // Since the export service enforces a session (2026-10-23), an expired or
+    // revoked session is a 401. "The export could not be completed. Please try
+    // again" would send them retrying forever; signing in again is the fix.
+    nextResponse = Promise.reject(Object.assign(new Error('Request failed with status 401'), { status: 401 }));
+    renderButton();
+
+    fireEvent.click(screen.getByRole('button'));
+
+    await waitFor(() => expect(toastCalls).toHaveLength(1));
+    expect(toastCalls[0].props.text).toBe('export_signed_out');
+    expect(toastCalls[0].props.isError).toBe(true);
+  });
+
   it('treats a header-only CSV as data, because zero rows is a real answer', async () => {
     // The aggregator emits header-only CSVs on purpose (PR #116). That is a
     // legitimate empty result the coordinator should still be able to open.
