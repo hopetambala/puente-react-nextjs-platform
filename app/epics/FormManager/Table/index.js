@@ -77,7 +77,7 @@ const FormManagerTable = ({
             <tr>
               <th className={styles.colCaret} aria-label={t('form_manager_col_expand')} />
               <th>{t('form_manager_col_name')}</th>
-              <th>{t('form_manager_col_description')}</th>
+              <th className={styles.colDescription}>{t('form_manager_col_description')}</th>
               <th className={styles.colStatus}>{t('field_status')}</th>
               <th className={styles.colDate}>{t('form_manager_col_updated')}</th>
               <th className={styles.colActions}>{t('form_manager_col_actions')}</th>
@@ -110,7 +110,7 @@ const FormManagerTable = ({
                     </span>
                   )}
                 </td>
-                <td>
+                <td className={styles.colDescription}>
                   <div className={styles.descCell} title={row.description || ''}>
                     {row.description || '—'}
                   </div>
