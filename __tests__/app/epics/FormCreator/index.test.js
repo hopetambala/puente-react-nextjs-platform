@@ -575,3 +575,48 @@ describe('FormCreator — copy', () => {
     expect(screen.getByText('form_creator_select_block')).toBeInTheDocument();
   });
 });
+
+// ─── Research export setting ─────────────────────────────────────────────────
+// Off by default: turning it on is a decision that this form's answers may
+// leave Puente in a de-identified file, so nobody gets it by accident.
+
+describe('Allow research export', () => {
+  const checkbox = () => screen.getByRole('checkbox', { name: /form_creator_allow_research_export/ });
+  const savedObject = (mockFn) => mockFn.mock.calls[0][0].localObject;
+
+  it('is off for a new form, and saved as off', async () => {
+    render(<FormCreator context={makeContext()} user={mockUser} />);
+    expect(checkbox()).not.toBeChecked();
+    await userEvent.click(screen.getByText('form_creator_publish'));
+    await waitFor(() => expect(postObjectsToClass).toHaveBeenCalled());
+    expect(savedObject(postObjectsToClass).allowResearchExport).toBe(false);
+  });
+
+  it('is saved as on once turned on', async () => {
+    render(<FormCreator context={makeContext()} user={mockUser} />);
+    await userEvent.click(checkbox());
+    await userEvent.click(screen.getByText('form_creator_publish'));
+    await waitFor(() => expect(postObjectsToClass).toHaveBeenCalled());
+    expect(savedObject(postObjectsToClass).allowResearchExport).toBe(true);
+  });
+
+  it('keeps an existing form\'s setting through an edit', async () => {
+    const ctx = makeContext({
+      action: 'edit',
+      data: {
+        name: 'Vision exam', description: '', fields: [], typeOfForm: ['Custom'],
+        organizations: ['test-org'], objectId: 'form-v', allowResearchExport: true,
+      },
+    });
+    render(<FormCreator context={ctx} user={mockUser} />);
+    await waitFor(() => expect(checkbox()).toBeChecked());
+    await userEvent.click(screen.getByText('form_creator_publish'));
+    await waitFor(() => expect(updateObject).toHaveBeenCalled());
+    expect(savedObject(updateObject).allowResearchExport).toBe(true);
+  });
+
+  it('says what turning it on means, next to the control', () => {
+    render(<FormCreator context={makeContext()} user={mockUser} />);
+    expect(screen.getByText('form_creator_allow_research_export_hint')).toBeInTheDocument();
+  });
+});

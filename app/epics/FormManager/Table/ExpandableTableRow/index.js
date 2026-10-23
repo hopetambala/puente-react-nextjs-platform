@@ -26,6 +26,14 @@ const ExpandableTableRowDetail = ({ row, surveyingOrganization }) => {
         <Text text={t('form_manager_forms_collected', { count })} element="h3" />
         <Button text={t('action_refresh')} isSmall onClick={getCount} />
       </Stack>
+      {/* Said in the open rather than in a hover tooltip, which keyboard and
+          touch users never see. The difference is the whole point. */}
+      {row.allowResearchExport && (
+        <div className={styles.exportNotes}>
+          <Text element="p" text={t('form_manager_research_file_contents')} />
+          <Text element="p" text={t('form_manager_full_records_contents')} />
+        </div>
+      )}
     </div>
   );
 };

@@ -179,3 +179,21 @@ describe('FormManagerTable — copy', () => {
     expect(screen.getByText('form_manager_delete_confirm')).toBeInTheDocument();
   });
 });
+
+// A form whose owner turned research export on says so in words, in the row,
+// so a coordinator can see which forms have a file safe to send outside Puente.
+describe('FormManagerTable — research export', () => {
+  const renderRows = (rows) => render(
+    <FormManagerTable data={rows} organization="McMaster" shortCode="mcmaster" {...mockFns} />,
+  );
+
+  it('labels a research-enabled form in its status cell', () => {
+    renderRows([makeRow({ allowResearchExport: true })]);
+    expect(screen.getByText('form_manager_research_badge')).toBeInTheDocument();
+  });
+
+  it('labels no other form', () => {
+    renderRows([makeRow()]);
+    expect(screen.queryByText('form_manager_research_badge')).not.toBeInTheDocument();
+  });
+});

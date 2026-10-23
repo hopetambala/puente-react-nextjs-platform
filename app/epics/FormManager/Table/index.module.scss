@@ -14,6 +14,12 @@
 .colDate { width: 96px; white-space: nowrap; }
 .colActions { width: 1%; text-align: right; white-space: nowrap; }
 
+.nameBadge {
+  display: block;
+  margin-top: var(--spacer-xs);
+  font-weight: normal;
+}
+
 .nameCell {
   min-width: 200px;
   font-weight: var(--font-weight-emphasis);
@@ -27,6 +33,24 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   color: var(--color-text-secondary);
+}
+
+.actionsStacked {
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+// The two exports stack too: side by side, their Spanish labels are wider than
+// the four buttons on every other row, and the column would grow past the
+// table edge for the whole table.
+.actionsStacked .actionGroup:last-child {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.actionGroup {
+  display: inline-flex;
+  gap: var(--spacer-xs);
 }
 
 .actions {

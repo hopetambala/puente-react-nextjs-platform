@@ -413,5 +413,12 @@
   "coverage_denominator": "of the {{count, number}} most recently synced records",
   "context_records_total": "records synced in total",
   "context_accounts_synced_of": "accounts · sampled from the last {{count, number}} records synced, not people who collected",
-  "number_value": "{{value, number}}"
+  "number_value": "{{value, number}}",
+  "export_research_button": "Export research file",
+  "export_full_records_button": "Export full records",
+  "form_manager_research_badge": "Research export on",
+  "form_manager_research_file_contents": "Research file: a study ID, age, sex, community and this form's answers. No names, ID numbers, phone numbers, birth dates or locations. This is the only file to send to a research partner.",
+  "form_manager_full_records_contents": "Full records: every answer with the person's name, ID number, phone number, birth date and location. Keep this file inside Puente.",
+  "form_creator_allow_research_export": "Allow research export",
+  "form_creator_allow_research_export_hint": "Adds an Export research file button to this form: a file without names, ID numbers, phone numbers, birth dates or locations, for a research partner with ethics approval. Location questions in this form are left out of it."
 }

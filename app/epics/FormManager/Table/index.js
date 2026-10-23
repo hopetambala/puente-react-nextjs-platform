@@ -102,6 +102,13 @@ const FormManagerTable = ({
                   ) : (
                     row.name
                   )}
+                  {/* Under the name, not in Status: the name column wraps, and a
+                      long Spanish badge in Status widened the whole table. */}
+                  {row.allowResearchExport && (
+                    <span className={styles.nameBadge}>
+                      <Badge variant="blue">{t('form_manager_research_badge')}</Badge>
+                    </span>
+                  )}
                 </td>
                 <td>
                   <div className={styles.descCell} title={row.description || ''}>
@@ -111,9 +118,13 @@ const FormManagerTable = ({
                 <td><Badge variant="green">{t('form_manager_status_active')}</Badge></td>
                 <td className={styles.colDate}>{row.updatedAt ? new Date(row.updatedAt).toLocaleDateString() : '—'}</td>
                 <td className={styles.colActions}>
-                  <div className={styles.actions}>
+                  {/* A research-enabled row carries two export buttons; stacking the
+                      groups keeps them on screen instead of past the table edge. */}
+                  <div className={row.allowResearchExport
+                    ? `${styles.actions} ${styles.actionsStacked}` : styles.actions}
+                  >
                     {!puenteForm && (
-                      <>
+                      <span className={styles.actionGroup}>
                         <Button
                           text={t('form_manager_edit')}
                           isSmall
@@ -130,9 +141,11 @@ const FormManagerTable = ({
                           isSmall
                           onClick={() => handleModal(row)}
                         />
-                      </>
+                      </span>
                     )}
-                    <CSVButton form={row} surveyingOrganization={organization} shortCode={shortCode} />
+                    <span className={styles.actionGroup}>
+                      <CSVButton form={row} surveyingOrganization={organization} shortCode={shortCode} />
+                    </span>
                   </div>
                 </td>
               </ExpandableTableRow>
