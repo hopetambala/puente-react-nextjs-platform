@@ -13,6 +13,7 @@ jest.mock('app/modules/data-export/puente', () => ({
   CustomData: {
     getSpecificRecordsByOrganization: (...a) => rec('Custom.byOrganization')(...a),
     getSpecificRecordsByShortCode: (...a) => rec('Custom.byShortCode')(...a),
+    getResearchRecordsByShortCode: (...a) => rec('Custom.research')(...a),
   },
   EnvironmentalHealth: {}, EvaluationMedical: {}, Vitals: {},
 }));
@@ -212,5 +213,120 @@ describe('CSVButton label', () => {
 
     await waitFor(() => expect(screen.getByRole('button')).toHaveTextContent('export_loading'));
     release('csv');
+  });
+});
+
+/**
+ * Research export: a de-identified file for a form whose owner turned it on.
+ * The identified file stays one click away, but is renamed on those rows so the
+ * two can never be mistaken for each other.
+ */
+describe('CSVButton on a form with research export turned on', () => {
+  const researchForm = {
+    name: 'Vision exam', objectId: 'spec-vision', customForm: true, allowResearchExport: true,
+  };
+
+  beforeEach(() => { calls.length = 0; nextResponse = 'study_id\nP-1\n'; });
+
+  it('offers the research file first, and names the identified one as full records', () => {
+    render(<CSVButton form={researchForm} surveyingOrganization="McMaster" shortCode="mcmaster" />);
+
+    const labels = screen.getAllByRole('button').map((b) => b.textContent);
+    expect(labels).toEqual(['export_research_button', 'export_full_records_button']);
+  });
+
+  it('downloads the research file from the research route', async () => {
+    render(<CSVButton form={researchForm} surveyingOrganization="McMaster" shortCode="mcmaster" />);
+
+    fireEvent.click(screen.getByText('export_research_button'));
+
+    await waitFor(() => expect(calls[0]).toEqual(['Custom.research', 'mcmaster', 'spec-vision']));
+  });
+
+  it('still downloads full records from the identified route', async () => {
+    render(<CSVButton form={researchForm} surveyingOrganization="McMaster" shortCode="mcmaster" />);
+
+    fireEvent.click(screen.getByText('export_full_records_button'));
+
+    await waitFor(() => expect(calls[0]).toEqual(['Custom.byShortCode', 'mcmaster', 'spec-vision']));
+  });
+
+  it('names the research file so it cannot be confused with the identified one', async () => {
+    const clicked = [];
+    const realCreate = document.createElement.bind(document);
+    jest.spyOn(document, 'createElement').mockImplementation((tag) => {
+      const el = realCreate(tag);
+      if (tag === 'a') el.click = () => clicked.push(el.download);
+      return el;
+    });
+    window.URL.createObjectURL = jest.fn(() => 'blob:x');
+    render(<CSVButton form={researchForm} surveyingOrganization="McMaster" shortCode="mcmaster" />);
+
+    fireEvent.click(screen.getByText('export_research_button'));
+
+    await waitFor(() => expect(clicked).toHaveLength(1));
+    expect(clicked[0]).toMatch(/^Vision exam - research - \d{4}-\d{2}-\d{2}\.csv$/);
+    document.createElement.mockRestore();
+  });
+
+  it('has no research file without a short code, because the route is keyed on it', () => {
+    render(<CSVButton form={researchForm} surveyingOrganization="Unresolved" shortCode={null} />);
+
+    expect(screen.getAllByRole('button').map((b) => b.textContent)).toEqual(['export_button']);
+  });
+
+  it('leaves every other form exactly as it was', () => {
+    render(<CSVButton
+      form={{ ...researchForm, allowResearchExport: false }}
+      surveyingOrganization="McMaster"
+      shortCode="mcmaster"
+    />);
+
+    expect(screen.getAllByRole('button').map((b) => b.textContent)).toEqual(['export_button']);
+  });
+});
+
+// One rule decides "this form has a research file", so the badge, the notes and
+// the button can never disagree (review of #130).
+describe('offersResearchExport', () => {
+  const offersResearchExport = require('app/modules/data-export/offersResearchExport').default;
+
+  it.each([
+    [{ customForm: true, allowResearchExport: true }, 'mcmaster', true],
+    [{ customForm: true, allowResearchExport: true }, null, false],
+    [{ customForm: true, allowResearchExport: false }, 'mcmaster', false],
+    [{ customForm: false, allowResearchExport: true }, 'mcmaster', false],
+    [{ allowResearchExport: 'true' }, 'mcmaster', false],
+  ])('%o with short code %s → %s', (form, shortCode, expected) => {
+    expect(offersResearchExport(form, shortCode)).toBe(expected);
+  });
+});
+
+// The file is named with the coordinator's own date. In the Dominican Republic
+// (UTC−4) a UTC date reads as tomorrow after 8pm (review of #130).
+describe('research file name date', () => {
+  it('uses the local calendar date, not UTC', async () => {
+    jest.useFakeTimers().setSystemTime(new Date(2026, 10, 10, 23, 30));
+    const clicked = [];
+    const realCreate = document.createElement.bind(document);
+    jest.spyOn(document, 'createElement').mockImplementation((tag) => {
+      const el = realCreate(tag);
+      if (tag === 'a') el.click = () => clicked.push(el.download);
+      return el;
+    });
+    window.URL.createObjectURL = jest.fn(() => 'blob:x');
+    nextResponse = 'study_id\nP-1\n';
+    render(<CSVButton
+      form={{ name: 'Vision exam', objectId: 'v', customForm: true, allowResearchExport: true }}
+      surveyingOrganization="McMaster"
+      shortCode="mcmaster"
+    />);
+
+    fireEvent.click(screen.getByText('export_research_button'));
+
+    await waitFor(() => expect(clicked).toHaveLength(1));
+    expect(clicked[0]).toBe('Vision exam - research - 2026-11-10.csv');
+    document.createElement.mockRestore();
+    jest.useRealTimers();
   });
 });

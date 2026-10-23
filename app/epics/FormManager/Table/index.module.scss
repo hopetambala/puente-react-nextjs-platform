@@ -14,6 +14,24 @@
 .colDate { width: 96px; white-space: nowrap; }
 .colActions { width: 1%; text-align: right; white-space: nowrap; }
 
+// Below 1440px the table is wider than its card and the actions (the one
+// column a coordinator came to use) start off-screen. Description is already
+// truncated to a few words and is the column to give up; the full text is one
+// Edit away. Measured, not a token: CSS variables can't be used in @media, and
+// --breakpoint-xl (1280px) would miss 1366px laptops. With Description shown,
+// the table overflowed by 22px (eng) and 59px (spa) at 1366, and first fit at
+// 1400 (eng) and 1430 (spa); hidden below 1440, it fits at every width in
+// eng, spa and hat.
+@media (max-width: 1439px) {
+  .colDescription { display: none; }
+}
+
+.nameBadge {
+  display: block;
+  margin-top: var(--spacer-xs);
+  font-weight: var(--font-weight-regular);
+}
+
 .nameCell {
   min-width: 200px;
   font-weight: var(--font-weight-emphasis);
@@ -27,6 +45,24 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   color: var(--color-text-secondary);
+}
+
+.actionsStacked {
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+// The two exports stack too: side by side, their Spanish labels are wider than
+// the four buttons on every other row, and the column would grow past the
+// table edge for the whole table.
+.actionsStacked .actionGroup:last-child {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.actionGroup {
+  display: inline-flex;
+  gap: var(--spacer-xs);
 }
 
 .actions {

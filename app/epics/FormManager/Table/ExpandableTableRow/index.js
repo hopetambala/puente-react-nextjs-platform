@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 import styles from './index.module.scss';
 
-const ExpandableTableRowDetail = ({ row, surveyingOrganization }) => {
+function ExpandableTableRowDetail({ row, surveyingOrganization, offersResearch }) {
   const { t } = useTranslation('common');
   const [count, setCount] = useState(0);
 
@@ -26,13 +26,21 @@ const ExpandableTableRowDetail = ({ row, surveyingOrganization }) => {
         <Text text={t('form_manager_forms_collected', { count })} element="h3" />
         <Button text={t('action_refresh')} isSmall onClick={getCount} />
       </Stack>
+      {/* Said in the open rather than in a hover tooltip, which keyboard and
+          touch users never see. The difference is the whole point. */}
+      {offersResearch && (
+        <div className={styles.exportNotes}>
+          <Text element="p" text={t('form_manager_research_file_contents')} />
+          <Text element="p" text={t('form_manager_full_records_contents')} />
+        </div>
+      )}
     </div>
   );
-};
+}
 
-const ExpandableTableRow = ({
-  children, row, surveyingOrganization,
-}) => {
+function ExpandableTableRow({
+  children, row, surveyingOrganization, offersResearch = false,
+}) {
   const { t } = useTranslation('common');
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -63,7 +71,11 @@ const ExpandableTableRow = ({
               the rule cannot see across the component boundary. */}
           {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
           <td colSpan={5}>
-            <ExpandableTableRowDetail row={row} surveyingOrganization={surveyingOrganization} />
+            <ExpandableTableRowDetail
+              row={row}
+              surveyingOrganization={surveyingOrganization}
+              offersResearch={offersResearch}
+            />
           </td>
         </tr>
       )}

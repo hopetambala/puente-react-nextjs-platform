@@ -55,3 +55,33 @@ describe('ExpandableTableRow — copy', () => {
     expect(screen.getByRole('button', { name: 'action_refresh' })).toBeInTheDocument();
   });
 });
+
+// Hover tooltips never reach keyboard or touch users, so what each file
+// contains is said in the open, in the row's detail.
+describe('ExpandableTableRow — research export', () => {
+  const expand = (row, offersResearch = false) => {
+    render(
+      <table>
+        <tbody>
+          <ExpandableTableRow row={row} surveyingOrganization="McMaster" offersResearch={offersResearch}>
+            <td>Vision exam</td>
+          </ExpandableTableRow>
+        </tbody>
+      </table>,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'form_manager_expand_row' }));
+  };
+
+  it('says what each file contains on a research-enabled form', () => {
+    expand({ objectId: 'f1', customForm: true, allowResearchExport: true }, true);
+    expect(screen.getByText('form_manager_research_file_contents')).toBeInTheDocument();
+    expect(screen.getByText('form_manager_full_records_contents')).toBeInTheDocument();
+  });
+
+  it('says nothing about research when the row has no research file', () => {
+    // allowResearchExport alone is not enough: without a short code there is
+    // no research button, so the notes would describe a file nobody can get.
+    expand({ objectId: 'f1', customForm: true, allowResearchExport: true }, false);
+    expect(screen.queryByText('form_manager_research_file_contents')).not.toBeInTheDocument();
+  });
+});

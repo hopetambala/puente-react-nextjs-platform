@@ -80,6 +80,21 @@ export class CustomDataExporter extends DataExporter {
     return fetchCSV(`v2/${this.endpoint}/short-code/${shortCode}/${formId}`)
   }
 
+   /**
+    * One custom form, de-identified, for a file that leaves Puente: no names,
+    * ID numbers, phone numbers, birth dates or locations. Refused unless the
+    * form has `allowResearchExport`. See puente-flask-rest-aggregator
+    * api/data_aggregation_v2/dicts/research.py.
+    *
+    * Its own route, not this.endpoint: the research file has no identified
+    * mode to fall back to. Kept on the exporter so callers find it beside the
+    * identified download it replaces.
+    */
+   // eslint-disable-next-line class-methods-use-this
+   async getResearchRecordsByShortCode(shortCode:string, formId:string) {
+    return fetchCSV(`v2/research/short-code/${shortCode}/${formId}`)
+   }
+
    async getSpecificRecordsByOrganization(organization:string, formId:string) {
     const orgsData = await fetchCSV(`v2/${this.endpoint}/organizations/${organization}/${formId}`)
     return orgsData;

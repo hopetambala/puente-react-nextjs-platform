@@ -1,5 +1,6 @@
 import Button from 'app/impacto-design-system/button';
 import Toast from 'app/impacto-design-system/toast';
+import offersResearchExport from 'app/modules/data-export/offersResearchExport';
 import {
     CustomData, EnvironmentalHealth, EvaluationMedical, SurveyData, Vitals,
 } from 'app/modules/data-export/puente';
@@ -21,10 +22,20 @@ const puenteMap = {
   EvaluationMedical,
 };
 
+// The coordinator's own calendar date. toISOString() is UTC, which in the
+// Dominican Republic (UTC−4) names an evening's file with tomorrow's date.
+const localDate = () => {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
+
 export default function CSVButtonWrapper({ form, surveyingOrganization, shortCode }) {
   const { objectId: customFormId, customForm, name } = form;
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(null);
   const { t } = useTranslation('common');
+
+  const offersResearch = offersResearchExport(form, shortCode);
 
   // Prefer the shortCode path: it covers every string the organization's
   // records carry. Verified in production — DR Missions exported 12 CSV lines
@@ -52,10 +63,10 @@ export default function CSVButtonWrapper({ form, surveyingOrganization, shortCod
       : puenteMap[name].getRecordByOrganization(surveyingOrganization);
   };
 
-  const fetchData = async () => {
-    setLoading(true);
+  const download = async (kind, fetchCSV, filename) => {
+    setLoading(kind);
     try {
-      const CSVData = await fetchCSVData();
+      const CSVData = await fetchCSV();
       // A blank body is not a file. The aggregator answers 200 with exactly
       // "\n" when a form has no results, and `=== undefined` never caught it —
       // so the coordinator got a correctly-named, completely empty CSV and was
@@ -69,23 +80,45 @@ export default function CSVButtonWrapper({ form, surveyingOrganization, shortCod
       }
       const blob = new Blob([CSVData], { type: 'text/csv' });
       const csvUrl = window.URL.createObjectURL(blob);
-      openWindow(csvUrl, `${name}-${new Date()}.csv`);
+      openWindow(csvUrl, filename);
     } catch (error) {
       // Distinct from the empty case on purpose. Both used to say "No data",
       // so a coordinator whose export CRASHED went looking for missing records
       // instead of retrying.
       toast(<Toast text={t('export_failed')} isError />);
     } finally {
-      setLoading(false);
+      setLoading(null);
     }
   };
 
-  return (
+  const fullRecords = (
     <Button
       isSmall
-      isLoading={loading}
-      text={loading ? t('export_loading') : t('export_button')}
-      onClick={fetchData}
+      isLoading={loading === 'full'}
+      text={loading === 'full' ? t('export_loading')
+        : t(offersResearch ? 'export_full_records_button' : 'export_button')}
+      onClick={() => download('full', fetchCSVData, `${name}-${new Date()}.csv`)}
     />
+  );
+
+  if (!offersResearch) return fullRecords;
+
+  return (
+    <>
+      <Button
+        isSmall
+        intent="primary"
+        isLoading={loading === 'research'}
+        text={loading === 'research' ? t('export_loading') : t('export_research_button')}
+        onClick={() => download(
+          'research',
+          () => CustomData.getResearchRecordsByShortCode(shortCode, customFormId),
+          // Named apart from the identified file, which is the one that must
+          // never be sent outside Puente.
+          `${name} - research - ${localDate()}.csv`,
+        )}
+      />
+      {fullRecords}
+    </>
   );
 }

@@ -413,5 +413,12 @@
   "coverage_denominator": "nan {{count, number}} dosye ki pi resan yo senkronize",
   "context_records_total": "dosye senkronize antou",
   "context_accounts_synced_of": "kont · chwazi nan {{count, number}} dosye ki pi resan yo senkronize; li konte kont ki senkronize, pa moun ki te kolekte",
-  "number_value": "{{value, number}}"
+  "number_value": "{{value, number}}",
+  "export_research_button": "Ekspòte fichye rechèch",
+  "export_full_records_button": "Ekspòte dosye konplè yo",
+  "form_manager_research_badge": "Ekspò rechèch aktive",
+  "form_manager_research_file_contents": "Fichye rechèch: yon ID etid, laj, sèks, kominote ak repons fòm sa a. Pa gen non, nimewo idantite, nimewo telefòn, dat nesans ni kote moun rete. Se sèl fichye pou voye bay yon patnè rechèch.",
+  "form_manager_full_records_contents": "Dosye konplè: chak repons ak non moun nan, nimewo idantite, nimewo telefòn, dat nesans ak kote li rete. Fichye sa a rete anndan Puente.",
+  "form_creator_allow_research_export": "Pèmèt ekspò rechèch",
+  "form_creator_allow_research_export_hint": "Ajoute bouton Ekspòte fichye rechèch sou fòm sa a: yon fichye san non, nimewo idantite, nimewo telefòn, dat nesans ni kote moun rete, pou yon patnè rechèch ki gen apwobasyon etik. Kesyon sou kote moun rete nan fòm sa a pa ladan l."
 }

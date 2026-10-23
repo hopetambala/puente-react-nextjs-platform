@@ -8,6 +8,11 @@
   color: var(--color-text);
 }
 
+.exportNotes {
+  margin-top: var(--spacer-s);
+  max-width: 70ch;
+}
+
 .expandableRow {
   cursor: pointer;
 }

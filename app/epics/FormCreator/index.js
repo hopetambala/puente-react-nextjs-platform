@@ -67,6 +67,9 @@ const COLLECTION = [
 function FormCreator({ context, user }) {
   const { t } = useTranslation('common');
   const [formName, setFormName] = useState('');
+  // Off unless someone decides this form's answers may leave Puente in a
+  // de-identified research file. See docs/vision-clinic-research-prd-edd.md.
+  const [allowResearchExport, setAllowResearchExport] = useState(false);
   const [formDescription, setFormDescription] = useState('');
   const [formItems, setFormItems] = useState([]);
   const [formTypeNames, setFormTypeNames] = useState(['Custom']);
@@ -95,11 +98,13 @@ function FormCreator({ context, user }) {
         objectId,
         name,
         description,
+        allowResearchExport: allowed,
       } = data;
 
       setFormId(objectId);
       setFormName(name);
       setFormDescription(description);
+      setAllowResearchExport(allowed === true);
       setFormTypeNames(typeOfForm || []);
       console.log("Orgs Authorized", orgs); //eslint-disable-line
       setFormItems(fields);
@@ -122,6 +127,7 @@ function FormCreator({ context, user }) {
     setFormId('');
     setFormName('');
     setFormDescription('');
+    setAllowResearchExport(false);
     setFormTypeNames([]);
     setFormItems([]);
   };
@@ -142,6 +148,11 @@ function FormCreator({ context, user }) {
     formObject.class = '';
     formObject.description = formDescription;
     formObject.customForm = true;
+    // Puente's own forms have no research file (the route serves custom forms
+    // only), so a Puente-form edit never carries the setting.
+    if (submissionType !== 'edit puente form') {
+      formObject.allowResearchExport = allowResearchExport;
+    }
 
     const postParams = {
       parseClass: 'FormSpecificationsV2',
@@ -300,6 +311,24 @@ function FormCreator({ context, user }) {
                   className={styles.input}
                 />
               </label>
+
+              {submissionType !== 'edit puente form' && (
+              <div className={styles.checkboxGroup}>
+                <label className={styles.checkboxLabel} htmlFor="allowResearchExport">
+                  <input
+                    id="allowResearchExport"
+                    type="checkbox"
+                    checked={allowResearchExport}
+                    onChange={(e) => setAllowResearchExport(e.target.checked)}
+                    aria-describedby="allowResearchExportHint"
+                  />
+                  {t('form_creator_allow_research_export')}
+                </label>
+                <span id="allowResearchExportHint" className={styles.checkboxHint}>
+                  {t('form_creator_allow_research_export_hint')}
+                </span>
+              </div>
+              )}
             </div>
 
             {/* Form builder canvas */}

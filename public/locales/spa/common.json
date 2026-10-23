@@ -413,5 +413,12 @@
   "coverage_denominator": "de los {{count, number}} registros sincronizados más recientes",
   "context_records_total": "registros sincronizados en total",
   "context_accounts_synced_of": "cuentas · muestreado de los {{count, number}} registros más recientes sincronizados; cuenta las cuentas que sincronizaron, no las personas que recolectaron",
-  "number_value": "{{value, number}}"
+  "number_value": "{{value, number}}",
+  "export_research_button": "Exportar archivo de investigación",
+  "export_full_records_button": "Exportar registros completos",
+  "form_manager_research_badge": "Investigación activada",
+  "form_manager_research_file_contents": "Archivo de investigación: un ID de estudio, edad, sexo, comunidad y las respuestas de este formulario. Sin nombres, números de cédula, teléfonos, fechas de nacimiento ni ubicaciones. Es el único archivo que se envía a un socio de investigación.",
+  "form_manager_full_records_contents": "Registros completos: cada respuesta con el nombre, número de cédula, teléfono, fecha de nacimiento y ubicación de la persona. Este archivo no sale de Puente.",
+  "form_creator_allow_research_export": "Permitir exportación para investigación",
+  "form_creator_allow_research_export_hint": "Agrega a este formulario el botón Exportar archivo de investigación: un archivo sin nombres, números de cédula, teléfonos, fechas de nacimiento ni ubicaciones, para un socio de investigación con aprobación ética. Las preguntas de ubicación de este formulario no se incluyen."
 }
