@@ -137,3 +137,35 @@ describe('No hardcoded English in the sign-in card', () => {
     expect(screen.getByText('divider_or')).toBeInTheDocument();
   });
 });
+
+// ─── Sign-in has to work the way every sign-in form works ───────────────────
+// The page had no <form> and a type="button" button: pressing Enter did
+// nothing at all, with no error and no request. The fields had no label link,
+// so screen readers announced "edit text" and password managers couldn't tell
+// which box was the username.
+describe('Keyboard and assistive technology', () => {
+  it('signs in when Enter is pressed in the password field', async () => {
+    render(<Login />);
+    retrieveSignInFunction.mockResolvedValue({});
+    await userEvent.type(screen.getByLabelText(/email or phone number/i), 'TestUser');
+    await userEvent.type(screen.getByLabelText(/^password/i), 'secret{enter}');
+    await waitFor(() => expect(retrieveSignInFunction).toHaveBeenCalledWith('TestUser', 'secret'));
+  });
+
+  it('names each field by its label', () => {
+    render(<Login />);
+    expect(screen.getByLabelText(/email or phone number/i)).toHaveAttribute('name', 'usernameV');
+    expect(screen.getByLabelText(/^password/i)).toHaveAttribute('name', 'passwordV');
+  });
+
+  it('tells password managers which field is which', () => {
+    render(<Login />);
+    expect(screen.getByLabelText(/email or phone number/i)).toHaveAttribute('autocomplete', 'username');
+    expect(screen.getByLabelText(/^password/i)).toHaveAttribute('autocomplete', 'current-password');
+  });
+
+  it('makes Sign in the form\'s submit button', () => {
+    render(<Login />);
+    expect(screen.getByRole('button', { name: /sign in/i })).toHaveAttribute('type', 'submit');
+  });
+});

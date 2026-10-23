@@ -37,8 +37,14 @@ export const notificationTypeRestParams = (type, data) => {
 
 export const refreshSessionToken = async () => {
   const currentUser = Parse.User.current();
-  if (currentUser) {
-    return Parse.User.logOut();
+  if (!currentUser) return null;
+  try {
+    await Parse.User.logOut();
+  } catch (error) {
+    // A session revoked on the server (deactivation, password reset, expiry)
+    // makes logOut reject with 209 "Invalid session token". The local copy is
+    // what this clears before a fresh sign-in, and that is gone either way, so
+    // the rejection must not abort the sign-in that follows.
   }
   return null;
 };

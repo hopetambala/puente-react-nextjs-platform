@@ -97,3 +97,18 @@ describe('Intent classes', () => {
     expect(className).not.toContain('danger');
   });
 });
+
+// A form's main action must be able to submit the form, or pressing Enter in a
+// field does nothing. The sign-in page was built this way and Enter silently
+// did nothing.
+describe('type', () => {
+  it('is a plain button by default, so it never submits a form by accident', () => {
+    render(<Button text="Go" />);
+    expect(screen.getByRole('button', { name: 'Go' })).toHaveAttribute('type', 'button');
+  });
+
+  it('can be a submit button', () => {
+    render(<Button text="Sign in" type="submit" />);
+    expect(screen.getByRole('button', { name: 'Sign in' })).toHaveAttribute('type', 'submit');
+  });
+});

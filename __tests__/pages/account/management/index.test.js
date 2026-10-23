@@ -46,7 +46,7 @@ jest.mock('app/impacto-design-system', () => ({
       {sub && <p>{sub}</p>}
     </div>
   ),
-  Button: ({ text, onClick }) => <button type="button" onClick={onClick}>{text}</button>,
+  Button: ({ text, onClick, type = 'button' }) => <button type={type} onClick={onClick}>{text}</button>,
   Card: ({ children }) => <div>{children}</div>,
   LanguageSwitcher: () => <div data-testid="language-switcher" />,
   Spinner: () => <div data-testid="spinner" />,
@@ -143,5 +143,28 @@ describe('Account Settings page — copy', () => {
     expect(JSON.parse(shell.dataset.breadcrumb)).toEqual(['breadcrumb_settings']);
     expect(screen.getByText('account_settings_title')).toBeInTheDocument();
     expect(screen.getByText('account_settings_sub')).toBeInTheDocument();
+  });
+});
+
+// Enter in a field saves the details; it must never delete the account. So
+// Update is the form's submit button and Delete stays a plain button.
+describe('form semantics', () => {
+  it('submits with Update, never with Delete', async () => {
+    render(<ManagementWrapper />);
+    const update = await screen.findByRole('button', { name: 'account_update_user' });
+    expect(update).toHaveAttribute('type', 'submit');
+    expect(update.closest('form')).not.toBeNull();
+    expect(screen.getByRole('button', { name: 'account_delete_user' })).toHaveAttribute('type', 'button');
+  });
+
+  it('links every field label to its input', async () => {
+    const { container } = render(<ManagementWrapper />);
+    await screen.findByRole('button', { name: 'account_update_user' });
+    const labels = container.querySelectorAll('label[for]');
+    expect(labels.length).toBeGreaterThan(0);
+    labels.forEach((label) => {
+      const target = container.querySelector(`#${CSS.escape(label.htmlFor)}`);
+      if (label.htmlFor !== 'Organization') expect(target).not.toBeNull();
+    });
   });
 });

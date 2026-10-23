@@ -93,7 +93,9 @@ function Management(props) {
         ) : (
         <Card padding="extraLarge">
           <FormProvider {...methods}>
-            <form>
+            {/* Enter saves the details. Delete is a plain button, so no key
+                press can ever delete an account. */}
+            <form onSubmit={handleSubmit(onSubmit)} noValidate>
               <Stack isVertical spacing="large" className={styles.stack} fill>
                 {user &&
                   Object.keys(user).map((attr) => (
@@ -103,8 +105,9 @@ function Management(props) {
                          themselves into another organization and see its data,
                          and a picker would only make the destinations easier to
                          find. Changing it is a staff action. */
-                      <Stack isVertical fill>
-                        <label htmlFor={attr}>{attr}</label>
+                      <Stack isVertical fill key={attr}>
+                        {/* Text, not a <label>: there is no input to label. */}
+                        <span>{attr}</span>
                         <p className={styles.readOnlyValue}>{user[attr]}</p>
                         <p
                           className={styles.readOnlyNote}
@@ -115,9 +118,9 @@ function Management(props) {
                         </p>
                       </Stack>
                     ) : (
-                    <Stack isVertical fill>
+                    <Stack isVertical fill key={attr}>
                       <label htmlFor={attr}>{attr}</label>
-                      <input name={attr} ref={register} />
+                      <input id={attr} name={attr} ref={register} />
                       {errors[`${attr}`]?.message && (
                         <p className={styles.errorText}>
                           {errors[`${attr}`]?.message}
@@ -129,9 +132,9 @@ function Management(props) {
               </Stack>
               <Stack isVertical spacing="large">
                 <Button
+                  type="submit"
                   intent="primary"
                   text={t('account_update_user')}
-                  onClick={handleSubmit(onSubmit)}
                   isFullWidth
                 />
                 <Button

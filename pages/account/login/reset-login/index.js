@@ -52,6 +52,7 @@ function ResetLogin() {
           <Stack isVertical className={styles.stack}>
             <Text text={t('account_reset_title')} element="h2" />
           </Stack>
+          <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <FormProvider {...methods}>
             <Stack
               isVertical
@@ -61,6 +62,7 @@ function ResetLogin() {
               <FormInput
                 name="usernameV"
                 label={t('account_reset_field')}
+                autoComplete="username"
                 required
                 errorobj={errors}
               />
@@ -85,13 +87,14 @@ function ResetLogin() {
               // A whole key per channel, not `Send reset ${type}`: "email" and
               // "text" are stored codes, and the two sentences do not share a
               // shape across languages.
+              type="submit"
               text={notificationType === 'text'
                 ? t('account_reset_submit_text')
                 : t('account_reset_submit_email')}
-              onClick={handleSubmit(onSubmit)}
               isFullWidth
             />
           </Stack>
+          </form>
         </Card>
       </div>
     </Page>

@@ -54,3 +54,15 @@ describe('Reset login page — copy', () => {
     expect(result.props).toHaveProperty('_nextI18Next');
   });
 });
+
+// Every account form submits like a form: its main action is the form's submit
+// button, so Enter works and nothing depends on a click handler. The sign-in
+// page shipped without this and Enter silently did nothing.
+describe('form semantics', () => {
+  it('the send button is the submit button of a form', async () => {
+    render(<ResetLogin />);
+    const button = await screen.findByRole('button', { name: 'account_reset_submit_email' });
+    expect(button).toHaveAttribute('type', 'submit');
+    expect(button.closest('form')).not.toBeNull();
+  });
+});
