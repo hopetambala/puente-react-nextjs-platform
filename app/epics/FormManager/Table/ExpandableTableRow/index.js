@@ -1,23 +1,22 @@
 import { Button, Stack, Text } from 'app/impacto-design-system';
-import { customMultiParamCountService } from 'app/modules/cloud-code';
+import { loadOrganizationScope } from 'app/modules/organization';
 import { useTranslation } from 'next-i18next';
+import { Parse } from 'parse';
 import { useState } from 'react';
 
+import formRecordsQuery from '../../_utils/formRecordsQuery';
 import styles from './index.module.scss';
 
 function ExpandableTableRowDetail({ row, surveyingOrganization, offersResearch }) {
   const { t } = useTranslation('common');
   const [count, setCount] = useState(0);
 
-  const { objectId } = row;
-
+  // The same query the record list runs, so the two never disagree. It used
+  // to ask FormResults for every card: Vitals read 0 with 14,799 collected.
   const getCount = async () => {
-    const asynCount = await customMultiParamCountService('FormResults', {
-      formSpecificationsId: objectId,
-      surveyingOrganization,
-    });
-
-    setCount(asynCount);
+    const scope = await loadOrganizationScope(Parse, surveyingOrganization);
+    const query = formRecordsQuery(Parse, row, scope);
+    setCount(query ? await query.count() : 0);
   };
 
   return (

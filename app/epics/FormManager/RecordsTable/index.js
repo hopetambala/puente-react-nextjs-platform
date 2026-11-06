@@ -1,9 +1,11 @@
 import { Badge, EmptyState, Spinner } from 'app/impacto-design-system';
+import { loadOrganizationScope } from 'app/modules/organization';
 import { useTranslation } from 'next-i18next';
 import Parse from 'parse';
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 
+import formRecordsQuery from '../_utils/formRecordsQuery';
 import styles from './index.module.css';
 
 const PAGE_SIZE = 20;
@@ -18,7 +20,7 @@ function getInitials(name) {
     .toUpperCase();
 }
 
-function RecordsTable({ form }) {
+function RecordsTable({ form, organization }) {
   const { t } = useTranslation('common');
   const [records, setRecords] = useState([]);
   const [total, setTotal] = useState(0);
@@ -31,8 +33,15 @@ function RecordsTable({ form }) {
     const fetchRecords = async () => {
       setLoading(true);
       try {
-        const query = new Parse.Query('SurveyData');
-        query.equalTo('formSpecification', form.objectId);
+        const scope = await loadOrganizationScope(Parse, organization);
+        const query = formRecordsQuery(Parse, form, scope);
+        if (!query) {
+          if (!cancelled) {
+            setRecords([]);
+            setTotal(0);
+          }
+          return;
+        }
         query.limit(PAGE_SIZE);
         query.skip(page * PAGE_SIZE);
 
@@ -55,7 +64,7 @@ function RecordsTable({ form }) {
     return () => {
       cancelled = true;
     };
-  }, [form.objectId, page]);
+  }, [form.objectId, form.name, organization, page]);
 
   const start = page * PAGE_SIZE + 1;
   const end = Math.min(start + PAGE_SIZE - 1, total);
@@ -155,9 +164,15 @@ function RecordsTable({ form }) {
 
 RecordsTable.propTypes = {
   form: PropTypes.shape({
-    objectId: PropTypes.string.isRequired,
+    // Optional: Puente cards (Vitals, SurveyData, …) are classes, not form specifications.
+    objectId: PropTypes.string,
     name: PropTypes.string,
   }).isRequired,
+  organization: PropTypes.string,
+};
+
+RecordsTable.defaultProps = {
+  organization: '',
 };
 
 export default RecordsTable;

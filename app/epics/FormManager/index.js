@@ -165,7 +165,7 @@ function FormManager({ context, router, user }) {
               {t('form_manager_back')}
             </button>
           </div>
-          <RecordsTable form={selectedForm} />
+          <RecordsTable form={selectedForm} organization={organization} />
         </div>
       ) : (
         <>

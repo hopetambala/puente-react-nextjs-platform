@@ -21,6 +21,11 @@ jest.mock('app/impacto-design-system', () => ({
   Spinner: () => <div data-testid="spinner" />,
 }));
 
+const mockScope = jest.fn();
+jest.mock('app/modules/organization', () => ({
+  loadOrganizationScope: (...args) => mockScope(...args),
+}));
+
 jest.mock('app/services/parse', () => ({
   default: {
     Query: jest.fn(),
@@ -32,6 +37,8 @@ jest.mock('parse', () => {
   const mockFind = jest.fn();
   const MockQuery = jest.fn().mockImplementation(() => ({
     equalTo: jest.fn().mockReturnThis(),
+      containedIn: jest.fn().mockReturnThis(),
+      descending: jest.fn().mockReturnThis(),
     limit: jest.fn().mockReturnThis(),
     skip: jest.fn().mockReturnThis(),
     count: jest.fn().mockResolvedValue(0),
@@ -46,6 +53,7 @@ const RecordsTable = require('app/epics/FormManager/RecordsTable').default;
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockScope.mockResolvedValue(['WOF', 'HOF']);
 });
 
 const makeRecord = (overrides = {}) => ({
@@ -69,7 +77,7 @@ const defaultForm = {
 
 function renderTable(props = {}) {
   return render(
-    <RecordsTable form={defaultForm} {...props} />,
+    <RecordsTable form={defaultForm} organization="WOF" {...props} />,
   );
 }
 
@@ -80,6 +88,8 @@ describe('RecordsTable — loading', () => {
     Parse.Query._mockFind.mockReturnValue(new Promise(() => {})); // never resolves
     Parse.Query.mockImplementation(() => ({
       equalTo: jest.fn().mockReturnThis(),
+      containedIn: jest.fn().mockReturnThis(),
+      descending: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
       skip: jest.fn().mockReturnThis(),
       count: jest.fn().mockReturnValue(new Promise(() => {})),
@@ -97,6 +107,8 @@ describe('RecordsTable — column headers', () => {
     Parse.Query._mockFind.mockResolvedValue([]);
     Parse.Query.mockImplementation(() => ({
       equalTo: jest.fn().mockReturnThis(),
+      containedIn: jest.fn().mockReturnThis(),
+      descending: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
       skip: jest.fn().mockReturnThis(),
       count: jest.fn().mockResolvedValue(0),
@@ -147,6 +159,8 @@ describe('RecordsTable — record rows', () => {
     Parse.Query._mockFind.mockResolvedValue(records);
     Parse.Query.mockImplementation(() => ({
       equalTo: jest.fn().mockReturnThis(),
+      containedIn: jest.fn().mockReturnThis(),
+      descending: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
       skip: jest.fn().mockReturnThis(),
       count: jest.fn().mockResolvedValue(2),
@@ -196,23 +210,48 @@ describe('RecordsTable — record rows', () => {
 // ─── Parse query wiring ────────────────────────────────────────────────────────
 
 describe('RecordsTable — Parse query', () => {
-  it('queries SurveyData class filtered by the form objectId', async () => {
+  let equalToMock;
+  let containedInMock;
+  beforeEach(() => {
     Parse.Query._mockFind.mockResolvedValue([]);
-    const equalToMock = jest.fn().mockReturnThis();
+    equalToMock = jest.fn().mockReturnThis();
+    containedInMock = jest.fn().mockReturnThis();
     Parse.Query.mockImplementation(() => ({
       equalTo: equalToMock,
+      containedIn: containedInMock,
+      descending: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
       skip: jest.fn().mockReturnThis(),
       count: jest.fn().mockResolvedValue(0),
       find: Parse.Query._mockFind,
     }));
+  });
 
+  // Custom-form answers live in FormResults, keyed by formSpecificationsId.
+  // Asking SurveyData for `formSpecification` showed 0 of CMM's 561 results.
+  it('reads a custom form from FormResults, scoped to every name of the organization', async () => {
     renderTable();
-
     await waitFor(() => {
-      expect(Parse.Query).toHaveBeenCalledWith('SurveyData');
-      expect(equalToMock).toHaveBeenCalledWith('formSpecification', 'form-abc');
+      expect(Parse.Query).toHaveBeenCalledWith('FormResults');
+      expect(equalToMock).toHaveBeenCalledWith('formSpecificationsId', 'form-abc');
+      expect(containedInMock).toHaveBeenCalledWith('surveyingOrganization', ['WOF', 'HOF']);
     });
+    expect(mockScope).toHaveBeenCalledWith(expect.anything(), 'WOF');
+  });
+
+  // Clicking "Vitals" used to list 44,038 patients from every organization.
+  it('reads the Vitals card from the Vitals class, never from SurveyData', async () => {
+    renderTable({ form: { name: 'Vitals', description: '' } });
+    await waitFor(() => expect(Parse.Query).toHaveBeenCalledWith('Vitals'));
+    expect(Parse.Query).not.toHaveBeenCalledWith('SurveyData');
+    expect(containedInMock).toHaveBeenCalledWith('surveyingOrganization', ['WOF', 'HOF']);
+  });
+
+  it('queries nothing, and says so, when the organization has no scope', async () => {
+    mockScope.mockResolvedValue([]);
+    renderTable();
+    await waitFor(() => expect(screen.getByTestId('empty-state')).toBeInTheDocument());
+    expect(Parse.Query).not.toHaveBeenCalled();
   });
 });
 
@@ -223,6 +262,8 @@ describe('RecordsTable — empty state', () => {
     Parse.Query._mockFind.mockResolvedValue([]);
     Parse.Query.mockImplementation(() => ({
       equalTo: jest.fn().mockReturnThis(),
+      containedIn: jest.fn().mockReturnThis(),
+      descending: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
       skip: jest.fn().mockReturnThis(),
       count: jest.fn().mockResolvedValue(0),
@@ -254,6 +295,8 @@ describe('RecordsTable — submitted date', () => {
     Parse.Query._mockFind.mockResolvedValue([record]);
     Parse.Query.mockImplementation(() => ({
       equalTo: jest.fn().mockReturnThis(),
+      containedIn: jest.fn().mockReturnThis(),
+      descending: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
       skip: jest.fn().mockReturnThis(),
       count: jest.fn().mockResolvedValue(1),
@@ -280,6 +323,8 @@ describe('RecordsTable — pagination', () => {
     Parse.Query._mockFind.mockResolvedValue(records);
     Parse.Query.mockImplementation(() => ({
       equalTo: jest.fn().mockReturnThis(),
+      containedIn: jest.fn().mockReturnThis(),
+      descending: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
       skip: jest.fn().mockReturnThis(),
       count: jest.fn().mockResolvedValue(100),
@@ -334,6 +379,8 @@ describe('FormManager RecordsTable — copy', () => {
     Parse.Query._mockFind.mockResolvedValue(rows);
     Parse.Query.mockImplementation(() => ({
       equalTo: jest.fn().mockReturnThis(),
+      containedIn: jest.fn().mockReturnThis(),
+      descending: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
       skip: jest.fn().mockReturnThis(),
       count: jest.fn().mockResolvedValue(total),
@@ -376,5 +423,30 @@ describe('FormManager RecordsTable — copy', () => {
       expect(screen.getByRole('button', { name: 'pagination_prev_page' })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'pagination_next_page' })).toBeInTheDocument();
     });
+  });
+});
+
+// Puente cards (Vitals, SurveyData, …) have no objectId: they are classes, not
+// form specifications. Requiring one logged a PropTypes error on every click.
+describe('RecordsTable — Puente card props', () => {
+  it('accepts a Puente card without an objectId', async () => {
+    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+    Parse.Query._mockFind.mockResolvedValue([]);
+    Parse.Query.mockImplementation(() => ({
+      equalTo: jest.fn().mockReturnThis(),
+      containedIn: jest.fn().mockReturnThis(),
+      descending: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockReturnThis(),
+      skip: jest.fn().mockReturnThis(),
+      count: jest.fn().mockResolvedValue(0),
+      find: Parse.Query._mockFind,
+    }));
+    renderTable({ form: { name: 'Vitals', description: '' } });
+    await waitFor(() => expect(screen.getByTestId('empty-state')).toBeInTheDocument());
+    // React 17 logs a format string with "prop" as a separate argument:
+    // ("Warning: Failed %s type: %s%s", "prop", …).
+    const propTypeErrors = consoleError.mock.calls.filter((c) => String(c[0]).includes('Failed %s type') && c[1] === 'prop');
+    consoleError.mockRestore();
+    expect(propTypeErrors).toEqual([]);
   });
 });
