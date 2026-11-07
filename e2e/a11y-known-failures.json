@@ -1,0 +1,505 @@
+{
+  "_readme": "Known failures of the responsive a11y sweep (e2e/suites/responsive-a11y.mjs): \"<route> @ <width>\" → rule ids failing there in either language. Rule ids are axe-core's, plus the sweep's own (see CUSTOM_RULES in e2e/lib/a11y-gate-lib.mjs). The sweep fails on anything not listed. Regenerate with `node e2e/suites/responsive-a11y.mjs --update`, which refuses to add entries. Each PR of docs/responsive-a11y-overhaul.md shrinks it; PR 7 empties it.",
+  "total": 310,
+  "byRoute": {
+    "/": 15,
+    "/account/login": 19,
+    "/account/login/reset-login": 17,
+    "/account/management": 20,
+    "/account/register": 17,
+    "/account/reset": 12,
+    "/account/verify": 6,
+    "/account/verify/redirect": 19,
+    "/billing": 16,
+    "/data/data-analysis": 15,
+    "/data/data-curation": 33,
+    "/data/data-visualization": 31,
+    "/forms/form-creator": 27,
+    "/forms/form-manager": 16,
+    "/forms/form-marketplace": 15,
+    "/organization-admin": 15,
+    "/quick-start": 17
+  },
+  "failures": {
+    "/ @ 320": [
+      "color-contrast",
+      "reflow",
+      "skip-link"
+    ],
+    "/ @ 375": [
+      "color-contrast",
+      "reflow",
+      "skip-link"
+    ],
+    "/ @ 768": [
+      "color-contrast",
+      "skip-link",
+      "text-spacing"
+    ],
+    "/ @ 1024": [
+      "color-contrast",
+      "skip-link",
+      "text-spacing"
+    ],
+    "/ @ 1440": [
+      "color-contrast",
+      "skip-link",
+      "text-spacing"
+    ],
+    "/account/login @ 320": [
+      "color-contrast",
+      "focus-not-visible",
+      "skip-link",
+      "target-min-24",
+      "target-size"
+    ],
+    "/account/login @ 375": [
+      "color-contrast",
+      "focus-not-visible",
+      "skip-link",
+      "target-min-24",
+      "target-size"
+    ],
+    "/account/login @ 768": [
+      "color-contrast",
+      "focus-not-visible",
+      "skip-link"
+    ],
+    "/account/login @ 1024": [
+      "color-contrast",
+      "focus-not-visible",
+      "skip-link"
+    ],
+    "/account/login @ 1440": [
+      "color-contrast",
+      "focus-not-visible",
+      "skip-link"
+    ],
+    "/account/login/reset-login @ 320": [
+      "color-contrast",
+      "focus-not-visible",
+      "reflow",
+      "skip-link"
+    ],
+    "/account/login/reset-login @ 375": [
+      "color-contrast",
+      "focus-not-visible",
+      "reflow",
+      "skip-link"
+    ],
+    "/account/login/reset-login @ 768": [
+      "color-contrast",
+      "focus-not-visible",
+      "skip-link"
+    ],
+    "/account/login/reset-login @ 1024": [
+      "color-contrast",
+      "focus-not-visible",
+      "skip-link"
+    ],
+    "/account/login/reset-login @ 1440": [
+      "color-contrast",
+      "focus-not-visible",
+      "skip-link"
+    ],
+    "/account/management @ 320": [
+      "color-contrast",
+      "reflow",
+      "skip-link",
+      "target-min-24",
+      "text-spacing"
+    ],
+    "/account/management @ 375": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "reflow",
+      "skip-link",
+      "target-min-24",
+      "text-spacing"
+    ],
+    "/account/management @ 768": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "skip-link"
+    ],
+    "/account/management @ 1024": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "skip-link"
+    ],
+    "/account/management @ 1440": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "skip-link"
+    ],
+    "/account/register @ 320": [
+      "color-contrast",
+      "focus-not-visible",
+      "skip-link",
+      "text-spacing"
+    ],
+    "/account/register @ 375": [
+      "color-contrast",
+      "focus-not-visible",
+      "skip-link",
+      "text-spacing"
+    ],
+    "/account/register @ 768": [
+      "color-contrast",
+      "focus-not-visible",
+      "skip-link"
+    ],
+    "/account/register @ 1024": [
+      "color-contrast",
+      "focus-not-visible",
+      "skip-link"
+    ],
+    "/account/register @ 1440": [
+      "color-contrast",
+      "focus-not-visible",
+      "skip-link"
+    ],
+    "/account/reset @ 320": [
+      "focus-not-visible",
+      "reflow",
+      "skip-link"
+    ],
+    "/account/reset @ 375": [
+      "focus-not-visible",
+      "reflow",
+      "skip-link"
+    ],
+    "/account/reset @ 768": [
+      "focus-not-visible",
+      "skip-link"
+    ],
+    "/account/reset @ 1024": [
+      "focus-not-visible",
+      "skip-link"
+    ],
+    "/account/reset @ 1440": [
+      "focus-not-visible",
+      "skip-link"
+    ],
+    "/account/verify @ 320": [
+      "focus-unreachable",
+      "reflow"
+    ],
+    "/account/verify @ 375": [
+      "focus-unreachable"
+    ],
+    "/account/verify @ 768": [
+      "focus-unreachable"
+    ],
+    "/account/verify @ 1024": [
+      "focus-unreachable"
+    ],
+    "/account/verify @ 1440": [
+      "focus-unreachable"
+    ],
+    "/account/verify/redirect @ 320": [
+      "color-contrast",
+      "focus-not-visible",
+      "skip-link",
+      "target-min-24",
+      "target-size"
+    ],
+    "/account/verify/redirect @ 375": [
+      "color-contrast",
+      "focus-not-visible",
+      "skip-link",
+      "target-min-24",
+      "target-size"
+    ],
+    "/account/verify/redirect @ 768": [
+      "color-contrast",
+      "focus-not-visible",
+      "skip-link"
+    ],
+    "/account/verify/redirect @ 1024": [
+      "color-contrast",
+      "focus-not-visible",
+      "skip-link"
+    ],
+    "/account/verify/redirect @ 1440": [
+      "color-contrast",
+      "focus-not-visible",
+      "skip-link"
+    ],
+    "/billing @ 320": [
+      "color-contrast",
+      "reflow",
+      "skip-link"
+    ],
+    "/billing @ 375": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "reflow",
+      "skip-link"
+    ],
+    "/billing @ 768": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "skip-link"
+    ],
+    "/billing @ 1024": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "skip-link"
+    ],
+    "/billing @ 1440": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "skip-link"
+    ],
+    "/data/data-analysis @ 320": [
+      "color-contrast",
+      "reflow",
+      "skip-link"
+    ],
+    "/data/data-analysis @ 375": [
+      "color-contrast",
+      "reflow",
+      "skip-link"
+    ],
+    "/data/data-analysis @ 768": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "skip-link"
+    ],
+    "/data/data-analysis @ 1024": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "skip-link"
+    ],
+    "/data/data-analysis @ 1440": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "skip-link"
+    ],
+    "/data/data-curation @ 320": [
+      "aria-prohibited-attr",
+      "color-contrast",
+      "label",
+      "reflow",
+      "select-name",
+      "skip-link",
+      "text-spacing"
+    ],
+    "/data/data-curation @ 375": [
+      "aria-prohibited-attr",
+      "color-contrast",
+      "label",
+      "reflow",
+      "select-name",
+      "skip-link",
+      "text-spacing"
+    ],
+    "/data/data-curation @ 768": [
+      "aria-prohibited-attr",
+      "color-contrast",
+      "label",
+      "label-content-name-mismatch",
+      "select-name",
+      "skip-link"
+    ],
+    "/data/data-curation @ 1024": [
+      "aria-prohibited-attr",
+      "color-contrast",
+      "label",
+      "label-content-name-mismatch",
+      "select-name",
+      "skip-link",
+      "text-spacing"
+    ],
+    "/data/data-curation @ 1440": [
+      "aria-prohibited-attr",
+      "color-contrast",
+      "label",
+      "label-content-name-mismatch",
+      "select-name",
+      "skip-link"
+    ],
+    "/data/data-visualization @ 320": [
+      "aria-prohibited-attr",
+      "color-contrast",
+      "label",
+      "reflow",
+      "select-name",
+      "skip-link"
+    ],
+    "/data/data-visualization @ 375": [
+      "aria-prohibited-attr",
+      "color-contrast",
+      "label",
+      "reflow",
+      "select-name",
+      "skip-link"
+    ],
+    "/data/data-visualization @ 768": [
+      "aria-prohibited-attr",
+      "color-contrast",
+      "label",
+      "label-content-name-mismatch",
+      "select-name",
+      "skip-link"
+    ],
+    "/data/data-visualization @ 1024": [
+      "aria-prohibited-attr",
+      "color-contrast",
+      "label",
+      "label-content-name-mismatch",
+      "select-name",
+      "skip-link",
+      "text-spacing"
+    ],
+    "/data/data-visualization @ 1440": [
+      "aria-prohibited-attr",
+      "color-contrast",
+      "label",
+      "label-content-name-mismatch",
+      "select-name",
+      "skip-link"
+    ],
+    "/forms/form-creator @ 320": [
+      "color-contrast",
+      "nested-interactive",
+      "reflow",
+      "skip-link",
+      "target-min-24",
+      "text-spacing"
+    ],
+    "/forms/form-creator @ 375": [
+      "color-contrast",
+      "nested-interactive",
+      "reflow",
+      "skip-link",
+      "target-min-24",
+      "text-spacing"
+    ],
+    "/forms/form-creator @ 768": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "nested-interactive",
+      "skip-link",
+      "text-spacing"
+    ],
+    "/forms/form-creator @ 1024": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "nested-interactive",
+      "skip-link",
+      "text-spacing"
+    ],
+    "/forms/form-creator @ 1440": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "nested-interactive",
+      "skip-link",
+      "text-spacing"
+    ],
+    "/forms/form-manager @ 320": [
+      "color-contrast",
+      "reflow",
+      "skip-link"
+    ],
+    "/forms/form-manager @ 375": [
+      "color-contrast",
+      "reflow",
+      "skip-link"
+    ],
+    "/forms/form-manager @ 768": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "skip-link"
+    ],
+    "/forms/form-manager @ 1024": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "skip-link"
+    ],
+    "/forms/form-manager @ 1440": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "skip-link",
+      "text-spacing"
+    ],
+    "/forms/form-marketplace @ 320": [
+      "color-contrast",
+      "reflow",
+      "skip-link"
+    ],
+    "/forms/form-marketplace @ 375": [
+      "color-contrast",
+      "reflow",
+      "skip-link"
+    ],
+    "/forms/form-marketplace @ 768": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "skip-link"
+    ],
+    "/forms/form-marketplace @ 1024": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "skip-link"
+    ],
+    "/forms/form-marketplace @ 1440": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "skip-link"
+    ],
+    "/organization-admin @ 320": [
+      "color-contrast",
+      "reflow",
+      "skip-link"
+    ],
+    "/organization-admin @ 375": [
+      "color-contrast",
+      "reflow",
+      "skip-link"
+    ],
+    "/organization-admin @ 768": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "skip-link"
+    ],
+    "/organization-admin @ 1024": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "skip-link"
+    ],
+    "/organization-admin @ 1440": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "skip-link"
+    ],
+    "/quick-start @ 320": [
+      "color-contrast",
+      "reflow",
+      "skip-link"
+    ],
+    "/quick-start @ 375": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "reflow",
+      "skip-link"
+    ],
+    "/quick-start @ 768": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "skip-link"
+    ],
+    "/quick-start @ 1024": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "skip-link",
+      "text-spacing"
+    ],
+    "/quick-start @ 1440": [
+      "color-contrast",
+      "label-content-name-mismatch",
+      "skip-link"
+    ]
+  }
+}

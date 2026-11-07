@@ -22,9 +22,12 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      # Blocking since PR 1a. app/ and pages/ are at zero errors, with
+      # plugin:jsx-a11y/strict on; the violations that predate it are per-file
+      # "warn" overrides in .eslintrc.json, each naming the PR that removes it.
+      # Warnings still print, so the backlog stays visible.
       - name: Run ESLint
         run: yarn lint
-        continue-on-error: true
 
       # The E2E harness is .mjs and lives outside next.config.js's lint dirs,
       # so `next lint` never saw a line of it. It reported 47 errors the first
@@ -36,6 +39,13 @@ jobs:
       # something a person just introduced. `yarn lint:e2e --fix` fixes most.
       - name: Run ESLint on the E2E harness
         run: yarn lint:e2e
+
+      # Stylelint with the a11y rules (no outline removal, no px font sizes,
+      # tokens for colour and z-index, dvh not 100vh, :focus-visible). Fails on
+      # any count above stylelint-baseline.json, and on any count below it that
+      # wasn't recorded with `yarn lint:css:baseline`.
+      - name: Run stylelint (a11y rules, ratcheting baseline)
+        run: yarn lint:css
 
   unit-tests:
     runs-on: ubuntu-latest
@@ -81,16 +91,99 @@ jobs:
           # be cached across CI runs rather than re-downloaded each time.
           MONGOMS_PREFER_GLOBAL_PATH: 1
 
+  # ── A11Y GATE ─────────────────────────────────────────────────────────────
+  # docs/responsive-a11y-overhaul.md, "A11y tooling stack". jest-axe and the
+  # undefined-token test run in unit-tests; jsx-a11y and stylelint in lint.
+  # Each layer has a checked-in known-failures list that later PRs shrink;
+  # anything new fails here.
+
+  # axe on every Storybook story at dlite's sm/md/lg/xl breakpoints.
+  storybook-a11y:
+    # Same pin as e2e: Playwright 1.60 can't install Chromium deps on 26.04.
+    runs-on: ubuntu-24.04
+    needs: lint
+    if: always()
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Storybook a11y (build, serve, axe every story)
+        run: yarn test-storybook
+
+  # Every route × 320/375/768/1024/1440 × eng/spa: axe, reflow, target size,
+  # text spacing, focus. BLOCKING, unlike the e2e job below: it runs against
+  # the synthetic world (e2e/lib/synthetic-world.mjs), so it needs no secrets,
+  # writes nothing, and doesn't depend on what is in staging today.
+  responsive-a11y:
+    runs-on: ubuntu-24.04
+    needs: lint
+    if: always()
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      # Placeholders, not credentials. Every Parse call is answered by the
+      # synthetic world's stubs before it leaves the browser; the SDK only
+      # needs an app id and a URL to build its requests.
+      - name: Write a placeholder environment
+        run: |
+          cat > .env.production.local <<EOF
+          NEXT_PUBLIC_parseAppId=a11y-sweep-placeholder
+          NEXT_PUBLIC_parseJavascriptKey=a11y-sweep-placeholder
+          NEXT_PUBLIC_parseServerUrl="https://parseapi.back4app.com/"
+          EOF
+
+      # A production build, not `next dev`: no per-route compile on first
+      # visit, so 170 page loads don't race a compiler.
+      - name: Build and start the app
+        run: |
+          yarn build
+          yarn start &
+          npx wait-on http://localhost:3000 --timeout 120000
+
+      - name: Responsive a11y sweep (stability gate)
+        run: node e2e/run-e2e.mjs responsive-a11y --repeat 2
+
+      # Same reason as the e2e job: no artifact upload. The sweep's screenshots
+      # are of synthetic data, but .e2e-artifacts/ is shared with suites that
+      # capture real records, so nothing from it is published by default.
+
   test-summary:
     runs-on: ubuntu-latest
-    needs: [unit-tests, integration-tests]
+    needs: [unit-tests, integration-tests, storybook-a11y, responsive-a11y]
     if: always()
 
     steps:
       - name: Check test results
         run: |
           if [ "${{ needs.unit-tests.result }}" != "success" ] || \
-             [ "${{ needs.integration-tests.result }}" != "success" ]; then
+             [ "${{ needs.integration-tests.result }}" != "success" ] || \
+             [ "${{ needs.storybook-a11y.result }}" != "success" ] || \
+             [ "${{ needs.responsive-a11y.result }}" != "success" ]; then
             echo "❌ Some tests failed"
             exit 1
           fi
