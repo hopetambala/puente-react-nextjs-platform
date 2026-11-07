@@ -4,6 +4,8 @@ const createJestConfig = nextJest({ dir: './' });
 
 module.exports = createJestConfig({
   testEnvironment: 'jest-environment-jsdom',
+  // jest-axe's toHaveNoViolations matcher, available in every test file.
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   moduleDirectories: ['node_modules', '<rootDir>'],
   moduleNameMapper: {
     '^@testing-library/react$':
