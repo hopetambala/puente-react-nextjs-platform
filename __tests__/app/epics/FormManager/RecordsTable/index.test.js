@@ -121,11 +121,6 @@ describe('RecordsTable — column headers', () => {
     await waitFor(() => expect(screen.getByText('form_manager_col_record')).toBeInTheDocument());
   });
 
-  it('renders Household column header', async () => {
-    renderTable();
-    await waitFor(() => expect(screen.getByText('field_household')).toBeInTheDocument());
-  });
-
   it('renders Surveyor column header', async () => {
     renderTable();
     await waitFor(() => expect(screen.getByText('field_surveyor')).toBeInTheDocument());
@@ -141,9 +136,14 @@ describe('RecordsTable — column headers', () => {
     await waitFor(() => expect(screen.getByText('field_status')).toBeInTheDocument());
   });
 
-  it('renders Water source column header', async () => {
+  // "Household" and "Water source" came from the environmental-health design
+  // mock. No other form has those fields, so on Vitals and every custom form
+  // they were a column of dashes on every row (2026-11-07).
+  it('has no Household or Water source column', async () => {
     renderTable();
-    await waitFor(() => expect(screen.getByText('form_manager_col_water_source')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('field_status')).toBeInTheDocument());
+    expect(screen.queryByText('field_household')).not.toBeInTheDocument();
+    expect(screen.queryByText('form_manager_col_water_source')).not.toBeInTheDocument();
   });
 });
 
@@ -192,18 +192,11 @@ describe('RecordsTable — record rows', () => {
     expect(screen.getByTestId('badge-orange')).toHaveTextContent('form_manager_status_conflict');
   });
 
-  it('renders the household for each row', async () => {
+  it('shows no household or water source, even on a record that has them', async () => {
     renderTable();
-    await waitFor(() =>
-      expect(screen.getByText('Sabana Yegua · Block 4')).toBeInTheDocument(),
-    );
-  });
-
-  it('renders the water source for each row', async () => {
-    renderTable();
-    await waitFor(() =>
-      expect(screen.getByText('Bottled')).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByText('EH-218')).toBeInTheDocument());
+    expect(screen.queryByText('Sabana Yegua · Block 4')).not.toBeInTheDocument();
+    expect(screen.queryByText('Bottled')).not.toBeInTheDocument();
   });
 });
 

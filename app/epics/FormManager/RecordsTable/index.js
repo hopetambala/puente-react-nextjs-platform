@@ -103,11 +103,9 @@ function RecordsTable({ form, organization }) {
       <div className={styles.tableHead}>
         <div className={`${styles.cell} ${styles.cellHead} ${styles.cellCheck}`} />
         <div className={`${styles.cell} ${styles.cellHead} ${styles.cellId}`}>{t('form_manager_col_record')}</div>
-        <div className={`${styles.cell} ${styles.cellHead}`}>{t('field_household')}</div>
         <div className={`${styles.cell} ${styles.cellHead}`}>{t('field_surveyor')}</div>
         <div className={`${styles.cell} ${styles.cellHead}`}>{t('field_submitted')}</div>
         <div className={`${styles.cell} ${styles.cellHead}`}>{t('field_status')}</div>
-        <div className={`${styles.cell} ${styles.cellHead}`}>{t('form_manager_col_water_source')}</div>
         <div className={`${styles.cell} ${styles.cellHead} ${styles.cellMenu}`} />
       </div>
 
@@ -117,13 +115,11 @@ function RecordsTable({ form, organization }) {
       ) : (
         records.map((record) => {
           const recordId = record.id;
-          const household = record.get('household') || '—';
           const surveyor = record.get('surveyingUser') || '—';
           const submitted = record.createdAt
             ? record.createdAt.toLocaleDateString()
             : '—';
           const syncStatus = record.get('syncStatus') || 'synced';
-          const waterSource = record.get('waterSource') || '—';
 
           return (
             <div key={recordId} className={styles.tableRow}>
@@ -131,7 +127,6 @@ function RecordsTable({ form, organization }) {
                 <input type="checkbox" aria-label={t('form_manager_select_record', { id: recordId })} />
               </div>
               <div className={`${styles.cell} ${styles.cellId}`}>{recordId}</div>
-              <div className={styles.cell}>{household}</div>
               <div className={`${styles.cell} ${styles.cellSurveyor}`}>
                 <span className={styles.avatar}>{getInitials(surveyor)}</span>
                 {surveyor}
@@ -145,7 +140,6 @@ function RecordsTable({ form, organization }) {
                   <Badge variant="green">{t('sync_ribbon_synced')}</Badge>
                 )}
               </div>
-              <div className={styles.cell}>{waterSource}</div>
               <div className={`${styles.cell} ${styles.cellMenu}`}>⋯</div>
             </div>
           );
