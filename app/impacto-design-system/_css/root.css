@@ -156,7 +156,6 @@ pre {
   white-space: pre-wrap;
 }
 
-/* stylelint-disable selector-pseudo-class-no-unknown */
 :global(.x-hellosign-embedded) {
   z-index: 99;
 }
@@ -164,4 +163,3 @@ pre {
 :global([class*='public-DraftStyleDefault-']) {
   margin: 0;
 }
-/* stylelint-enable selector-pseudo-class-no-unknown */

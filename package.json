@@ -22,10 +22,12 @@
     "reinstall": "rm yarn.lock && rm -rf node_modules/ && yarn install",
     "release": "standard-version",
     "lint": "next lint",
-    "lint:e2e": "eslint e2e --ext .mjs",
+    "lint:e2e": "eslint e2e scripts --ext .mjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "lint:fix": "next lint --fix"
+    "lint:fix": "next lint --fix",
+    "lint:css": "node scripts/lint-css.mjs",
+    "lint:css:baseline": "node scripts/lint-css.mjs --update"
   },
   "dependencies": {
     "@apollo/client": "^3.3.17",

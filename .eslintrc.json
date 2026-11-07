@@ -119,7 +119,8 @@
       // script. Left on they reported 85 warnings and 15 errors that nobody
       // could ever act on, which is exactly how a lint report stops being
       // read. Everything else here stays an error.
-      "files": ["e2e/**/*.mjs"],
+      // scripts/ is the same kind of Node dev tooling (yarn lint:css).
+      "files": ["e2e/**/*.mjs", "scripts/**/*.mjs"],
       "rules": {
         // The harness's whole report — every check, every failure diagnosis —
         // is stdout. console IS the interface in this directory.
