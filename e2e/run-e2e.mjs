@@ -31,6 +31,7 @@ const SUITES = {
   'form-create': 'suites/form-create.mjs',
   'data-export': 'suites/data-export.mjs',
   'form-edit': 'suites/form-edit.mjs',
+  'responsive-a11y': 'suites/responsive-a11y.mjs',
 };
 
 const { suites: wanted, repeat } = parseRunArgs(process.argv.slice(2));

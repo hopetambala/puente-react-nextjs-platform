@@ -4,6 +4,7 @@
  * Every query here is behavioural: if a coordinator could not find or read the
  * thing, the check fails. See e2e/README.md for the harness rules.
  */
+import { reflow } from '../lib/a11y-checks.mjs';
 import { openSession } from '../lib/harness.mjs';
 
 const QUEUE = { role: 'heading', name: /needs attention|requiere atenci/i };
@@ -86,8 +87,12 @@ const QUEUE = { role: 'heading', name: /needs attention|requiere atenci/i };
   console.log('\n[NARROW] the 65/35 split stacks rather than squeezing');
   await s.page.setViewportSize({ width: 860, height: 900 });
   await s.go('/quick-start', QUEUE);
-  await s.check('no horizontal page overflow at 860px',
-    !await s.page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1));
+  // Element by element. The old check compared <html>'s scrollWidth with its
+  // clientWidth, which `html, body { overflow-x: hidden }` holds equal, so it
+  // could never fail. reflow() is the responsive-a11y sweep's own check.
+  const overflowing = await reflow(s.page);
+  await s.check('no element overflows or is clipped past the viewport at 860px',
+    overflowing.length === 0, overflowing.map((o) => o.detail).slice(0, 2).join(' | ') || 'none');
   const box = await (await s.see(row(/missing key fields/i))).loc.boundingBox();
   await s.check('queue rows hold single-line density when narrow',
     !box || box.height <= 72, box ? `${Math.round(box.height)}px` : 'no rows');

@@ -10,7 +10,7 @@ import "style-dictionary-dlite-tokens/web/puente/default/components.css";
 import "style-dictionary-dlite-tokens/web/puente/default/variables.css";
 import "app/impacto-design-system/_css/root.css";
 
-import { BREAKPOINTS, WCAG_TAGS } from "../a11y.config";
+import { BREAKPOINTS, WCAG_TAGS } from "../a11y.config.cjs";
 
 const viewports = Object.fromEntries(
   Object.entries(BREAKPOINTS).map(([name, width]) => [

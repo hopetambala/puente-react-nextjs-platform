@@ -9,7 +9,7 @@
  */
 const { configureAxe } = require('jest-axe');
 
-const { WCAG_TAGS } = require('../a11y.config');
+const { WCAG_TAGS } = require('../a11y.config.cjs');
 
 const axe = configureAxe({
   runOnly: { type: 'tag', values: WCAG_TAGS },

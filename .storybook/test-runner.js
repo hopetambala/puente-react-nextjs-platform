@@ -2,7 +2,7 @@
  * `yarn test-storybook`: axe on every story at every dlite breakpoint.
  *
  * Each story is rendered once, then resized through BREAKPOINTS (640, 768,
- * 1024, 1280) and checked with the WCAG 2.2 AA rule set from a11y.config.js.
+ * 1024, 1280) and checked with the WCAG 2.2 AA rule set from a11y.config.cjs.
  * A violation fails the story unless `a11y-known-failures.json` lists it as
  * `"<story id> @ <width>": ["<axe rule id>", …]`. Listed failures that no longer
  * occur are printed as fixed, so the PR that fixed them can delete the entry.
@@ -13,7 +13,7 @@
 const { getStoryContext } = require('@storybook/test-runner');
 const { getViolations, injectAxe } = require('axe-playwright');
 
-const { BREAKPOINTS, WCAG_TAGS } = require('../a11y.config');
+const { BREAKPOINTS, WCAG_TAGS } = require('../a11y.config.cjs');
 const KNOWN = require('./a11y-known-failures.json').failures;
 
 module.exports = {

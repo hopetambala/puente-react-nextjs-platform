@@ -27,6 +27,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
+import a11yConfig from '../../a11y.config.cjs';
 import { describeSelector, extractAppId, mayWrite, mergeResults, summarizeRuns, verdict } from './harness-lib.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -35,6 +36,9 @@ const OUT = process.env.E2E_ARTIFACTS ?? join(ROOT, '.e2e-artifacts');
 /** Where screenshots, failure notes and the orphan ledger are written. */
 export const ARTIFACTS = OUT;
 export const BASE = process.env.E2E_BASE ?? 'http://localhost:3000';
+
+/** URL prefix per locale (a11y.config.cjs). Next serves Spanish under /spa. */
+export const LOCALE_PREFIX = a11yConfig.LOCALES;
 
 /** Surfaces a suite is allowed to fail on. Errors elsewhere are reported, not failed. */
 const DEFAULT_OWNED = [/quick-start/, /data-curation/];
@@ -52,11 +56,20 @@ export async function openSession({
   expectedErrors = null,
   viewport = { width: 1440, height: 900 },
   deviceScaleFactor = 1,
+  // 'eng' or 'spa'. Next serves Spanish under /spa, so `go()` prefixes every
+  // path with the locale's prefix: a suite written once runs in both.
+  locale = 'eng',
+  // `async (ctx) => {}`, run on the browser context before the page opens:
+  // the place for ctx.addInitScript / ctx.route stubs.
+  beforePage = null,
 } = {}) {
+  if (!(locale in LOCALE_PREFIX)) throw new Error(`Unknown locale "${locale}". Use one of: ${Object.keys(LOCALE_PREFIX).join(', ')}`);
+  const prefix = LOCALE_PREFIX[locale];
   mkdirSync(OUT, { recursive: true });
   const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
   const browser = await chromium.launch({ headless: true });
   const ctx = await browser.newContext({ viewport, deviceScaleFactor });
+  if (beforePage) await beforePage(ctx);
   const page = await ctx.newPage();
 
   const results = {};
@@ -177,8 +190,14 @@ export async function openSession({
     }
   };
 
-  const go = (path, expectSpec, description = `go ${path}`) =>
-    step(description, () => page.goto(`${BASE}${path}`), expectSpec);
+  /** `/quick-start` → `/spa/quick-start` in a Spanish session. */
+  const localePath = (path) => `${prefix}${path === '/' && prefix ? '' : path}`;
+
+  const go = (path, expectSpec, description = `go ${localePath(path)}`) =>
+    step(description, () => page.goto(`${BASE}${localePath(path)}`), expectSpec);
+
+  /** Resize the page. Height defaults to a phone-ish 900 so short pages still scroll. */
+  const setViewport = (width, height = viewport.height) => page.setViewportSize({ width, height });
 
   const click = async (spec, expectSpec, description) => {
     const { d, loc } = await see(spec);
@@ -277,8 +296,9 @@ export async function openSession({
   };
 
   return {
-    page, results, check, see, find, step, go, click, UNSAFE_pause, login, shot, finish,
+    page, ctx, results, check, see, find, step, go, click, UNSAFE_pause, login, shot, finish,
     withExpectedErrors, requireWritableEnvironment, consoleLog, foreign,
+    locale, localePath, setViewport,
     get appId() { return observedAppId; },
   };
 }

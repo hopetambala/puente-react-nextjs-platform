@@ -27,6 +27,36 @@ Artifacts land in `.e2e-artifacts/` (gitignored).
 | `form-create` | **yes** | Build → publish → find → delete, and sweeps leftover `e2e-*` forms |
 | `form-edit` | **yes** | Create, edit in a fresh session, verify against the server, confirm no duplicate, delete |
 | `data-export` | reads real data | Really downloads the CSV, checks it is not an error body, deletes it |
+| `responsive-a11y` | no (stubbed) | Every route × 320/375/768/1024/1440 × eng/spa: axe WCAG 2.2 AA, reflow, 24px targets, text spacing, Tab focus. Gated by `e2e/a11y-known-failures.json` — see below |
+
+### The responsive a11y sweep
+
+`responsive-a11y` never logs in and never reaches Parse: it runs against the
+synthetic world in `e2e/lib/synthetic-world.mjs` (an invented, signed-in org
+admin; every backend call stubbed). That is why it is the one suite that
+blocks CI without secrets.
+
+Failures that existed when the gate went in are listed per `"<route> @ <width>"`
+in `e2e/a11y-known-failures.json`. Anything not listed fails its check; listed
+failures that are gone print as FIXED. After fixing something:
+
+```bash
+node e2e/suites/responsive-a11y.mjs --update     # refuses to add entries
+```
+
+Narrow a run while working (filtered runs never report the rest as fixed):
+
+```bash
+E2E_A11Y_ROUTES=/quick-start E2E_A11Y_WIDTHS=375 E2E_A11Y_LOCALES=eng node e2e/suites/responsive-a11y.mjs
+```
+
+Every finding, element by element, is in `.e2e-artifacts/responsive-a11y-report.json`.
+
+### Screenshot matrix
+
+`node e2e/capture-matrix.mjs --label <name>` shoots every route at 375/768/1440
+in both languages (`--text-200` adds 200% text) into `.e2e-artifacts/<name>/`,
+from the same synthetic world, for the before/after gallery in each PR.
 
 ---
 
