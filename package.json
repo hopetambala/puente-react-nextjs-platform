@@ -27,7 +27,9 @@
     "build-storybook": "storybook build",
     "lint:fix": "next lint --fix",
     "lint:css": "node scripts/lint-css.mjs",
-    "lint:css:baseline": "node scripts/lint-css.mjs --update"
+    "lint:css:baseline": "node scripts/lint-css.mjs --update",
+    "test-storybook": "storybook build --quiet && concurrently -k -s first -n sb,test \"http-server storybook-static --port 6006 --silent\" \"wait-on tcp:127.0.0.1:6006 && test-storybook --url http://127.0.0.1:6006\"",
+    "test-storybook:dev": "test-storybook --url http://localhost:6006"
   },
   "dependencies": {
     "@apollo/client": "^3.3.17",
@@ -100,6 +102,7 @@
     "@types/node": "20.12.5",
     "@types/react": "18.2.74",
     "axe-playwright": "^2.2.2",
+    "concurrently": "^9",
     "eslint": "8.57.0",
     "eslint-config-airbnb": "19.0.4",
     "eslint-config-next": "14.1.4",
@@ -127,5 +130,9 @@
   },
   "engines": {
     "node": "24.x"
+  },
+  "resolutions": {
+    "@storybook/test-runner/**/playwright": "1.60.0",
+    "@storybook/test-runner/**/playwright-core": "1.60.0"
   }
 }

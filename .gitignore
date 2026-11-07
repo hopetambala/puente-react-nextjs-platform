@@ -48,3 +48,6 @@ docs/README.md
 # `tsc` run. It was committed by accident once; keep it out.
 *.tsbuildinfo
 .e2e-artifacts/
+
+# Storybook static build (yarn build-storybook / test-storybook:ci)
+storybook-static/

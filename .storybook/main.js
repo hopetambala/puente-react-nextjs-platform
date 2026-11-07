@@ -8,6 +8,9 @@ const config = {
     "@storybook/addon-links",
     "@storybook/addon-essentials",
     "@storybook/addon-interactions",
+    // The a11y panel runs axe on the open story while you work. `yarn
+    // test-storybook` runs the same checks on every story at every breakpoint.
+    "@storybook/addon-a11y",
   ],
   framework: {
     name: "@storybook/nextjs",
