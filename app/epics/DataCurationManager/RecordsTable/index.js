@@ -107,7 +107,6 @@ export default function RecordsTable({
                     resolve statically; it also treats every `td` as interactive.
                     The cell holds a loading placeholder, so there is no label to
                     add. */}
-                {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
                 <td colSpan={isFormResults ? 6 : 6}>
                   <Skeleton width="100%" height={16} />
                 </td>
@@ -125,14 +124,12 @@ export default function RecordsTable({
               ) : (
                 // The score is announced by CompletenessBar's own aria-label,
                 // which the rule cannot see across the component boundary.
-                // eslint-disable-next-line jsx-a11y/control-has-associated-label
                 <td className={styles.completenessCell}>
                   <CompletenessBar pct={scoreRecord(r, source, formDefinition)} />
                 </td>
               )}
               {/* Flags are announced by the chips themselves; the rule cannot
                   see labels across the component boundary. */}
-              {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
               <td onClick={(e) => e.stopPropagation()}>
                 <FlagChips
                   isDup={dups.has(r.id)}

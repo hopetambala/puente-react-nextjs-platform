@@ -117,12 +117,10 @@ function Login() {
 
           <div className={styles.altLinks}>
             <Link href="/account/login/reset-login" passHref>
-              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
               <a className={styles.altLink}>{t('forgot_password')}</a>
             </Link>
             <span className={styles.altSep}>·</span>
             <Link href="/account/register" passHref>
-              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
               <a className={styles.altLink}>{t('create_account')}</a>
             </Link>
           </div>

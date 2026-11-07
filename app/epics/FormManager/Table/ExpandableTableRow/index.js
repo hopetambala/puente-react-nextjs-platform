@@ -76,11 +76,9 @@ function ExpandableTableRow({
         <tr className={styles.detailRow}>
           {/* Spacer cell aligning under the expand-toggle column -- it is empty
               by design, so there is no label to associate. */}
-          {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
           <td />
           {/* The detail panel supplies its own heading and button labels, which
               the rule cannot see across the component boundary. */}
-          {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
           <td colSpan={5}>
             <ExpandableTableRowDetail
               row={row}

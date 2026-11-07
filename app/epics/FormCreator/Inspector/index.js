@@ -20,7 +20,6 @@ function Toggle({
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
       />
-      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
       <span
         className={`${styles.switch} ${checked ? styles.switchOn : ''}`}
         onClick={() => onChange(!checked)}

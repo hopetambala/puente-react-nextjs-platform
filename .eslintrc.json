@@ -5,6 +5,7 @@
     "next/core-web-vitals",
     "plugin:react/recommended",
     "airbnb",
+    "plugin:jsx-a11y/strict",
     "plugin:storybook/recommended",
     "plugin:@typescript-eslint/recommended",
     "prettier"
@@ -25,6 +26,19 @@
     "react/prop-types": "warn",
     "react/function-component-definition": "warn",
     "react/jsx-no-bind": "warn",
+    // plugin:jsx-a11y/strict switches this rule OFF, and coming after airbnb
+    // it would silently undo airbnb's "error". It is how an icon-only button
+    // or an empty table-cell control gets caught, so restore airbnb's setting.
+    "jsx-a11y/control-has-associated-label": [
+      "error",
+      {
+        "labelAttributes": ["label"],
+        "controlComponents": [],
+        "ignoreElements": ["audio", "canvas", "embed", "input", "textarea", "tr", "video"],
+        "ignoreRoles": ["grid", "listbox", "menu", "menubar", "radiogroup", "row", "tablist", "toolbar", "tree", "treegrid"],
+        "depth": 5
+      }
+    ],
     "jsx-a11y/anchor-is-valid": [
       "error",
       {
@@ -68,6 +82,35 @@
     "@typescript-eslint/no-shadow": "error"
   },
   "overrides": [
+    // ── jsx-a11y BASELINE ───────────────────────────────────────────────────
+    // Violations that existed when plugin:jsx-a11y/strict went in (PR 1a).
+    // Each was an inline eslint-disable before; they now live here, scoped to
+    // one file and one rule, downgraded to "warn" so `yarn lint` still prints
+    // them. A NEW violation anywhere, or another rule in these files, is an
+    // error. Each PR named below deletes its block; nothing is ever added.
+    {
+      // TODO(PR 5): RecordsTable becomes stacked cards with a real button to
+      // open a record; the skeleton and flag cells stop being bare <td>s.
+      "files": ["app/epics/DataCurationManager/RecordsTable/index.js"],
+      "rules": { "jsx-a11y/control-has-associated-label": "warn" }
+    },
+    {
+      // TODO(PR 5): form-manager's expand rows get aria-expanded and a real
+      // <table> layout; the empty spacer cell goes away.
+      "files": ["app/epics/FormManager/Table/ExpandableTableRow/index.js"],
+      "rules": { "jsx-a11y/control-has-associated-label": "warn" }
+    },
+    {
+      // TODO(PR 3): react-toastify and this Toast are replaced by the
+      // live-region Toast primitive, whose dismiss button is labelled directly.
+      "files": ["app/impacto-design-system/toast/index.js"],
+      "rules": { "jsx-a11y/control-has-associated-label": "warn" }
+    },
+    {
+      // TODO(PR 7): landing page links get real URLs, or stop being links.
+      "files": ["pages/index.js"],
+      "rules": { "jsx-a11y/anchor-is-valid": "warn" }
+    },
     {
       // The E2E harness is Node + Playwright dev tooling, not app code, and it
       // was linted by nothing at all until now: `next lint` only reads the

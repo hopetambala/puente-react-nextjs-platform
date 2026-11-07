@@ -132,7 +132,6 @@ export default function NeedsAttention({
               passHref, so it IS keyboard-navigable — the rule cannot see
               that and reports a false positive. */}
           <Link href={r.href} passHref>
-            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
             <a className={styles.row} data-testid={`triage-row-${r.id}`}>
               <span className={styles.count}>{quantity(r)}</span>
               <span className={styles.label}>

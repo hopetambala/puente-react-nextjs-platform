@@ -41,7 +41,6 @@ export default function Homepage() {
       {/* ── top nav ── */}
       <nav className={styles.nav}>
         <Link href="/" passHref>
-          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
           <a className={styles.navBrand}>
             <div className={styles.navBrandMark}>P</div>
             <span className={styles.navBrandName}>Puente</span>
@@ -49,7 +48,6 @@ export default function Homepage() {
         </Link>
         <div className={styles.navLinks}>
           <Link href="/account/login" passHref>
-            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
             <a className={styles.navLink}>Sign in to Manage →</a>
           </Link>
           <a href="https://apps.apple.com/us/app/puente-collect/id1362371696" target="_blank" rel="noreferrer" className={styles.navLink}>Download Collect</a>
@@ -73,7 +71,6 @@ export default function Homepage() {
               </p>
               <div className={styles.heroCta}>
                 <Link href="/account/login" passHref>
-                  {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                   <a className={`${styles.btn} ${styles.btnPrimary}`}>Open Puente Manage →</a>
                 </Link>
                 <a href="https://apps.apple.com/us/app/puente-collect/id1362371696" target="_blank" rel="noreferrer" className={`${styles.btn} ${styles.btnGhost}`}>Download Collect</a>
@@ -343,10 +340,8 @@ export default function Homepage() {
           </p>
           <div className={styles.ctaButtons}>
             <Link href="/account/login" passHref>
-              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
               <a className={`${styles.btn} ${styles.btnPrimary}`}>Sign in to Manage</a>
             </Link>
-            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
             <a href="#" className={`${styles.btn} ${styles.btnGhost} ${styles.ctaBtnGhost}`}>
               Read the docs
             </a>

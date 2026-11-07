@@ -37,7 +37,6 @@ const Toast = ({
         // a component prop rather than as children, so it reports a false
         // positive. Adding an aria-label here would duplicate a control that
         // already has a visible, translated one.
-        // eslint-disable-next-line jsx-a11y/control-has-associated-label
         <button className={styles.action} onClick={closeToast} type="button">
           <Text text={t('action_dismiss')} />
         </button>
