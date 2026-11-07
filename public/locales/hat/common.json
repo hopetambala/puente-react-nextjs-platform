@@ -344,6 +344,7 @@
   "form_manager_col_record": "Dosye",
   "form_manager_col_water_source": "Sous dlo",
   "form_manager_records_empty": "Nou pa jwenn okenn dosye pou fòm sa a.",
+  "form_manager_records_error": "Dosye sa yo pa t chaje.",
   "form_manager_status_conflict": "Konfli",
   "form_manager_select_record": "Chwazi dosye {{id}}",
   "form_manager_prev": "‹ Anvan",

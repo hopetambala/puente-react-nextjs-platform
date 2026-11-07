@@ -1,29 +1,40 @@
 import { Button, Stack, Text } from 'app/impacto-design-system';
-import { customMultiParamCountService } from 'app/modules/cloud-code';
+import { loadOrganizationScope } from 'app/modules/organization';
 import { useTranslation } from 'next-i18next';
+import { Parse } from 'parse';
 import { useState } from 'react';
 
+import formRecordsQuery from '../../_utils/formRecordsQuery';
 import styles from './index.module.scss';
 
 function ExpandableTableRowDetail({ row, surveyingOrganization, offersResearch }) {
   const { t } = useTranslation('common');
   const [count, setCount] = useState(0);
+  // A failed count must not read as "0 collected": that false zero is the
+  // report this view was fixed for.
+  const [countFailed, setCountFailed] = useState(false);
 
-  const { objectId } = row;
-
+  // The same query the record list runs, so the two never disagree. It used
+  // to ask FormResults for every card: Vitals read 0 with 14,799 collected.
   const getCount = async () => {
-    const asynCount = await customMultiParamCountService('FormResults', {
-      formSpecificationsId: objectId,
-      surveyingOrganization,
-    });
-
-    setCount(asynCount);
+    try {
+      const scope = await loadOrganizationScope(Parse, surveyingOrganization);
+      const query = formRecordsQuery(Parse, row, scope);
+      setCount(query ? await query.count() : 0);
+      setCountFailed(false);
+    } catch {
+      setCountFailed(true);
+    }
   };
 
   return (
     <div className={styles.rowDetail}>
       <Stack spacing="extraLarge" isWrapDisabled>
-        <Text text={t('form_manager_forms_collected', { count })} element="h3" />
+        {countFailed ? (
+          <p role="alert">{t('form_manager_records_error')}</p>
+        ) : (
+          <Text text={t('form_manager_forms_collected', { count })} element="h3" />
+        )}
         <Button text={t('action_refresh')} isSmall onClick={getCount} />
       </Stack>
       {/* Said in the open rather than in a hover tooltip, which keyboard and

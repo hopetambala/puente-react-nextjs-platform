@@ -6,28 +6,14 @@ import { Parse } from 'parse';
 import { useEffect, useMemo, useState } from 'react';
 import { isArray } from 'underscore';
 
+import { PUENTE_FORM_CLASSES } from './_utils/formRecordsQuery';
 import styles from './index.module.scss';
 import RecordsTable from './RecordsTable';
 import Table from './Table';
 
-const puenteConfig = [
-  {
-    name: 'SurveyData',
-    description: '',
-  },
-  {
-    name: 'HistoryEnvironmentalHealth',
-    description: '',
-  },
-  {
-    name: 'Vitals',
-    description: '',
-  },
-  {
-    name: 'EvaluationMedical',
-    description: '',
-  },
-];
+// Built from the classes the record query reads, so a card can never name a
+// class its count and record list do not know how to scope.
+const puenteConfig = PUENTE_FORM_CLASSES.map((name) => ({ name, description: '' }));
 
 function FormManager({ context, router, user }) {
   const { t } = useTranslation('common');
@@ -165,7 +151,7 @@ function FormManager({ context, router, user }) {
               {t('form_manager_back')}
             </button>
           </div>
-          <RecordsTable form={selectedForm} />
+          <RecordsTable form={selectedForm} organization={organization} />
         </div>
       ) : (
         <>
