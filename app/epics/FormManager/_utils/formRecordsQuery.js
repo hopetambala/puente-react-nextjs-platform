@@ -24,7 +24,13 @@ export const PUENTE_FORM_CLASSES = [
 ];
 
 export default function formRecordsQuery(Parse, form, organizationValues) {
-  if (!form || !Array.isArray(organizationValues) || organizationValues.length === 0) {
+  // Blank values never scope anything. loadOrganizationScope returns [''] for
+  // an account with no organization, and the internal-test bucket has '' among
+  // its aliases: scoping on it hands blank accounts records that are not theirs.
+  const scope = Array.isArray(organizationValues)
+    ? organizationValues.filter((v) => typeof v === 'string' && v.trim() !== '')
+    : [];
+  if (!form || scope.length === 0) {
     return null;
   }
 
@@ -38,7 +44,7 @@ export default function formRecordsQuery(Parse, form, organizationValues) {
     return null;
   }
 
-  query.containedIn('surveyingOrganization', organizationValues);
+  query.containedIn('surveyingOrganization', scope);
   query.descending('createdAt');
   return query;
 }

@@ -571,3 +571,24 @@ describe('Custom forms — the retry keeps the coordinator in place', () => {
     );
   });
 });
+
+// Every Puente card must name a class formRecordsQuery can read; a card it
+// cannot place shows nothing and counts 0. One list feeds both, so they
+// cannot drift.
+describe('Puente cards', () => {
+  it('offers exactly the classes the record query knows how to read', async () => {
+    const Table = require('app/epics/FormManager/Table');
+    const { default: formRecordsQuery, PUENTE_FORM_CLASSES } = jest.requireActual('app/epics/FormManager/_utils/formRecordsQuery');
+    renderManager([]);
+    await waitFor(() => expect(retrieveCustomData).toHaveBeenCalled());
+    const puenteCall = Table.mock.calls.find(([props]) => props.puenteForm);
+    const cards = puenteCall[0].data;
+    expect(cards.map((c) => c.name)).toEqual(PUENTE_FORM_CLASSES);
+    function Query(cls) { this.cls = cls; }
+    Query.prototype.containedIn = function chain() { return this; };
+    Query.prototype.descending = function chain() { return this; };
+    cards.forEach((card) => {
+      expect(formRecordsQuery({ Query }, card, ['test-org'])).not.toBeNull();
+    });
+  });
+});

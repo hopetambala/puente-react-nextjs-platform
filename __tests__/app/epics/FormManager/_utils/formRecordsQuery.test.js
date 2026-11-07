@@ -73,4 +73,19 @@ describe('formRecordsQuery: which records a form card shows and counts', () => {
     expect(formRecordsQuery(Parse, { name: 'Something else' }, HOF)).toBeNull();
     expect(made).toHaveLength(0);
   });
+
+  // A blank organization comes back from loadOrganizationScope as ['']. The
+  // internal-test bucket has '' among its aliases, so scoping on it would hand
+  // the 11 blank-organization accounts records that are not theirs.
+  it.each([[['']], [['  ']], [['', '  ']]])('builds nothing when every scope value is blank (%p)', (values) => {
+    const { Parse, made } = fakeParse();
+    expect(formRecordsQuery(Parse, { name: 'Vitals' }, values)).toBeNull();
+    expect(made).toHaveLength(0);
+  });
+
+  it('drops blank values but keeps the real ones', () => {
+    const { Parse } = fakeParse();
+    const q = formRecordsQuery(Parse, { name: 'Vitals' }, ['WOF', '', 'HOF']);
+    expect(q.calls).toContainEqual(['containedIn', 'surveyingOrganization', ['WOF', 'HOF']]);
+  });
 });

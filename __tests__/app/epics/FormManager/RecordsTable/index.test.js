@@ -450,3 +450,46 @@ describe('RecordsTable — Puente card props', () => {
     expect(propTypeErrors).toEqual([]);
   });
 });
+
+// A failed load is not an empty form. Saying "No records found" when the
+// request failed is the "nothing appeared" a coordinator reported, and on a
+// field connection the organization lookup this view now makes can fail too.
+describe('RecordsTable — failed load', () => {
+  function mockFailingThenWorking() {
+    const find = jest.fn()
+      .mockRejectedValueOnce(new Error('XMLHttpRequest failed'))
+      .mockResolvedValue([]);
+    Parse.Query.mockImplementation(() => ({
+      equalTo: jest.fn().mockReturnThis(),
+      containedIn: jest.fn().mockReturnThis(),
+      descending: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockReturnThis(),
+      skip: jest.fn().mockReturnThis(),
+      count: jest.fn().mockResolvedValue(0),
+      find,
+    }));
+    return find;
+  }
+
+  it('says the records did not load, not that there are none', async () => {
+    mockFailingThenWorking();
+    renderTable();
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('form_manager_records_error'));
+    expect(screen.queryByTestId('empty-state')).not.toBeInTheDocument();
+  });
+
+  it('says so when the organization lookup fails', async () => {
+    mockFailingThenWorking();
+    mockScope.mockRejectedValueOnce(new Error('offline'));
+    renderTable();
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('form_manager_records_error'));
+  });
+
+  it('loads again from "Try again"', async () => {
+    const find = mockFailingThenWorking();
+    renderTable();
+    fireEvent.click(await screen.findByRole('button', { name: 'form_manager_retry' }));
+    await waitFor(() => expect(screen.getByTestId('empty-state')).toBeInTheDocument());
+    expect(find).toHaveBeenCalledTimes(2);
+  });
+});

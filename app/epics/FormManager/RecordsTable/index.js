@@ -26,12 +26,17 @@ function RecordsTable({ form, organization }) {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(true);
+  // A failed load is not an empty form: "No records found" after a failed
+  // request reads as "my data is gone". `attempt` re-runs the fetch on retry.
+  const [failed, setFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
 
     const fetchRecords = async () => {
       setLoading(true);
+      setFailed(false);
       try {
         const scope = await loadOrganizationScope(Parse, organization);
         const query = formRecordsQuery(Parse, form, scope);
@@ -54,6 +59,8 @@ function RecordsTable({ form, organization }) {
           setRecords(results);
           setTotal(count);
         }
+      } catch {
+        if (!cancelled) setFailed(true);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -64,7 +71,7 @@ function RecordsTable({ form, organization }) {
     return () => {
       cancelled = true;
     };
-  }, [form.objectId, form.name, organization, page]);
+  }, [form.objectId, form.name, organization, page, attempt]);
 
   const start = page * PAGE_SIZE + 1;
   const end = Math.min(start + PAGE_SIZE - 1, total);
@@ -73,6 +80,19 @@ function RecordsTable({ form, organization }) {
     return (
       <div className={styles.spinnerWrap}>
         <Spinner />
+      </div>
+    );
+  }
+
+  if (failed) {
+    return (
+      // role="alert": the spinner disappearing is the only other cue.
+      <div role="alert" className="cl-dlite-text-center cl-dlite-sem-py-xxl cl-dlite-sem-px-lg">
+        <p>{t('form_manager_records_error')}</p>
+        <p>{t('form_manager_custom_forms_error_sub')}</p>
+        <button type="button" className={styles.pageBtn} onClick={() => setAttempt((n) => n + 1)}>
+          {t('form_manager_retry')}
+        </button>
       </div>
     );
   }

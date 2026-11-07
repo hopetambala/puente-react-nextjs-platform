@@ -344,6 +344,7 @@
   "form_manager_col_record": "Registro",
   "form_manager_col_water_source": "Fuente de agua",
   "form_manager_records_empty": "No se encontraron registros para este formulario.",
+  "form_manager_records_error": "Estos registros no se cargaron.",
   "form_manager_status_conflict": "Conflicto",
   "form_manager_select_record": "Seleccionar el registro {{id}}",
   "form_manager_prev": "‹ Anterior",

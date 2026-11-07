@@ -148,3 +148,24 @@ describe('ExpandableTableRow — collected count', () => {
     expect(screen.getByText('form_manager_forms_collected(count=0)')).toBeInTheDocument();
   });
 });
+
+// "Forms collected: 0" after a failed count is the exact false zero this
+// fix exists to remove.
+describe('ExpandableTableRow — failed count', () => {
+  it('says the count did not load instead of showing 0', async () => {
+    mockScope.mockRejectedValueOnce(new Error('offline'));
+    render(
+      <table>
+        <tbody>
+          <ExpandableTableRow row={{ name: 'Vitals' }} surveyingOrganization="WOF">
+            <td>Vitals</td>
+          </ExpandableTableRow>
+        </tbody>
+      </table>,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'form_manager_expand_row' }));
+    fireEvent.click(screen.getByRole('button', { name: 'action_refresh' }));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('form_manager_records_error'));
+    expect(screen.queryByText('form_manager_forms_collected(count=0)')).not.toBeInTheDocument();
+  });
+});
