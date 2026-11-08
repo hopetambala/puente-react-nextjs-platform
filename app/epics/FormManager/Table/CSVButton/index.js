@@ -4,7 +4,9 @@ import offersResearchExport from 'app/modules/data-export/offersResearchExport';
 import {
     CustomData, EnvironmentalHealth, EvaluationMedical, SurveyData, Vitals,
 } from 'app/modules/data-export/puente';
+import { loadOrganizationIdentity } from 'app/modules/organization';
 import { useTranslation } from 'next-i18next';
+import { Parse } from 'parse';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -40,29 +42,27 @@ export default function CSVButtonWrapper({ form, surveyingOrganization, shortCod
 
   const offersResearch = offersResearchExport(form, shortCode);
 
-  // Prefer the shortCode path: it covers every string the organization's
-  // records carry. Verified in production — DR Missions exported 12 CSV lines
-  // by name and 623 by shortCode, because 611 of its records say "DRMT".
-  //
-  // Falls back to the organization name when there is no shortCode. 123 of 792
-  // accounts do not resolve to an organization and must still be able to
-  // export their own records.
-  const fetchCSVData = () => {
+  const fetchCSVData = async () => {
+    // A pending or failed lookup can leave shortCode unset. Verify the scope
+    // before using the legacy path, which only serves a single organization name.
+    const code = shortCode || (await loadOrganizationIdentity(
+      Parse, surveyingOrganization, { strict: true },
+    )).shortCode;
     if (customForm) {
-      return shortCode
-        ? CustomData.getSpecificRecordsByShortCode(shortCode, customFormId)
+      return code
+        ? CustomData.getSpecificRecordsByShortCode(code, customFormId)
         : CustomData.getSpecificRecordsByOrganization(surveyingOrganization, customFormId);
     }
     /**
      * This is a workaround for the SurveyData class, which has a different endpoint (v3)
      */
     if (name === 'SurveyData') {
-      return shortCode
-        ? SurveyData.getIdRecordByShortCode(shortCode)
+      return code
+        ? SurveyData.getIdRecordByShortCode(code)
         : SurveyData.getIdRecordByOrganization(surveyingOrganization);
     }
-    return shortCode
-      ? puenteMap[name].getRecordByShortCode(shortCode)
+    return code
+      ? puenteMap[name].getRecordByShortCode(code)
       : puenteMap[name].getRecordByOrganization(surveyingOrganization);
   };
 
