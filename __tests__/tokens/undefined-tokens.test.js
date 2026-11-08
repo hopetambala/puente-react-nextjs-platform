@@ -33,12 +33,6 @@ const SOURCE = /\.(css|scss|js|jsx|ts|tsx)$/;
  * delete this list.
  */
 const KNOWN_UNDEFINED = {
-  // Legacy pre-dlite names, never defined after the token migration.
-  '--color-neutral-400': 'controls.css',
-  '--color-surface-base': 'FormManager',
-  '--color-text-secondary': 'FormManager, FormMarketplace, form-manager page',
-  '--radius-m': 'panel',
-  '--radius-s': 'FormManager RecordsTable',
   // The toast palette was never ported. PR 3 replaces react-toastify anyway.
   '--color-toast-bg': 'toast',
   '--color-toast-button-active': 'toast',
@@ -60,14 +54,6 @@ const KNOWN_UNDEFINED = {
   '--color-toast-warning-button-hover': 'toast',
   '--color-toast-warning-icon': 'toast',
   '--color-toast-warning-text': 'toast',
-  // dlite names that do not exist in any published version.
-  '--tk-dlite-semantic-color-border-default': 'FormManager RecordsTable',
-  '--tk-dlite-semantic-color-neutral-100': 'FormManager',
-  '--tk-dlite-semantic-color-neutral-50': 'FormManager ExpandableTableRow',
-  '--tk-dlite-semantic-color-surface-hovered': 'FormManager RecordsTable',
-  '--tk-dlite-semantic-color-text-disabled': 'FormCreator Inspector',
-  '--tk-dlite-semantic-typography-size-lg': 'Billing',
-  '--tk-dlite-semantic-typography-size-sm': 'Billing',
 };
 
 const stripComments = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '');

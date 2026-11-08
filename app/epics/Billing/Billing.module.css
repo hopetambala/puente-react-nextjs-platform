@@ -22,7 +22,7 @@
 
 .total {
   font-family: var(--tk-dlite-semantic-typography-font-heading);
-  font-size: var(--tk-dlite-semantic-typography-size-lg);
+  font-size: var(--tk-dlite-semantic-typography-size-500);
   color: var(--tk-dlite-semantic-color-text-primary);
 }
 
@@ -51,7 +51,7 @@
 }
 
 .meta {
-  font-size: var(--tk-dlite-semantic-typography-size-sm);
+  font-size: var(--tk-dlite-semantic-typography-size-300);
   color: var(--tk-dlite-semantic-color-text-secondary);
 }
 
@@ -63,7 +63,7 @@
 /* Age is the signal, so it is the only accent on the surface. */
 .overdue {
   color: var(--tk-dlite-semantic-color-feedback-danger);
-  font-size: var(--tk-dlite-semantic-typography-size-sm);
+  font-size: var(--tk-dlite-semantic-typography-size-300);
 }
 
 .unavailable {

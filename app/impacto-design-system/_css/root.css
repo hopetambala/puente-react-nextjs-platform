@@ -26,7 +26,6 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
   font-family: var(--font-family);
   font-weight: var(--font-weight-regular);
   font-size: var(--font-size-body);
@@ -38,10 +37,53 @@ body {
   min-height: 100%;
 }
 
+/* No `width: 100vw` / `height: 100vh` and no `overflow-x: hidden` here.
+   100vw is wider than the page whenever a vertical scrollbar takes space, and
+   the hidden overflow then clipped whatever stuck out, including controls a
+   phone user could no longer reach (WCAG 1.4.10). Layouts must fit instead;
+   the responsive-a11y sweep fails any element past the viewport edge. */
 body {
-  width: 100vw;
-  height: 100vh;
   margin: 0;
+}
+
+/* ── Focus ────────────────────────────────────────────────────────────────
+   One visible ring for every focusable element, keyboard-only via
+   :focus-visible, and a solid colour that clears 3:1 against the page
+   (WCAG 2.4.7, 2.4.11, 1.4.11). Components don't restyle focus: they inherit
+   this. */
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* ── Motion ───────────────────────────────────────────────────────────────
+   Honour the OS "reduce motion" setting everywhere at once (WCAG 2.3.3).
+   `!important` is the point: it has to beat every component's own
+   transition and animation, whatever their selector specificity. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Visually hidden, still announced ─────────────────────────────────────
+   For text that screen readers need and sighted users get from context,
+   like a page h1 the layout already shows visually. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 h1 {
@@ -132,16 +174,34 @@ textarea::-webkit-input-placeholder {
   color: var(--color-text-placeholder);
 }
 
-a {
+/* Links are underlined so they don't rely on colour alone (WCAG 1.4.1).
+   Navigation, buttons styled as links and whole-row links opt out in their
+   own module, where their shape already says "this is clickable".
+
+   `body a`, not `a`: dlite's reset.css is imported after this file and sets
+   `a { color: inherit; text-decoration: inherit }`, which silently won and
+   left every link the colour of its surrounding text. Two type selectors beat
+   the reset's one but still lose to any component class (.navItem etc.). */
+body a {
   color: var(--color-link);
   cursor: pointer;
-  text-decoration: none;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
 }
 
-a:hover {
+body a:hover {
   color: var(--color-link-hover);
-  transition: color 0.3s;
-  text-decoration: none;
+  transition: color var(--tk-dlite-semantic-duration-fast) ease-out;
+}
+
+/* iOS zooms the page when a focused field's text is under 16px, and the
+   page then stays zoomed. Touch screens get at least 1rem. */
+@media (pointer: coarse) {
+  input,
+  select,
+  textarea {
+    font-size: max(1rem, var(--font-size-body));
+  }
 }
 
 img {

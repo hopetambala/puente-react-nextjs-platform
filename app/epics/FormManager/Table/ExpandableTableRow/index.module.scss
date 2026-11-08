@@ -26,18 +26,18 @@
   border: none;
   border-radius: var(--border-radius-m);
   background: transparent;
-  color: var(--color-text-secondary);
+  color: var(--tk-dlite-semantic-color-text-secondary);
   font-size: 10px;
   cursor: pointer;
   transition: background var(--duration-fast) ease-out;
 }
 
 .expandBtn:hover {
-  background: var(--tk-dlite-semantic-color-neutral-100);
+  background: var(--tk-dlite-semantic-color-background);
 }
 
 .detailRow {
-  background: var(--tk-dlite-semantic-color-neutral-50, var(--color-bg-light));
+  background: var(--tk-dlite-semantic-color-surface-base);
 }
 
 .detailRow td {

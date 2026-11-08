@@ -12,10 +12,9 @@
     "pages/forms/form-marketplace/": "PR 6 (form-marketplace)",
     "app/epics/DataAnalyticsManager/": "PR 6 (data-analysis)",
     "pages/data/": "PR 6 (data routes)",
-    "pages/index.module.scss": "PR 7 (landing page)",
-    "styles/landing-page/": "PR 7 (landing page; slick and animate.css go with the dead UI deps in PR 1b)"
+    "pages/index.module.scss": "PR 7 (landing page)"
   },
-  "total": 341,
+  "total": 275,
   "files": {
     "app/epics/DataAnalyticsManager/index.module.scss": {
       "no-empty-source": 1
@@ -100,16 +99,8 @@
       "declaration-property-unit-disallowed-list": 12,
       "declaration-property-value-disallowed-list": 1
     },
-    "app/impacto-design-system/_css/controls.css": {
-      "selector-pseudo-class-disallowed-list": 1
-    },
-    "app/impacto-design-system/_css/input.css": {
-      "declaration-property-value-disallowed-list": 1,
-      "selector-pseudo-class-disallowed-list": 1
-    },
     "app/impacto-design-system/_css/root.css": {
-      "declaration-property-value-allowed-list": 1,
-      "declaration-property-value-disallowed-list": 1
+      "declaration-property-value-allowed-list": 1
     },
     "app/impacto-design-system/_css/variables.css": {
       "declaration-block-no-duplicate-custom-properties": 4
@@ -197,33 +188,6 @@
       "declaration-property-unit-disallowed-list": 61,
       "declaration-property-value-allowed-list": 2,
       "function-disallowed-list": 17
-    },
-    "styles/landing-page/animate-extends.css": {
-      "keyframe-selector-notation": 2
-    },
-    "styles/landing-page/animate-slider.css": {
-      "declaration-no-important": 1,
-      "declaration-property-unit-disallowed-list": 6,
-      "declaration-property-value-allowed-list": 1,
-      "declaration-property-value-disallowed-list": 1,
-      "function-disallowed-list": 3
-    },
-    "styles/landing-page/hamburger-menu.css": {
-      "declaration-no-important": 11
-    },
-    "styles/landing-page/slick/slick-theme.css": {
-      "color-named": 3,
-      "color-no-hex": 1,
-      "declaration-property-unit-disallowed-list": 2,
-      "declaration-property-value-disallowed-list": 4,
-      "font-family-no-missing-generic-family-keyword": 2,
-      "selector-pseudo-class-disallowed-list": 6,
-      "selector-pseudo-element-colon-notation": 14
-    },
-    "styles/landing-page/slick/slick.css": {
-      "declaration-property-value-disallowed-list": 1,
-      "selector-pseudo-class-disallowed-list": 1,
-      "selector-pseudo-element-colon-notation": 3
     }
   }
 }

@@ -36,6 +36,7 @@ common,continue,Continue,Continuar,Kontinye,,Collect uses accountSettings.delete
 common,coverage_empty,No community has synced yet,Ninguna comunidad se ha sincronizado todavía,Okenn kominote poko senkronize,,
 common,coverage_empty_sub,Communities appear here as field staff sync from the mobile app.,Las comunidades aparecen aquí a medida que el personal de campo sincroniza desde la aplicación móvil.,Kominote yo parèt isit la lè anplwaye sou teren an senkronize depi aplikasyon mobil la.,,
 common,coverage_more,{{count}} more communities not shown.,{{count}} comunidades más no se muestran.,{{count}} lòt kominote yo pa montre.,,
+common,coverage_more_one,{{count}} more community not shown.,{{count}} comunidad más no se muestra.,{{count}} lòt kominote yo pa montre.,,"Singular, shown when the count is 1. Creole keeps the plural wording because the noun does not change for number: please confirm it reads naturally with ""1""."
 common,coverage_quiet_days,quiet {{count}}d,inactiva {{count}} d,trankil {{count}} j,,
 common,coverage_quiet_months,quiet {{count}}mo,inactiva {{count}} m,trankil {{count}} mwa,,
 common,coverage_quiet_today,synced today,sincronizado hoy,senkronize jodi a,,
@@ -43,6 +44,7 @@ common,coverage_quiet_years,quiet {{count}}y,inactiva {{count}} a,trankil {{coun
 common,coverage_sampled,"Figures reduced from the most recent 1,000 records, so communities beyond that are not counted.","Las cifras se derivan de los 1.000 registros más recientes, por lo que no se cuentan las comunidades fuera de ese rango.","Chif yo soti nan 1,000 dosye ki pi resan yo, kidonk kominote ki depase sa yo pa konte.",,
 common,coverage_synced_days,synced {{count}}d ago,sincronizado hace {{count}} d,senkronize gen {{count}} j,,
 common,coverage_unattributed,{{count}} records had no community recorded.,{{count}} registros no tenían ninguna comunidad registrada.,{{count}} dosye pa te gen okenn kominote anrejistre.,,
+common,coverage_unattributed_one,{{count}} record had no community recorded.,{{count}} registro no tenía ninguna comunidad registrada.,{{count}} dosye pa te gen okenn kominote anrejistre.,,"Singular, shown when the count is 1. Creole keeps the plural wording because the noun does not change for number: please confirm it reads naturally with ""1""."
 common,create_account,Create account,Crear cuenta,Kreye yon kont,,
 common,dashboard_coverage,Community coverage,Cobertura comunitaria,Kouvèti kominote a,,
 common,dashboard_eyebrow_today,Today,Hoy,Jodi a,,Collect uses home.today
@@ -177,16 +179,22 @@ common,sync_ribbon_synced,Synced,Sincronizado,Senkronize,,
 common,triage_clear,Nothing needs attention,No hay nada que requiera atención,Anyen pa bezwen atansyon,,
 common,triage_clear_sub,Every record that synced passed the quality checks.,Todos los registros sincronizados pasaron los controles de calidad.,Tout dosye ki senkronize yo pase kontwòl kalite yo.,,
 common,triage_estimated,estimated,estimado,estime,,
-common,triage_form_drift,form renamed since its answers were collected,formulario renombrado desde que se recolectaron sus respuestas,fòm yo chanje non depi yo te kolekte repons yo,,
-common,triage_form_drift_approx,form may have been renamed since its answers were collected,el formulario podría haberse renombrado desde que se recolectaron sus respuestas,fòm nan ka chanje non depi yo te kolekte repons yo,,
+common,triage_form_drift,forms renamed since their answers were collected,formularios renombrados desde que se recolectaron sus respuestas,fòm yo chanje non depi yo te kolekte repons yo,,Now the plural form (count ≠ 1); the singular moved to the _one key.
+common,triage_form_drift_one,form renamed since its answers were collected,formulario renombrado desde que se recolectaron sus respuestas,fòm yo chanje non depi yo te kolekte repons yo,,"Singular, shown when the count is 1. Creole keeps the plural wording because the noun does not change for number: please confirm it reads naturally with ""1""."
+common,triage_form_drift_approx,forms may have been renamed since their answers were collected,los formularios podrían haberse renombrado desde que se recolectaron sus respuestas,fòm nan ka chanje non depi yo te kolekte repons yo,,Now the plural form (count ≠ 1); the singular moved to the _one key.
+common,triage_form_drift_approx_one,form may have been renamed since its answers were collected,el formulario podría haberse renombrado desde que se recolectaron sus respuestas,fòm nan ka chanje non depi yo te kolekte repons yo,,"Singular, shown when the count is 1. Creole keeps the plural wording because the noun does not change for number: please confirm it reads naturally with ""1""."
 common,triage_missing_key_fields,records missing key fields,registros a los que les faltan campos clave,dosye ki manke chan kle,,
+common,triage_missing_key_fields_one,record missing key fields,registro al que le faltan campos clave,dosye ki manke chan kle,,"Singular, shown when the count is 1. Creole keeps the plural wording because the noun does not change for number: please confirm it reads naturally with ""1""."
 common,triage_missing_key_fields_approx,records may be missing key fields,registros a los que podrían faltarles campos clave,dosye ki ka manke chan kle,,
+common,triage_missing_key_fields_approx_one,record may be missing key fields,registro al que podrían faltarle campos clave,dosye ki ka manke chan kle,,"Singular, shown when the count is 1. Creole keeps the plural wording because the noun does not change for number: please confirm it reads naturally with ""1""."
 common,triage_no_records,No records yet,Todavía no hay registros,Pa gen dosye ankò,,
 common,triage_no_records_sub,Records appear here when field staff sync from the mobile app.,Los registros aparecen aquí cuando el personal de campo sincroniza desde la aplicación móvil.,Dosye yo parèt isit la lè anplwaye sou teren an senkronize depi aplikasyon mobil la.,,
 common,triage_partial,Nothing found — but not everything could be checked,"No se encontró nada, pero no se pudo verificar todo",Nou pa jwenn anyen — men nou pa t ka tcheke tout bagay,,
 common,triage_partial_sub,"Treat this as incomplete, not as a clean bill of health.","Considera esto como incompleto, no como un resultado sin problemas.","Konsidere sa a kòm enkonplè, pa kòm yon rezilta san pwoblèm.",,
 common,triage_possible_duplicates,possible duplicate households,posibles hogares duplicados,kay ki ka an doub,,
+common,triage_possible_duplicates_one,possible duplicate household,posible hogar duplicado,kay ki ka an doub,,"Singular, shown when the count is 1. Creole keeps the plural wording because the noun does not change for number: please confirm it reads naturally with ""1""."
 common,triage_possible_duplicates_approx,possible duplicate households,posibles hogares duplicados,kay ki ka an doub,,
+common,triage_possible_duplicates_approx_one,possible duplicate household,posible hogar duplicado,kay ki ka an doub,,"Singular, shown when the count is 1. Creole keeps the plural wording because the noun does not change for number: please confirm it reads naturally with ""1""."
 common,triage_severity_critical,Blocks exports,Bloquea las exportaciones,Bloke ekspòtasyon yo,,
 common,triage_severity_high,Needs repair,Necesita reparación,Bezwen reparasyon,,
 common,triage_severity_medium,Fixable,Corregible,Ka repare,,
@@ -196,7 +204,9 @@ common,triage_unavailable_missing-key-fields,missing key fields,campos clave fal
 common,triage_unavailable_possible-duplicates,duplicate households,hogares duplicados,kay an doub,,
 common,triage_unavailable_unresolved-parent,unresolved household links,vínculos de hogar sin resolver,lyen kay ki poko rezoud,,
 common,triage_unresolved_parent,records with an unresolved household link,registros con un vínculo de hogar sin resolver,dosye ki gen yon lyen kay ki poko rezoud,,
+common,triage_unresolved_parent_one,record with an unresolved household link,registro con un vínculo de hogar sin resolver,dosye ki gen yon lyen kay ki poko rezoud,,"Singular, shown when the count is 1. Creole keeps the plural wording because the noun does not change for number: please confirm it reads naturally with ""1""."
 common,triage_unresolved_parent_approx,records may have an unresolved household link,registros podrían tener un vínculo de hogar sin resolver,dosye ki ka gen yon lyen kay ki poko rezoud,,
+common,triage_unresolved_parent_approx_one,record may have an unresolved household link,registro que podría tener un vínculo de hogar sin resolver,dosye ki ka gen yon lyen kay ki poko rezoud,,"Singular, shown when the count is 1. Creole keeps the plural wording because the noun does not change for number: please confirm it reads naturally with ""1""."
 common,your_forms,Your forms,Tus formularios,Fòm ou yo,,
 common,export_empty,This form has no records to export yet.,Este formulario todavía no tiene registros para exportar.,Fòm sa a poko gen okenn dosye pou ekspòte.,,
 common,export_failed,The export could not be completed. Please try again.,"No se pudo completar la descarga. Por favor, inténtelo de nuevo.",Nou pa t kapab fini ekspòtasyon an. Tanpri eseye ankò.,,
@@ -446,11 +456,13 @@ saas-landing,pricing_title,Pricing & Plan,Precios y planes,Pri ak plan,,
 saas-landing,see_detail,See Detail,Ver detalles,Gade detay,,
 saas-landing,testi_title,What Our Customers,Lo que dicen nuestros clientes,Sa kliyan nou yo di,,
 saas-landing,testi_titlestrong,Testimonial,Testimonios,Temwayaj,,
-common,triage_count_of_total,"{{count, number}} of {{total, number}}","{{count, number}} de {{total, number}}","{{count, number}} sou {{total, number}}",,
-common,triage_count_of_unknown,"{{count, number}} of an unknown total","{{count, number}} de un total desconocido","{{count, number}} sou yon total nou pa konnen",,
+common,triage_count_of_total,"{{count}} of {{total, number}}","{{count}} de {{total, number}}","{{count}} sou {{total, number}}",,
+common,triage_count_of_unknown,{{count}} of an unknown total,{{count}} de un total desconocido,{{count}} sou yon total nou pa konnen,,
 common,coverage_denominator,"of the {{count, number}} most recently synced records","de los {{count, number}} registros sincronizados más recientes","nan {{count, number}} dosye ki pi resan yo senkronize",,
+common,coverage_denominator_one,"of the {{count, number}} most recently synced record","del {{count, number}} registro sincronizado más reciente","nan {{count, number}} dosye ki pi resan yo senkronize",,"Singular, shown when the count is 1. Creole keeps the plural wording because the noun does not change for number: please confirm it reads naturally with ""1""."
 common,context_records_total,records synced in total,registros sincronizados en total,dosye senkronize antou,,
 common,context_accounts_synced_of,"accounts · sampled from the last {{count, number}} records synced, not people who collected","cuentas · muestreado de los {{count, number}} registros más recientes sincronizados; cuenta las cuentas que sincronizaron, no las personas que recolectaron","kont · chwazi nan {{count, number}} dosye ki pi resan yo senkronize; li konte kont ki senkronize, pa moun ki te kolekte",,
+common,context_accounts_synced_of_one,"accounts · sampled from the last {{count, number}} record synced, not people who collected","cuentas · muestreado del {{count, number}} registro sincronizado más reciente; cuenta las cuentas que sincronizaron, no las personas que recolectaron","kont · chwazi nan {{count, number}} dosye ki pi resan yo senkronize; li konte kont ki senkronize, pa moun ki te kolekte",,"Singular, shown when the count is 1. Creole keeps the plural wording because the noun does not change for number: please confirm it reads naturally with ""1""."
 common,number_value,"{{value, number}}","{{value, number}}","{{value, number}}",,number format only — ICU renders each locale's grouping separator; no prose to translate
 common,export_research_button,Export research file,Exportar archivo de investigación,Ekspòte fichye rechèch,,Research export (vision clinic study)
 common,export_full_records_button,Export full records,Exportar registros completos,Ekspòte dosye konplè yo,,Research export (vision clinic study)

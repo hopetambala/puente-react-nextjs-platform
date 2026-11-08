@@ -178,7 +178,7 @@
 }
 
 .grip {
-  color: var(--tk-dlite-semantic-color-text-disabled);
+  color: var(--tk-dlite-semantic-color-text-tertiary);
   font-size: 12px;
   cursor: grab;
   user-select: none;

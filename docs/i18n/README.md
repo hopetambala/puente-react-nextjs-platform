@@ -78,7 +78,7 @@ overlap is greetings and buttons.
 
 ## Reviewing
 
-[`review-worksheet.csv`](./review-worksheet.csv) — 454 rows, English alongside
+[`review-worksheet.csv`](./review-worksheet.csv) — 473 rows, English alongside
 both translations, with a `reviewed_by` column and a `notes` column flagging
 the 19 strings where Collect already has a human translation of the same
 English (plus one number-format row with no prose to translate).

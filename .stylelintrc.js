@@ -115,6 +115,9 @@ module.exports = {
           '/^(height|min-height|max-height|block-size|min-block-size|max-block-size)$/': ['/\\b100vh\\b/'],
         }],
         'selector-pseudo-class-disallowed-list': null,
+        // The global prefers-reduced-motion reset has to beat every
+        // component's own transition, whatever its specificity.
+        'declaration-no-important': null,
       },
     },
     {

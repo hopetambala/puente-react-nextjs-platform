@@ -1,18 +1,19 @@
-import { red } from '@material-ui/core/colors';
 import { createTheme } from '@material-ui/core/styles';
 
-// MUI theme aligned with dlite Puente brand tokens.
-// MUI 4 requires raw hex values (no CSS vars), so these mirror the dlite primitives.
+// MUI theme aligned with dlite Puente brand tokens. Temporary: Material-UI is
+// removed from Manage by the responsive/a11y overhaul (docs/responsive-a11y-overhaul.md),
+// and this file goes with it. Until then MUI 4 needs raw hex (no CSS vars), so
+// these mirror the dlite values that pass WCAG AA contrast.
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#3D80FC', // --tk-dlite-primitive-color-blue-600 (Puente brand)
+      main: '#1B5FDB', // blue-600, dlite 0.4.0 action-primary: white text 5.67:1 (the old #3D80FC was 3.69:1)
     },
     secondary: {
       main: '#FFE680', // --tk-dlite-primitive-color-yellow-200 (Puente accent)
     },
     error: {
-      main: red.A400, // --tk-dlite-semantic-color-feedback-danger
+      main: '#BF3813', // --tk-dlite-semantic-color-feedback-danger: 5.5:1 (MUI red.A400 was 3.85:1)
     },
     background: {
       default: '#F7F7F7', // --tk-dlite-primitive-color-neutral-100

@@ -97,7 +97,17 @@
   /* FOCUS STATE
   /* =============================================================== */
 
-  --focus-glow: 0 0 0 3px var(--color-focus-glow);
+  /* A solid ring, not the old 50%-alpha glow (1.85:1, failed WCAG 1.4.11).
+     action-primary-active is blue-700 now and blue-800 in dlite 0.4.0; both
+     clear 3:1 on every surface. The 0.4.0 bump points these at
+     --tk-dlite-semantic-color-focus-ring / -focus-ring-width / -offset. */
+  --focus-ring-color: var(--tk-dlite-semantic-color-action-primary-active);
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+  --focus-ring: var(--focus-ring-width) solid var(--focus-ring-color);
+  /* Kept for components that still draw focus with box-shadow (PR 3 moves
+     them to the global :focus-visible ring). Now the same solid colour. */
+  --focus-glow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
 
   /* STACKING ORDER
   /* =============================================================== */
@@ -339,7 +349,9 @@
   /* Text */
   --color-link: var(--tk-dlite-semantic-color-action-primary);
   --color-link-active: var(--tk-dlite-semantic-color-action-primary-active);
-  --color-link-hover: var(--tk-dlite-primitive-color-blue-500);
+  /* Hover goes darker, never back to the lighter blue the old primary was
+     (which fails contrast once action-primary is blue-600). */
+  --color-link-hover: var(--tk-dlite-semantic-color-action-primary-active);
   --color-text: var(--tk-dlite-semantic-color-text-primary);
   --color-text-light: var(--tk-dlite-primitive-color-neutral-700);
   --color-text-placeholder: var(--tk-dlite-semantic-color-text-secondary);
@@ -363,7 +375,6 @@
   --color-input-border-error: var(--tk-dlite-semantic-color-feedback-danger);
 
   /* Focus */
-  --color-focus-glow: rgba(61, 128, 252, 0.5);
 
   /* Buttons: Default */
   --color-button-default: var(--tk-dlite-semantic-color-surface-base);
@@ -376,7 +387,7 @@
 
   /* Buttons: Primary */
   --color-button-primary: var(--tk-dlite-semantic-color-action-primary);
-  --color-button-primary-hover: var(--tk-dlite-primitive-color-blue-500);
+  --color-button-primary-hover: var(--tk-dlite-semantic-color-action-primary-active);
   --color-button-primary-active: var(--tk-dlite-semantic-color-action-primary-active);
   --color-button-primary-icon: var(--tk-dlite-primitive-color-blue-100);
   --color-button-primary-text: var(--tk-dlite-semantic-color-text-on-primary);
@@ -608,7 +619,6 @@
   --color-input-border-error: var(--hex-red-600);
 
   /* Focus */
-  --color-focus-glow: rgba(26, 96, 232, 0.8);
 
   /* Buttons: Default */
   --color-button-default: var(--hex-neutral-800);

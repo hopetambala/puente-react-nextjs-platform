@@ -1,7 +1,7 @@
 .panel {
   background: var(--tk-dlite-semantic-color-surface-base);
   border: 1px solid var(--tk-dlite-semantic-color-border);
-  border-radius: var(--radius-m);
+  border-radius: var(--tk-dlite-semantic-border-radius-md);
   overflow: hidden;
 }
 
