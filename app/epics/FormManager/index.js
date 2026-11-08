@@ -41,16 +41,15 @@ function FormManager({ context, router, user }) {
   // later, on the slow connection that caused the failure. Measured, not guessed.
   const [isRetrying, setIsRetrying] = useState(false);
 
-  // The CSV exporter keys on shortCode so an export covers every string the
-  // organization's records carry. Null until resolved, and null for an
-  // organization we do not recognise — CSVButton falls back to the legacy
-  // single-name path in both cases rather than exporting nothing.
-  const [shortCode, setShortCode] = useState(null);
+  // Resolve early so research exports can be shown as soon as forms load.
+  // CSVButton checks the scope itself if Export is clicked before this finishes.
+  const [exportIdentity, setExportIdentity] = useState(null);
+  const shortCode = exportIdentity?.organization === organization ? exportIdentity.shortCode : null;
   useEffect(() => {
     if (!organization) return undefined;
     let ignore = false;
     loadOrganizationIdentity(Parse, organization).then((identity) => {
-      if (!ignore) setShortCode(identity.shortCode);
+      if (!ignore) setExportIdentity({ organization, shortCode: identity.shortCode });
     });
     return () => { ignore = true; };
   }, [organization]);

@@ -245,8 +245,11 @@ export function organizationMatchValues(name, organizations = []) {
  * names contain commas ("Beahan, Cole and Wolf" is a real alias), so they
  * cannot be passed as a delimited path segment.
  */
-export async function loadOrganizationIdentity(Parse, organization) {
+export async function loadOrganizationIdentity(Parse, organization, { strict = false } = {}) {
   try {
+    if (strict && !normalizeOrganizationName(organization)) {
+      throw new Error('An organization is required for export.');
+    }
     const query = new Parse.Query('Organization');
     query.select('name', 'shortCode', 'aliases', 'active');
     query.limit(ORGANIZATION_FETCH_LIMIT);
@@ -258,22 +261,18 @@ export async function loadOrganizationIdentity(Parse, organization) {
       aliases: r.get('aliases') || [],
     }));
 
-    let resolved;
-    try {
-      resolved = resolveOrganization({ name: organization }, organizations);
-    } catch (error) {
-      resolved = { status: 'unresolved' };
+    const resolved = resolveOrganization({ name: organization }, organizations);
+    const shortCode = resolved.organization?.shortCode || null;
+    if (strict && resolved.status === 'resolved' && !shortCode) {
+      throw new Error('The organization has no short code.');
     }
 
     return {
       values: organizationMatchValues(organization, organizations),
-      // Null when unrecognised, so callers fall back to the legacy
-      // single-string export path rather than exporting nothing.
-      shortCode: resolved.status === 'resolved'
-        ? resolved.organization.shortCode || null
-        : null,
+      shortCode,
     };
   } catch (error) {
+    if (strict) throw error;
     return { values: [organization], shortCode: null };
   }
 }

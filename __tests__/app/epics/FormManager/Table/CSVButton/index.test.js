@@ -4,6 +4,17 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 const calls = [];
 let nextResponse = 'csv';
 const rec = (name) => (...args) => { calls.push([name, ...args]); return Promise.resolve(nextResponse); };
+const mockFindOrganizations = jest.fn();
+
+jest.mock('parse', () => ({
+  Parse: {
+    Query: jest.fn(() => ({
+      select: jest.fn(),
+      limit: jest.fn(),
+      find: mockFindOrganizations,
+    })),
+  },
+}));
 
 jest.mock('app/modules/data-export/puente', () => ({
   SurveyData: {
@@ -15,7 +26,11 @@ jest.mock('app/modules/data-export/puente', () => ({
     getSpecificRecordsByShortCode: (...a) => rec('Custom.byShortCode')(...a),
     getResearchRecordsByShortCode: (...a) => rec('Custom.research')(...a),
   },
-  EnvironmentalHealth: {}, EvaluationMedical: {}, Vitals: {},
+  Vitals: {
+    getRecordByOrganization: (...a) => rec('Vitals.byOrganization')(...a),
+    getRecordByShortCode: (...a) => rec('Vitals.byShortCode')(...a),
+  },
+  EnvironmentalHealth: {}, EvaluationMedical: {},
 }));
 
 jest.mock('app/impacto-design-system/button', () => ({
@@ -36,7 +51,49 @@ jest.mock('next-i18next', () => ({ useTranslation: () => ({ t: (key) => key }) }
 const CSVButton = require('app/epics/FormManager/Table/CSVButton/index').default;
 
 describe('CSVButton export path', () => {
-  beforeEach(() => { calls.length = 0; nextResponse = 'csv'; });
+  const wof = {
+    id: 'wof-id',
+    get: (key) => ({ name: 'WOF', shortCode: 'wof', aliases: ['HOF'] })[key],
+  };
+
+  function clickHofVitalsExport() {
+    render(<CSVButton
+      form={{ name: 'Vitals', objectId: 'vitals' }}
+      surveyingOrganization="HOF"
+      shortCode={null}
+    />);
+    fireEvent.click(screen.getByRole('button'));
+  }
+
+  beforeEach(() => {
+    calls.length = 0;
+    toastCalls.length = 0;
+    nextResponse = 'csv';
+    mockFindOrganizations.mockReset().mockResolvedValue([]);
+  });
+
+  it('waits for the alias lookup before exporting HOF vitals', async () => {
+    let resolveLookup;
+    mockFindOrganizations.mockReturnValue(new Promise((resolve) => { resolveLookup = resolve; }));
+
+    clickHofVitalsExport();
+    expect(calls).toEqual([]);
+
+    resolveLookup([wof]);
+    await waitFor(() => expect(calls).toEqual([['Vitals.byShortCode', 'wof']]));
+  });
+
+  it('shows a retryable failure when the alias lookup fails and succeeds on retry', async () => {
+    mockFindOrganizations.mockRejectedValueOnce(new Error('Connection unavailable'))
+      .mockResolvedValueOnce([wof]);
+
+    clickHofVitalsExport();
+    await waitFor(() => expect(toastCalls[0]?.props.text).toBe('export_failed'));
+    expect(calls).toEqual([]);
+
+    fireEvent.click(screen.getByRole('button'));
+    await waitFor(() => expect(calls).toEqual([['Vitals.byShortCode', 'wof']]));
+  });
 
   it('exports by shortCode when the organization is known', async () => {
     // The single-organization path returned 12 CSV lines for DR Missions where
