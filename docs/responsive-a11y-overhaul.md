@@ -1,6 +1,8 @@
 <!-- Tracker: https://claude.ai/artifact/VkMu3RXmunRPod4gceCGb7 (private Artifact; work items, owners, PRs, handoff log) -->
 
-> **Working on this?** Before you start, read the tracker linked above and this doc. Then claim your work item on the tracker by setting its status, session and branch. Before your session ends, update the row (status, PR URL, allowlist count, gallery link) and add a handoff entry to the `log` collection. The tracker splits PR 1 into **1a (test tooling and gate)**, which can start right away, and **1b (foundation)**, which waits for dlite 0.4.0 to publish.
+> **Working on this?** Before you start, read the tracker linked above and this doc. Then claim your work item on the tracker by setting its status and session. Before your session ends, update the row (status, allowlist count, gallery link) and add a handoff entry to the `log` collection.
+>
+> **One branch.** All Manage work for this overhaul lands on the single branch `feat/responsive-a11y`, in the worktree `.worktrees/manage-responsive-a11y`, as one PR against `master`. The phases below are commits and checkpoints on that branch, not separate PRs. Work them in order, and don't create other branches or worktrees for this overhaul. The only other branch is the token repo's, because it's a different repo. PR 1a (test tooling and gate) is done. PR 1b (foundation) waits on dlite 0.4.0 only for its token bump.
 
 # Manage overhaul: responsive layouts + WCAG 2.2 AA, built on style-dictionary-dlite
 
@@ -25,7 +27,7 @@ The goal is one responsive and accessible foundation, owned by the token package
 Decisions made with Hope:
 - The token contrast gate enforces **Puente only**. Other brands are untouched.
 - **Delete** the design-system code nobody uses.
-- Land the work as **stacked PRs by phase**.
+- Land all Manage work on **one branch, `feat/responsive-a11y`, as one PR**. Hope changed this from stacked PRs on 2026-11-07. The phases are ordered checkpoints on that branch.
 - **One design system.** dlite tokens + Impacto components only. Material-UI v4 (`core`, `icons`, `lab`, `pickers`), `@date-io`, `react-toastify` and `react-select` are removed. So are the dead UI dependencies (`@nivo/*`, `google-maps-react`, `react-slick`, `react-countup`, `react-anchor-link-smooth-scroll`, `animate.css`). The only third-party UI code left is behavior: `@popperjs/core` for positioning and `react-beautiful-dnd` for drag. Neither brings its own styling.
 - **All a11y tooling, in CI:** token contrast test, jest-axe, Playwright + axe responsive sweep, `jsx-a11y` strict, stylelint a11y rules, and Storybook `addon-a11y` + test-runner. Nothing is left as optional (see "A11y tooling stack").
 - **Screenshots drive UI polish and production readiness.** Every PR gets a screenshot matrix and an outside design critique before it's called done (see "Screenshot review loop").
@@ -89,15 +91,11 @@ Decisions made with Hope:
 3. **Session protocol.** Each work item runs in its own session, started from here or from the tracker. Each session:
    - reads the tracker and the plan doc first
    - marks its row in progress with its session id
-   - works in its own worktree on the stacked branch
+   - works in `.worktrees/manage-responsive-a11y` on `feat/responsive-a11y`, and never in parallel with another session on that branch
    - before ending, writes a handoff entry and updates status, PR URL and allowlist count
 
    Any later session can pick up from the tracker alone.
-4. **Parallelism, following the dependency graph:**
-   - Phase 0 and PR 1's test tooling (axe, stylelint, Storybook a11y, the e2e sweep and capture matrix) can start at the same time.
-   - PR 1's token bump waits for 0.4.0 to publish.
-   - PRs 2 and 3 are sequential.
-   - PRs 4, 5 and 6 run in parallel sessions after PR 3.
+4. **Order.** Phase 0 (token repo) ran alongside PR 1a. Everything on the Manage branch is sequential: 1b → 2 → 3 → 4 → 5 → 6 → 7. Only 1b's token bump waits for dlite 0.4.0 to publish.
    - PR 7 runs last.
 
 ## A11y tooling stack (all of it, all in CI; set up in PR 1, extended by each later PR)
@@ -132,7 +130,7 @@ Decisions made with Hope:
    - no console errors
    - `yarn build` passes
 
-## Manage work: stacked PRs off `master`
+## Manage work: one branch, `feat/responsive-a11y`, off `master`
 
 Work happens in a new worktree, `.worktrees/manage-responsive-a11y`. The main checkout has uncommitted, unrelated changes, which stay untouched. Add a `manage-responsive-a11y-worktree` entry to the workspace-root `.claude/launch.json` (port 3000), as the existing worktree entries do.
 
@@ -299,7 +297,7 @@ Fix each primitive once, to the systemic patterns, so routes inherit the fixes:
   - then start Phase 0 and PR 1's tooling half as separate sessions, each pointed at the tracker
 - TDD per PR: the failing jest-axe, behavior or e2e assertion comes first, then the fix.
 - Each PR is verified in the in-app browser at 375, 768 and 1440, with screenshots in the PR.
-- After PR 3 lands, PRs 4, 5 and 6 touch disjoint files. They can run as parallel sessions in their own worktrees, each stacked on PR 3.
+- PRs 4, 5 and 6 touch disjoint files, but they still run one after another on the one branch, so that only one session commits to it at a time.
 - Lint each changed file with `yarn eslint`, which includes `jsx-a11y`. No new suppressions.
 - Memory: `yarn build` breaks a running dev server, so restart the server before Playwright runs.
 
