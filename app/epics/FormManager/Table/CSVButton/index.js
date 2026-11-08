@@ -8,6 +8,9 @@ import { useTranslation } from 'next-i18next';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
+// U+FEFF, written as the bytes EF BB BF: how Excel recognises a UTF-8 CSV.
+const UTF8_BOM = '\uFEFF';
+
 function openWindow(dataurl, filename) {
   const link = document.createElement('a');
   link.href = dataurl;
@@ -78,7 +81,11 @@ export default function CSVButtonWrapper({ form, surveyingOrganization, shortCod
         toast(<Toast text={t('export_empty')} />);
         return;
       }
-      const blob = new Blob([CSVData], { type: 'text/csv' });
+      // The UTF-8 byte-order mark first: Windows Excel reads a CSV without it
+      // as Windows-1252, so "jiménez" opens as "jimÃ©nez". Coordinators open
+      // these files by double-click in Excel; their August spreadsheets had
+      // hundreds of garbled names and not one correct accent.
+      const blob = new Blob([UTF8_BOM, CSVData], { type: 'text/csv;charset=utf-8' });
       const csvUrl = window.URL.createObjectURL(blob);
       openWindow(csvUrl, filename);
     } catch (error) {
