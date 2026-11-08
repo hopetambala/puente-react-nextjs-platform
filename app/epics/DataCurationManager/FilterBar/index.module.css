@@ -51,7 +51,6 @@
 
 .searchInput {
   border: none;
-  outline: none;
   background: transparent;
   font-family: var(--font-family);
   font-size: 13px;
@@ -73,10 +72,8 @@
   color: var(--tk-dlite-semantic-color-text-primary);
   padding: 0 var(--tk-dlite-semantic-spacing-sm);
   cursor: pointer;
-  outline: none;
 }
 
 .filterSelect:focus-visible {
   border-color: var(--tk-dlite-semantic-color-action-primary);
-  box-shadow: var(--focus-glow);
 }

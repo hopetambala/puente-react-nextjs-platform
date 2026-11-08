@@ -100,14 +100,14 @@ a.card:hover {
 .elevated,
 .clickable:hover,
 .clickable:active,
-.clickable:focus,
+.clickable:focus-visible,
 .clickable.subtle:hover {
   box-shadow: var(--shadow-lv1);
 }
 
 .clickable.elevated:hover,
 .clickable.elevated:active,
-.clickable.elevated:focus {
+.clickable.elevated:focus-visible {
   box-shadow: var(--shadow-lv1-hover);
 }
 
@@ -158,8 +158,7 @@ a.card:hover {
 
 .clickable:hover,
 .clickable:active,
-.clickable:focus {
-  outline: none;
+.clickable:focus-visible {
   z-index: var(--z-focused);
 }
 

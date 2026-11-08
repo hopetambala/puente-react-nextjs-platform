@@ -72,10 +72,8 @@
 }
 
 .action:active,
-.action:focus {
+.action:focus-visible {
   border-radius: var(--border-radius-m);
-  box-shadow: var(--focus-glow);
-  outline: none;
 }
 
 /* Error Styles */

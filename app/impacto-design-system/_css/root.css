@@ -191,7 +191,7 @@ body a {
 
 body a:hover {
   color: var(--color-link-hover);
-  transition: color var(--tk-dlite-semantic-duration-fast) ease-out;
+  transition: color var(--tk-dlite-semantic-motion-duration-quick) ease-out;
 }
 
 /* iOS zooms the page when a focused field's text is under 16px, and the

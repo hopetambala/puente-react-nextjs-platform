@@ -35,12 +35,10 @@
 
 .button:active,
 .button:active:hover,
-.button:focus,
-.button:focus:hover {
+.button:focus-visible,
+.button:focus-visible:hover {
   background-color: var(--color-button-default-active);
   border-color: var(--color-button-default-active-border);
-  box-shadow: var(--focus-glow);
-  outline: none;
   transition: none;
   position: relative;
 }
@@ -118,8 +116,8 @@
   background-color: var(--color-button-primary-hover);
 }
 
-.primary:hover:focus,
-.primary:focus,
+.primary:hover:focus-visible,
+.primary:focus-visible,
 .primary:active {
   background-color: var(--color-button-primary-active) !important;
 }
@@ -143,8 +141,8 @@
   background-color: var(--color-button-danger-hover);
 }
 
-.danger:focus,
-.danger:focus:hover,
+.danger:focus-visible,
+.danger:focus-visible:hover,
 .danger:active .danger:active:hover {
   background-color: var(--color-button-danger-active) !important;
 }
@@ -187,15 +185,14 @@
   box-shadow: none;
 }
 
-.iconButton:focus,
+.iconButton:focus-visible,
 .iconButton:active {
   background-color: var(--color-button-icon-active);
   box-shadow: none;
-  outline: none;
 }
 
 .iconButton:hover .buttonIcon,
-.iconButton:focus .buttonIcon,
+.iconButton:focus-visible .buttonIcon,
 .iconButton:active .buttonIcon {
   color: var(--color-icon-hover);
 }
@@ -215,13 +212,13 @@
   background-color: var(--color-blue-bg);
 }
 
-.iconButton.primary:focus,
+.iconButton.primary:focus-visible,
 .iconButton.primary:active {
   background-color: var(--color-blue-bg-alt);
 }
 
 .iconButton.primary:hover .buttonIcon,
-.iconButton.primary:focus .buttonIcon,
+.iconButton.primary:focus-visible .buttonIcon,
 .iconButton.primary:active .buttonIcon {
   color: var(--color-blue);
 }
@@ -230,13 +227,13 @@
   background-color: var(--color-red-bg);
 }
 
-.iconButton.danger:focus,
+.iconButton.danger:focus-visible,
 .iconButton.danger:active {
   background-color: var(--color-red-bg-alt);
 }
 
 .iconButton.danger:hover .buttonIcon,
-.iconButton.danger:focus .buttonIcon,
+.iconButton.danger:focus-visible .buttonIcon,
 .iconButton.danger:active .buttonIcon {
   color: var(--color-red);
 }

@@ -1,7 +1,6 @@
 import { useTranslation } from 'next-i18next';
 import { Parse } from 'parse';
 import { useEffect, useMemo, useState } from 'react';
-import Select from 'react-select';
 
 import styles from './index.module.css';
 
@@ -15,60 +14,6 @@ const FIXED_SOURCES = [
   { value: 'eval-medical', key: 'data_curation_source_eval_medical' },
   { value: 'vitals',       key: 'data_curation_source_vitals' },
 ];
-
-// Selected outranks focused: the keyboard/pointer focus ring moves between
-// options while the chosen one stays chosen, and it must keep reading as chosen
-// while that happens.
-function optionBackground(state) {
-  if (state.isSelected) return 'var(--tk-dlite-semantic-color-action-primary)';
-  if (state.isFocused) return 'var(--tk-dlite-semantic-color-surface-raised)';
-  return 'transparent';
-}
-
-const selectStyles = {
-  container: (base) => ({ ...base, minWidth: 220, flex: 1 }),
-  control: (base, state) => ({
-    ...base,
-    minHeight: 32,
-    height: 32,
-    border: `1px solid var(--tk-dlite-semantic-color-border)`,
-    borderRadius: 'var(--tk-dlite-semantic-border-radius-sm)',
-    boxShadow: state.isFocused ? 'var(--focus-glow)' : 'none',
-    borderColor: state.isFocused ? 'var(--tk-dlite-semantic-color-action-primary)' : 'var(--tk-dlite-semantic-color-border)',
-    '&:hover': { borderColor: 'var(--tk-dlite-semantic-color-border)' },
-    fontSize: 13,
-    fontFamily: 'var(--font-family)',
-    backgroundColor: 'var(--tk-dlite-semantic-color-surface-base)',
-    cursor: 'pointer',
-  }),
-  valueContainer: (base) => ({ ...base, padding: '0 8px', height: 32 }),
-  indicatorsContainer: (base) => ({ ...base, height: 32 }),
-  groupHeading: (base) => ({
-    ...base,
-    fontFamily: 'var(--font-family-heading)',
-    fontSize: 10,
-    fontWeight: 700,
-    textTransform: 'uppercase',
-    letterSpacing: '0.07em',
-    color: 'var(--tk-dlite-semantic-color-text-secondary)',
-  }),
-  option: (base, state) => ({
-    ...base,
-    fontSize: 13,
-    fontFamily: 'var(--font-family)',
-    backgroundColor: optionBackground(state),
-    color: state.isSelected ? 'var(--tk-dlite-semantic-color-text-on-primary)' : 'var(--tk-dlite-semantic-color-text-primary)',
-    cursor: 'pointer',
-  }),
-  menu: (base) => ({
-    ...base,
-    borderRadius: 'var(--tk-dlite-semantic-border-radius-sm)',
-    boxShadow: 'var(--tk-dlite-semantic-elevation-high)',
-    zIndex: 100,
-  }),
-  singleValue: (base) => ({ ...base, fontSize: 13, color: 'var(--tk-dlite-semantic-color-text-primary)' }),
-  placeholder: (base) => ({ ...base, fontSize: 13, color: 'var(--tk-dlite-semantic-color-text-secondary)' }),
-};
 
 export default function SourceSelector({ source, orgValues, onChange }) {
   const { t } = useTranslation('common');
@@ -101,32 +46,35 @@ export default function SourceSelector({ source, orgValues, onChange }) {
     [customForms, t],
   );
 
-  const grouped = [
-    {
-      label: t('data_curation_source_group_system'),
-      options: fixedOptions,
-    },
-    ...(formOptions.length > 0
-      ? [{ label: t('data_curation_source_group_custom'), options: formOptions }]
-      : []),
-  ];
-  const currentValue = [...fixedOptions, ...formOptions].find((o) => o.value === source) ?? null;
+  const known = [...fixedOptions, ...formOptions].some((o) => o.value === source);
 
+  // A native <select>: a real label, the platform's own keyboard behaviour and
+  // type-ahead, the phone's own picker, and the app's focus ring. The list is
+  // four record types plus the organization's forms, short enough that the
+  // searchable react-select it replaced bought nothing a coordinator on a
+  // phone could use.
   return (
     <div className={styles.wrapper}>
       {/* Sentence case in the catalog; `.label` uppercases it in CSS. Storing
           it shouting would make every locale hand-uppercase its own string,
           and casing is not uniform across languages. */}
-      <span className={styles.label}>{t('data_curation_source_label')}</span>
-      <Select
-        inputId="source-select"
-        options={grouped}
-        value={currentValue}
-        onChange={(opt) => onChange(opt.value)}
-        isSearchable
-        placeholder={t('data_curation_source_placeholder')}
-        styles={selectStyles}
-      />
+      <label htmlFor="source-select" className={styles.label}>{t('data_curation_source_label')}</label>
+      <select
+        id="source-select"
+        className={styles.select}
+        value={known ? source : ''}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        {!known && <option value="" disabled>{t('data_curation_source_placeholder')}</option>}
+        <optgroup label={t('data_curation_source_group_system')}>
+          {fixedOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </optgroup>
+        {formOptions.length > 0 && (
+          <optgroup label={t('data_curation_source_group_custom')}>
+            {formOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </optgroup>
+        )}
+      </select>
     </div>
   );
 }

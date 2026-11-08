@@ -7,8 +7,8 @@ export default function PageHeader({
 }) {
   return (
     <div className={styles.pageHeader}>
-      <div>
-        {eyebrow && <div className={styles.pageHeaderEyebrow}>{eyebrow}</div>}
+      <div className={styles.pageHeaderText}>
+        {eyebrow && <p className={styles.pageHeaderEyebrow}>{eyebrow}</p>}
         <h1 className={styles.pageHeaderTitle}>{title}</h1>
         {sub && <p className={styles.pageHeaderSub}>{sub}</p>}
       </div>

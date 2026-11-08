@@ -79,35 +79,29 @@
   --shadow-lv2: var(--tk-dlite-semantic-elevation-medium);
   --shadow-lv3: var(--tk-dlite-semantic-elevation-high);
 
-  /* BREAKPOINTS — sourced from dlite tokens
+  /* BREAKPOINTS: not custom properties, because var() can't be used inside
+     @media. Use dlite's custom media queries instead, e.g.
+     `@media (--tk-dlite-bp-lg-down) { … }`. postcss.config.js expands them
+     from style-dictionary-dlite-tokens/web/custom-media.css at build time.
   /* =============================================================== */
-
-  --breakpoint-s: var(--tk-dlite-semantic-breakpoint-sm, 640px);
-  --breakpoint-m: var(--tk-dlite-semantic-breakpoint-md, 768px);
-  --breakpoint-l: var(--tk-dlite-semantic-breakpoint-lg, 1024px);
-  --breakpoint-xl: var(--tk-dlite-semantic-breakpoint-xl, 1280px);
 
   /* TRANSITIONS — sourced from dlite tokens
   /* =============================================================== */
 
-  --duration-fast: var(--tk-dlite-semantic-duration-fast, 0.15s);
-  --duration-normal: var(--tk-dlite-semantic-duration-normal, 0.3s);
+  --duration-fast: var(--tk-dlite-semantic-motion-duration-quick);
+  --duration-normal: var(--tk-dlite-semantic-motion-duration-base);
 
 
   /* FOCUS STATE
   /* =============================================================== */
 
-  /* A solid ring, not the old 50%-alpha glow (1.85:1, failed WCAG 1.4.11).
-     action-primary-active is blue-700 now and blue-800 in dlite 0.4.0; both
-     clear 3:1 on every surface. The 0.4.0 bump points these at
-     --tk-dlite-semantic-color-focus-ring / -focus-ring-width / -offset. */
-  --focus-ring-color: var(--tk-dlite-semantic-color-action-primary-active);
-  --focus-ring-width: 2px;
-  --focus-ring-offset: 2px;
+  /* A solid ring from the dlite focus tokens, not the old 50%-alpha glow
+     (1.85:1, failed WCAG 1.4.11). dlite's contrast test holds the colour to
+     3:1 or better on every surface, light and dark. */
+  --focus-ring-color: var(--tk-dlite-semantic-color-focus-ring);
+  --focus-ring-width: var(--tk-dlite-semantic-focus-ring-width);
+  --focus-ring-offset: var(--tk-dlite-semantic-focus-ring-offset);
   --focus-ring: var(--focus-ring-width) solid var(--focus-ring-color);
-  /* Kept for components that still draw focus with box-shadow (PR 3 moves
-     them to the global :focus-visible ring). Now the same solid colour. */
-  --focus-glow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
 
   /* STACKING ORDER
   /* =============================================================== */
@@ -347,11 +341,11 @@
   --color-acuity-5-text: var(--hex-white);
 
   /* Text */
-  --color-link: var(--tk-dlite-semantic-color-action-primary);
   --color-link-active: var(--tk-dlite-semantic-color-action-primary-active);
   /* Hover goes darker, never back to the lighter blue the old primary was
-     (which fails contrast once action-primary is blue-600). */
-  --color-link-hover: var(--tk-dlite-semantic-color-action-primary-active);
+     (which fails contrast with white text once action-primary is blue-600). */
+  --color-link: var(--tk-dlite-semantic-color-text-link);
+  --color-link-hover: var(--tk-dlite-semantic-color-action-primary-hover);
   --color-text: var(--tk-dlite-semantic-color-text-primary);
   --color-text-light: var(--tk-dlite-primitive-color-neutral-700);
   --color-text-placeholder: var(--tk-dlite-semantic-color-text-secondary);
@@ -387,7 +381,7 @@
 
   /* Buttons: Primary */
   --color-button-primary: var(--tk-dlite-semantic-color-action-primary);
-  --color-button-primary-hover: var(--tk-dlite-semantic-color-action-primary-active);
+  --color-button-primary-hover: var(--tk-dlite-semantic-color-action-primary-hover);
   --color-button-primary-active: var(--tk-dlite-semantic-color-action-primary-active);
   --color-button-primary-icon: var(--tk-dlite-primitive-color-blue-100);
   --color-button-primary-text: var(--tk-dlite-semantic-color-text-on-primary);

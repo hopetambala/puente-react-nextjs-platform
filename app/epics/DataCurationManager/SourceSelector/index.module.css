@@ -1,15 +1,33 @@
 .wrapper {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--tk-dlite-semantic-spacing-sm);
+  gap: var(--tk-dlite-semantic-spacing-xs) var(--tk-dlite-semantic-spacing-sm);
+  min-width: 0;
 }
 
 .label {
   font-family: var(--font-family-heading);
-  font-size: 11px;
+  font-size: var(--tk-dlite-semantic-typography-size-200);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
   color: var(--tk-dlite-semantic-color-text-secondary);
-  white-space: nowrap;
+}
+
+/* At least the comfortable touch height, and never wider than its row. */
+.select {
+  flex: 1 1 14rem;
+  min-width: 0;
+  max-width: 100%;
+  min-height: var(--tk-dlite-semantic-sizing-target-min);
+  padding-block: var(--tk-dlite-semantic-spacing-xs);
+  padding-inline: var(--tk-dlite-semantic-spacing-sm);
+  border: 1px solid var(--tk-dlite-semantic-color-border-control);
+  border-radius: var(--tk-dlite-semantic-border-radius-sm);
+  background: var(--tk-dlite-semantic-color-surface-base);
+  color: var(--tk-dlite-semantic-color-text-primary);
+  font-family: var(--font-family);
+  font-size: var(--tk-dlite-semantic-typography-size-300);
+  cursor: pointer;
 }

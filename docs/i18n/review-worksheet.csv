@@ -60,6 +60,7 @@ common,data_curation_empty,Data curation tools are coming soon.,Las herramientas
 common,data_curation_filtered_missing-key-fields,"Showing only records missing key fields. The counts below describe this filtered set, not every record.","Mostrando solo los registros a los que les faltan campos clave. Las cifras siguientes describen este conjunto filtrado, no todos los registros.","N ap montre sèlman dosye ki manke chan kle. Chif ki anba yo dekri ansanm filtre sa a, se pa tout dosye yo.",,
 common,data_curation_filtered_unresolved-parent,"Showing only records with an unresolved household link. The counts below describe this filtered set, not every record.","Mostrando solo los registros con un vínculo de hogar sin resolver. Las cifras siguientes describen este conjunto filtrado, no todos los registros.","N ap montre sèlman dosye ki gen yon lyen kay ki poko rezoud. Chif ki anba yo dekri ansanm filtre sa a, se pa tout dosye yo.",,
 common,data_curation_records,records,registros,dosye,,
+common,data_curation_records_table,Records table,Tabla de registros,Tablo dosye yo,,Accessible name of the scrollable records table (screen readers only). Spanish and Creole written by Claude: needs native review.
 common,data_curation_save,Save,Guardar,Sove,,
 common,data_curation_sub,"Curate, clean, and review collected records.","Cura, limpia y revisa los registros recolectados.","Kire, netwaye epi revize dosye yo kolekte yo.",,
 common,divider_or,or,o,oswa,,
@@ -103,6 +104,13 @@ common,nav_form_manager,Manage,Gestionar,Jere,,
 common,nav_forms,Forms,Formularios,Fòm,,Collect uses findResident.residentPage.household.forms
 common,nav_households,Households,Hogares,Kay,,
 common,nav_logout,Log out,Cerrar sesión,Dekonekte,,Collect uses home.logOut
+common,nav_group_workspace,Workspace,Espacio de trabajo,Espas travay,,"Sidebar group title, previously hard-coded English. Spanish and Creole written by Claude: needs native review."
+common,nav_group_org,Organization,Organización,Òganizasyon,,"Sidebar group title, previously hard-coded English. Spanish and Creole written by Claude: needs native review."
+common,nav_main_label,Main,Principal,Prensipal,,Screen-reader and keyboard label added by the responsive/a11y overhaul. Spanish and Creole written by Claude: needs native review.
+common,nav_open_menu,Open menu,Abrir menú,Louvri meni,,Screen-reader and keyboard label added by the responsive/a11y overhaul. Spanish and Creole written by Claude: needs native review.
+common,nav_close_menu,Close menu,Cerrar menú,Fèmen meni,,Screen-reader and keyboard label added by the responsive/a11y overhaul. Spanish and Creole written by Claude: needs native review.
+common,breadcrumb_label,Breadcrumb,Ruta de navegación,Chemen paj la,,Screen-reader and keyboard label added by the responsive/a11y overhaul. Spanish and Creole written by Claude: needs native review.
+common,skip_to_content,Skip to main content,Saltar al contenido principal,Ale dirèkteman nan kontni prensipal la,,Screen-reader and keyboard label added by the responsive/a11y overhaul. Spanish and Creole written by Claude: needs native review.
 common,nav_marketplace,Market,Mercado,Mache,,
 common,nav_members,Members,Miembros,Manm,,
 common,nav_settings,Settings,Configuración,Paramèt,,Collect uses global.settings

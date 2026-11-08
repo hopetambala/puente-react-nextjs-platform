@@ -2,7 +2,10 @@
   background: var(--tk-dlite-semantic-color-surface-base);
   border: 1px solid var(--tk-dlite-semantic-color-border);
   border-radius: var(--tk-dlite-semantic-border-radius-md);
-  overflow: hidden;
+  /* Scroll, never clip: `overflow: hidden` cut off the columns that didn't
+     fit, with no way to reach them (WCAG 1.4.10). The wrapper is a focusable,
+     labelled region so keyboard users can scroll it too. */
+  overflow-x: auto;
 }
 
 .table {

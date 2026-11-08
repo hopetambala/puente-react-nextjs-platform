@@ -19,9 +19,9 @@
   flex: 1;
   min-width: 0;
   color: var(--tk-dlite-semantic-color-text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  /* Wrap, don't truncate: an ellipsis hid the end of long community names,
+     and more of them under larger text spacing (WCAG 1.4.12). */
+  overflow-wrap: anywhere;
 }
 
 /* Tabular so counts line up down the rail. */

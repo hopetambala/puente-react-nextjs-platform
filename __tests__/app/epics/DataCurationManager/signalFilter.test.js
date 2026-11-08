@@ -124,29 +124,9 @@ jest.mock('app/impacto-design-system', () => ({
   ),
 }));
 
-// The REAL SourceSelector renders here, so a test can change the data source
-// the way a user does — by picking an option off the control by the label it
-// shows. Only react-select is stubbed, down to a native <select> carrying the
-// selector's own option list, verbatim from
-// __tests__/app/epics/DataCurationManager/SourceSelector/index.test.js.
-jest.mock('react-select', () => ({
-  options, value, onChange, inputId, placeholder,
-}) => (
-  <select
-    data-testid="source-select"
-    id={inputId}
-    value={value?.value ?? ''}
-    onChange={(e) => {
-      const flat = options.flatMap((g) => g.options ?? [g]);
-      onChange(flat.find((o) => o.value === e.target.value));
-    }}
-  >
-    <option value="" disabled>{placeholder}</option>
-    {options.map((group) => (group.options
-      ? group.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)
-      : <option key={group.value} value={group.value}>{group.label}</option>))}
-  </select>
-));
+// The REAL SourceSelector renders here, a native <select>, so a test can
+// change the data source the way a user does: by picking an option off the
+// control by the label it shows.
 jest.mock('app/epics/DataCurationManager/FilterBar', () => () => <div data-testid="filter-bar" />);
 jest.mock('app/epics/DataCurationManager/RecordsTable', () => ({ records }) => (
   <div data-testid="records-table">{records.length} rows</div>

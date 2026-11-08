@@ -99,7 +99,7 @@
   border: 1px solid var(--tk-dlite-semantic-color-border);
   border-radius: var(--tk-dlite-semantic-border-radius-sm);
   min-inline-size: 0;
-  transition: border-color var(--tk-dlite-semantic-duration-fast);
+  transition: border-color var(--tk-dlite-semantic-motion-duration-quick);
 }
 
 .input:focus-visible {

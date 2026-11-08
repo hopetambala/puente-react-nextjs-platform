@@ -29,8 +29,8 @@
   font-family: var(--tk-dlite-semantic-typography-font-body);
   font-size: var(--tk-dlite-semantic-typography-size-100);
   cursor: pointer;
-  transition: color var(--tk-dlite-semantic-duration-fast),
-    background-color var(--tk-dlite-semantic-duration-fast);
+  transition: color var(--tk-dlite-semantic-motion-duration-quick),
+    background-color var(--tk-dlite-semantic-motion-duration-quick);
 }
 
 .option:hover {

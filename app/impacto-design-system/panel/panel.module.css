@@ -2,19 +2,25 @@
   background: var(--tk-dlite-semantic-color-surface-base);
   border: 1px solid var(--tk-dlite-semantic-color-border);
   border-radius: var(--tk-dlite-semantic-border-radius-md);
-  overflow: hidden;
+  /* No `overflow: hidden`: it rounded the corners and also cut off whatever
+     didn't fit, e.g. Spanish rows under larger text spacing (WCAG 1.4.12).
+     Content wraps instead. */
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .panelHeader {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   justify-content: space-between;
+  gap: var(--tk-dlite-semantic-spacing-xs) var(--tk-dlite-semantic-spacing-sm);
   padding: var(--spacer-sm) var(--spacer-m);
   border-bottom: 1px solid var(--tk-dlite-semantic-color-border);
 }
 
 .panelTitle {
-  font-size: 13px;
+  font-size: var(--tk-dlite-semantic-typography-size-300);
   font-weight: 700;
   color: var(--tk-dlite-semantic-color-text-primary);
   letter-spacing: 0.01em;

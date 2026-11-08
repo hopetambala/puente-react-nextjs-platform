@@ -91,16 +91,16 @@ describe('Avatar — with user', () => {
 // Clicking the avatar must navigate to /account/management.
 
 describe('Phase 3 — Avatar navigation', () => {
-  it('avatar has aria-label="Account settings"', () => {
+  it('names the avatar with its visible initials and its purpose (WCAG 2.5.3)', () => {
     render(<TopBar breadcrumb={['Dashboard']} />);
-    expect(screen.getByRole('button', { name: 'topbar_account_settings' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /topbar_account_settings/ })).toBeInTheDocument();
   });
 
   it('clicking avatar calls router.push("/account/management")', () => {
     const push = jest.fn();
     useRouter.mockReturnValue({ push });
     render(<TopBar breadcrumb={['Dashboard']} />);
-    fireEvent.click(screen.getByRole('button', { name: 'topbar_account_settings' }));
+    fireEvent.click(screen.getByRole('button', { name: /topbar_account_settings/ }));
     expect(push).toHaveBeenCalledWith('/account/management');
   });
 });
@@ -108,6 +108,6 @@ describe('Phase 3 — Avatar navigation', () => {
 describe('TopBar — copy', () => {
   it('routes the account-settings label through t()', () => {
     render(<TopBar breadcrumb={['Forms', 'Form Manager']} />);
-    expect(screen.getByLabelText('topbar_account_settings')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^\S+ topbar_account_settings$/ })).toBeInTheDocument();
   });
 });

@@ -79,7 +79,7 @@ export default function RecordsTable({
   const hasPrev = page > 0;
 
   return (
-    <div className={styles.tableWrap}>
+    <div className={styles.tableWrap} role="region" aria-label={t('data_curation_records_table')} tabIndex={0}>
       <table className={styles.table}>
         <thead>
           <tr>

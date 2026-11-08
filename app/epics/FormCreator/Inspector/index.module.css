@@ -76,8 +76,7 @@
   border-radius: var(--border-radius-s);
 }
 
-.textInput:focus {
-  outline: none;
+.textInput:focus-visible {
   border-color: var(--tk-dlite-semantic-color-action-primary);
 }
 

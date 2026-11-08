@@ -15,7 +15,7 @@
   border-block-end: 1px solid var(--tk-dlite-semantic-color-border);
   color: var(--tk-dlite-semantic-color-text-primary);
   text-decoration: none;
-  transition: background-color var(--tk-dlite-semantic-duration-fast) ease-out;
+  transition: background-color var(--tk-dlite-semantic-motion-duration-quick) ease-out;
 }
 
 /* Hover is a quiet background shift and nothing else.
@@ -37,7 +37,7 @@
 .row:focus-visible {
   background: var(--tk-dlite-semantic-color-surface-raised);
   color: var(--tk-dlite-semantic-color-text-primary);
-  transition: background-color var(--tk-dlite-semantic-duration-fast) ease-out;
+  transition: background-color var(--tk-dlite-semantic-motion-duration-quick) ease-out;
 }
 
 /* The quantity is now "12 of 43,979", not a bare numerator — a count without

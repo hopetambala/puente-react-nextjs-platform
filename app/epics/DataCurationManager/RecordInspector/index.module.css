@@ -91,12 +91,10 @@
   font-family: var(--font-family);
   font-size: 13px;
   color: var(--tk-dlite-semantic-color-text-primary);
-  outline: none;
 }
 
 .input:focus-visible {
   border-color: var(--tk-dlite-semantic-color-action-primary);
-  box-shadow: var(--focus-glow);
 }
 
 .readOnly {

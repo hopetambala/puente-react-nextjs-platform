@@ -14,7 +14,7 @@
     "pages/data/": "PR 6 (data routes)",
     "pages/index.module.scss": "PR 7 (landing page)"
   },
-  "total": 275,
+  "total": 226,
   "files": {
     "app/epics/DataAnalyticsManager/index.module.scss": {
       "no-empty-source": 1
@@ -26,18 +26,14 @@
       "declaration-property-unit-disallowed-list": 3
     },
     "app/epics/DataCurationManager/FilterBar/index.module.css": {
-      "declaration-property-unit-disallowed-list": 3,
-      "declaration-property-value-disallowed-list": 2
+      "declaration-property-unit-disallowed-list": 3
     },
     "app/epics/DataCurationManager/RecordInspector/index.module.css": {
       "declaration-property-unit-disallowed-list": 7,
-      "declaration-property-value-disallowed-list": 2
+      "declaration-property-value-disallowed-list": 1
     },
     "app/epics/DataCurationManager/RecordsTable/index.module.css": {
       "declaration-property-unit-disallowed-list": 3
-    },
-    "app/epics/DataCurationManager/SourceSelector/index.module.css": {
-      "declaration-property-unit-disallowed-list": 1
     },
     "app/epics/DataCurationManager/index.module.css": {
       "declaration-property-unit-disallowed-list": 1
@@ -68,13 +64,11 @@
     },
     "app/epics/FormCreator/Inspector/index.module.css": {
       "color-no-hex": 2,
-      "declaration-property-unit-disallowed-list": 2,
-      "declaration-property-value-disallowed-list": 1,
-      "selector-pseudo-class-disallowed-list": 1
+      "declaration-property-unit-disallowed-list": 2
     },
     "app/epics/FormCreator/index.module.scss": {
       "declaration-property-unit-disallowed-list": 5,
-      "declaration-property-value-disallowed-list": 2
+      "declaration-property-value-disallowed-list": 1
     },
     "app/epics/FormManager/RecordsTable/index.module.css": {
       "declaration-property-unit-disallowed-list": 1
@@ -88,16 +82,10 @@
       "declaration-property-unit-disallowed-list": 3
     },
     "app/epics/FormManager/index.module.scss": {
-      "declaration-property-unit-disallowed-list": 5,
-      "declaration-property-value-disallowed-list": 1
+      "declaration-property-unit-disallowed-list": 5
     },
     "app/epics/NativeApplcationDrawer/index.module.css": {
       "declaration-property-value-allowed-list": 1
-    },
-    "app/impacto-design-system/AppShell/AppShell.module.css": {
-      "color-named": 2,
-      "declaration-property-unit-disallowed-list": 12,
-      "declaration-property-value-disallowed-list": 1
     },
     "app/impacto-design-system/_css/root.css": {
       "declaration-property-value-allowed-list": 1
@@ -110,20 +98,7 @@
     },
     "app/impacto-design-system/button/css/button.module.css": {
       "declaration-no-important": 7,
-      "declaration-property-value-disallowed-list": 2,
-      "property-no-deprecated": 1,
-      "selector-pseudo-class-disallowed-list": 12
-    },
-    "app/impacto-design-system/card-alt/index.module.scss": {
-      "selector-pseudo-class-disallowed-list": 1
-    },
-    "app/impacto-design-system/card-group/css/card-group.module.css": {
-      "declaration-property-value-disallowed-list": 1,
-      "selector-pseudo-class-disallowed-list": 3
-    },
-    "app/impacto-design-system/card/css/card.module.css": {
-      "declaration-property-value-disallowed-list": 1,
-      "selector-pseudo-class-disallowed-list": 3
+      "property-no-deprecated": 1
     },
     "app/impacto-design-system/empty-state/empty-state.module.css": {
       "declaration-property-unit-disallowed-list": 2
@@ -134,9 +109,6 @@
     "app/impacto-design-system/form-controls/select-autocomplete/index.module.scss": {
       "declaration-no-important": 1,
       "function-disallowed-list": 1
-    },
-    "app/impacto-design-system/panel/panel.module.css": {
-      "declaration-property-unit-disallowed-list": 1
     },
     "app/impacto-design-system/segmented-control/css/segmented-control.module.css": {
       "declaration-property-unit-disallowed-list": 1,
@@ -149,8 +121,7 @@
       "declaration-property-value-disallowed-list": 1
     },
     "app/impacto-design-system/toast/css/toast.module.css": {
-      "declaration-property-value-disallowed-list": 2,
-      "selector-pseudo-class-disallowed-list": 1
+      "declaration-property-value-disallowed-list": 1
     },
     "app/impacto-design-system/tooltip/css/tooltip.module.css": {
       "declaration-no-important": 1

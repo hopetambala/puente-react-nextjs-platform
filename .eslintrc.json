@@ -39,6 +39,14 @@
         "depth": 5
       }
     ],
+    // A horizontally scrollable region (a wide table) has to take keyboard
+    // focus so it can be scrolled without a mouse (WCAG 2.1.1; axe
+    // scrollable-region-focusable). Allowed only with role="region", which
+    // also requires an accessible name.
+    "jsx-a11y/no-noninteractive-tabindex": [
+      "error",
+      { "tags": [], "roles": ["tabpanel", "region"], "allowExpressionValues": true }
+    ],
     "jsx-a11y/anchor-is-valid": [
       "error",
       {

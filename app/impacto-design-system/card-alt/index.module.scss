@@ -15,7 +15,7 @@
 }
 
 .card:hover,
-.card:focus,
+.card:focus-visible,
 .card:active {
     color: var(--color-link);
     border-color: var(--tk-dlite-primitive-color-blue-300);

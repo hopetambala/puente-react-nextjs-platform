@@ -26,29 +26,6 @@ jest.mock('parse', () => ({
 
 jest.mock('app/services/parse', () => ({ initialize: jest.fn() }));
 
-jest.mock('react-select', () => ({ options, value, onChange, inputId, placeholder }) => (
-  <select
-    data-testid="source-select"
-    id={inputId}
-    value={value?.value ?? ''}
-    onChange={(e) => {
-      const flat = options.flatMap((g) => g.options ?? [g]);
-      onChange(flat.find((o) => o.value === e.target.value));
-    }}
-  >
-    <option value="" disabled>{placeholder}</option>
-    {options.map((group) =>
-      group.options
-        ? (
-          <optgroup key={group.label} label={group.label}>
-            {group.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </optgroup>
-        )
-        : <option key={group.value} value={group.value}>{group.label}</option>
-    )}
-  </select>
-));
-
 // Import after mocks
 const SourceSelector = require('app/epics/DataCurationManager/SourceSelector').default;
 
@@ -67,11 +44,23 @@ describe('SourceSelector', () => {
     });
   });
 
-  it('routes the control label and the search placeholder through t()', async () => {
+  it('labels the control (a real <label>, not a span beside it) through t()', async () => {
     render(<SourceSelector source="survey-data" orgValues={['TestOrg']} onChange={mockOnChange} />);
-    await waitFor(() => screen.getByRole('combobox'));
-    expect(screen.getByText('data_curation_source_label')).toBeInTheDocument();
-    expect(screen.getByText('data_curation_source_placeholder')).toBeInTheDocument();
+    expect(await screen.findByRole('combobox', { name: 'data_curation_source_label' })).toBeInTheDocument();
+  });
+
+  it('shows the placeholder through t() only while no source is chosen', async () => {
+    const { rerender } = render(<SourceSelector source="" orgValues={['TestOrg']} onChange={mockOnChange} />);
+    expect(await screen.findByText('data_curation_source_placeholder')).toBeInTheDocument();
+    rerender(<SourceSelector source="vitals" orgValues={['TestOrg']} onChange={mockOnChange} />);
+    expect(screen.queryByText('data_curation_source_placeholder')).not.toBeInTheDocument();
+  });
+
+  it('has no axe violations', async () => {
+    const { axe } = require('../../../../../__test-utils__/axe');
+    const { container } = render(<SourceSelector source="survey-data" orgValues={['TestOrg']} onChange={mockOnChange} />);
+    await screen.findByRole('combobox');
+    expect(await axe(container)).toHaveNoViolations();
   });
 
   it('routes both option-group headings through t()', async () => {
@@ -168,7 +157,7 @@ describe('SourceSelector', () => {
     render(<SourceSelector source="survey-data" orgValues={['TestOrg']} onChange={mockOnChange} />);
 
     await waitFor(() => {
-      const select = screen.getByTestId('source-select');
+      const select = screen.getByRole('combobox');
       const values = Array.from(select.options).map((o) => o.value);
       expect(values).toContain('survey-data');
       expect(values).toContain('form-results:form1');

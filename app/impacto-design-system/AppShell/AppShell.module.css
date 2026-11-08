@@ -1,102 +1,208 @@
-/* ============ shell ============ */
+/* ============ shell ============
+   Docked sidebar from dlite's `lg` breakpoint up; one column below it, with the
+   same navigation in a modal drawer (see AppShell.js). Breakpoints come from
+   dlite's custom media (postcss.config.js), never a literal width. */
 .shell {
+  --sidebar-width: 16.5rem;
+
   display: grid;
-  grid-template-columns: 264px 1fr;
-  height: 100vh;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  /* dvh, not vh: 100vh is taller than the visible area on mobile browsers,
+     which hid the bottom of the sidebar (Log out) under the toolbar. */
+  height: 100dvh;
   background: var(--tk-dlite-semantic-color-background);
   font-family: var(--font-family-heading);
   color: var(--tk-dlite-semantic-color-text-primary);
   overflow: hidden;
 }
 
+.sidebarDocked {
+  min-height: 0;
+}
+
 .main {
   display: grid;
-  grid-template-rows: var(--header-height) 1fr;
+  grid-template-rows: auto minmax(0, 1fr);
   overflow: hidden;
   min-width: 0;
+}
+
+@media (--tk-dlite-bp-lg-down) {
+  .shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sidebarDocked {
+    display: none;
+  }
+}
+
+/* ============ skip link ============
+   The first stop for a keyboard user: jumps past the navigation to <main>
+   (WCAG 2.4.1). Off-screen until it has keyboard focus. */
+.skipLink {
+  position: absolute;
+  inset-block-start: var(--tk-dlite-semantic-spacing-sm);
+  inset-inline-start: var(--tk-dlite-semantic-spacing-sm);
+  z-index: var(--tk-dlite-semantic-z-index-overlay);
+  padding: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-md);
+  border-radius: var(--tk-dlite-semantic-border-radius-md);
+  background: var(--tk-dlite-semantic-color-surface-base);
+  color: var(--tk-dlite-semantic-color-text-link);
+  font-weight: 600;
+  translate: 0 -200%;
+}
+
+.skipLink:focus-visible {
+  translate: 0 0;
+}
+
+/* ============ nav drawer (below lg) ============ */
+.navDrawer {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inset-inline-end: auto;
+  width: min(var(--sidebar-width), 85vw);
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  background: var(--tk-dlite-semantic-color-surface-base);
+  color: var(--tk-dlite-semantic-color-text-primary);
+  translate: 0 0;
+  transition: translate var(--tk-dlite-semantic-motion-duration-base) ease-out;
+}
+
+@starting-style {
+  .navDrawer[open] {
+    translate: -100% 0;
+  }
+}
+
+.navDrawer::backdrop {
+  background: var(--tk-dlite-semantic-color-surface-scrim);
+}
+
+@media (--tk-dlite-bp-lg-up) {
+  .navDrawer {
+    display: none;
+  }
+}
+
+.drawerClose {
+  display: grid;
+  place-items: center;
+  width: var(--tk-dlite-semantic-sizing-target-comfortable);
+  height: var(--tk-dlite-semantic-sizing-target-comfortable);
+  margin-inline-start: auto;
+  border-radius: var(--tk-dlite-semantic-border-radius-md);
+  font-size: var(--tk-dlite-semantic-typography-size-700);
+  line-height: 1;
+  color: var(--tk-dlite-semantic-color-text-secondary);
+}
+
+.drawerClose:hover {
+  background: var(--tk-dlite-semantic-color-background);
+  color: var(--tk-dlite-semantic-color-text-primary);
 }
 
 /* ============ sidebar ============ */
 .sidebar {
   background: var(--tk-dlite-semantic-color-surface-base);
-  border-right: 1px solid var(--tk-dlite-semantic-color-border);
+  border-inline-end: 1px solid var(--tk-dlite-semantic-color-border);
   display: flex;
   flex-direction: column;
   height: 100%;
-  font-size: 13px;
+  font-size: var(--tk-dlite-semantic-typography-size-300);
   overflow-y: auto;
 }
 
 .brand {
-  display: grid;
-  grid-template-columns: 32px 1fr;
+  display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--tk-dlite-semantic-color-border);
+  gap: var(--tk-dlite-semantic-spacing-300);
+  padding: var(--tk-dlite-semantic-spacing-300) var(--tk-dlite-semantic-spacing-400);
+  border-block-end: 1px solid var(--tk-dlite-semantic-color-border);
+}
+
+.brandText {
+  min-width: 0;
 }
 
 .brandMark {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--tk-dlite-semantic-border-radius-md);
   background: var(--tk-dlite-semantic-color-action-primary);
-  color: white;
+  color: var(--tk-dlite-semantic-color-text-on-primary);
   display: grid;
   place-items: center;
   font-weight: 800;
-  font-size: 16px;
+  font-size: var(--tk-dlite-semantic-typography-size-400);
   letter-spacing: -0.02em;
   flex-shrink: 0;
 }
 
 .brandName {
   font-weight: 700;
-  font-size: 14px;
+  font-size: var(--tk-dlite-semantic-typography-size-300);
   color: var(--tk-dlite-semantic-color-text-primary);
   letter-spacing: -0.01em;
   line-height: 1.2;
 }
 
 .brandOrg {
-  font-size: 11px;
+  font-size: var(--tk-dlite-semantic-typography-size-200);
   color: var(--tk-dlite-semantic-color-text-secondary);
+  overflow-wrap: anywhere;
 }
 
 .nav {
   flex: 1;
-  padding: 8px;
+  padding: var(--tk-dlite-semantic-spacing-sm);
 }
 
 .navGroup {
-  margin-bottom: 16px;
+  margin-block-end: var(--tk-dlite-semantic-spacing-md);
 }
 
 .navGroupTitle {
-  font-size: 10px;
+  margin: 0;
+  font-size: var(--tk-dlite-semantic-typography-size-200);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--tk-dlite-semantic-color-text-secondary);
-  padding: 6px 10px;
+  padding: var(--tk-dlite-semantic-spacing-xs) var(--tk-dlite-semantic-spacing-300);
   font-weight: 700;
 }
 
+.navList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Rows are at least the comfortable touch size: this list is the main way
+   around the app on a phone (WCAG 2.5.8 sets 24px as the floor). */
 .navItem {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 7px 10px;
-  border-radius: var(--border-radius-m);
+  gap: var(--tk-dlite-semantic-spacing-300);
+  min-height: var(--tk-dlite-semantic-sizing-target-comfortable);
+  padding: var(--tk-dlite-semantic-spacing-xs) var(--tk-dlite-semantic-spacing-300);
+  border-radius: var(--tk-dlite-semantic-border-radius-md);
   cursor: pointer;
   color: var(--tk-dlite-semantic-color-text-secondary);
   font-weight: 500;
-  font-size: 13px;
+  font-size: var(--tk-dlite-semantic-typography-size-300);
   text-decoration: none;
   border: none;
   background: transparent;
   width: 100%;
-  text-align: left;
-  transition: background 0.1s ease, color 0.1s ease;
+  text-align: start;
+  transition: background var(--tk-dlite-semantic-motion-duration-quick) ease, color var(--tk-dlite-semantic-motion-duration-quick) ease;
 }
 
 .navItem:hover {
@@ -104,31 +210,27 @@
   color: var(--tk-dlite-semantic-color-text-primary);
 }
 
-.navItemActive {
+.navItemActive,
+.navItemActive:hover {
   background: var(--tk-dlite-primitive-color-blue-100);
-  color: var(--tk-dlite-semantic-color-action-primary);
+  color: var(--tk-dlite-semantic-color-text-link);
   font-weight: 600;
 }
 
-.navItemActive:hover {
-  background: var(--tk-dlite-primitive-color-blue-100);
-  color: var(--tk-dlite-semantic-color-action-primary);
-}
-
 .navIcon {
-  font-size: 14px;
-  width: 18px;
+  font-size: var(--tk-dlite-semantic-typography-size-300);
+  width: 1.125rem;
   text-align: center;
   flex-shrink: 0;
 }
 
 .navBottom {
-  border-top: 1px solid var(--tk-dlite-semantic-color-border);
-  padding: 8px;
+  border-block-start: 1px solid var(--tk-dlite-semantic-color-border);
+  padding: var(--tk-dlite-semantic-spacing-sm);
 }
 
 .navDanger {
-  color: var(--tk-dlite-primitive-color-red-600);
+  color: var(--tk-dlite-semantic-color-feedback-danger);
 }
 
 .navDanger:hover {
@@ -137,43 +239,100 @@
 }
 
 .navPulse {
-  width: 7px;
-  height: 7px;
+  width: 0.4375rem;
+  height: 0.4375rem;
   border-radius: 50%;
   background: var(--tk-dlite-primitive-color-yellow-200);
-  margin-left: auto;
+  margin-inline-start: auto;
   flex-shrink: 0;
   animation: pulse 2s ease-in-out infinite;
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
+  0%,
+  100% { opacity: 1; }
   50% { opacity: 0.35; }
 }
 
 /* ============ topbar ============ */
 .topbar {
   background: var(--tk-dlite-semantic-color-surface-base);
-  border-bottom: 1px solid var(--tk-dlite-semantic-color-border);
+  border-block-end: 1px solid var(--tk-dlite-semantic-color-border);
   display: flex;
   align-items: center;
-  padding: 0 24px;
-  gap: 16px;
+  min-height: var(--header-height);
+  padding-block: var(--tk-dlite-semantic-spacing-xs);
+  padding-inline: var(--tk-dlite-semantic-spacing-lg);
+  gap: var(--tk-dlite-semantic-spacing-md);
 }
 
+@media (--tk-dlite-bp-sm-down) {
+  .topbar {
+    padding-inline: var(--tk-dlite-semantic-spacing-sm);
+    gap: var(--tk-dlite-semantic-spacing-sm);
+  }
+}
+
+.menuButton {
+  display: none;
+  place-items: center;
+  flex-shrink: 0;
+  width: var(--tk-dlite-semantic-sizing-target-comfortable);
+  height: var(--tk-dlite-semantic-sizing-target-comfortable);
+  border-radius: var(--tk-dlite-semantic-border-radius-md);
+  color: var(--tk-dlite-semantic-color-text-primary);
+}
+
+.menuButton:hover {
+  background: var(--tk-dlite-semantic-color-background);
+}
+
+@media (--tk-dlite-bp-lg-down) {
+  .menuButton {
+    display: grid;
+  }
+}
+
+.menuIcon {
+  width: var(--tk-dlite-semantic-sizing-icon-md);
+  height: var(--tk-dlite-semantic-sizing-icon-md);
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+/* The trail may wrap but never pushes the account button off-screen. */
 .breadcrumb {
   flex: 1;
+  min-width: 0;
+}
+
+.crumbs {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
+  gap: var(--tk-dlite-semantic-spacing-xs) var(--tk-dlite-semantic-spacing-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--tk-dlite-semantic-typography-size-300);
   color: var(--tk-dlite-semantic-color-text-secondary);
   font-weight: 500;
 }
 
-.crumbSep {
+.crumbs li {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* The separator is drawn, not text: the empty alternative after the slash
+   keeps screen readers from announcing it. */
+.crumbs li + li::before {
+  content: "/" / "";
+  margin-inline-end: var(--tk-dlite-semantic-spacing-sm);
   font-family: var(--font-family-mono);
-  opacity: 0.4;
+  color: var(--tk-dlite-semantic-color-text-tertiary);
 }
 
 .crumbCurrent {
@@ -184,31 +343,43 @@
 .topbarActions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--tk-dlite-semantic-spacing-sm);
+  flex-shrink: 0;
 }
 
 .avatar {
-  width: 30px;
-  height: 30px;
+  width: 2rem;
+  height: 2rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--tk-dlite-primitive-color-blue-500), var(--tk-dlite-primitive-color-blue-700));
-  color: white;
+  background: var(--tk-dlite-semantic-color-action-primary);
+  color: var(--tk-dlite-semantic-color-text-on-primary);
   display: grid;
   place-items: center;
-  font-size: 11px;
+  font-size: var(--tk-dlite-semantic-typography-size-200);
   font-weight: 700;
   font-family: var(--font-family-heading);
   flex-shrink: 0;
 }
 
-/* ============ page area ============ */
+/* ============ page area ============
+   The page is a size container, so page content lays itself out against the
+   space it actually has (`@container`), not the window. The window is wider
+   than the content by the docked sidebar. */
 .page {
   overflow: auto;
-  padding: 32px 32px 64px;
+  container-type: inline-size;
+  padding: var(--tk-dlite-semantic-spacing-xl) var(--tk-dlite-semantic-spacing-xl) var(--tk-dlite-semantic-spacing-xxxl);
+}
+
+@media (--tk-dlite-bp-sm-down) {
+  .page {
+    padding: var(--tk-dlite-semantic-spacing-md) var(--tk-dlite-semantic-spacing-md) var(--tk-dlite-semantic-spacing-xxl);
+  }
 }
 
 .pageFullBleed {
   overflow-y: auto;
+  container-type: inline-size;
   height: 100%;
   padding: 0;
 }
@@ -216,42 +387,50 @@
 /* ============ page header ============ */
 .pageHeader {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 32px;
-  margin-bottom: 32px;
+  gap: var(--tk-dlite-semantic-spacing-md) var(--tk-dlite-semantic-spacing-xl);
+  margin-block-end: var(--tk-dlite-semantic-spacing-xl);
+}
+
+.pageHeaderText {
+  flex: 1 1 20rem;
+  min-width: 0;
 }
 
 .pageHeaderEyebrow {
-  font-size: 11px;
+  margin: 0 0 var(--tk-dlite-semantic-spacing-xs);
+  font-size: var(--tk-dlite-semantic-typography-size-200);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--tk-dlite-semantic-color-text-secondary);
   font-weight: 700;
-  margin-bottom: 6px;
 }
 
 .pageHeaderTitle {
   font-family: var(--font-family-heading);
-  font-size: 32px;
+  font-size: clamp(var(--tk-dlite-semantic-typography-size-700), 1.25rem + 2vw, var(--tk-dlite-semantic-typography-size-800));
   font-weight: 700;
   letter-spacing: -0.02em;
-  line-height: 1.1;
+  line-height: 1.15;
   margin: 0;
   color: var(--tk-dlite-semantic-color-text-primary);
+  overflow-wrap: anywhere;
 }
 
 .pageHeaderSub {
-  margin-top: 8px;
+  margin: var(--tk-dlite-semantic-spacing-sm) 0 0;
   color: var(--tk-dlite-semantic-color-text-secondary);
-  font-size: 15px;
+  font-size: var(--tk-dlite-semantic-typography-size-350);
   line-height: 1.5;
   font-family: var(--font-family-heading);
+  max-width: 65ch;
 }
 
 .pageHeaderActions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
+  gap: var(--tk-dlite-semantic-spacing-sm);
 }
