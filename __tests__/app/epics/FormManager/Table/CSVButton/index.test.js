@@ -344,3 +344,58 @@ describe('research file name date', () => {
     jest.useRealTimers();
   });
 });
+
+// Windows Excel decides a CSV's encoding from its first bytes. Without the
+// UTF-8 byte-order mark it reads UTF-8 as Windows-1252, so every accent is
+// garbled: the coordinator's own spreadsheets (Aug 2026) had 246 and 269 cells
+// like "jimÃ©nez" and "el rÃ­o", and not one correct accent.
+describe('CSVButton file encoding for Excel', () => {
+  let blobs;
+
+  const bytesOf = (blob) => new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(new Uint8Array(reader.result));
+    reader.readAsArrayBuffer(blob);
+  });
+
+  beforeEach(() => {
+    calls.length = 0;
+    toastCalls.length = 0;
+    blobs = [];
+    window.URL.createObjectURL = jest.fn((blob) => { blobs.push(blob); return 'blob:x'; });
+    jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+  });
+
+  afterEach(() => { jest.restoreAllMocks(); });
+
+  const csv = 'fname,lname,communityname\nLía,Jiménez,El Río\nMaría,Muñoz,Peña\n';
+
+  async function downloaded(button) {
+    nextResponse = csv;
+    fireEvent.click(button);
+    await waitFor(() => expect(blobs).toHaveLength(1));
+    return { blob: blobs[0], bytes: await bytesOf(blobs[0]) };
+  }
+
+  it('starts the file with the UTF-8 byte-order mark and keeps the CSV unchanged after it', async () => {
+    render(<CSVButton form={{ name: 'Seguimiento', objectId: 'form-1', customForm: true }}
+      surveyingOrganization="Constanza Medical Mission" shortCode="constanza-medical-mission" />);
+
+    const { blob, bytes } = await downloaded(screen.getByRole('button'));
+
+    expect([...bytes.slice(0, 3)]).toEqual([0xEF, 0xBB, 0xBF]);
+    // jsdom has no TextDecoder; Node's is the same API.
+    const { TextDecoder: Decoder } = require('util');
+    expect(new Decoder('utf-8', { ignoreBOM: true }).decode(bytes.slice(3))).toBe(csv);
+    expect(blob.type).toBe('text/csv;charset=utf-8');
+  });
+
+  it('does the same for the research file', async () => {
+    render(<CSVButton form={{ name: 'Vision exam', objectId: 'form-r', customForm: true, allowResearchExport: true }}
+      surveyingOrganization="McMaster" shortCode="mcmaster" />);
+
+    const { bytes } = await downloaded(screen.getAllByRole('button')[0]);
+
+    expect([...bytes.slice(0, 3)]).toEqual([0xEF, 0xBB, 0xBF]);
+  });
+});
