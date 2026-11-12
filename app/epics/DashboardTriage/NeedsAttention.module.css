@@ -8,6 +8,7 @@
 
 .row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--tk-dlite-semantic-spacing-sm);
   min-height: 48px;
@@ -48,7 +49,9 @@
    lines up exactly and the counts land right-aligned just left of it. In a
    records tool a ragged numeric column reads as sloppy data, not sloppy CSS. */
 .count {
-  min-width: 12ch;
+  /* min(), so a narrow row gives the label room instead of the reserved
+     column: on a phone the tags then wrap under the label. */
+  min-width: min(12ch, 30%);
   text-align: end;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
@@ -56,8 +59,9 @@
 }
 
 .label {
-  flex: 1;
+  flex: 1 1 12rem;
   min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .tags {

@@ -30,7 +30,7 @@ export default function SyncRibbon({ state, loading }) {
       // aria-busy: Skeleton is aria-hidden, so without it the provenance strip
       // is absent rather than pending to a screen reader.
       <div className={styles.ribbon} data-testid="sync-ribbon-loading" aria-busy="true">
-        <Skeleton width={180} height={13} />
+        <Skeleton width="min(11.25rem, 60vw)" height={13} />
         <Skeleton width={90} height={13} />
       </div>
     );

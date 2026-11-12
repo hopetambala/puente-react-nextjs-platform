@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 import {
   render, screen, waitFor, within,
 } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 // Resolve t() against the REAL eng locale and shout when a key is absent, so a
 // single assertion below proves every key the page uses actually ships.
@@ -32,7 +33,8 @@ const translate = (key, opts) => {
 };
 
 jest.mock('next-i18next', () => ({ useTranslation: () => ({ t: translate }) }));
-jest.mock('next/router', () => ({ useRouter: () => ({ push: jest.fn(), pathname: '/quick-start' }) }));
+const mockPush = jest.fn();
+jest.mock('next/router', () => ({ useRouter: () => ({ push: mockPush, pathname: '/quick-start' }) }));
 jest.mock('parse', () => ({ Parse: { Query: jest.fn(), Object: { extend: jest.fn() } } }));
 
 const mockUser = jest.fn();
@@ -49,6 +51,14 @@ const mockOrgScope = jest.fn();
 jest.mock('app/modules/organization', () => ({
   loadOrganizationScope: (...a) => mockOrgScope(...a),
 }));
+
+// The page's load timeout, shortened only by the tests that need a load to
+// time out (fake timers don't drive waitFor in this Testing Library version).
+const mockTimeout = { ms: null };
+jest.mock('app/modules/async/settleWithin', () => {
+  const actual = jest.requireActual('app/modules/async/settleWithin');
+  return { ...actual, settleWithin: (p, ms) => actual.settleWithin(p, mockTimeout.ms ?? ms) };
+});
 
 const mockLoad = jest.fn();
 jest.mock('app/epics/DashboardTriage/loadTriage', () => ({
@@ -469,5 +479,72 @@ describe('Nothing to scope a query with', () => {
     await waitFor(() => {
       expect(screen.queryByTestId('triage-loading')).not.toBeInTheDocument();
     });
+  });
+});
+
+
+// ─── Design review C10 / C7 and the PR 5 checklist ──────────────────────────
+describe('Page structure (design review C10)', () => {
+  it('names the page with a visible h1 that matches the nav and breadcrumb', async () => {
+    render(<Dashboard />);
+    await waitFor(() => expect(mockLoad).toHaveBeenCalled());
+    expect(within(screen.getByRole('main')).getByRole('heading', { level: 1, name: 'Dashboard' })).toBeInTheDocument();
+  });
+});
+
+describe('Announcing the result (WCAG 4.1.3)', () => {
+  it('says how many things need attention once the checks finish', async () => {
+    render(<Dashboard />);
+    const announcement = screen.getByTestId('triage-announcement');
+    expect(announcement).toHaveAttribute('role', 'status');
+    expect(announcement).toBeEmptyDOMElement();
+    await waitFor(() => expect(announcement).toHaveTextContent('4 things need attention.'));
+  });
+
+  it('says only that the dashboard loaded when the queue is empty, never "all clear"', async () => {
+    mockLoad.mockResolvedValue(payload({
+      signals: {
+        missingKeyFields: { count: 0, exact: true },
+        unresolvedParent: { count: 0, exact: true },
+        possibleDuplicates: { count: 0, exact: false },
+        possibleFormDrift: { count: 0, exact: false },
+      },
+    }));
+    render(<Dashboard />);
+    await waitFor(() => expect(screen.getByTestId('triage-announcement')).toHaveTextContent('Dashboard loaded.'));
+  });
+});
+
+describe('A load that never answers (design review C7)', () => {
+  beforeEach(() => { mockTimeout.ms = 50; });
+  afterEach(() => { mockTimeout.ms = null; });
+
+  it('stops waiting, says so, and offers to try again', async () => {
+    mockLoad.mockReturnValue(new Promise(() => {}));
+    render(<Dashboard />);
+    expect(await screen.findByRole('alert')).toHaveTextContent('Some checks did not finish');
+    expect(screen.queryByTestId('triage-loading')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
+  });
+
+  it('runs the checks again from Try again', async () => {
+    mockLoad.mockReturnValueOnce(new Promise(() => {}));
+    render(<Dashboard />);
+    await userEvent.click(await screen.findByRole('button', { name: 'Try again' }));
+    await waitFor(() => expect(mockLoad).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(screen.queryByRole('alert')).not.toBeInTheDocument());
+  });
+
+  it('uses a timeout long enough for a slow field connection by default', () => {
+    const { LOAD_TIMEOUT_MS } = jest.requireActual('app/modules/async/settleWithin');
+    expect(LOAD_TIMEOUT_MS).toBeGreaterThanOrEqual(20000);
+  });
+});
+
+describe('No Parse session (design review C7)', () => {
+  it('sends the person to sign in instead of showing an empty organization', async () => {
+    mockUser.mockReturnValue(null);
+    render(<Dashboard />);
+    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/account/login'));
   });
 });

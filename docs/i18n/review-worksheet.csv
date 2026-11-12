@@ -50,6 +50,10 @@ common,dashboard_coverage,Community coverage,Cobertura comunitaria,Kouvèti komi
 common,dashboard_eyebrow_today,Today,Hoy,Jodi a,,Collect uses home.today
 common,dashboard_good_morning,"Good morning, {{name}}.","Buenos días, {{name}}.","Bonjou, {{name}}.",,
 common,dashboard_needs_attention,Needs attention,Requiere atención,Bezwen atansyon,,
+common,dashboard_announce_attention,{{count}} things need attention.,{{count}} cosas necesitan atención.,{{count}} bagay bezwen atansyon.,,"Dashboard announcement and load-failure alert (design review C7, WCAG 4.1.3). Spanish and Creole written by Claude: needs native review."
+common,dashboard_announce_attention_one,{{count}} thing needs attention.,{{count}} cosa necesita atención.,{{count}} bagay bezwen atansyon.,,"Dashboard announcement and load-failure alert (design review C7, WCAG 4.1.3). Spanish and Creole written by Claude: needs native review."
+common,dashboard_announce_loaded,Dashboard loaded.,Panel cargado.,Tablo a chaje.,,"Dashboard announcement and load-failure alert (design review C7, WCAG 4.1.3). Spanish and Creole written by Claude: needs native review."
+common,dashboard_load_failed,Some checks did not finish. Check your connection and try again.,Algunas verificaciones no terminaron. Revisa tu conexión e inténtalo de nuevo.,Kèk verifikasyon pa fini. Verifye koneksyon ou epi eseye ankò.,,"Dashboard announcement and load-failure alert (design review C7, WCAG 4.1.3). Spanish and Creole written by Claude: needs native review."
 common,dashboard_new_form,+ New form,+ Formulario nuevo,+ Nouvo fòm,,
 common,dashboard_sub,Here's what's moving.,Esto es lo que está pasando.,Men sa k ap pase.,,
 common,data_curation_anomalies,anomalies,anomalías,anomali,,

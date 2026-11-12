@@ -22,17 +22,46 @@
    ara/deu/ind/prt/zho were retired 2026-08-28. */
 .body {
   display: grid;
-  grid-template-columns: 65fr 35fr;
+  grid-template-columns: minmax(0, 65fr) minmax(0, 35fr);
   gap: var(--tk-dlite-semantic-spacing-lg);
   padding: var(--tk-dlite-semantic-spacing-md);
 }
 
-/* Spanish runs ~20% longer than English and Creole longer still: stack rather
-   than squeeze the columns. (This used to cite German and Portuguese, which
-   this app has not shipped since 2026-08-28.) */
-@media (max-width: 900px) {
+/* Stack rather than squeeze: Spanish runs ~20% longer than English and
+   Creole longer still. A container query on the page's own width (AppShell's
+   <main> is the size container), not the window: the window is wider than the
+   content by the docked sidebar, so the old 900px media query split a 636px
+   page into two columns and stacked a 900px one. */
+@container (max-width: 45rem) {
   .body {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.pageTitle {
+  margin: 0;
+  padding: var(--tk-dlite-semantic-spacing-md) var(--tk-dlite-semantic-spacing-md) 0;
+  font-family: var(--font-family-heading);
+  font-size: var(--tk-dlite-semantic-typography-size-700);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.loadFailed {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-md);
+  margin: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-md) 0;
+  padding: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-md);
+  border-radius: var(--tk-dlite-semantic-border-radius-md);
+  background: var(--tk-dlite-semantic-color-feedback-warning-bg);
+  color: var(--tk-dlite-semantic-color-feedback-warning-fg);
+
+  p {
+    margin: 0;
+    flex: 1 1 16rem;
   }
 }
 

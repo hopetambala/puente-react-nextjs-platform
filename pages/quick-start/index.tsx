@@ -5,9 +5,11 @@ import NeedsAttention from 'app/epics/DashboardTriage/NeedsAttention';
 import SyncRibbon from 'app/epics/DashboardTriage/SyncRibbon';
 import { summarizeSyncState } from 'app/epics/DashboardTriage/syncState';
 import { buildTriageQueue, findUnavailableSignals } from 'app/epics/DashboardTriage/triageQueue';
-import { AppShell, Skeleton } from 'app/impacto-design-system';
+import { AppShell, Button, Skeleton } from 'app/impacto-design-system';
+import { settleWithin } from 'app/modules/async/settleWithin';
 import { loadOrganizationScope } from 'app/modules/organization';
 import { retrieveCurrentUserAsyncFunction } from 'app/modules/user';
+import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { Parse } from 'parse';
@@ -71,10 +73,20 @@ const RECORD_STATE_BY_SYNC_STATUS: Record<string, 'none' | 'unknown'> = {
  */
 export default function Dashboard() {
   const { t } = useTranslation('common');
+  const router = useRouter();
 
   const [org, setOrg] = useState('');
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<TriageData | null>(null);
+  // A load that failed or never answered (design review C7). Try again bumps
+  // `attempt`, which reruns both effects below.
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+  const retry = () => {
+    setLoadFailed(false);
+    setLoading(true);
+    setAttempt((n) => n + 1);
+  };
 
   // Whether the account has been read yet. Without this the first render is
   // indistinguishable from "this account has no organization", and the page
@@ -82,8 +94,15 @@ export default function Dashboard() {
   const [accountRead, setAccountRead] = useState(false);
   useEffect(() => {
     const user = retrieveCurrentUserAsyncFunction();
-    if (user) setOrg(user.get('organization') || '');
+    // A stored login with no Parse session can't query anything: every load
+    // would hang. Send the person to sign in (design review C7).
+    if (!user) {
+      router.push('/account/login');
+      return;
+    }
+    setOrg(user.get('organization') || '');
     setAccountRead(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Every string this organization's records may carry. Resolved once, then
@@ -100,7 +119,7 @@ export default function Dashboard() {
     if (!org) { setLoading(false); return undefined; }
 
     let ignore = false;
-    loadOrganizationScope(Parse, org)
+    settleWithin(loadOrganizationScope(Parse, org))
       .then((values: string[]) => {
         if (ignore) return;
         setOrgValues(values);
@@ -119,24 +138,33 @@ export default function Dashboard() {
       // returned early on an empty orgValues, setLoading(false) was never
       // reached, and the dashboard shimmered indefinitely. Slow and failing
       // connections are this product's design case, not its edge case.
-      .catch(() => { if (!ignore) setLoading(false); });
+      .catch(() => {
+        if (ignore) return;
+        setLoading(false);
+        setLoadFailed(true);
+      });
 
     return () => { ignore = true; };
-  }, [org, accountRead]);
+  }, [org, accountRead, attempt]);
 
   useEffect(() => {
-    if (!orgValues.length) return;
+    if (!orgValues.length) return undefined;
     let ignore = false;
 
-    loadDashboardTriage({ Parse, orgValues, now: new Date() })
+    // settleWithin: a load that never answers ends as a failure, not a
+    // skeleton forever (design review C7).
+    settleWithin(loadDashboardTriage({ Parse, orgValues, now: new Date() }))
       .then((d) => { if (!ignore) setData(d); })
       // A failed load must leave the page standing, not blank it.
-      .catch(() => { if (!ignore) setData(null); })
+      .catch(() => {
+        if (ignore) return;
+        setData(null);
+        setLoadFailed(true);
+      })
       .finally(() => { if (!ignore) setLoading(false); });
 
-    // eslint-disable-next-line consistent-return
     return () => { ignore = true; };
-  }, [orgValues]);
+  }, [orgValues, attempt]);
 
   const syncState = data ? summarizeSyncState({ ...data.sync, now: new Date() }) : null;
   const queue = data ? buildTriageQueue(data.signals) : [];
@@ -154,12 +182,30 @@ export default function Dashboard() {
     ? (RECORD_STATE_BY_SYNC_STATUS[syncState.status] || 'some')
     : 'unknown';
 
+  // Said once the checks finish (WCAG 4.1.3). It never says "all clear": an
+  // empty queue can mean checks that could not run, which the queue explains.
+  let announcement = '';
+  if (!loading && !loadFailed) {
+    announcement = queue.length
+      ? t('dashboard_announce_attention', { count: queue.length })
+      : t('dashboard_announce_loaded');
+  }
+
   return (
     <AppShell breadcrumb={[t('breadcrumb_dashboard')]}>
       {/* Three bands: trust, work, context. The wrapper exists so the middle
           band can take the slack and the context strip anchors the bottom of
           the frame, rather than the page ending in 400px of uncomposed grey. */}
       <div className={styles.frame}>
+      {/* The page's name, matching the nav and breadcrumb (design review C10). */}
+      <h1 className={styles.pageTitle}>{t('breadcrumb_dashboard')}</h1>
+      <p className="sr-only" role="status" data-testid="triage-announcement">{announcement}</p>
+      {loadFailed && (
+        <div className={styles.loadFailed}>
+          <p role="alert">{t('dashboard_load_failed')}</p>
+          <Button isSmall text={t('action_try_again')} onClick={retry} />
+        </div>
+      )}
       <SyncRibbon state={syncState} loading={loading} />
 
       <div className={styles.body}>
@@ -196,11 +242,11 @@ export default function Dashboard() {
           <>
             <span className={styles.contextItem} data-testid="context-strip-loading">
               <Skeleton width={40} height={14} />
-              <Skeleton width={120} height={12} />
+              <Skeleton width="min(7.5rem, 30vw)" height={12} />
             </span>
             <span className={styles.contextItem}>
               <Skeleton width={28} height={14} />
-              <Skeleton width={200} height={12} />
+              <Skeleton width="min(12.5rem, 50vw)" height={12} />
             </span>
           </>
         ) : (
