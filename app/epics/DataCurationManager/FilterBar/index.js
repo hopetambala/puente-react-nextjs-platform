@@ -1,4 +1,5 @@
 import { SegmentedControl } from 'app/impacto-design-system';
+import Icon from 'app/impacto-design-system/icon';
 import { useTranslation } from 'next-i18next';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
@@ -25,6 +26,13 @@ const COMPLETENESS_OPTIONS = [
   { value: 'low',  key: 'data_curation_completeness_low' },
 ];
 
+let idCounter = 0;
+function fieldIds() {
+  idCounter += 1;
+  const base = `curation-filter-${idCounter}`;
+  return { search: `${base}-search`, surveyor: `${base}-surveyor`, community: `${base}-community` };
+}
+
 export default function FilterBar({ surveyors, communities, onFilterChange, loading }) {
   const { t } = useTranslation('common');
   const [search, setSearch] = useState('');
@@ -33,6 +41,9 @@ export default function FilterBar({ surveyors, communities, onFilterChange, load
   const [status, setStatus] = useState('all');
   const [completeness, setCompleteness] = useState('all');
   const debounceRef = useRef(null);
+  // React 17 has no useId. One bar per page, so fixed ids would do today, but
+  // a second instance (a saved-filter preview, a story) would collide.
+  const ids = useMemo(() => fieldIds(), []);
 
   const statusOptions = useMemo(
     () => STATUS_OPTIONS.map(({ value, key }) => ({ value, label: t(key) })),
@@ -79,34 +90,57 @@ export default function FilterBar({ surveyors, communities, onFilterChange, load
   useEffect(() => () => clearTimeout(debounceRef.current), []);
 
   return (
-    <div className={styles.filterStrip}>
+    // A search landmark: the filters are how a coordinator finds a record, and
+    // a screen-reader user can jump straight to them. A role rather than the
+    // <search> element, which Safari before 17 and jsdom don't know.
+    <div role="search" className={styles.filterStrip} aria-label={t('data_curation_filters_label')}>
       <div className={styles.filterLeft}>
-        <div className={styles.search}>
-          <span className={styles.searchIcon}>⌕</span>
-          <input
-            type="text"
-            className={styles.searchInput}
-            placeholder={t('data_curation_search_placeholder')}
-            value={search}
-            onChange={handleSearch}
-            disabled={loading}
-          />
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor={ids.search}>{t('data_curation_search_label')}</label>
+          <div className={styles.search}>
+            <Icon name="search" size="small" className={styles.searchIcon} />
+            <input
+              id={ids.search}
+              type="search"
+              className={styles.searchInput}
+              placeholder={t('data_curation_search_placeholder')}
+              value={search}
+              onChange={handleSearch}
+              disabled={loading}
+            />
+          </div>
         </div>
 
-        <select className={styles.filterSelect} value={surveyor} onChange={handleSurveyor} disabled={loading}>
-          <option value="">{t('data_curation_all_surveyors')}</option>
-          {surveyors.map((s) => <option key={s} value={s}>{s}</option>)}
-        </select>
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor={ids.surveyor}>{t('field_surveyor')}</label>
+          <select id={ids.surveyor} className={styles.filterSelect} value={surveyor} onChange={handleSurveyor} disabled={loading}>
+            <option value="">{t('data_curation_all_surveyors')}</option>
+            {surveyors.map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
+        </div>
 
-        <select className={styles.filterSelect} value={community} onChange={handleCommunity} disabled={loading}>
-          <option value="">{t('data_curation_all_communities')}</option>
-          {communities.map((c) => <option key={c} value={c}>{c}</option>)}
-        </select>
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor={ids.community}>{t('field_community')}</label>
+          <select id={ids.community} className={styles.filterSelect} value={community} onChange={handleCommunity} disabled={loading}>
+            <option value="">{t('data_curation_all_communities')}</option>
+            {communities.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
       </div>
 
       <div className={styles.filterRight}>
-        <SegmentedControl options={statusOptions} value={status} onChange={handleStatus} />
-        <SegmentedControl options={completenessOptions} value={completeness} onChange={handleCompleteness} />
+        <SegmentedControl
+          label={t('data_curation_filter_status')}
+          options={statusOptions}
+          value={status}
+          onChange={handleStatus}
+        />
+        <SegmentedControl
+          label={t('data_curation_col_completeness')}
+          options={completenessOptions}
+          value={completeness}
+          onChange={handleCompleteness}
+        />
       </div>
     </div>
   );

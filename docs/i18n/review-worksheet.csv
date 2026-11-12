@@ -56,17 +56,23 @@ common,dashboard_announce_loaded,Dashboard loaded.,Panel cargado.,Tablo a chaje.
 common,dashboard_load_failed,Some checks did not finish. Check your connection and try again.,Algunas verificaciones no terminaron. Revisa tu conexión e inténtalo de nuevo.,Kèk verifikasyon pa fini. Verifye koneksyon ou epi eseye ankò.,,"Dashboard announcement and load-failure alert (design review C7, WCAG 4.1.3). Spanish and Creole written by Claude: needs native review."
 common,dashboard_new_form,+ New form,+ Formulario nuevo,+ Nouvo fòm,,
 common,dashboard_sub,Here's what's moving.,Esto es lo que está pasando.,Men sa k ap pase.,,
-common,data_curation_anomalies,anomalies,anomalías,anomali,,
-common,data_curation_avg,avg completeness,completitud promedio,mwayèn konplè,,
-common,data_curation_dups,duplicates,duplicados,doub,,
 common,data_curation_edit,Edit,Editar,Modifye,,Collect uses findRecordSettings.edit
 common,data_curation_empty,Data curation tools are coming soon.,Las herramientas de curación de datos estarán disponibles pronto.,Zouti kirasyon done yo ap disponib byento.,,
 common,data_curation_filtered_missing-key-fields,"Showing only records missing key fields. The counts below describe this filtered set, not every record.","Mostrando solo los registros a los que les faltan campos clave. Las cifras siguientes describen este conjunto filtrado, no todos los registros.","N ap montre sèlman dosye ki manke chan kle. Chif ki anba yo dekri ansanm filtre sa a, se pa tout dosye yo.",,
 common,data_curation_filtered_unresolved-parent,"Showing only records with an unresolved household link. The counts below describe this filtered set, not every record.","Mostrando solo los registros con un vínculo de hogar sin resolver. Las cifras siguientes describen este conjunto filtrado, no todos los registros.","N ap montre sèlman dosye ki gen yon lyen kay ki poko rezoud. Chif ki anba yo dekri ansanm filtre sa a, se pa tout dosye yo.",,
-common,data_curation_records,records,registros,dosye,,
 common,data_curation_records_table,Records table,Tabla de registros,Tablo dosye yo,,Accessible name of the scrollable records table (screen readers only). Spanish and Creole written by Claude: needs native review.
 common,data_curation_save,Save,Guardar,Sove,,
 common,data_curation_sub,"Curate, clean, and review collected records.","Cura, limpia y revisa los registros recolectados.","Kire, netwaye epi revize dosye yo kolekte yo.",,
+common,data_curation_summary_total_one,"{{count, number}} record","{{count, number}} registro","{{count, number}} dosye",,"Whole data set, not the page (design review C13). Needs native review."
+common,data_curation_summary_total_other,"{{count, number}} records","{{count, number}} registros","{{count, number}} dosye",,Needs native review.
+common,data_curation_summary_page,"On this page ({{count, number}}):","En esta página ({{count, number}}):","Sou paj sa a ({{count, number}}):",,Qualifies the figures after it as this page only (C13). Needs native review.
+common,data_curation_summary_avg,"{{pct, number}}% average completeness","{{pct, number}} % de completitud promedio","{{pct, number}}% mwayèn konplè",,Needs native review.
+common,data_curation_summary_dups_one,"{{count, number}} possible duplicate","{{count, number}} posible duplicado","{{count, number}} doub posib",,"""Possible"": a flag for review, not a verdict. Needs native review."
+common,data_curation_summary_dups_other,"{{count, number}} possible duplicates","{{count, number}} posibles duplicados","{{count, number}} doub posib",,Needs native review.
+common,data_curation_summary_anomalies_one,"{{count, number}} anomaly","{{count, number}} anomalía","{{count, number}} anomali",,Needs native review.
+common,data_curation_summary_anomalies_other,"{{count, number}} anomalies","{{count, number}} anomalías","{{count, number}} anomali",,Needs native review.
+common,data_curation_load_failed,Records didn't load. Check your connection and try again.,Los registros no se cargaron. Revisa tu conexión e inténtalo de nuevo.,Dosye yo pa chaje. Verifye koneksyon ou epi eseye ankò.,,Replaces an endless skeleton (C7). Needs native review.
+common,data_curation_view_label,View,Vista,Vi,,Needs native review.
 common,divider_or,or,o,oswa,,
 common,eng,English,Inglés,Anglè,,Collect uses languagePicker.english
 common,error_with_status,An error occurred on server,Ocurrió un error en el servidor,Yon erè te rive sou sèvè a,,
@@ -239,6 +245,9 @@ common,form_manager_create,+ Create form,+ Crear formulario,+ Kreye fòm,,
 common,data_curation_search_placeholder,Search records…,Buscar registros…,Chèche dosye…,,
 common,data_curation_all_surveyors,All surveyors,Todos los encuestadores,Tout ankètè,,
 common,data_curation_all_communities,All communities,Todas las comunidades,Tout kominote,,
+common,data_curation_filters_label,Filter records,Filtrar registros,Filtre dosye yo,,Names the filter landmark for screen readers. Needs native review.
+common,data_curation_search_label,Search,Buscar,Chèche,,Visible label over the record search. Needs native review.
+common,data_curation_filter_status,Status,Estado,Estati,,Names the status filter group. Needs native review.
 common,data_curation_status_all,All,Todos,Tout,,
 common,data_curation_status_duplicates,Duplicates,Duplicados,Doub,,
 common,data_curation_status_anomalies,Anomalies,Anomalías,Anomali,,
@@ -297,7 +306,6 @@ common,action_cancel,Cancel,Cancelar,Anile,,Design-system string added by the re
 common,action_try_again,Try again,Intentar de nuevo,Eseye ankò,,Retry after a failed load (design review C7). Spanish and Creole written by Claude: needs native review.
 common,status_loading,Loading,Cargando,Ap chaje,,Design-system string added by the responsive/a11y overhaul. Spanish and Creole written by Claude: needs native review.
 common,notifications_label,Notifications,Notificaciones,Notifikasyon,,Design-system string added by the responsive/a11y overhaul. Spanish and Creole written by Claude: needs native review.
-common,data_curation_inspector_close_overlay,Close inspector overlay,Cerrar la capa del inspector,Fèmen kouch enspektè a,,
 common,data_curation_inspector_save_failed,Save failed — try again,No se pudo guardar. Inténtalo de nuevo.,Nou pa t ka sove. Eseye ankò.,,
 common,data_curation_inspector_saving,Saving…,Guardando…,Ap sove…,,
 common,data_curation_inspector_unsaved,Unsaved changes,Cambios sin guardar,Chanjman ki pa sove,,
@@ -314,8 +322,11 @@ common,data_curation_col_completeness,Completeness,Completitud,Konplè,,
 common,data_curation_col_flags,Flags,Señales,Siyal,,
 common,data_curation_flag_dup,Dup,Dup,Doub,,
 common,data_curation_flag_low,Low,Bajo,Ba,,
-common,data_curation_prev,← Prev,← Anterior,← Anvan,,
-common,data_curation_next,Next →,Siguiente →,Apre →,,
+common,data_curation_prev,Previous,Anterior,Anvan,,Arrows removed: screen readers read them aloud (design review X10).
+common,data_curation_next,Next,Siguiente,Apre,,Arrows removed: screen readers read them aloud (design review X10).
+common,data_curation_no_records,No records yet. Records appear here after field staff sync from Puente Collect.,Todavía no hay registros. Aparecen aquí cuando el personal de campo sincroniza desde Puente Collect.,Poko gen dosye. Dosye yo parèt isit la apre ekip teren an senkronize depi Puente Collect.,,"Curation empty states (design review C18, X13; wording from its rewrite table). Creole written by Claude: needs native review."
+common,data_curation_no_results,No records match these filters.,Ningún registro coincide con estos filtros.,Pa gen okenn dosye ki koresponn ak filtè sa yo.,,"Curation empty states (design review C18, X13; wording from its rewrite table). Creole written by Claude: needs native review."
+common,data_curation_clear_filters,Clear filters,Quitar filtros,Retire filtè yo,,"Curation empty states (design review C18, X13; wording from its rewrite table). Creole written by Claude: needs native review."
 common,data_curation_percent,"{{pct, number}}%","{{pct, number}} %","{{pct, number}} %",,
 common,data_curation_completeness_aria,"{{pct, number}}% complete","{{pct, number}} % completo","{{pct, number}} % konplè",,
 common,pagination_showing,"Showing {{from, number}}–{{to, number}} of {{total, number}}","Mostrando {{from, number}}–{{to, number}} de {{total, number}}","Ap montre {{from, number}}–{{to, number}} sou {{total, number}}",,

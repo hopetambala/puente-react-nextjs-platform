@@ -14,7 +14,7 @@
     "pages/data/": "PR 6 (data routes)",
     "pages/index.module.scss": "PR 7 (landing page)"
   },
-  "total": 173,
+  "total": 158,
   "files": {
     "app/epics/DataAnalyticsManager/index.module.scss": {
       "no-empty-source": 1
@@ -24,19 +24,6 @@
     },
     "app/epics/DataCurationManager/DuplicateResolver/index.module.css": {
       "declaration-property-unit-disallowed-list": 3
-    },
-    "app/epics/DataCurationManager/FilterBar/index.module.css": {
-      "declaration-property-unit-disallowed-list": 3
-    },
-    "app/epics/DataCurationManager/RecordInspector/index.module.css": {
-      "declaration-property-unit-disallowed-list": 7,
-      "declaration-property-value-disallowed-list": 1
-    },
-    "app/epics/DataCurationManager/RecordsTable/index.module.css": {
-      "declaration-property-unit-disallowed-list": 3
-    },
-    "app/epics/DataCurationManager/index.module.css": {
-      "declaration-property-unit-disallowed-list": 1
     },
     "app/epics/FormCreator/FormBlocks/index.module.scss": {
       "color-named": 1,

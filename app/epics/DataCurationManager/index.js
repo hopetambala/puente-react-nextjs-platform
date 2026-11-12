@@ -1,4 +1,5 @@
-import { SegmentedControl, Skeleton } from 'app/impacto-design-system';
+import { Button, SegmentedControl, Skeleton } from 'app/impacto-design-system';
+import { settleWithin } from 'app/modules/async/settleWithin';
 import {
   detectDuplicates,
   flagAnomalies,
@@ -92,6 +93,12 @@ export default function DataCurationManager() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
+  // Bumped by Try again, so the fetch effect runs with unchanged filters.
+  const [attempt, setAttempt] = useState(0);
+  // FilterBar keeps its own field state. Remounting it (a new key) is how a
+  // clear or a source change empties the fields along with the query.
+  const [filterBarKey, setFilterBarKey] = useState(0);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [duplicateGroup, setDuplicateGroup] = useState(null);
   const [dups, setDups] = useState(new Set());
@@ -106,6 +113,15 @@ export default function DataCurationManager() {
 
   const user = retrieveCurrentUserAsyncFunction();
   const org = user ? user.get('organization') : '';
+  const router = useRouter();
+
+  // A stored login with no Parse session can't query anything, and the page
+  // used to show skeletons forever. Send the person to sign in (design review
+  // C7), as the dashboard does.
+  const signedOut = !user;
+  useEffect(() => {
+    if (signedOut) router?.push('/account/login');
+  }, [signedOut, router]);
 
   // Every string this organization's records may carry, not just the one on the
   // account. Records hold what was COLLECTED, and one organization's are spread
@@ -125,7 +141,6 @@ export default function DataCurationManager() {
   // The dashboard's needs-attention queue deep-links here as
   // /data/data-curation?signal=<name>. Optional-chained: this component also
   // renders outside a router context.
-  const router = useRouter();
   const signal = router?.query?.signal || '';
 
   // Every signal predicate in app/modules/data-quality reads SurveyData and only
@@ -172,7 +187,12 @@ export default function DataCurationManager() {
 
   // Main paginated fetch
   useEffect(() => {
-    if (!org) return;
+    // An account with no organization has no records to scope to; show the
+    // empty state rather than a skeleton that never resolves.
+    if (!org) {
+      setLoading(false);
+      return undefined;
+    }
     setLoading(true);
     const parseClass = resolveParseClass(source);
     // Signal-scoped queues build off the shared predicates in
@@ -198,15 +218,28 @@ export default function DataCurationManager() {
     if (filters.to) q.lessThanOrEqualTo('createdAt', filters.to);
     q.descending('createdAt').limit(PAGE_SIZE).skip(page * PAGE_SIZE);
 
-    Promise.all([q.find(), q.count()])
+    setLoadFailed(false);
+    let ignore = false;
+    // settleWithin: a query that never answers ends as a failure, not a
+    // skeleton forever (design review C7). A failure says so and offers Try
+    // again; it no longer passes itself off as an empty organization.
+    settleWithin(Promise.all([q.find(), q.count()]))
       .then(([results, count]) => {
+        if (ignore) return;
         setRecords(results);
         setTotal(count);
         setDups(detectDuplicates(results));
       })
-      .catch(() => { setRecords([]); setTotal(0); })
-      .finally(() => setLoading(false));
-  }, [source, filters, page, org, orgValues, activeSignal]);
+      .catch(() => {
+        if (ignore) return;
+        setRecords([]);
+        setTotal(0);
+        setDups(new Set());
+        setLoadFailed(true);
+      })
+      .finally(() => { if (!ignore) setLoading(false); });
+    return () => { ignore = true; };
+  }, [source, filters, page, org, orgValues, activeSignal, attempt]);
 
   const handleSourceChange = (newSource) => {
     setSource(newSource);
@@ -217,6 +250,15 @@ export default function DataCurationManager() {
     // leftover community filter matches zero rows on any other class and reads
     // as "no data collected" rather than surfacing an error.
     setFilters(EMPTY_FILTERS);
+    setFilterBarKey((k) => k + 1);
+  };
+
+  const hasFilters = Object.keys(EMPTY_FILTERS).some((k) => filters[k] !== EMPTY_FILTERS[k]);
+
+  const handleClearFilters = () => {
+    setFilters(EMPTY_FILTERS);
+    setPage(0);
+    setFilterBarKey((k) => k + 1);
   };
 
   const handleFilterChange = (newFilters) => {
@@ -238,7 +280,7 @@ export default function DataCurationManager() {
     if (partner) setDuplicateGroup({ a: record, b: partner });
   };
 
-  const refetch = () => setFilters((prev) => ({ ...prev }));
+  const refetch = () => setAttempt((n) => n + 1);
 
   // Client-side filter for status/completeness after fetch
   const visibleRecords = records.filter((r) => {
@@ -259,6 +301,7 @@ export default function DataCurationManager() {
     <div className={styles.manager}>
       <div className={styles.viewTabs}>
         <SegmentedControl
+          label={t('data_curation_view_label')}
           options={[
             { label: t('data_curation_tab_records'), value: 'records' },
             { label: t('data_curation_tab_community_audit'), value: 'community-audit' },
@@ -278,27 +321,36 @@ export default function DataCurationManager() {
             <p className={styles.signalNotice}>{t(SIGNAL_NOTICE_KEYS[activeSignal])}</p>
           )}
 
-          {/* Summary bar */}
-          <div className={styles.summaryBar}>
-            {loading ? (
+          {/* Summary bar. The total is the data set's count; the averages are
+              computed from the rows on screen and say so (design review C13).
+              A polite status, so filtering reads out the new counts. */}
+          <div className={styles.summaryBar} role="status" aria-busy={loading}>
+            {loading && <Skeleton width="min(24rem, 100%)" height="1em" />}
+            {!loading && !loadFailed && (
               <>
-                <Skeleton width={80} height={14} />
-                <Skeleton width={100} height={14} />
-                <Skeleton width={80} height={14} />
-                <Skeleton width={90} height={14} />
-              </>
-            ) : (
-              <>
-                <span>{records.length} {t('data_curation_records')}</span>
-                <span>{avgCompleteness}% {t('data_curation_avg')}</span>
-                <span>{dups.size} {t('data_curation_dups')}</span>
-                <span>{anomalies.size} {t('data_curation_anomalies')}</span>
+                <span className={styles.summaryTotal}>{t('data_curation_summary_total', { count: total })}</span>
+                {records.length > 0 && (
+                  <>
+                    <span>{t('data_curation_summary_page', { count: records.length })}</span>
+                    <span>{t('data_curation_summary_avg', { pct: avgCompleteness })}</span>
+                    <span>{t('data_curation_summary_dups', { count: dups.size })}</span>
+                    <span>{t('data_curation_summary_anomalies', { count: anomalies.size })}</span>
+                  </>
+                )}
               </>
             )}
           </div>
 
+          {loadFailed && (
+            <div className={styles.loadFailed}>
+              <p role="alert">{t('data_curation_load_failed')}</p>
+              <Button isSmall text={t('action_try_again')} onClick={refetch} />
+            </div>
+          )}
+
           {/* Filter bar */}
           <FilterBar
+            key={filterBarKey}
             surveyors={surveyors}
             communities={communities}
             onFilterChange={handleFilterChange}
@@ -326,6 +378,8 @@ export default function DataCurationManager() {
                 onDuplicateGroup={handleDuplicateGroup}
                 loading={loading}
                 formDefinition={formDefinition}
+                hasFilters={hasFilters}
+                onClearFilters={handleClearFilters}
               />
             )}
 

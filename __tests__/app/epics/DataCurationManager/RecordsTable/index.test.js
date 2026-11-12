@@ -230,32 +230,32 @@ describe('RecordsTable — completeness is scored per source', () => {
   it('scores a fully populated vitals row 100%', () => {
     const rec = pointerRecord('v1', FULL_VITALS, { fname: 'Juan', lname: 'Perez' });
     render(<RecordsTable {...defaultProps} source="vitals" records={[rec]} />);
-    expect(screen.getByLabelText('data_curation_completeness_aria(pct=100)')).toBeInTheDocument();
+    expect(screen.getByRole('meter')).toHaveAttribute('aria-valuenow', '100');
   });
 
   it('scores a vitals row with 4 of 6 readings 67%', () => {
     const partial = { bloodPressure: '120/80', pulse: '70', temp: '36.8', weight: '70' };
     const rec = pointerRecord('v2', partial, { fname: 'Juan', lname: 'Perez' });
     render(<RecordsTable {...defaultProps} source="vitals" records={[rec]} />);
-    expect(screen.getByLabelText('data_curation_completeness_aria(pct=67)')).toBeInTheDocument();
+    expect(screen.getByRole('meter')).toHaveAttribute('aria-valuenow', '67');
   });
 
   it('scores a fully populated eval-medical row 100%', () => {
     const rec = pointerRecord('e1', FULL_EVAL_MEDICAL, { fname: 'Juan', lname: 'Perez' });
     render(<RecordsTable {...defaultProps} source="eval-medical" records={[rec]} />);
-    expect(screen.getByLabelText('data_curation_completeness_aria(pct=100)')).toBeInTheDocument();
+    expect(screen.getByRole('meter')).toHaveAttribute('aria-valuenow', '100');
   });
 
   it('scores a fully populated env-health row 100%', () => {
     const rec = pointerRecord('h1', FULL_ENV_HEALTH, { fname: 'Juan', lname: 'Perez' });
     render(<RecordsTable {...defaultProps} source="env-health" records={[rec]} />);
-    expect(screen.getByLabelText('data_curation_completeness_aria(pct=100)')).toBeInTheDocument();
+    expect(screen.getByRole('meter')).toHaveAttribute('aria-valuenow', '100');
   });
 
   it('still scores a survey-data row against the SurveyData fields', () => {
     render(<RecordsTable {...defaultProps} />);
     // makeRecord() populates 4 of the 8 scored fields: fname, lname, communityname, surveyingUser
-    expect(screen.getByLabelText('data_curation_completeness_aria(pct=50)')).toBeInTheDocument();
+    expect(screen.getByRole('meter')).toHaveAttribute('aria-valuenow', '50');
   });
 });
 
@@ -273,5 +273,62 @@ describe('RecordsTable — unrecognised source follows the SurveyData fallback',
   it('reads the community off the record itself when the source is unrecognised', () => {
     render(<RecordsTable {...defaultProps} source="not-a-known-source" />);
     expect(screen.getByText('Nsanje')).toBeInTheDocument();
+  });
+});
+
+// ─── Overhaul PR 5: design review C7, C18/X13, C21, X10 and the audit ────────
+describe('RecordsTable — opening a record without a mouse', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it('makes the name a button, so Enter opens the record (WCAG 2.1.1)', () => {
+    render(<RecordsTable {...defaultProps} />);
+    const open = screen.getByRole('button', { name: 'Hope Tambala' });
+    open.focus();
+    fireEvent.click(open);
+    expect(mockOnSelectRecord).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('RecordsTable — completeness is a meter with its number shown', () => {
+  it('exposes the score as a labelled meter and prints the percentage (WCAG 1.4.1, 4.1.2)', () => {
+    render(<RecordsTable {...defaultProps} />);
+    const meter = screen.getByRole('meter');
+    expect(meter).toHaveAttribute('aria-valuemin', '0');
+    expect(meter).toHaveAttribute('aria-valuemax', '100');
+    const pct = meter.getAttribute('aria-valuenow');
+    expect(meter).toHaveAccessibleName('data_curation_col_completeness');
+    expect(screen.getByText(`data_curation_percent(pct=${pct})`)).toBeInTheDocument();
+  });
+});
+
+describe('RecordsTable — empty and loading states', () => {
+  const empty = { ...defaultProps, records: [], total: 0 };
+
+  it('says where records come from when there are none yet, without "Showing 0–0 of 0"', () => {
+    render(<RecordsTable {...empty} hasFilters={false} />);
+    expect(screen.getByText('data_curation_no_records')).toBeInTheDocument();
+    expect(screen.queryByText(/pagination_showing/)).not.toBeInTheDocument();
+  });
+
+  it('says no records match the filters, with a way to clear them', () => {
+    const onClearFilters = jest.fn();
+    render(<RecordsTable {...empty} hasFilters onClearFilters={onClearFilters} />);
+    expect(screen.getByText('data_curation_no_results')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'data_curation_clear_filters' }));
+    expect(onClearFilters).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not claim "Showing 0–0 of 0" while it is still loading, and says it is busy', () => {
+    render(<RecordsTable {...defaultProps} records={[]} total={0} loading />);
+    expect(screen.queryByText(/pagination_showing/)).not.toBeInTheDocument();
+    expect(screen.getByRole('table')).toHaveAttribute('aria-busy', 'true');
+  });
+});
+
+describe('RecordsTable — pagination labels (design review X10)', () => {
+  it('uses words, not arrow characters, which screen readers read aloud', () => {
+    const eng = require('../../../../../public/locales/eng/common.json');
+    expect(eng.data_curation_prev).not.toMatch(/[←→‹›]/);
+    expect(eng.data_curation_next).not.toMatch(/[←→‹›]/);
   });
 });

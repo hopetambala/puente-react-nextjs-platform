@@ -11,12 +11,18 @@ import { SURVEY_COMPLETENESS_FIELDS } from 'app/modules/data-quality';
 // eslint-disable-next-line global-require
 const engCommon = require('public/locales/eng/common.json');
 
+// Mirrors i18next where it matters here: a `count` picks the `_one`/`_other`
+// form, and `{{count, number}}` interpolates like `{{count}}`.
 const mockTranslate = (key, opts) => {
-  if (!(key in engCommon)) return `MISSING:${key}`;
-  let out = engCommon[key];
+  let resolved = key;
+  if (opts && typeof opts.count === 'number' && !(key in engCommon)) {
+    resolved = `${key}_${opts.count === 1 ? 'one' : 'other'}`;
+  }
+  if (!(resolved in engCommon)) return `MISSING:${key}`;
+  let out = engCommon[resolved];
   if (opts) {
     Object.entries(opts).forEach(([k, v]) => {
-      out = out.replace(new RegExp(`{{\\s*${k}\\s*}}`, 'g'), String(v));
+      out = out.replace(new RegExp(`{{\\s*${k}\\s*(,[^}]*)?}}`, 'g'), String(v));
     });
   }
   return out;

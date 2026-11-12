@@ -1,58 +1,5 @@
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: var(--gradient-modal-backdrop);
-  border: none;
-  cursor: pointer;
-  z-index: var(--z-modal);
-}
-
-.panel {
-  position: fixed;
-  top: 0;
-  right: 0;
-  height: 100vh;
-  width: 360px;
-  background: var(--tk-dlite-semantic-color-surface-base);
-  box-shadow: var(--tk-dlite-semantic-elevation-high);
-  z-index: var(--z-modal);
-  display: flex;
-  flex-direction: column;
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--tk-dlite-semantic-spacing-md);
-  border-bottom: 1px solid var(--tk-dlite-semantic-color-border);
-}
-
-.title {
-  font-family: var(--font-family-heading);
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--tk-dlite-semantic-color-text-primary);
-}
-
-.closeBtn {
-  border: none;
-  background: none;
-  font-size: 16px;
-  color: var(--tk-dlite-semantic-color-text-secondary);
-  cursor: pointer;
-  padding: var(--tk-dlite-semantic-spacing-xs);
-  line-height: 1;
-}
-
-.body {
-  flex: 1;
-  overflow-y: auto;
-  padding: var(--tk-dlite-semantic-spacing-md);
-  display: flex;
-  flex-direction: column;
-  gap: var(--tk-dlite-semantic-spacing-lg);
-}
+/* The frame (header, scrolling body, pinned footer, side vs bottom sheet) is
+   the Sheet primitive's. This file styles only what goes inside it. */
 
 .section {
   display: flex;
@@ -60,10 +7,16 @@
   gap: var(--tk-dlite-semantic-spacing-sm);
 }
 
+.section + .section {
+  margin-block-start: var(--tk-dlite-semantic-spacing-lg);
+}
+
+/* Uppercase and tracked so it still reads as a label at a small size
+   (design review C12). */
 .sectionTitle {
   margin: 0;
   font-family: var(--font-family-heading);
-  font-size: 11px;
+  font-size: var(--tk-dlite-semantic-typography-size-200);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -78,42 +31,53 @@
 
 .fieldLabel {
   font-family: var(--font-family);
-  font-size: 12px;
+  font-size: var(--tk-dlite-semantic-typography-size-200);
   color: var(--tk-dlite-semantic-color-text-secondary);
 }
 
+/* Font size comes from the global input rule (16px on touch, so iOS doesn't
+   zoom); the focus ring is the global one. */
 .input {
-  height: var(--input-height);
-  border: 1px solid var(--tk-dlite-semantic-color-border);
+  min-height: var(--tk-dlite-semantic-sizing-target-comfortable);
+  padding: 0 var(--tk-dlite-semantic-spacing-sm);
+  border: 1px solid var(--tk-dlite-semantic-color-border-control);
   border-radius: var(--tk-dlite-semantic-border-radius-sm);
   background: var(--tk-dlite-semantic-color-surface-base);
-  padding: 0 var(--tk-dlite-semantic-spacing-sm);
   font-family: var(--font-family);
-  font-size: 13px;
   color: var(--tk-dlite-semantic-color-text-primary);
-}
-
-.input:focus-visible {
-  border-color: var(--tk-dlite-semantic-color-action-primary);
 }
 
 .readOnly {
-  font-family: var(--font-family);
-  font-size: 13px;
-  color: var(--tk-dlite-semantic-color-text-primary);
   padding: var(--tk-dlite-semantic-spacing-xs) 0;
+  font-family: var(--font-family);
+  font-size: var(--tk-dlite-semantic-typography-size-300);
+  color: var(--tk-dlite-semantic-color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.error {
+  margin: 0 0 var(--tk-dlite-semantic-spacing-md);
+  padding: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-md);
+  border-radius: var(--tk-dlite-semantic-border-radius-md);
+  background: var(--tk-dlite-semantic-color-feedback-danger-bg);
+  color: var(--tk-dlite-semantic-color-feedback-danger-active);
 }
 
 .footer {
   display: flex;
-  gap: var(--tk-dlite-semantic-spacing-sm);
-  padding: var(--tk-dlite-semantic-spacing-md);
-  border-top: 1px solid var(--tk-dlite-semantic-color-border);
+  flex-wrap: wrap;
   align-items: center;
+  gap: var(--tk-dlite-semantic-spacing-sm);
+  width: 100%;
 }
 
 .unsavedWarning {
+  margin-inline-start: auto;
   font-family: var(--font-family);
-  font-size: 12px;
-  color: var(--tk-dlite-semantic-color-feedback-warning);
+  font-size: var(--tk-dlite-semantic-typography-size-200);
+  color: var(--tk-dlite-semantic-color-feedback-warning-fg);
+}
+
+.unsavedWarning:empty {
+  display: none;
 }

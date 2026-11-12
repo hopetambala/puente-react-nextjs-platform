@@ -10,13 +10,17 @@ import { useEffect, useRef } from 'react';
  *
  * - `open` → showModal() / close(), so React state stays the source of truth.
  * - Focus goes back to whatever opened the dialog when it closes (WCAG 2.4.3).
- * - A click on the backdrop closes it. That is a click whose target is the
- *   <dialog> element itself, so the dialog's content must fill it (no padding
- *   on the <dialog>; pad an inner element).
- * - Closes the browser starts (Esc, a backdrop click) report through
- *   `onClose`, so the parent's state can't drift from the DOM. A close the
- *   parent caused by setting `open` to false does not call `onClose` again:
- *   callers that toggle (`() => setOpen(!open)`) would otherwise reopen it.
+ * - Esc and a click on the backdrop are requests, not closes: they call
+ *   `onClose`, and the dialog closes when the parent sets `open` to false. A
+ *   parent may decline: a sheet with unsaved edits asks "Discard changes?"
+ *   instead of vanishing with them. (A backdrop click is a click whose target
+ *   is the <dialog> element itself, so the content must fill it: no padding on
+ *   the <dialog>; pad an inner element.)
+ * - A close the browser forces anyway (Chrome closes on a second Esc with no
+ *   user activation between) is reported through `onClose` too, so the
+ *   parent's state can't drift from the DOM. A close the parent caused by
+ *   setting `open` to false does not call `onClose` again: callers that toggle
+ *   (`() => setOpen(!open)`) would otherwise reopen it.
  *
  * Shared by the AppShell nav drawer, Dialog and Sheet.
  *
@@ -58,14 +62,20 @@ export default function useModalDialog(open, onClose) {
       }
       if (openRef.current) onCloseRef.current();
     };
+    const handleCancel = (event) => {
+      event.preventDefault();
+      onCloseRef.current();
+    };
     const handleBackdropClick = (event) => {
-      if (event.target === dialog) dialog.close();
+      if (event.target === dialog) onCloseRef.current();
     };
 
     dialog.addEventListener('close', handleClose);
+    dialog.addEventListener('cancel', handleCancel);
     dialog.addEventListener('click', handleBackdropClick);
     return () => {
       dialog.removeEventListener('close', handleClose);
+      dialog.removeEventListener('cancel', handleCancel);
       dialog.removeEventListener('click', handleBackdropClick);
     };
   }, []);

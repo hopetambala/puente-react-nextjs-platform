@@ -1,5 +1,9 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import {
+  act, fireEvent, render, screen, waitFor, within,
+} from '@testing-library/react';
+
+import { axe } from '../../../../../__test-utils__/axe';
 
 // `t` echoes the key, so an assertion on a key proves the string reached t().
 jest.mock('next-i18next', () => ({ useTranslation: () => ({ t: (k) => k }) }));
@@ -8,7 +12,8 @@ jest.mock('app/impacto-design-system', () => ({
   Button: ({ text, onClick, isDisabled }) => (
     <button type="button" onClick={onClick} disabled={isDisabled}>{text}</button>
   ),
-  Toast: ({ text }) => <div data-testid="toast">{text}</div>,
+  // The real Sheet: the inspector's dialog behaviour is what is under test.
+  Sheet: jest.requireActual('app/impacto-design-system/sheet').default,
   Badge: ({ children, variant }) => <span data-testid={`badge-${variant}`}>{children}</span>,
   Modal: ({ open, text, actionText, action, handleClose }) =>
     open ? (
@@ -214,9 +219,8 @@ describe('RecordInspector — chrome and coded values', () => {
 
   const props = { record: makeRecord(), source: 'survey-data', formDefinition: null, onClose: mockOnClose, onSaved: mockOnSaved };
 
-  it('routes both close affordances through t()', () => {
+  it('routes the close button through t()', () => {
     render(<RecordInspector {...props} />);
-    expect(screen.getByRole('button', { name: 'data_curation_inspector_close_overlay' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'action_close' })).toBeInTheDocument();
   });
 
@@ -325,5 +329,93 @@ describe('RecordInspector — dirty state', () => {
     fireEvent.click(screen.getByRole('button', { name: 'action_close' }));
     expect(mockOnClose).toHaveBeenCalled();
     expect(screen.queryByTestId('discard-modal')).not.toBeInTheDocument();
+  });
+});
+
+// The inspector is a Sheet: a modal <dialog> from the inline end on wide
+// screens, from the bottom on phones. It replaces a fixed 420px <aside> and an
+// overlay <button> the size of the page, which a screen reader announced as
+// "Close inspector overlay, button" and which never held focus.
+describe('RecordInspector — as a sheet', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  const props = { record: makeRecord(), source: 'survey-data', formDefinition: null, onClose: mockOnClose, onSaved: mockOnSaved };
+  const sheet = () => document.querySelector('dialog');
+  const pressEsc = () => act(() => { sheet().dispatchEvent(new Event('cancel', { cancelable: true })); });
+
+  it('opens as a modal dialog named for the person', () => {
+    render(<RecordInspector {...props} />);
+    expect(screen.getByRole('dialog', { name: 'Hope Tambala' })).toBeInTheDocument();
+    expect(sheet().open).toBe(true);
+  });
+
+  it('puts the person under the sheet heading and each section one level below', () => {
+    render(<RecordInspector {...props} />);
+    expect(screen.getByRole('heading', { level: 2, name: 'Hope Tambala' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'data_curation_inspector_section_identity' })).toBeInTheDocument();
+  });
+
+  it('has no page-sized overlay button any more', () => {
+    render(<RecordInspector {...props} />);
+    expect(screen.queryByRole('button', { name: 'data_curation_inspector_close_overlay' })).not.toBeInTheDocument();
+  });
+
+  it('closes on Esc when nothing was edited', () => {
+    render(<RecordInspector {...props} />);
+    pressEsc();
+    expect(mockOnClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('asks before discarding edits on Esc, and stays open', () => {
+    render(<RecordInspector {...props} />);
+    fireEvent.change(screen.getByLabelText('field_fname'), { target: { value: 'Hopeful' } });
+    pressEsc();
+    expect(screen.getByTestId('discard-modal')).toBeInTheDocument();
+    expect(mockOnClose).not.toHaveBeenCalled();
+    expect(sheet().open).toBe(true);
+  });
+
+  it('asks before discarding edits on a backdrop click', () => {
+    render(<RecordInspector {...props} />);
+    fireEvent.change(screen.getByLabelText('field_fname'), { target: { value: 'Hopeful' } });
+    fireEvent.click(sheet());
+    expect(screen.getByTestId('discard-modal')).toBeInTheDocument();
+    expect(mockOnClose).not.toHaveBeenCalled();
+  });
+
+  it('asks before Cancel throws edits away too', () => {
+    render(<RecordInspector {...props} />);
+    fireEvent.change(screen.getByLabelText('field_fname'), { target: { value: 'Hopeful' } });
+    fireEvent.click(screen.getByRole('button', { name: 'data_curation_cancel' }));
+    expect(screen.getByTestId('discard-modal')).toBeInTheDocument();
+    expect(mockOnClose).not.toHaveBeenCalled();
+  });
+
+  it('closes once the discard is confirmed', () => {
+    render(<RecordInspector {...props} />);
+    fireEvent.change(screen.getByLabelText('field_fname'), { target: { value: 'Hopeful' } });
+    pressEsc();
+    fireEvent.click(screen.getByRole('button', { name: 'data_curation_inspector_discard_action' }));
+    expect(mockOnClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('says a failed save out loud and keeps the edits', async () => {
+    mockSave.mockRejectedValueOnce(new Error('offline'));
+    render(<RecordInspector {...props} />);
+    fireEvent.change(screen.getByLabelText('field_fname'), { target: { value: 'Hopeful' } });
+    fireEvent.click(screen.getByRole('button', { name: 'data_curation_save' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('data_curation_inspector_save_failed');
+    expect(screen.getByLabelText('field_fname')).toHaveValue('Hopeful');
+  });
+
+  it('announces unsaved changes politely', () => {
+    render(<RecordInspector {...props} />);
+    fireEvent.change(screen.getByLabelText('field_fname'), { target: { value: 'Hopeful' } });
+    expect(screen.getByText('data_curation_inspector_unsaved').closest('[role="status"]')).not.toBeNull();
+  });
+
+  it('has no axe violations', async () => {
+    const { baseElement } = render(<RecordInspector {...props} />);
+    expect(await axe(baseElement)).toHaveNoViolations();
   });
 });

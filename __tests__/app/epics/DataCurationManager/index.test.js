@@ -4,14 +4,15 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 // ─── Mocks ───────────────────────────────────────────────────────────────────
 jest.mock('next-i18next', () => ({
   useTranslation: () => ({
-    t: (key) => ({
-      data_curation_records: 'records',
-      data_curation_avg: 'avg completeness',
-      data_curation_dups: 'duplicates',
-      data_curation_anomalies: 'anomalies',
-      data_curation_edit: 'Edit',
-      data_curation_save: 'Save',
-    }[key] ?? key),
+    // Interpolated keys echo their values, so a test can tell which number
+    // reached which string: t('data_curation_summary_total', { count: 357 })
+    // renders "data_curation_summary_total:357".
+    t: (key, opts) => {
+      const fixed = { data_curation_edit: 'Edit', data_curation_save: 'Save' }[key];
+      if (fixed) return fixed;
+      if (opts && typeof opts === 'object') return `${key}:${Object.values(opts).join(',')}`;
+      return key;
+    },
   }),
 }));
 
@@ -20,6 +21,18 @@ jest.mock('app/modules/user', () => ({
     get: (key) => ({ organization: 'TestOrg' }[key] ?? null),
   })),
 }));
+
+const mockRouter = { query: {}, push: jest.fn() };
+jest.mock('next/router', () => ({ useRouter: () => mockRouter }));
+
+// A load that never answers must end as an error. The real timeout is 25s;
+// tests that exercise it shorten it here rather than faking timers, which
+// waitFor in this Testing Library version doesn't advance.
+const mockTimeout = { ms: null };
+jest.mock('app/modules/async/settleWithin', () => {
+  const actual = jest.requireActual('app/modules/async/settleWithin');
+  return { ...actual, settleWithin: (p, ms) => actual.settleWithin(p, mockTimeout.ms ?? ms) };
+});
 
 const mockSave = jest.fn().mockResolvedValue({});
 const mockSet = jest.fn();
@@ -64,8 +77,10 @@ jest.mock('app/impacto-design-system', () => ({
     <button type="button" onClick={onClick} disabled={isDisabled}>{text}</button>
   ),
   Skeleton: ({ width, height }) => <span data-testid="skeleton" style={{ width, height }} />,
-  SegmentedControl: ({ options, value, onChange }) => (
-    <div data-testid="view-tabs">
+  SegmentedControl: ({
+    options, value, onChange, label,
+  }) => (
+    <div data-testid="view-tabs" role="group" aria-label={label}>
       {options.map((o) => (
         <button
           key={o.value}
@@ -99,8 +114,11 @@ jest.mock('app/epics/DataCurationManager/FilterBar', () => ({ onFilterChange }) 
     <button type="button" onClick={() => onFilterChange({ completeness: 'high' })}>filter to high completeness</button>
   </div>
 ));
-jest.mock('app/epics/DataCurationManager/RecordsTable', () => ({ records }) => (
-  <div data-testid="records-table">{records.length} rows</div>
+jest.mock('app/epics/DataCurationManager/RecordsTable', () => ({ records, hasFilters, onClearFilters }) => (
+  <div data-testid="records-table">
+    {records.length} rows
+    {hasFilters && <button type="button" onClick={onClearFilters}>clear filters</button>}
+  </div>
 ));
 jest.mock('app/epics/DataCurationManager/RecordInspector', () => () => <div data-testid="record-inspector" />);
 jest.mock('app/epics/DataCurationManager/DuplicateResolver', () => () => <div data-testid="duplicate-resolver" />);
@@ -253,18 +271,29 @@ describe('flagAnomalies', () => {
 
 // ─── Orchestration tests ──────────────────────────────────────────────────────
 
+// Design review C13: the strip said "50 records · 63% avg completeness" when the
+// organization had 357, because both numbers came off the 50 rows on screen.
+// The total is now the data set's count, and the rest says it is per page.
 describe('Summary bar', () => {
-  it('shows record count after fetch', async () => {
+  it('counts the whole data set, not the page', async () => {
     mockFind.mockResolvedValue([makeRecord()]);
-    mockCount.mockResolvedValue(1);
+    mockCount.mockResolvedValue(357);
     render(<DataCurationManager />);
-    await waitFor(() => expect(screen.getByText(/1.*records/i)).toBeInTheDocument());
+    expect(await screen.findByText('data_curation_summary_total:357')).toBeInTheDocument();
+  });
+
+  it('says the averages describe the page on screen', async () => {
+    mockFind.mockResolvedValue([makeRecord()]);
+    mockCount.mockResolvedValue(357);
+    render(<DataCurationManager />);
+    expect(await screen.findByText('data_curation_summary_page:1')).toBeInTheDocument();
   });
 
   it('shows avg completeness', async () => {
     mockFind.mockResolvedValue([makeRecord()]);
+    mockCount.mockResolvedValue(1);
     render(<DataCurationManager />);
-    await waitFor(() => expect(screen.getByText(/100%.*avg completeness/i)).toBeInTheDocument());
+    expect(await screen.findByText('data_curation_summary_avg:100')).toBeInTheDocument();
   });
 
   it('shows duplicate count', async () => {
@@ -273,15 +302,90 @@ describe('Summary bar', () => {
       makeRecord({ objectId: 'r1', householdId: 'HH01', createdAt: day }),
       makeRecord({ objectId: 'r2', householdId: 'HH01', createdAt: day }),
     ]);
+    mockCount.mockResolvedValue(2);
     render(<DataCurationManager />);
-    await waitFor(() => expect(screen.getByText(/2.*duplicates/i)).toBeInTheDocument());
+    expect(await screen.findByText('data_curation_summary_dups:2')).toBeInTheDocument();
   });
 
   it('shows anomaly count', async () => {
     const r = makeRecord({ objectId: 'r1', fname: '', lname: '', dob: '', sex: '', householdId: '', surveyingUser: '', telephoneNumber: '' });
     mockFind.mockResolvedValue([r]);
+    mockCount.mockResolvedValue(1);
     render(<DataCurationManager />);
-    await waitFor(() => expect(screen.getByText(/1.*anomalies/i)).toBeInTheDocument());
+    expect(await screen.findByText('data_curation_summary_anomalies:1')).toBeInTheDocument();
+  });
+
+  // X15: "0% average completeness" for zero records reads as a finding.
+  it('shows no average when there are no records', async () => {
+    render(<DataCurationManager />);
+    expect(await screen.findByText('data_curation_summary_total:0')).toBeInTheDocument();
+    expect(screen.queryByText(/data_curation_summary_avg/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/data_curation_summary_page/)).not.toBeInTheDocument();
+  });
+
+  it('announces the counts politely when they change', async () => {
+    mockFind.mockResolvedValue([makeRecord()]);
+    mockCount.mockResolvedValue(357);
+    render(<DataCurationManager />);
+    const total = await screen.findByText('data_curation_summary_total:357');
+    expect(total.closest('[role="status"]')).not.toBeNull();
+  });
+});
+
+// Design review C7: a load that never settles showed skeletons and "Showing
+// 0–0 of 0" at once, forever. It now ends as an alert with Retry.
+describe('load failures', () => {
+  afterEach(() => { mockTimeout.ms = null; });
+
+  it('says the records did not load when the query fails, and retries', async () => {
+    // count() rather than find(): the filter-option sample also calls find().
+    mockCount.mockRejectedValue(new Error('offline'));
+    render(<DataCurationManager />);
+    expect(await screen.findByRole('alert')).toHaveTextContent('data_curation_load_failed');
+
+    mockFind.mockResolvedValue([makeRecord()]);
+    mockCount.mockResolvedValue(1);
+    fireEvent.click(screen.getByRole('button', { name: 'action_try_again' }));
+    expect(await screen.findByText('data_curation_summary_total:1')).toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('turns a query that never answers into the same alert', async () => {
+    mockTimeout.ms = 30;
+    mockCount.mockReturnValue(new Promise(() => {}));
+    render(<DataCurationManager />);
+    expect(await screen.findByRole('alert')).toHaveTextContent('data_curation_load_failed');
+  });
+
+  it('sends someone with no session to sign in instead of loading forever', async () => {
+    const { retrieveCurrentUserAsyncFunction } = require('app/modules/user');
+    retrieveCurrentUserAsyncFunction.mockReturnValueOnce(null);
+    render(<DataCurationManager />);
+    await waitFor(() => expect(mockRouter.push).toHaveBeenCalledWith('/account/login'));
+  });
+});
+
+describe('clearing filters', () => {
+  it('offers Clear filters only once a filter is set, and clearing re-queries unfiltered', async () => {
+    render(<DataCurationManager />);
+    await waitFor(() => screen.getByTestId('filter-bar'));
+    expect(screen.queryByRole('button', { name: 'clear filters' })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'set community filter' }));
+    await waitFor(() => expect(mockQueryChain.equalTo).toHaveBeenCalledWith('communityname', 'Nsanje'));
+
+    mockQueryChain.equalTo.mockClear();
+    fireEvent.click(await screen.findByRole('button', { name: 'clear filters' }));
+    await waitFor(() => expect(mockFind).toHaveBeenCalled());
+    await waitFor(() => expect(screen.queryByRole('button', { name: 'clear filters' })).not.toBeInTheDocument());
+    expect(mockQueryChain.equalTo).not.toHaveBeenCalledWith('communityname', 'Nsanje');
+  });
+});
+
+describe('view tabs are named', () => {
+  it('names the records/community audit switch', async () => {
+    render(<DataCurationManager />);
+    expect(await screen.findByRole('group', { name: 'data_curation_view_label' })).toBeInTheDocument();
   });
 });
 
@@ -428,27 +532,27 @@ describe('summary bar scores completeness per source', () => {
 
   it('reports 100% avg completeness for a fully populated vitals record', async () => {
     await renderAtSource('vitals', [fieldRecord('v1', FULL_VITALS)]);
-    await waitFor(() => expect(screen.getByText(/100%.*avg completeness/i)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('data_curation_summary_avg:100')).toBeInTheDocument());
   });
 
   it('reports zero anomalies for a fully populated vitals record', async () => {
     await renderAtSource('vitals', [fieldRecord('v1', FULL_VITALS)]);
-    await waitFor(() => expect(screen.getByText(/0 anomalies/i)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('data_curation_summary_anomalies:0')).toBeInTheDocument());
   });
 
   it('reports 100% avg completeness for a fully populated eval-medical record', async () => {
     await renderAtSource('eval-medical', [fieldRecord('e1', FULL_EVAL_MEDICAL)]);
-    await waitFor(() => expect(screen.getByText(/100%.*avg completeness/i)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('data_curation_summary_avg:100')).toBeInTheDocument());
   });
 
   it('reports 100% avg completeness for a fully populated env-health record', async () => {
     await renderAtSource('env-health', [fieldRecord('h1', FULL_ENV_HEALTH)]);
-    await waitFor(() => expect(screen.getByText(/100%.*avg completeness/i)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('data_curation_summary_avg:100')).toBeInTheDocument());
   });
 
   it('still scores survey-data against the SurveyData field list', async () => {
     await renderAtSource('survey-data', [makeRecord()]);
-    await waitFor(() => expect(screen.getByText(/100%.*avg completeness/i)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('data_curation_summary_avg:100')).toBeInTheDocument());
   });
 });
 

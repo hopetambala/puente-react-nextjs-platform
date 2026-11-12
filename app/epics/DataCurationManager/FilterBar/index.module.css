@@ -1,6 +1,6 @@
 .filterStrip {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   /* Spanish and Creole labels run longer than the English they were sized
      against — "Todas las comunidades" against "All communities" — and the
@@ -16,64 +16,71 @@
 
 .filterLeft {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
+  align-items: flex-end;
   gap: var(--tk-dlite-semantic-spacing-sm);
-  flex: 1;
-  /* fit-content, not 0: at 0 the group shrinks below its own controls and the
-     last select is truncated. This makes the row wrap instead. */
-  min-width: fit-content;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .filterRight {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--tk-dlite-semantic-spacing-sm);
-  flex-shrink: 0;
 }
 
-.search {
-  display: flex;
-  align-items: center;
+/* Label above control: the label stays visible after a value is chosen or
+   typed, which the placeholder and the "All …" first option never did. */
+.field {
+  display: grid;
   gap: var(--tk-dlite-semantic-spacing-xs);
-  background: var(--tk-dlite-semantic-color-background);
-  border: 1px solid var(--tk-dlite-semantic-color-border);
-  border-radius: var(--tk-dlite-semantic-border-radius-sm);
-  padding: 0 var(--tk-dlite-semantic-spacing-sm);
-  height: 32px;
-  min-width: 220px;
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.label {
+  font-size: var(--tk-dlite-semantic-typography-size-200);
+  font-weight: 600;
+  color: var(--tk-dlite-semantic-color-text-secondary);
+}
+
+/* The input is the field: it owns the border and gets the global focus ring.
+   The glyph sits over its start padding and ignores the pointer. */
+.search {
+  position: relative;
 }
 
 .searchIcon {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: var(--tk-dlite-semantic-spacing-sm);
+  margin-block: auto;
   color: var(--tk-dlite-semantic-color-text-secondary);
-  font-size: 14px;
-  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.searchInput,
+.filterSelect {
+  width: 100%;
+  min-height: var(--tk-dlite-semantic-sizing-target-comfortable);
+  padding: 0 var(--tk-dlite-semantic-spacing-sm);
+  border: 1px solid var(--tk-dlite-semantic-color-border-control);
+  border-radius: var(--tk-dlite-semantic-border-radius-sm);
+  font-family: var(--font-family);
+  color: var(--tk-dlite-semantic-color-text-primary);
 }
 
 .searchInput {
-  border: none;
-  background: transparent;
-  font-family: var(--font-family);
-  font-size: 13px;
-  color: var(--tk-dlite-semantic-color-text-primary);
-  width: 100%;
+  padding-inline-start: calc(var(--tk-dlite-semantic-spacing-sm) * 2 + var(--tk-dlite-semantic-sizing-icon-sm));
+  background: var(--tk-dlite-semantic-color-background);
 }
 
 .searchInput::placeholder {
-  color: var(--tk-dlite-semantic-color-text-secondary);
+  color: var(--tk-dlite-semantic-color-text-tertiary);
 }
 
 .filterSelect {
-  height: 32px;
-  border: 1px solid var(--tk-dlite-semantic-color-border);
-  border-radius: var(--tk-dlite-semantic-border-radius-sm);
   background: var(--tk-dlite-semantic-color-surface-base);
-  font-family: var(--font-family);
-  font-size: 13px;
-  color: var(--tk-dlite-semantic-color-text-primary);
-  padding: 0 var(--tk-dlite-semantic-spacing-sm);
   cursor: pointer;
-}
-
-.filterSelect:focus-visible {
-  border-color: var(--tk-dlite-semantic-color-action-primary);
 }

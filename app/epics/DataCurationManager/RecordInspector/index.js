@@ -1,4 +1,4 @@
-import { Button, Modal, Toast } from 'app/impacto-design-system';
+import { Button, Modal, Sheet } from 'app/impacto-design-system';
 import { useTranslation } from 'next-i18next';
 import { useMemo, useState } from 'react';
 
@@ -177,73 +177,73 @@ export default function RecordInspector({ record, source, formDefinition, onClos
     };
   }
 
+  // Every way out (the close button, Esc, the backdrop, Cancel) asks first
+  // when there are edits; the Sheet stays open until this says it may close.
+  const requestClose = () => (dirty ? setDiscardOpen(true) : onClose());
+
+  const title = isFormResults
+    ? (record.get('title') || t('data_curation_inspector_form_record'))
+    : (`${record.get('fname') || ''} ${record.get('lname') || ''}`.trim()
+      || t('data_curation_inspector_record'));
+
+  const footer = (
+    <div className={styles.footer}>
+      <Button
+        text={saving ? t('data_curation_inspector_saving') : t('data_curation_save')}
+        intent="primary"
+        onClick={handleSave}
+        isDisabled={saving}
+      />
+      <Button text={t('data_curation_cancel')} onClick={requestClose} />
+      <span className={styles.unsavedWarning} role="status">
+        {dirty ? t('data_curation_inspector_unsaved') : ''}
+      </span>
+    </div>
+  );
+
   return (
     <>
-      <button type="button" className={styles.overlay} aria-label={t('data_curation_inspector_close_overlay')} onClick={dirty ? () => setDiscardOpen(true) : onClose} />
-      <aside className={styles.panel}>
-        <header className={styles.header}>
-          <span className={styles.title}>
-            {isFormResults
-              ? (record.get('title') || t('data_curation_inspector_form_record'))
-              : `${record.get('fname') || ''} ${record.get('lname') || ''}`.trim()
-                || t('data_curation_inspector_record')}
-          </span>
-          <button type="button" className={styles.closeBtn} aria-label={t('action_close')} onClick={dirty ? () => setDiscardOpen(true) : onClose}>✕</button>
-        </header>
+      <Sheet open onClose={requestClose} title={title} footer={footer}>
+        {error && <p className={styles.error} role="alert">{t('data_curation_inspector_save_failed')}</p>}
 
-        <div className={styles.body}>
-          {error && <Toast text={t('data_curation_inspector_save_failed')} isError />}
-
-          {isFormResults ? (
-            <>
-              <section className={styles.section}>
-                <h4 className={styles.sectionTitle}>{t('data_curation_inspector_section_metadata')}</h4>
-                <FieldRow field={{ key: 'surveyingUser', labelKey: 'field_surveyor' }} value={edits.surveyingUser ?? (record.get('surveyingUser') || '')} onChange={handleChange} />
-                <div className={styles.field}>
-                  <span className={styles.fieldLabel}>{t('data_curation_field_organization')}</span>
-                  <span className={styles.readOnly}>{record.get('surveyingOrganization') || '—'}</span>
-                </div>
-              </section>
-              <section className={styles.section}>
-                <h4 className={styles.sectionTitle}>{t('data_curation_inspector_section_fields')}</h4>
-                {formFields.map((f) => (
-                  <FieldRow
-                    key={f.formikKey}
-                    field={toFieldDescriptor(f)}
-                    value={edits[f.formikKey] ?? ''}
-                    onChange={handleChange}
-                  />
-                ))}
-              </section>
-            </>
-          ) : (
-            SURVEY_SECTIONS.map((sec) => (
-              <section key={sec.titleKey} className={styles.section}>
-                <h4 className={styles.sectionTitle}>{t(sec.titleKey)}</h4>
-                {sec.fields.map((f) => (
-                  <FieldRow
-                    key={f.key}
-                    field={f}
-                    value={f.readOnly ? (record.get(f.key) || '') : (edits[f.key] ?? '')}
-                    onChange={handleChange}
-                  />
-                ))}
-              </section>
-            ))
-          )}
-        </div>
-
-        <footer className={styles.footer}>
-          <Button
-            text={saving ? t('data_curation_inspector_saving') : t('data_curation_save')}
-            intent="primary"
-            onClick={handleSave}
-            isDisabled={saving}
-          />
-          <Button text={t('data_curation_cancel')} onClick={onClose} />
-          {dirty && <span className={styles.unsavedWarning}>{t('data_curation_inspector_unsaved')}</span>}
-        </footer>
-      </aside>
+        {isFormResults ? (
+          <>
+            <section className={styles.section}>
+              <h3 className={styles.sectionTitle}>{t('data_curation_inspector_section_metadata')}</h3>
+              <FieldRow field={{ key: 'surveyingUser', labelKey: 'field_surveyor' }} value={edits.surveyingUser ?? (record.get('surveyingUser') || '')} onChange={handleChange} />
+              <div className={styles.field}>
+                <span className={styles.fieldLabel}>{t('data_curation_field_organization')}</span>
+                <span className={styles.readOnly}>{record.get('surveyingOrganization') || '—'}</span>
+              </div>
+            </section>
+            <section className={styles.section}>
+              <h3 className={styles.sectionTitle}>{t('data_curation_inspector_section_fields')}</h3>
+              {formFields.map((f) => (
+                <FieldRow
+                  key={f.formikKey}
+                  field={toFieldDescriptor(f)}
+                  value={edits[f.formikKey] ?? ''}
+                  onChange={handleChange}
+                />
+              ))}
+            </section>
+          </>
+        ) : (
+          SURVEY_SECTIONS.map((sec) => (
+            <section key={sec.titleKey} className={styles.section}>
+              <h3 className={styles.sectionTitle}>{t(sec.titleKey)}</h3>
+              {sec.fields.map((f) => (
+                <FieldRow
+                  key={f.key}
+                  field={f}
+                  value={f.readOnly ? (record.get(f.key) || '') : (edits[f.key] ?? '')}
+                  onChange={handleChange}
+                />
+              ))}
+            </section>
+          ))
+        )}
+      </Sheet>
       <Modal
         open={discardOpen}
         handleClose={() => setDiscardOpen(false)}
