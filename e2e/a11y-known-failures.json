@@ -1,14 +1,14 @@
 {
   "_readme": "Known failures of the responsive a11y sweep (e2e/suites/responsive-a11y.mjs): \"<route> @ <width>\" → rule ids failing there in either language. Rule ids are axe-core's, plus the sweep's own (see CUSTOM_RULES in e2e/lib/a11y-gate-lib.mjs). The sweep fails on anything not listed. Regenerate with `node e2e/suites/responsive-a11y.mjs --update`, which refuses to add entries. Each PR of docs/responsive-a11y-overhaul.md shrinks it; PR 7 empties it.",
-  "total": 113,
+  "total": 76,
   "byRoute": {
     "/": 15,
-    "/account/login": 14,
-    "/account/login/reset-login": 12,
-    "/account/register": 17,
+    "/account/login": 5,
+    "/account/login/reset-login": 5,
+    "/account/register": 5,
     "/account/reset": 7,
     "/account/verify": 6,
-    "/account/verify/redirect": 14,
+    "/account/verify/redirect": 5,
     "/data/data-curation": 10,
     "/data/data-visualization": 10,
     "/forms/form-creator": 7,
@@ -41,76 +41,48 @@
       "text-spacing"
     ],
     "/account/login @ 320": [
-      "focus-not-visible",
-      "skip-link",
-      "target-min-24",
-      "target-size"
+      "skip-link"
     ],
     "/account/login @ 375": [
-      "focus-not-visible",
-      "skip-link",
-      "target-min-24",
-      "target-size"
+      "skip-link"
     ],
     "/account/login @ 768": [
-      "focus-not-visible",
       "skip-link"
     ],
     "/account/login @ 1024": [
-      "focus-not-visible",
       "skip-link"
     ],
     "/account/login @ 1440": [
-      "focus-not-visible",
       "skip-link"
     ],
     "/account/login/reset-login @ 320": [
-      "focus-not-visible",
-      "reflow",
       "skip-link"
     ],
     "/account/login/reset-login @ 375": [
-      "focus-not-visible",
-      "reflow",
       "skip-link"
     ],
     "/account/login/reset-login @ 768": [
-      "focus-not-visible",
       "skip-link"
     ],
     "/account/login/reset-login @ 1024": [
-      "focus-not-visible",
       "skip-link"
     ],
     "/account/login/reset-login @ 1440": [
-      "focus-not-visible",
       "skip-link"
     ],
     "/account/register @ 320": [
-      "color-contrast",
-      "focus-not-visible",
-      "skip-link",
-      "text-spacing"
+      "skip-link"
     ],
     "/account/register @ 375": [
-      "color-contrast",
-      "focus-not-visible",
-      "skip-link",
-      "text-spacing"
+      "skip-link"
     ],
     "/account/register @ 768": [
-      "color-contrast",
-      "focus-not-visible",
       "skip-link"
     ],
     "/account/register @ 1024": [
-      "color-contrast",
-      "focus-not-visible",
       "skip-link"
     ],
     "/account/register @ 1440": [
-      "color-contrast",
-      "focus-not-visible",
       "skip-link"
     ],
     "/account/reset @ 320": [
@@ -147,27 +119,18 @@
       "focus-unreachable"
     ],
     "/account/verify/redirect @ 320": [
-      "focus-not-visible",
-      "skip-link",
-      "target-min-24",
-      "target-size"
+      "skip-link"
     ],
     "/account/verify/redirect @ 375": [
-      "focus-not-visible",
-      "skip-link",
-      "target-min-24",
-      "target-size"
+      "skip-link"
     ],
     "/account/verify/redirect @ 768": [
-      "focus-not-visible",
       "skip-link"
     ],
     "/account/verify/redirect @ 1024": [
-      "focus-not-visible",
       "skip-link"
     ],
     "/account/verify/redirect @ 1440": [
-      "focus-not-visible",
       "skip-link"
     ],
     "/data/data-curation @ 320": [
