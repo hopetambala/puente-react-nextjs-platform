@@ -1,12 +1,11 @@
 import Button from 'app/impacto-design-system/button';
-import Toast from 'app/impacto-design-system/toast';
+import { toast } from 'app/impacto-design-system/toast/notify';
 import offersResearchExport from 'app/modules/data-export/offersResearchExport';
 import {
     CustomData, EnvironmentalHealth, EvaluationMedical, SurveyData, Vitals,
 } from 'app/modules/data-export/puente';
 import { useTranslation } from 'next-i18next';
 import { useState } from 'react';
-import { toast } from 'react-toastify';
 
 function openWindow(dataurl, filename) {
   const link = document.createElement('a');
@@ -75,7 +74,7 @@ export default function CSVButtonWrapper({ form, surveyingOrganization, shortCod
       // A header-only CSV is NOT blank: zero rows is a real answer, and the
       // aggregator emits those deliberately.
       if (CSVData === undefined || String(CSVData).trim() === '') {
-        toast(<Toast text={t('export_empty')} />);
+        toast({ text: t('export_empty') });
         return;
       }
       const blob = new Blob([CSVData], { type: 'text/csv' });
@@ -87,7 +86,7 @@ export default function CSVButtonWrapper({ form, surveyingOrganization, shortCod
       // instead of retrying.
       // A 401 is a session that expired or was revoked: retrying can't help,
       // signing in again does.
-      toast(<Toast text={t(error && error.status === 401 ? 'export_signed_out' : 'export_failed')} isError />);
+      toast({ text: t(error && error.status === 401 ? 'export_signed_out' : 'export_failed'), isError: true });
     } finally {
       setLoading(null);
     }

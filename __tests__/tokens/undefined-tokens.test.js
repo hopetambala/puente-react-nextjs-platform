@@ -29,32 +29,10 @@ const SOURCE = /\.(css|scss|js|jsx|ts|tsx)$/;
  * Known offenders on the day the gate went in (PR 1a). Each later PR removes
  * the names it fixes; this list only ever shrinks. Name → why it is still here.
  *
- * TODO(PR 1b, foundation): map every name below to a real dlite token, and
- * delete this list.
+ * Empty since the overhaul's primitives phase: every var() in the app resolves.
+ * Keep it empty: fix a new name, don't list it.
  */
-const KNOWN_UNDEFINED = {
-  // The toast palette was never ported. PR 3 replaces react-toastify anyway.
-  '--color-toast-bg': 'toast',
-  '--color-toast-button-active': 'toast',
-  '--color-toast-button-hover': 'toast',
-  '--color-toast-error-bg': 'toast',
-  '--color-toast-error-button-active': 'toast',
-  '--color-toast-error-button-hover': 'toast',
-  '--color-toast-error-icon': 'toast',
-  '--color-toast-error-text': 'toast',
-  '--color-toast-icon': 'toast',
-  '--color-toast-success-bg': 'toast',
-  '--color-toast-success-button-active': 'toast',
-  '--color-toast-success-button-hover': 'toast',
-  '--color-toast-success-icon': 'toast',
-  '--color-toast-success-text': 'toast',
-  '--color-toast-text': 'toast',
-  '--color-toast-warning-bg': 'toast',
-  '--color-toast-warning-button-active': 'toast',
-  '--color-toast-warning-button-hover': 'toast',
-  '--color-toast-warning-icon': 'toast',
-  '--color-toast-warning-text': 'toast',
-};
+const KNOWN_UNDEFINED = {};
 
 const stripComments = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '');
 const declared = (s) => [...stripComments(s).matchAll(/(--[A-Za-z0-9_-]+)\s*:/g)].map((m) => m[1]);

@@ -7,7 +7,7 @@ const Toast = require('app/impacto-design-system/toast').default;
 
 describe('Toast — copy', () => {
   it('routes the dismiss control through t()', () => {
-    render(<Toast text="Saved" />);
+    render(<Toast text="Saved" closeToast={() => {}} />);
     expect(screen.getByRole('button', { name: 'action_dismiss' })).toBeInTheDocument();
   });
 });

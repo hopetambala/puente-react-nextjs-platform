@@ -41,7 +41,7 @@ jest.mock('react-hook-form', () => ({
   }),
 }));
 
-jest.mock('react-toastify', () => ({ toast: jest.fn() }));
+jest.mock('app/impacto-design-system/toast/notify', () => ({ toast: jest.fn() }));
 
 jest.mock('parse', () => ({ Parse: {} }));
 

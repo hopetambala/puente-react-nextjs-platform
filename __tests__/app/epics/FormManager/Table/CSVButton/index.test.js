@@ -23,13 +23,8 @@ jest.mock('app/impacto-design-system/button', () => ({
   default: ({ text, onClick }) => <button type="button" onClick={onClick}>{text}</button>,
 }));
 
-jest.mock('app/impacto-design-system/toast', () => ({
-  __esModule: true,
-  default: ({ text, isError }) => <div data-testid="toast" data-error={!!isError}>{text}</div>,
-}));
-
 const toastCalls = [];
-jest.mock('react-toastify', () => ({ toast: (node) => { toastCalls.push(node); } }));
+jest.mock('app/impacto-design-system/toast/notify', () => ({ toast: (options) => { toastCalls.push(options); } }));
 
 jest.mock('next-i18next', () => ({ useTranslation: () => ({ t: (key) => key }) }));
 
@@ -142,7 +137,7 @@ describe('CSVButton empty export', () => {
     fireEvent.click(screen.getByRole('button'));
 
     await waitFor(() => expect(toastCalls).toHaveLength(1));
-    expect(toastCalls[0].props.text).toBe('export_empty');
+    expect(toastCalls[0].text).toBe('export_empty');
     expect(window.alert).not.toHaveBeenCalled();
   });
 
@@ -156,8 +151,8 @@ describe('CSVButton empty export', () => {
     fireEvent.click(screen.getByRole('button'));
 
     await waitFor(() => expect(toastCalls).toHaveLength(1));
-    expect(toastCalls[0].props.text).toBe('export_failed');
-    expect(toastCalls[0].props.isError).toBe(true);
+    expect(toastCalls[0].text).toBe('export_failed');
+    expect(toastCalls[0].isError).toBe(true);
   });
 
   it('asks the coordinator to sign in again when the session is no longer valid', async () => {
@@ -170,8 +165,8 @@ describe('CSVButton empty export', () => {
     fireEvent.click(screen.getByRole('button'));
 
     await waitFor(() => expect(toastCalls).toHaveLength(1));
-    expect(toastCalls[0].props.text).toBe('export_signed_out');
-    expect(toastCalls[0].props.isError).toBe(true);
+    expect(toastCalls[0].text).toBe('export_signed_out');
+    expect(toastCalls[0].isError).toBe(true);
   });
 
   it('treats a header-only CSV as data, because zero rows is a real answer', async () => {

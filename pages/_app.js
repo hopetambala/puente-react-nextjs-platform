@@ -2,7 +2,6 @@
 
 /* dlite design tokens + app design system */
 import 'app/impacto-design-system/_css/root.css'
-import 'react-toastify/dist/ReactToastify.css'
 import 'style-dictionary-dlite-tokens/web/puente/default/components.css'
 import 'style-dictionary-dlite-tokens/web/puente/default/primitives.css'
 import 'style-dictionary-dlite-tokens/web/puente/default/reset.css'
@@ -12,6 +11,7 @@ import 'style-dictionary-dlite-tokens/web/puente/default/variables.css'
 
 import CssBaseline from '@material-ui/core/CssBaseline'
 import { ThemeProvider } from '@material-ui/core/styles'
+import { ToastRegion } from 'app/impacto-design-system'
 import { stripLocalePrefix, syncDocumentLanguage } from 'app/modules/i18n/languages'
 import theme from 'app/modules/theme'
 import { parseUserValue } from 'app/modules/user'
@@ -22,7 +22,6 @@ import { useRouter } from 'next/router'
 import { appWithTranslation } from 'next-i18next'
 import PropTypes from 'prop-types'
 import { useEffect, useState } from 'react'
-import { ToastContainer } from 'react-toastify'
 
 // Initialize Parse once at module load time (client-side only) so every
 // component — including AppShell children that useEffect before parents — can
@@ -110,16 +109,7 @@ function App(props) {
           {authorized && (
             <>
               <Component {...pageProps} />
-              <ToastContainer
-                autoClose={8000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                draggable={false}
-                pauseOnVisibilityChange
-                closeOnClick
-                pauseOnHover
-                closeButton={false}
-              />
+              <ToastRegion />
             </>
           )}
         </ThemeProvider>

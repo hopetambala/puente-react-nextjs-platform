@@ -13,19 +13,27 @@ import { useEffect, useRef } from 'react';
  * - A click on the backdrop closes it. That is a click whose target is the
  *   <dialog> element itself, so the dialog's content must fill it (no padding
  *   on the <dialog>; pad an inner element).
- * - Every way of closing (Esc, backdrop, close(), unmount of the trigger)
- *   reports through `onClose`, so the parent's state can't drift from the DOM.
+ * - Closes the browser starts (Esc, a backdrop click) report through
+ *   `onClose`, so the parent's state can't drift from the DOM. A close the
+ *   parent caused by setting `open` to false does not call `onClose` again:
+ *   callers that toggle (`() => setOpen(!open)`) would otherwise reopen it.
  *
  * Shared by the AppShell nav drawer, Dialog and Sheet.
  *
  * @param {boolean} open
- * @param {() => void} onClose  Must be stable (useCallback), or the listeners
- *   are re-bound on every render.
+ * @param {() => void} onClose  May be an inline function: it is read through a
+ *   ref, so the listeners are bound once. (Re-binding them on every render
+ *   removed the close listener in the same commit that closed the dialog, so
+ *   focus never went back to the trigger.)
  * @returns {import('react').RefObject<HTMLDialogElement>}
  */
 export default function useModalDialog(open, onClose) {
   const ref = useRef(null);
   const returnFocusTo = useRef(null);
+  const openRef = useRef(open);
+  openRef.current = open;
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     const dialog = ref.current;
@@ -48,7 +56,7 @@ export default function useModalDialog(open, onClose) {
       if (trigger && typeof trigger.focus === 'function' && document.contains(trigger)) {
         trigger.focus();
       }
-      onClose();
+      if (openRef.current) onCloseRef.current();
     };
     const handleBackdropClick = (event) => {
       if (event.target === dialog) dialog.close();
@@ -60,7 +68,7 @@ export default function useModalDialog(open, onClose) {
       dialog.removeEventListener('close', handleClose);
       dialog.removeEventListener('click', handleBackdropClick);
     };
-  }, [onClose]);
+  }, []);
 
   return ref;
 }

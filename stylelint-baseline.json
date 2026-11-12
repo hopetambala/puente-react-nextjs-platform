@@ -14,7 +14,7 @@
     "pages/data/": "PR 6 (data routes)",
     "pages/index.module.scss": "PR 7 (landing page)"
   },
-  "total": 226,
+  "total": 225,
   "files": {
     "app/epics/DataAnalyticsManager/index.module.scss": {
       "no-empty-source": 1
@@ -118,9 +118,6 @@
       "declaration-no-important": 1
     },
     "app/impacto-design-system/template-page/index.module.scss": {
-      "declaration-property-value-disallowed-list": 1
-    },
-    "app/impacto-design-system/toast/css/toast.module.css": {
       "declaration-property-value-disallowed-list": 1
     },
     "app/impacto-design-system/tooltip/css/tooltip.module.css": {

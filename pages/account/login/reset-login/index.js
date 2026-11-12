@@ -5,15 +5,14 @@ import {
   FormInput,
   Page, Stack,
   Text,
-  Toast,
 } from 'app/impacto-design-system';
+import { toast } from 'app/impacto-design-system/toast/notify';
 import { sendMessage } from 'app/modules/cloud-code';
 import { queryUser, retrieveSignOutFunction } from 'app/modules/user';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
 import * as yup from 'yup';
 
 import styles from './index.module.scss';
@@ -35,13 +34,9 @@ function ResetLogin() {
 
   const onSubmit = (data) => {
     const { usernameV } = data;
-    return retrieveUser(usernameV).then(() => toast(
-      <Toast text={t('account_reset_sent')} />,
-    )).catch(async (e) => {
+    return retrieveUser(usernameV).then(() => toast({ text: t('account_reset_sent') })).catch(async (e) => {
       await retrieveSignOutFunction();
-      return toast(
-        <Toast text={`${e.message}`} isError />,
-      );
+      return toast({ text: `${e.message}`, isError: true });
     });
   };
 

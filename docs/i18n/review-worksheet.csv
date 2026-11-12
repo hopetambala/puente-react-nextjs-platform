@@ -278,6 +278,9 @@ common,data_curation_sex_female,Female,Femenino,Fi,,
 common,data_curation_sex_prefer_not_to_say,Prefer not to say,Prefiere no decirlo,Pi pito pa di,,
 common,data_curation_cancel,Cancel,Cancelar,Anile,,
 common,action_close,Close,Cerrar,Fèmen,,
+common,action_cancel,Cancel,Cancelar,Anile,,Design-system string added by the responsive/a11y overhaul. Spanish and Creole written by Claude: needs native review.
+common,status_loading,Loading,Cargando,Ap chaje,,Design-system string added by the responsive/a11y overhaul. Spanish and Creole written by Claude: needs native review.
+common,notifications_label,Notifications,Notificaciones,Notifikasyon,,Design-system string added by the responsive/a11y overhaul. Spanish and Creole written by Claude: needs native review.
 common,data_curation_inspector_close_overlay,Close inspector overlay,Cerrar la capa del inspector,Fèmen kouch enspektè a,,
 common,data_curation_inspector_save_failed,Save failed — try again,No se pudo guardar. Inténtalo de nuevo.,Nou pa t ka sove. Eseye ankò.,,
 common,data_curation_inspector_saving,Saving…,Guardando…,Ap sove…,,

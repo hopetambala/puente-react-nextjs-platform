@@ -1,0 +1,120 @@
+/* Native <dialog> as a sheet. No padding on the <dialog> itself: a click on
+   the element (not its content) is a backdrop click. */
+.sheet {
+  --sheet-width: min(28rem, 100vw);
+
+  margin: 0;
+  padding: 0;
+  border: 0;
+  max-width: none;
+  max-height: none;
+  background: var(--tk-dlite-semantic-color-surface-raised);
+  color: var(--tk-dlite-semantic-color-text-primary);
+  box-shadow: var(--tk-dlite-semantic-elevation-high);
+  transition: translate var(--tk-dlite-semantic-motion-duration-base) ease-out;
+}
+
+.sheet::backdrop {
+  background: var(--tk-dlite-semantic-color-surface-scrim);
+}
+
+/* Wide: a side panel at the inline end, full height. */
+@media (--tk-dlite-bp-lg-up) {
+  .sheet {
+    inset-block: 0;
+    inset-inline-start: auto;
+    inset-inline-end: 0;
+    width: var(--sheet-width);
+    height: 100dvh;
+  }
+
+  @starting-style {
+    .sheet[open] {
+      translate: 100% 0;
+    }
+  }
+}
+
+/* Narrow: a bottom sheet, the phone's full width, at most most of its height. */
+@media (--tk-dlite-bp-lg-down) {
+  .sheet {
+    inset-block: auto 0;
+    inset-inline: 0;
+    width: 100%;
+    max-height: 90dvh;
+    border-start-start-radius: var(--tk-dlite-semantic-border-radius-lg);
+    border-start-end-radius: var(--tk-dlite-semantic-border-radius-lg);
+  }
+
+  @starting-style {
+    .sheet[open] {
+      translate: 0 100%;
+    }
+  }
+}
+
+.frame {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100%;
+  max-height: inherit;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--tk-dlite-semantic-spacing-sm);
+  padding-block: var(--tk-dlite-semantic-spacing-sm);
+  padding-inline: var(--tk-dlite-semantic-spacing-lg) var(--tk-dlite-semantic-spacing-sm);
+  border-block-end: 1px solid var(--tk-dlite-semantic-color-border);
+}
+
+.title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-family: var(--font-family-heading);
+  font-size: var(--tk-dlite-semantic-typography-size-500);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.close {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: var(--tk-dlite-semantic-sizing-target-comfortable);
+  height: var(--tk-dlite-semantic-sizing-target-comfortable);
+  border-radius: var(--tk-dlite-semantic-border-radius-md);
+  color: var(--tk-dlite-semantic-color-text-secondary);
+}
+
+.close:hover {
+  background: var(--tk-dlite-semantic-color-background);
+  color: var(--tk-dlite-semantic-color-text-primary);
+}
+
+.closeIcon {
+  width: var(--tk-dlite-semantic-sizing-icon-md);
+  height: var(--tk-dlite-semantic-sizing-icon-md);
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.body {
+  overflow-y: auto;
+  padding: var(--tk-dlite-semantic-spacing-lg);
+  overscroll-behavior: contain;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--tk-dlite-semantic-spacing-sm);
+  padding: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-lg);
+  padding-block-end: max(var(--tk-dlite-semantic-spacing-sm), env(safe-area-inset-bottom));
+  border-block-start: 1px solid var(--tk-dlite-semantic-color-border);
+}

@@ -22,6 +22,9 @@ import Toast from './toast';
 import Tooltip from './tooltip';
 
 export { AppShell, PageHeader } from './AppShell';
+export { default as Sheet } from './sheet';
+export { dismiss, toast } from './toast/notify';
+export { default as ToastRegion } from './toast/ToastRegion';
 
 export {
   Badge,

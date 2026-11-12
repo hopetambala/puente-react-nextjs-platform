@@ -3,8 +3,8 @@ import {
     Button,
     FormInput,
     LanguageSwitcher,
-    Toast,
 } from 'app/impacto-design-system';
+import { toast } from 'app/impacto-design-system/toast/notify';
 import { retrieveSignInFunction } from 'app/modules/user';
 import parseService from 'app/services/parse';
 import Link from 'next/link';
@@ -13,7 +13,6 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
 import * as yup from 'yup';
 
 import styles from './index.module.scss';
@@ -42,7 +41,7 @@ function Login() {
         const returnUrl = router.query.returnUrl || '/quick-start';
         router.push(returnUrl);
       })
-      .catch((e) => toast(<Toast text={`${e.message}`} isError />))
+      .catch((e) => toast({ text: `${e.message}`, isError: true }))
       .finally(() => setLoading(false));
   };
 

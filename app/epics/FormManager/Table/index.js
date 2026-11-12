@@ -65,7 +65,7 @@ function FormManagerTable({
     <>
       <Modal
         open={open}
-        handleClose={() => setOpen(!open)}
+        handleClose={() => setOpen(false)}
         text={t('form_manager_delete_confirm')}
         actionText={t('form_manager_delete_action')}
         intent="danger"

@@ -4,9 +4,9 @@ import {
     FormInput,
     Stack,
     Text,
-    Toast,
 } from 'app/impacto-design-system';
 import FormSelectAutoComplete from 'app/impacto-design-system/form-controls/select-autocomplete';
+import { toast } from 'app/impacto-design-system/toast/notify';
 import { loadOrganizations, selectedOrganizationName } from 'app/modules/organization';
 import { retrieveSignUpFunction } from 'app/modules/user';
 import { useRouter } from 'next/router';
@@ -15,7 +15,6 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { Parse } from 'parse';
 import { useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
 import * as yup from 'yup';
 
 import styles from './index.module.scss';
@@ -86,9 +85,7 @@ function Register() {
     };
     await retrieveSignUpFunction(payload, notificationType).then(() => {
       router.push('/quick-start');
-    }).catch((e) => toast(
-      <Toast text={`${e.message}`} isError />,
-    ));
+    }).catch((e) => toast({ text: `${e.message}`, isError: true }));
   };
 
   return (
