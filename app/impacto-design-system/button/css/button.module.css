@@ -3,7 +3,10 @@
   background-color: var(--color-button-default);
   border: 1px solid var(--color-button-default-border);
   border-radius: var(--border-radius-m);
-  height: 40px;
+  /* A minimum, not a height: a long or translated label wraps instead of
+     overflowing (WCAG 1.4.10, 1.4.12). */
+  min-height: 2.5rem;
+  padding-block: var(--tk-dlite-semantic-spacing-xs);
   cursor: pointer;
   text-align: center;
   font-family: var(--font-family-heading);
@@ -16,7 +19,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0 var(--spacer-m);
+  padding-inline: var(--spacer-m);
 }
 
 .button,
@@ -45,9 +48,7 @@
 
 .buttonText {
   flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
 }
 
 .dropdownIcon {
@@ -68,7 +69,7 @@
 }
 
 .small {
-  height: 32px;
+  min-height: 2rem;
 }
 
 .fullWidth {
@@ -119,7 +120,7 @@
 .primary:hover:focus-visible,
 .primary:focus-visible,
 .primary:active {
-  background-color: var(--color-button-primary-active) !important;
+  background-color: var(--color-button-primary-active);
 }
 
 .primary .buttonIcon,
@@ -143,8 +144,9 @@
 
 .danger:focus-visible,
 .danger:focus-visible:hover,
-.danger:active .danger:active:hover {
-  background-color: var(--color-button-danger-active) !important;
+.danger:active,
+.danger:active:hover {
+  background-color: var(--color-button-danger-active);
 }
 
 .danger .buttonIcon,
@@ -152,10 +154,12 @@
   color: var(--color-button-danger-icon);
 }
 
-.disabled {
-  pointer-events: none !important;
-  box-shadow: none !important;
-  opacity: 0.5 !important;
+/* Two classes outrank every intent and state rule above, so no !important. */
+.button.disabled,
+.iconButton.disabled {
+  pointer-events: none;
+  box-shadow: none;
+  opacity: 0.5;
 }
 
 .button.disabled:not(.primary):not(.danger) {
@@ -168,8 +172,8 @@
   border-radius: var(--border-radius-full);
   box-shadow: none;
   background-color: var(--color-button-icon);
-  width: 40px;
-  height: 40px;
+  width: 2.5rem;
+  height: 2.5rem;
   padding: 0;
   cursor: pointer;
   text-align: center;
@@ -197,10 +201,14 @@
   color: var(--color-icon-hover);
 }
 
-.iconButton.small {
-  background: transparent !important;
-  width: 24px;
-  height: 24px;
+/* 24px: the WCAG 2.5.8 minimum target, not smaller. */
+.iconButton.small,
+.iconButton.small:hover,
+.iconButton.small:focus-visible,
+.iconButton.small:active {
+  background: transparent;
+  width: var(--tk-dlite-semantic-sizing-target-min);
+  height: var(--tk-dlite-semantic-sizing-target-min);
 }
 
 .iconButton.primary .buttonIcon,
@@ -244,14 +252,15 @@
   height: 1px;
   width: 1px;
   overflow: hidden;
-  clip: rect(1px, 1px, 1px, 1px);
+  clip-path: inset(50%);
   white-space: nowrap;
   top: 0;
   left: 0;
 }
 
-.loading {
-  box-shadow: none !important;
+.button.loading,
+.iconButton.loading {
+  box-shadow: none;
 }
 
 .loading:not(.iconButton) .buttonIcon,

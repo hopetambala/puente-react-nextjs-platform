@@ -1,7 +1,7 @@
-/* :root {
-  --spinner-size: 24px;
-  --spinner-size-large: 40px;
-} */
+/* The wrapper is the status region; the svg keeps its old placement. */
+.wrapper {
+  display: contents;
+}
 
 .spinner {
   position: relative;
@@ -20,7 +20,7 @@
 
 .spinner circle {
   fill: transparent;
-  stroke: var(--color-blue);
+  stroke: var(--tk-dlite-semantic-color-action-primary);
   stroke-width: 10%;
   stroke-dasharray: calc(3.14 * 24px);
   transform-origin: center;

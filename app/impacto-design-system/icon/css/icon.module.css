@@ -1,75 +1,31 @@
-svg.icon {
-  fill: currentColor;
-  transition: unset;
-
-  /* Prevent excess space below due to text line-height */
+/* Stroke icons in the text colour. display:block avoids the line-height gap
+   under an inline svg. */
+.icon {
   display: block;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-svg.icon.orange {
-  fill: var(--color-orange);
+.tiny {
+  width: var(--tk-dlite-semantic-sizing-icon-sm);
+  height: var(--tk-dlite-semantic-sizing-icon-sm);
 }
 
-svg.icon.gray {
-  fill: var(--hex-neutral-600);
+.small {
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
-svg.icon.darkGray {
-  fill: var(--color-text-light);
+.medium {
+  width: var(--tk-dlite-semantic-sizing-icon-md);
+  height: var(--tk-dlite-semantic-sizing-icon-md);
 }
 
-svg.icon.lightGray {
-  fill: var(--hex-neutral-200);
-}
-
-svg.icon.black {
-  fill: var(--color-text);
-}
-
-svg.icon.white {
-  fill: var(--hex-white);
-}
-
-svg.icon.red {
-  fill: var(--color-red);
-}
-
-svg.icon.blue {
-  fill: var(--color-blue);
-}
-
-svg.icon.green {
-  fill: var(--color-green);
-}
-
-svg.icon.teal {
-  fill: var(--color-teal);
-}
-
-svg.icon.purple {
-  fill: var(--color-purple);
-}
-
-svg.icon.yellow {
-  fill: var(--color-yellow);
-}
-
-svg.icon.tiny {
-  width: 16px;
-  height: 16px;
-}
-
-svg.icon.small {
-  width: 20px;
-  height: 20px;
-}
-
-svg.icon.medium {
-  width: 24px;
-  height: 24px;
-}
-
-svg.icon.large {
-  width: 32px;
-  height: 32px;
+.large {
+  width: var(--tk-dlite-semantic-sizing-icon-lg);
+  height: var(--tk-dlite-semantic-sizing-icon-lg);
 }

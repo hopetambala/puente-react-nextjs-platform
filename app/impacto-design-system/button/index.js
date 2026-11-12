@@ -1,6 +1,5 @@
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import React from 'react';
 
 import Icon from '../icon';
 import Link from '../Link';
@@ -50,32 +49,46 @@ function Button({
       )}
       {isLoading && (
         <div className={styles.spinner}>
-          <Spinner isSmall />
+          <Spinner isSmall isDecorative />
         </div>
       )}
     </>
   );
 
-  const button = href ? (
-    <Link
-      href={href}
-      className={classname}
-      id={id}
-      shouldOpenHrefInNewTab={shouldOpenHrefInNewTab}
-    >
-      {contents}
-    </Link>
-  ) : (
-    <button
-      id={id}
-      onClick={onClick}
-      className={classname}
-      disabled={!!isDisabled || !!isLoading}
-      type={type === 'submit' ? 'submit' : 'button'}
-    >
-      {contents}
-    </button>
-  );
+  let button;
+  if (href && isDisabled) {
+    // A disabled link has no href, so it can't be followed or focused, and
+    // says it's disabled rather than just looking faded.
+    button = (
+      <a id={id} className={classname} aria-disabled="true">
+        {contents}
+      </a>
+    );
+  } else if (href) {
+    button = (
+      <Link
+        href={href}
+        className={classname}
+        id={id}
+        shouldOpenHrefInNewTab={shouldOpenHrefInNewTab}
+      >
+        {contents}
+      </Link>
+    );
+  } else {
+    button = (
+      <button
+        id={id}
+        onClick={onClick}
+        className={classname}
+        disabled={!!isDisabled || !!isLoading}
+        aria-busy={isLoading || undefined}
+        type={type === 'submit' ? 'submit' : 'button'}
+      >
+        {contents}
+      </button>
+    );
+  }
 
   const shouldShowTooltip = isIconOnly && !isLoading && !isDisabled;
 

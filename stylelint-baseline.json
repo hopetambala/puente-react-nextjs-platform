@@ -14,7 +14,7 @@
     "pages/data/": "PR 6 (data routes)",
     "pages/index.module.scss": "PR 7 (landing page)"
   },
-  "total": 225,
+  "total": 213,
   "files": {
     "app/epics/DataAnalyticsManager/index.module.scss": {
       "no-empty-source": 1
@@ -96,14 +96,7 @@
     "app/impacto-design-system/badge/css/badge.module.css": {
       "declaration-property-unit-disallowed-list": 1
     },
-    "app/impacto-design-system/button/css/button.module.css": {
-      "declaration-no-important": 7,
-      "property-no-deprecated": 1
-    },
     "app/impacto-design-system/empty-state/empty-state.module.css": {
-      "declaration-property-unit-disallowed-list": 2
-    },
-    "app/impacto-design-system/form-controls/radio-group/css/radio-group.module.css": {
       "declaration-property-unit-disallowed-list": 2
     },
     "app/impacto-design-system/form-controls/select-autocomplete/index.module.scss": {
@@ -115,12 +108,6 @@
       "function-disallowed-list": 1
     },
     "app/impacto-design-system/stack/css/stack.module.css": {
-      "declaration-no-important": 1
-    },
-    "app/impacto-design-system/template-page/index.module.scss": {
-      "declaration-property-value-disallowed-list": 1
-    },
-    "app/impacto-design-system/tooltip/css/tooltip.module.css": {
       "declaration-no-important": 1
     },
     "pages/account/login/index.module.scss": {

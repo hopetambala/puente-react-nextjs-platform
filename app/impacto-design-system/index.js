@@ -2,10 +2,8 @@ import Badge from './badge';
 import Button from './button';
 import Card from './card';
 import CardAlt from './card-alt';
-import CardGroup from './card-group';
 import EmptyState from './empty-state';
 import FormInput from './form-controls/input';
-import RadioGroup from './form-controls/radio-group';
 import Icon from './icon';
 import LanguageSwitcher from './language-switcher';
 import Link from './Link';
@@ -31,7 +29,6 @@ export {
   Button,
   Card,
   CardAlt,
-  CardGroup,
   EmptyState,
   FormInput,
   Icon,
@@ -40,7 +37,6 @@ export {
   Modal,
   Page,
   Panel,
-  RadioGroup,
   SegmentedControl,
   Skeleton,
   Spinner,

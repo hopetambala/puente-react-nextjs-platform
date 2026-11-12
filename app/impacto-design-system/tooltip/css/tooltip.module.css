@@ -1,34 +1,28 @@
-.tooltipWrapper {
-  margin: 0 !important;
-  pointer-events: none;
-  z-index: var(--z-tooltip);
-}
-
-.tooltip {
-  background: var(--color-tooltip-bg);
-  border-radius: var(--border-radius-s);
-  box-shadow: var(--shadow-lv1);
-  color: var(--color-text);
-  font-size: var(--font-size-small);
-  line-height: var(--line-height-small);
-  max-width: 360px;
-  padding: var(--spacer-xs) var(--spacer-s);
-  text-align: center;
-}
-
-.tooltipTriggerWrapper {
+.trigger {
   display: inline-flex;
 }
 
-.tooltip[data-popper-reference-hidden] {
-  pointer-events: none;
-  visibility: hidden;
+.tooltip {
+  z-index: var(--tk-dlite-semantic-z-index-overlay);
+  max-width: min(22.5rem, calc(100vw - 2 * var(--tk-dlite-semantic-spacing-sm)));
+  padding: var(--tk-dlite-semantic-spacing-xs) var(--tk-dlite-semantic-spacing-sm);
+  border-radius: var(--tk-dlite-semantic-border-radius-sm);
+  background: var(--tk-dlite-semantic-color-text-primary);
+  color: var(--tk-dlite-semantic-color-surface-base);
+  font-size: var(--tk-dlite-semantic-typography-size-300);
+  line-height: 1.4;
+  text-align: center;
+  overflow-wrap: anywhere;
+  opacity: 1;
+  transition: opacity var(--tk-dlite-semantic-motion-duration-quick) ease-out;
 }
 
-.ellipsis {
-  display: inline-block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;
-  white-space: nowrap;
+@starting-style {
+  .tooltip {
+    opacity: 0;
+  }
+}
+
+.tooltip[data-popper-reference-hidden] {
+  visibility: hidden;
 }
