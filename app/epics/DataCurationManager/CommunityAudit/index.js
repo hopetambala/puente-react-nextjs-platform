@@ -1,4 +1,5 @@
 import { Button, Modal, Panel } from 'app/impacto-design-system';
+import { settleWithin } from 'app/modules/async/settleWithin';
 import { useTranslation } from 'next-i18next';
 import { Parse } from 'parse';
 import { useEffect, useState } from 'react';
@@ -67,27 +68,46 @@ export default function CommunityAudit({ orgValues }) {
   // The group index awaiting confirmation, set when Apply is clicked. Holds the
   // confirm dialog open until the user explicitly confirms the bulk rename.
   const [pendingGroup, setPendingGroup] = useState(null);
+  const [loading, setLoading] = useState(true);
+  // Some class could not be read. "Nothing found" would then mean "nothing
+  // checked", which the dashboard is careful never to say.
+  const [partial, setPartial] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+  // { kind: 'renamed' | 'failed', target } — the outcome of the last rename.
+  const [outcome, setOutcome] = useState(null);
 
   useEffect(() => {
-    if (!orgValues || !orgValues.length) return;
+    if (!orgValues || !orgValues.length) return undefined;
+    let ignore = false;
+    setLoading(true);
+    setPartial(false);
     async function load() {
       // Parse `distinct()` needs the Master Key (client SDK can't use it), so
       // we sample records per class and reduce to distinct community names here.
-      const all = await Promise.all(
+      // allSettled + settleWithin: one class failing or hanging still lets the
+      // others be checked, and the page says which happened (design review C7).
+      const results = await Promise.allSettled(
         AUDIT_CLASSES.map(async (cls) => {
           const q = new Parse.Query(cls);
           q.containedIn('surveyingOrganization', orgValues);
           q.select('communityname');
           q.limit(1000);
-          const recs = await q.find().catch(() => []);
+          const recs = await settleWithin(q.find());
           return recs.map((r) => r.get('communityname'));
         }),
       );
-      const names = [...new Set(all.flat().filter(Boolean))];
+      if (ignore) return;
+      const names = [...new Set(results
+        .filter((r) => r.status === 'fulfilled')
+        .flatMap((r) => r.value)
+        .filter(Boolean))];
       setGroups(groupSimilarNames(names));
+      setPartial(results.some((r) => r.status === 'rejected'));
+      setLoading(false);
     }
     load();
-  }, [orgValues]);
+    return () => { ignore = true; };
+  }, [orgValues, attempt]);
 
   async function applyCanonical() {
     if (pendingGroup === null) return;
@@ -96,6 +116,7 @@ export default function CommunityAudit({ orgValues }) {
     const target = canonical[gi] || group[0];
     setApplying(gi);
     setPendingGroup(null);
+    setOutcome(null);
     try {
       await Promise.all(AUDIT_CLASSES.map(async (cls) => {
         const variants = group.filter((n) => n !== target);
@@ -114,8 +135,10 @@ export default function CommunityAudit({ orgValues }) {
             // applies a server default of 100 when no limit is set, so this
             // renamed 100 records and reported success for all of them.
             q.limit(RENAME_PAGE_SIZE);
+            // A failed query throws. Read as "no records left", it ended the
+            // loop and the group vanished as though every record were renamed.
             // eslint-disable-next-line no-await-in-loop
-            const recs = await q.find().catch(() => []);
+            const recs = await q.find();
             if (!recs.length) break;
             // eslint-disable-next-line no-await-in-loop
             await Promise.all(recs.map((r) => {
@@ -129,6 +152,12 @@ export default function CommunityAudit({ orgValues }) {
         }));
       }));
       setGroups((prev) => prev.filter((_, i) => i !== gi));
+      setCanonical({});
+      setOutcome({ kind: 'renamed', target });
+    } catch {
+      // The group stays: some records may be renamed and some not, and running
+      // it again finishes the job (renamed records no longer match).
+      setOutcome({ kind: 'failed', target });
     } finally {
       setApplying(null);
     }
@@ -151,41 +180,62 @@ export default function CommunityAudit({ orgValues }) {
         intent="primary"
         action={applyCanonical}
       />
-      {groups.length === 0 ? (
+      <p className={styles.status} role="status">
+        {loading && t('data_curation_audit_loading')}
+        {!loading && outcome?.kind === 'renamed' && t('data_curation_audit_renamed', { target: outcome.target })}
+      </p>
+      {outcome?.kind === 'failed' && (
+        <p className={styles.error} role="alert">{t('data_curation_audit_rename_failed', { target: outcome.target })}</p>
+      )}
+      {!loading && partial && (
+        <div className={styles.partial}>
+          <p role="alert">{t('data_curation_audit_partial')}</p>
+          <Button isSmall text={t('action_try_again')} onClick={() => setAttempt((n) => n + 1)} />
+        </div>
+      )}
+      {!loading && groups.length === 0 && !partial && (
         <p className={styles.empty}>{t('data_curation_audit_empty')}</p>
-      ) : (
+      )}
+      {!loading && groups.length > 0 && (
         <div className={styles.groups}>
-          {groups.map((group, gi) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <div key={gi} className={styles.group}>
-              <div className={styles.variants}>
-                {group.map((name, vi) => (
-                  <label
-                    key={name}
-                    className={styles.variant}
-                    htmlFor={`canonical-${gi}-${vi}`}
-                  >
-                    <input
-                      id={`canonical-${gi}-${vi}`}
-                      type="radio"
-                      name={`canonical-${gi}`}
-                      checked={(canonical[gi] || group[0]) === name}
-                      onChange={() => setCanonical((prev) => ({ ...prev, [gi]: name }))}
-                    />
-                    <span>{name}</span>
-                  </label>
-                ))}
+          {groups.map((group, gi) => {
+            const target = canonical[gi] || group[0];
+            return (
+              // Index keys: a group has no id, and the list only shrinks.
+              // eslint-disable-next-line react/no-array-index-key
+              <div key={gi} className={styles.group}>
+                <fieldset className={styles.variants}>
+                  <legend className={styles.legend}>
+                    {t('data_curation_audit_group_legend', { name: group[0] })}
+                  </legend>
+                  {group.map((name, vi) => (
+                    <label
+                      key={name}
+                      className={styles.variant}
+                      htmlFor={`canonical-${gi}-${vi}`}
+                    >
+                      <input
+                        id={`canonical-${gi}-${vi}`}
+                        type="radio"
+                        name={`canonical-${gi}`}
+                        checked={target === name}
+                        onChange={() => setCanonical((prev) => ({ ...prev, [gi]: name }))}
+                      />
+                      <span>{name}</span>
+                    </label>
+                  ))}
+                </fieldset>
+                <Button
+                  text={applying === gi
+                    ? t('data_curation_audit_applying')
+                    : t('data_curation_audit_apply', { target })}
+                  isSmall
+                  isDisabled={applying !== null}
+                  onClick={() => setPendingGroup(gi)}
+                />
               </div>
-              <Button
-                text={applying === gi
-                  ? t('data_curation_audit_applying')
-                  : t('data_curation_audit_apply')}
-                isSmall
-                isDisabled={applying === gi}
-                onClick={() => setPendingGroup(gi)}
-              />
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </Panel>

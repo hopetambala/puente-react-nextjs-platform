@@ -1,7 +1,37 @@
+.status:empty {
+  display: none;
+}
+
+.status,
 .empty {
+  margin: 0;
   font-family: var(--font-family);
-  font-size: 13px;
+  font-size: var(--tk-dlite-semantic-typography-size-300);
   color: var(--tk-dlite-semantic-color-text-secondary);
+}
+
+.error,
+.partial {
+  margin: 0 0 var(--tk-dlite-semantic-spacing-md);
+  padding: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-md);
+  border-radius: var(--tk-dlite-semantic-border-radius-md);
+}
+
+.error {
+  background: var(--tk-dlite-semantic-color-feedback-danger-bg);
+  color: var(--tk-dlite-semantic-color-feedback-danger-active);
+}
+
+.partial {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-md);
+  background: var(--tk-dlite-semantic-color-feedback-warning-bg);
+  color: var(--tk-dlite-semantic-color-feedback-warning-fg);
+}
+
+.partial p {
   margin: 0;
 }
 
@@ -11,9 +41,12 @@
   gap: var(--tk-dlite-semantic-spacing-md);
 }
 
+/* Spellings and the button wrap under each other in a narrow container
+   rather than squeezing the names. */
 .group {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
+  align-items: flex-end;
   justify-content: space-between;
   gap: var(--tk-dlite-semantic-spacing-md);
   padding: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-md);
@@ -24,15 +57,29 @@
 .variants {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--tk-dlite-semantic-spacing-md);
+  gap: var(--tk-dlite-semantic-spacing-xs) var(--tk-dlite-semantic-spacing-md);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
+.legend {
+  width: 100%;
+  margin-block-end: var(--tk-dlite-semantic-spacing-xs);
+  padding: 0;
+  font-size: var(--tk-dlite-semantic-typography-size-200);
+  color: var(--tk-dlite-semantic-color-text-secondary);
+}
+
+/* The whole label is the target, at least 24px tall (WCAG 2.5.8). */
 .variant {
   display: flex;
   align-items: center;
   gap: var(--tk-dlite-semantic-spacing-xs);
+  min-height: var(--tk-dlite-semantic-sizing-target-min);
   font-family: var(--font-family);
-  font-size: 13px;
+  font-size: var(--tk-dlite-semantic-typography-size-300);
   color: var(--tk-dlite-semantic-color-text-primary);
   cursor: pointer;
 }

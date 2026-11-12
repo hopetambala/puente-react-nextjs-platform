@@ -1,5 +1,9 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  fireEvent, render, screen, waitFor, within,
+} from '@testing-library/react';
+
+import { axe } from '../../../../../__test-utils__/axe';
 
 // `t` echoes the key, and appends its interpolation vars when given any. That
 // second half matters here: the rename confirmation embeds a community name,
@@ -12,7 +16,7 @@ jest.mock('next-i18next', () => ({
 }));
 
 jest.mock('app/impacto-design-system', () => ({
-  Panel: ({ title, children }) => <div><h3>{title}</h3>{children}</div>,
+  Panel: ({ title, children }) => <section aria-label={title}><h2>{title}</h2>{children}</section>,
   Button: ({ text, onClick, isDisabled }) => (
     <button type="button" onClick={onClick} disabled={isDisabled}>{text}</button>
   ),
@@ -52,6 +56,12 @@ jest.mock('parse', () => ({
 
 jest.mock('app/services/parse', () => ({ initialize: jest.fn() }));
 
+const mockTimeout = { ms: null };
+jest.mock('app/modules/async/settleWithin', () => {
+  const actual = jest.requireActual('app/modules/async/settleWithin');
+  return { ...actual, settleWithin: (p, ms) => actual.settleWithin(p, mockTimeout.ms ?? ms) };
+});
+
 const { levenshtein } = require('app/epics/DataCurationManager/CommunityAudit');
 const CommunityAudit = require('app/epics/DataCurationManager/CommunityAudit').default;
 const { Parse: MockParse } = require('parse');
@@ -90,17 +100,18 @@ describe('CommunityAudit — grouping', () => {
     await waitFor(() => expect(screen.getByText('data_curation_audit_empty')).toBeInTheDocument());
   });
 
-  it('routes the Apply button label through t()', async () => {
+  it('names the spelling the Apply button keeps', async () => {
     mockFind.mockResolvedValue(recordsFromNames(['Sabana Yegua', 'Sabana Yégua']));
     render(<CommunityAudit orgValues={['TestOrg']} />);
-    await waitFor(() => expect(screen.getByText('data_curation_audit_apply')).toBeInTheDocument());
+    expect(await screen.findByRole('button', { name: 'data_curation_audit_apply {"target":"Sabana Yegua"}' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('radio', { name: 'Sabana Yégua' }));
+    expect(screen.getByRole('button', { name: 'data_curation_audit_apply {"target":"Sabana Yégua"}' })).toBeInTheDocument();
   });
 
   it('interpolates the community name into the confirmation rather than concatenating it', async () => {
     mockFind.mockResolvedValue(recordsFromNames(['Sabana Yegua', 'Sabana Yégua']));
     render(<CommunityAudit orgValues={['TestOrg']} />);
-    await waitFor(() => screen.getByText('data_curation_audit_apply'));
-    fireEvent.click(screen.getByText('data_curation_audit_apply'));
+    fireEvent.click(await screen.findByText(/^data_curation_audit_apply/));
     expect(
       screen.getByText(/^data_curation_audit_rename_confirm .*"target":"Sabana Yegua"/),
     ).toBeInTheDocument();
@@ -259,5 +270,81 @@ describe('CommunityAudit — audited Parse classes', () => {
       expect(MockParse.Query).toHaveBeenCalledWith('EvaluationMedical');
       expect(MockParse.Query).toHaveBeenCalledWith('Vitals');
     });
+  });
+});
+
+describe('CommunityAudit — structure and honesty', () => {
+  beforeEach(() => { jest.clearAllMocks(); mockFind.mockResolvedValue([]); });
+  afterEach(() => { mockTimeout.ms = null; });
+
+  // Each group's radios were loose: no group name, so a screen reader read
+  // "Sabana Yegua, radio button, 1 of 2" with nothing saying what was chosen.
+  it('puts each group of spellings in a named fieldset', async () => {
+    mockFind.mockResolvedValue(recordsFromNames(['Sabana Yegua', 'Sabana Yégua']));
+    render(<CommunityAudit orgValues={['TestOrg']} />);
+    const group = await screen.findByRole('group', { name: 'data_curation_audit_group_legend {"name":"Sabana Yegua"}' });
+    expect(within(group).getAllByRole('radio')).toHaveLength(2);
+  });
+
+  // It used to say "No similar community names detected" before it had looked.
+  it('says it is checking, not that nothing was found, while loading', async () => {
+    let finish;
+    mockFind.mockReturnValue(new Promise((resolve) => { finish = resolve; }));
+    render(<CommunityAudit orgValues={['TestOrg']} />);
+    expect(screen.getByRole('status')).toHaveTextContent('data_curation_audit_loading');
+    expect(screen.queryByText('data_curation_audit_empty')).not.toBeInTheDocument();
+    finish([]);
+    expect(await screen.findByText('data_curation_audit_empty')).toBeInTheDocument();
+  });
+
+  // A failed class query was read as "no names there", so "nothing found"
+  // could mean "nothing checked" (the dashboard's partial-check voice).
+  it('says when some records could not be checked, and offers Try again', async () => {
+    mockFind
+      .mockRejectedValueOnce(new Error('offline'))
+      .mockResolvedValue([]);
+    render(<CommunityAudit orgValues={['TestOrg']} />);
+    expect(await screen.findByRole('alert')).toHaveTextContent('data_curation_audit_partial');
+    expect(screen.queryByText('data_curation_audit_empty')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'action_try_again' }));
+    expect(await screen.findByText('data_curation_audit_empty')).toBeInTheDocument();
+  });
+
+  it('treats a check that never answers as one that failed', async () => {
+    mockTimeout.ms = 30;
+    mockFind.mockReturnValue(new Promise(() => {}));
+    render(<CommunityAudit orgValues={['TestOrg']} />);
+    expect(await screen.findByRole('alert')).toHaveTextContent('data_curation_audit_partial');
+  });
+
+  // A failed query inside the rename was read as "no records left", so the
+  // group vanished as though every record had been renamed.
+  it('keeps the group and says so when the rename fails', async () => {
+    mockFind
+      .mockResolvedValueOnce(recordsFromNames(['Sabana Yegua', 'Sabana Yégua']))
+      .mockResolvedValueOnce([]).mockResolvedValueOnce([]).mockResolvedValueOnce([])
+      .mockRejectedValue(new Error('offline'));
+    render(<CommunityAudit orgValues={['TestOrg']} />);
+    fireEvent.click(await screen.findByText(/^data_curation_audit_apply/));
+    fireEvent.click(screen.getByText('data_curation_audit_rename_action'));
+    expect(await screen.findByRole('alert')).toHaveTextContent('data_curation_audit_rename_failed {"target":"Sabana Yegua"}');
+    expect(screen.getByRole('radio', { name: 'Sabana Yégua' })).toBeInTheDocument();
+  });
+
+  it('announces a finished rename', async () => {
+    mockFind
+      .mockResolvedValueOnce(recordsFromNames(['Sabana Yegua', 'Sabana Yégua']))
+      .mockResolvedValue([]);
+    render(<CommunityAudit orgValues={['TestOrg']} />);
+    fireEvent.click(await screen.findByText(/^data_curation_audit_apply/));
+    fireEvent.click(screen.getByText('data_curation_audit_rename_action'));
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('data_curation_audit_renamed {"target":"Sabana Yegua"}'));
+  });
+
+  it('has no axe violations with a group listed', async () => {
+    mockFind.mockResolvedValue(recordsFromNames(['Sabana Yegua', 'Sabana Yégua']));
+    const { container } = render(<CommunityAudit orgValues={['TestOrg']} />);
+    await screen.findAllByRole('radio');
+    expect(await axe(container)).toHaveNoViolations();
   });
 });

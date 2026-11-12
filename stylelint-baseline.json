@@ -14,16 +14,10 @@
     "pages/data/": "PR 6 (data routes)",
     "pages/index.module.scss": "PR 7 (landing page)"
   },
-  "total": 158,
+  "total": 153,
   "files": {
     "app/epics/DataAnalyticsManager/index.module.scss": {
       "no-empty-source": 1
-    },
-    "app/epics/DataCurationManager/CommunityAudit/index.module.css": {
-      "declaration-property-unit-disallowed-list": 2
-    },
-    "app/epics/DataCurationManager/DuplicateResolver/index.module.css": {
-      "declaration-property-unit-disallowed-list": 3
     },
     "app/epics/FormCreator/FormBlocks/index.module.scss": {
       "color-named": 1,

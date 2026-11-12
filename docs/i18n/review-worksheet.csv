@@ -265,11 +265,16 @@ common,data_curation_source_eval_medical,Medical Evaluation,Evaluación médica,
 common,data_curation_source_vitals,Vitals,Signos vitales,Siy vital,,
 common,data_curation_source_untitled_form,Untitled form,Formulario sin título,Fòm san tit,,
 common,data_curation_audit_title,Community Audit,Auditoría de comunidades,Odit kominote,,
+common,data_curation_audit_loading,Checking community names…,Revisando los nombres de comunidad…,N ap verifye non kominote yo…,,Needs native review.
 common,data_curation_audit_empty,No similar community names detected.,No se detectaron nombres de comunidad similares.,Nou pa jwenn okenn non kominote ki sanble.,,
+common,data_curation_audit_partial,"Some records couldn't be checked, so this list may be incomplete.","No se pudieron revisar algunos registros, así que esta lista puede estar incompleta.","Nou pa t ka verifye kèk dosye, kidonk lis sa a ka pa konplè.",,"A failed check must not read as ""nothing found"". Needs native review."
+common,data_curation_audit_group_legend,Spellings like “{{name}}”. Choose the one to keep.,Escrituras parecidas a «{{name}}». Elige la que se conserva.,Fason ekri ki sanble ak «{{name}}». Chwazi sa pou kenbe a.,,Needs native review.
 common,data_curation_audit_rename_confirm,Rename all records in this group to “{{target}}”? This updates every matching record and cannot be undone.,¿Cambiar el nombre de todos los registros de este grupo a «{{target}}»? Esto actualiza todos los registros coincidentes y no se puede deshacer.,Chanje non tout dosye nan gwoup sa a pou «{{target}}»? Sa ap modifye chak dosye ki koresponn e li pa ka defèt.,,
 common,data_curation_audit_rename_action,Rename records,Cambiar nombre,Chanje non,,
-common,data_curation_audit_apply,Apply,Aplicar,Aplike,,
+common,data_curation_audit_apply,Use “{{target}}”,Usar «{{target}}»,Itilize «{{target}}»,,"Names the spelling kept; was a bare ""Apply"" on every group. Needs native review."
 common,data_curation_audit_applying,Applying…,Aplicando…,Ap aplike…,,
+common,data_curation_audit_renamed,Records renamed to “{{target}}”.,Registros renombrados a «{{target}}».,Dosye yo gen non «{{target}}» kounye a.,,Needs native review.
+common,data_curation_audit_rename_failed,Not every record was renamed to “{{target}}”. Check your connection and try again. Records already renamed stay renamed.,No todos los registros se renombraron a «{{target}}». Revisa tu conexión e inténtalo de nuevo. Los registros ya renombrados se quedan así.,Se pa tout dosye ki chanje non pou «{{target}}». Verifye koneksyon ou epi eseye ankò. Dosye ki deja chanje yo rete konsa.,,Needs native review.
 common,data_curation_inspector_section_identity,Identity,Identidad,Idantite,,
 common,data_curation_inspector_section_contact,Contact,Contacto,Kontak,,
 common,data_curation_inspector_section_location,Location,Ubicación,Kote,,
@@ -330,11 +335,15 @@ common,data_curation_clear_filters,Clear filters,Quitar filtros,Retire filtè yo
 common,data_curation_percent,"{{pct, number}}%","{{pct, number}} %","{{pct, number}} %",,
 common,data_curation_completeness_aria,"{{pct, number}}% complete","{{pct, number}} % completo","{{pct, number}} % konplè",,
 common,pagination_showing,"Showing {{from, number}}–{{to, number}} of {{total, number}}","Mostrando {{from, number}}–{{to, number}} de {{total, number}}","Ap montre {{from, number}}–{{to, number}} sou {{total, number}}",,
-common,data_curation_dup_record,Record {{label}},Registro {{label}},Dosye {{label}},,
-common,data_curation_dup_keep,"Keep {{keep}}, dismiss {{dismiss}}","Conservar {{keep}}, descartar {{dismiss}}","Kenbe {{keep}}, jete {{dismiss}}",,
-common,data_curation_dup_both_unique,Both are unique — dismiss,Ambos son únicos: descartar,Toude se dosye diferan — jete,,
-common,data_curation_dup_delete_confirm,Permanently delete this record? This cannot be undone.,¿Eliminar este registro de forma permanente? No se puede deshacer.,Efase dosye sa a nèt? Sa pa ka defèt.,,
-common,data_curation_dup_delete_action,Delete record,Eliminar registro,Efase dosye,,
+common,data_curation_dup_title,Possible duplicate,Posible duplicado,Doub posib,,Needs native review.
+common,data_curation_dup_intro,"These two records share a household and a day. Compare them, then keep one or both. Values that don't match are marked Different.",Estos dos registros comparten hogar y día. Compáralos y conserva uno o ambos. Los valores que no coinciden están marcados como Diferente.,"De dosye sa yo gen menm kay ak menm jou. Konpare yo, epi kenbe youn oswa toude. Valè ki pa menm yo make Diferan.",,Needs native review.
+common,data_curation_dup_record,Record {{label}},Registro {{label}},Dosye {{label}},,Needs native review.
+common,data_curation_dup_differs,Different,Diferente,Diferan,,Needs native review.
+common,data_curation_dup_keep,"Keep {{keep}}, delete {{discard}}","Conservar {{keep}}, eliminar {{discard}}","Kenbe {{keep}}, efase {{discard}}",,"""Delete"", not ""dismiss"": the other record is destroyed (design review X12). Needs native review."
+common,data_curation_dup_both_unique,Keep both,Conservar ambos,Kenbe toude,,Needs native review.
+common,data_curation_dup_delete_confirm,Delete record {{discard}} for good? Record {{keep}} is kept. This can't be undone.,¿Eliminar el registro {{discard}} de forma permanente? Se conserva el registro {{keep}}. No se puede deshacer.,Efase dosye {{discard}} nèt? Dosye {{keep}} rete. Sa pa ka defèt.,,Names which record goes and which stays (X12). Needs native review.
+common,data_curation_dup_delete_failed,Record {{label}} wasn't deleted. Check your connection and try again.,El registro {{label}} no se eliminó. Revisa tu conexión e inténtalo de nuevo.,Dosye {{label}} pa efase. Verifye koneksyon ou epi eseye ankò.,,Needs native review.
+common,data_curation_dup_delete_action,Delete record,Eliminar registro,Efase dosye,,Needs native review.
 common,form_creator_remove_question,Remove question,Eliminar pregunta,Retire kesyon an,,
 common,form_creator_question_placeholder,Enter your question here,Escribe tu pregunta aquí,Ekri kesyon ou an isit la,,
 common,form_creator_type_geolocation,Geolocation,Geolocalización,Jeyolokalizasyon,,
