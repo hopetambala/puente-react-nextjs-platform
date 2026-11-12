@@ -1,80 +1,47 @@
-.auth {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  min-height: 100vh;
-}
-
-.left {
-  background: var(--tk-dlite-semantic-color-text-primary);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  padding: var(--tk-dlite-semantic-spacing-xl);
-}
-
-.leftBrand {
-  display: flex;
-  align-items: center;
-  gap: var(--tk-dlite-semantic-spacing-sm);
-}
-
-.leftBrandMark {
-  width: 28px;
-  height: 28px;
-  background: var(--tk-dlite-primitive-color-yellow-200);
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* The sign-up card. The page frame (brand column, <main>, breakpoints) is
+   AuthLayout's. */
+.heading {
+  margin: 0 0 var(--tk-dlite-semantic-spacing-sm);
+  font-family: var(--font-family-heading);
+  font-size: clamp(var(--tk-dlite-semantic-typography-size-700), 1.25rem + 2vw, var(--tk-dlite-semantic-typography-size-800));
   font-weight: 700;
-  font-size: 14px;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
 }
 
-.leftBrandName {
-  color: var(--tk-dlite-primitive-color-white);
-  font-weight: 600;
-  font-size: 15px;
-}
-
-.right {
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: var(--tk-dlite-semantic-spacing-xl);
-  background: var(--tk-dlite-semantic-color-background);
-  overflow-y: auto;
-}
-
-.card {
-  width: 100%;
-  max-width: 480px;
-  padding: var(--spacer-xl) 0;
+.requiredNote {
+  margin: 0 0 var(--tk-dlite-semantic-spacing-lg);
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  font-size: var(--tk-dlite-semantic-typography-size-300);
 }
 
 .stack {
   padding-bottom: var(--spacer-l);
 }
 
+.unavailable {
+  margin: 0;
+  color: var(--tk-dlite-semantic-color-feedback-danger);
+  font-size: var(--tk-dlite-semantic-typography-size-300);
+}
+
 /* A real <button>, not a link: it toggles a disclosure, it does not navigate.
-   Styled to read as a link so it stays quiet next to the picker. */
+   Underlined so it reads as actionable without relying on colour (WCAG 1.4.1),
+   and at least the 24px target. */
 .notListed {
-  /* No align-self here: Stack wraps this fragment in a plain block <div>
-     (StackItem), so there is no flex parent to align against. A <button> is
-     inline-block, so it already shrinks to its text. */
+  min-height: var(--tk-dlite-semantic-sizing-target-min);
   margin-top: var(--tk-dlite-semantic-spacing-xs);
   padding: 0;
   border: 0;
   background: none;
   cursor: pointer;
-  color: var(--tk-dlite-semantic-color-action-primary);
+  color: var(--tk-dlite-semantic-color-text-link);
   font-family: var(--tk-dlite-semantic-typography-font-heading);
   font-size: var(--tk-dlite-semantic-typography-size-300);
   font-weight: 500;
   text-align: start;
-
-  &:hover {
-    text-decoration: underline;
-  }
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
 }
 
 .notListedHelp {
@@ -84,6 +51,6 @@
   line-height: 1.5;
 
   a {
-    color: var(--tk-dlite-semantic-color-action-primary);
+    color: var(--tk-dlite-semantic-color-text-link);
   }
 }

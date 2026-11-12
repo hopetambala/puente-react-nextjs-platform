@@ -46,6 +46,10 @@ jest.mock('app/impacto-design-system/toast/notify', () => ({ toast: jest.fn() })
 
 jest.mock('parse', () => ({ Parse: {} }));
 
+jest.mock('next/head', () => function MockHead({ children }) {
+  return <div data-testid="head">{children}</div>;
+});
+
 // Defaults to a successful empty load so tests that are not about the picker
 // (the Phase 8 layout tests) do not have to stub it.
 const mockLoad = jest.fn().mockResolvedValue({ options: [], unavailable: false });
@@ -67,6 +71,8 @@ jest.mock('app/impacto-design-system/form-controls/select', () => ({
 }));
 
 jest.mock('app/impacto-design-system', () => ({
+  // The real frame: its <main>, skip link and title are what's under test.
+  AuthLayout: jest.requireActual('app/impacto-design-system/auth-layout').default,
   Button: ({ text, onClick, type = 'button' }) => <button type={type} onClick={onClick}>{text}</button>,
   Card: ({ children }) => <div data-testid="card">{children}</div>,
   FormInput: ({ name, label }) => <input aria-label={label || name} name={name} />,
@@ -288,5 +294,40 @@ describe('form semantics', () => {
     const button = await screen.findByRole('button', { name: 'Register' });
     expect(button).toHaveAttribute('type', 'submit');
     expect(button.closest('form')).not.toBeNull();
+  });
+});
+
+
+// ─── The shared signed-out frame and its errors (overhaul PR 4) ─────────────
+describe('Register — page structure', () => {
+  it('puts the form in a <main> with a skip link, an h1 and its own document title', async () => {
+    render(<Register />);
+    const main = await screen.findByRole('main');
+    expect(within(main).getByRole('heading', { level: 1, name: 'Create an account' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Skip to main content' })).toHaveAttribute('href', '#main');
+    expect(screen.getByTestId('head')).toHaveTextContent('Create an account · Puente');
+  });
+
+  it('announces that the organization list did not load (WCAG 4.1.3)', async () => {
+    mockLoad.mockResolvedValueOnce({ options: [], unavailable: true });
+    render(<Register />);
+    expect(await screen.findByRole('alert')).toHaveTextContent('We could not load the list of organizations');
+  });
+});
+
+describe('Register — sign-up errors in the reader\'s language', () => {
+  const { toast } = require('app/impacto-design-system/toast/notify');
+  const { retrieveSignUpFunction } = require('app/modules/user');
+
+  it('says the account already exists instead of Parse\'s English', async () => {
+    retrieveSignUpFunction.mockRejectedValueOnce(Object.assign(new Error('Account already exists for this username.'), { code: 202 }));
+    mockFormValues = { email: 'ada@example.org', organization: 'Puente' };
+    render(<Register />);
+    const form = (await screen.findByRole('main')).querySelector('form');
+    fireEvent.submit(form);
+    await waitFor(() => expect(toast).toHaveBeenCalledWith({
+      text: 'An account already uses that email or phone number. Sign in instead, or reset your password.',
+      isError: true,
+    }));
   });
 });

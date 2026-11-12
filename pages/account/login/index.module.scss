@@ -1,145 +1,31 @@
-.login {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  min-height: 100vh;
-}
-
-/* ── left column ── */
-.left {
-  background: var(--tk-dlite-semantic-color-text-primary);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: var(--tk-dlite-semantic-spacing-xl);
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: -80px;
-    left: -80px;
-    width: 320px;
-    height: 320px;
-    background: radial-gradient(circle, rgba(255, 230, 128, 0.16) 0%, transparent 70%);
-    pointer-events: none;
-  }
-}
-
-.leftBrand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  position: relative;
-  z-index: 1;
-}
-
-.leftBrandMark {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--tk-dlite-semantic-border-radius-md);
-  background: var(--tk-dlite-semantic-color-action-primary);
-  color: white;
-  display: grid;
-  place-items: center;
-  font-weight: 800;
-  font-size: 16px;
-  flex-shrink: 0;
-}
-
-.leftBrandName {
-  font-weight: 700;
-  font-size: 18px;
-  color: white;
-  font-family: var(--font-family-heading);
-  letter-spacing: -0.01em;
-}
-
-.quote {
-  position: relative;
-  z-index: 1;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: var(--tk-dlite-semantic-spacing-1000) 0;
-}
-
-.quoteMark {
-  font-family: 'Source Serif 4', Georgia, serif;
-  font-size: 64px;
-  font-weight: 400;
-  color: var(--tk-dlite-primitive-color-yellow-200);
-  line-height: 0.8;
-  margin-bottom: var(--tk-dlite-semantic-spacing-md);
-}
-
-.quoteBody {
-  font-family: 'Source Serif 4', Georgia, serif;
-  font-size: 22px;
-  font-weight: 400;
-  font-style: italic;
-  color: white;
-  line-height: 1.5;
-  margin: 0 0 var(--tk-dlite-semantic-spacing-500);
-}
-
-.quoteAttr {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.5);
-  font-family: var(--font-family-heading);
-}
-
-.leftFooter {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.35);
-  font-family: var(--font-family-mono);
-  display: flex;
-  gap: var(--tk-dlite-semantic-spacing-sm);
-  position: relative;
-  z-index: 1;
-}
-
-/* ── right column ── */
-.right {
-  background: var(--tk-dlite-semantic-color-surface-base);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--tk-dlite-semantic-spacing-xxl) var(--tk-dlite-semantic-spacing-xl);
-}
-
-.card {
-  width: 100%;
-  max-width: 380px;
-}
-
+/* The sign-in card. The page frame (brand column, <main>, breakpoints) is
+   AuthLayout's. */
 .eyebrow {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-weight: 700;
-  color: var(--tk-dlite-semantic-color-text-secondary);
+  margin: 0 0 var(--tk-dlite-semantic-spacing-sm);
   font-family: var(--font-family-heading);
-  margin-bottom: var(--tk-dlite-semantic-spacing-sm);
+  font-size: var(--tk-dlite-semantic-typography-size-200);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tk-dlite-semantic-color-text-secondary);
 }
 
 .title {
+  margin: 0 0 var(--tk-dlite-semantic-spacing-sm);
   font-family: var(--font-family-heading);
-  font-size: 30px;
+  font-size: clamp(var(--tk-dlite-semantic-typography-size-700), 1.25rem + 2vw, var(--tk-dlite-semantic-typography-size-800));
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.1;
   color: var(--tk-dlite-semantic-color-text-primary);
-  margin: 0 0 var(--tk-dlite-semantic-spacing-sm);
 }
 
 .sub {
-  font-size: 14px;
-  color: var(--tk-dlite-semantic-color-text-secondary);
-  line-height: 1.5;
   margin: 0 0 var(--tk-dlite-semantic-spacing-700);
   font-family: var(--font-family-heading);
+  font-size: var(--tk-dlite-semantic-typography-size-300);
+  line-height: 1.5;
+  color: var(--tk-dlite-semantic-color-text-secondary);
 }
 
 .fields {
@@ -154,12 +40,12 @@
   align-items: center;
   gap: var(--tk-dlite-semantic-spacing-300);
   margin: var(--tk-dlite-semantic-spacing-500) 0;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--tk-dlite-semantic-color-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
   font-family: var(--font-family-heading);
+  font-size: var(--tk-dlite-semantic-typography-size-200);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tk-dlite-semantic-color-text-secondary);
 
   &::before,
   &::after {
@@ -172,37 +58,36 @@
 
 .altLinks {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 10px;
-  font-size: 13px;
+  gap: var(--tk-dlite-semantic-spacing-xs) var(--tk-dlite-semantic-spacing-sm);
   font-family: var(--font-family-heading);
+  font-size: var(--tk-dlite-semantic-typography-size-300);
 }
 
+/* Underlined like every link (WCAG 1.4.1), in the contrast-checked link colour. */
 .altLink {
-  color: var(--tk-dlite-semantic-color-action-primary);
-  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tk-dlite-semantic-sizing-target-min);
+  color: var(--tk-dlite-semantic-color-text-link);
   font-weight: 500;
-
-  &:hover {
-    text-decoration: underline;
-  }
 }
 
 .altSep {
   color: var(--tk-dlite-semantic-color-text-secondary);
-  font-size: 11px;
 }
 
 .hint {
-  margin-top: var(--tk-dlite-semantic-spacing-lg);
-  background: var(--tk-dlite-primitive-color-yellow-200);
+  margin: var(--tk-dlite-semantic-spacing-lg) 0 0;
+  padding: var(--tk-dlite-semantic-spacing-300) var(--tk-dlite-semantic-spacing-md);
   border-radius: var(--border-radius-m);
-  padding: var(--tk-dlite-semantic-spacing-300) 14px;
-  font-size: 13px;
-  color: var(--tk-dlite-semantic-color-text-primary);
-  line-height: 1.5;
+  background: var(--tk-dlite-semantic-color-feedback-warning-bg);
+  color: var(--tk-dlite-semantic-color-feedback-warning-fg);
   font-family: var(--font-family-heading);
+  font-size: var(--tk-dlite-semantic-typography-size-300);
+  line-height: 1.5;
 }
 
 .languageSwitcher {

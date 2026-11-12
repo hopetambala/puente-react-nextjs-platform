@@ -1,74 +1,159 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import {
+  render, screen, waitFor, within,
+} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
-jest.mock('@hookform/resolvers', () => ({
-  yupResolver: jest.fn(() => jest.fn()),
-}));
+import { axe } from '../../../../__test-utils__/axe';
 
-jest.mock('yup', () => ({
-  object: () => ({ shape: () => ({ required: () => ({}) }) }),
-  string: () => ({ required: () => ({}) }),
-}));
+// /account/reset?objectId=… is where someone finishes their account after a
+// reset link: their details, prefilled, and a new password.
+//
+// Real react-hook-form, real yup, real design-system fields: the earlier test
+// mocked all three away and so could not see that the new password showed as
+// plain text, that fields had no autocomplete or input type, that labels and
+// validation spoke English to everyone (the fields were named by English object
+// keys, which also made ids with spaces in them), or that the h1 said "PUENTE".
 
+const mockPush = jest.fn();
 jest.mock('next/router', () => ({
-  useRouter: jest.fn(() => ({ push: jest.fn(), query: {} })),
+  useRouter: jest.fn(() => ({ push: mockPush, query: { objectId: 'USR1' } })),
 }));
+
+// The real English catalog, so missing keys fail visibly.
+jest.mock('next-i18next', () => {
+  // eslint-disable-next-line global-require
+  const catalog = require('../../../../public/locales/eng/common.json');
+  return { useTranslation: () => ({ t: (key) => catalog[key] ?? key }) };
+});
+
+jest.mock('next/head', () => function MockHead({ children }) {
+  return <div data-testid="head">{children}</div>;
+});
+
+jest.mock('app/impacto-design-system/toast/notify', () => ({ toast: jest.fn() }));
 
 jest.mock('app/modules/user', () => ({
-  retrieveSignInFunction: jest.fn(),
-  retrieveUserByObjectId: jest.fn().mockResolvedValue({ attributes: {} }),
-  updateUser: jest.fn().mockResolvedValue({}),
+  retrieveSignInFunction: jest.fn().mockResolvedValue({}),
+  retrieveUserByObjectId: jest.fn(),
+  updateUser: jest.fn(),
 }));
 
-jest.mock('react-hook-form', () => ({
-  FormProvider: ({ children }) => <>{children}</>,
-  useForm: () => ({
-    handleSubmit: (fn) => fn,
-    register: jest.fn(),
-    reset: jest.fn(),
-    errors: {},
-  }),
-}));
-
-jest.mock('app/impacto-design-system', () => ({
-  Button: ({ text, onClick, type = 'button' }) => <button type={type} onClick={onClick}>{text}</button>,
-  Card: ({ children }) => <div data-testid="card">{children}</div>,
-  Page: ({ children }) => <div data-testid="page">{children}</div>,
-  Stack: ({ children }) => <div>{children}</div>,
-  Text: ({ text }) => <span>{text}</span>,
-  FormInput: ({ name, label }) => <input aria-label={label || name} name={name} />,
-}));
-
+const { retrieveSignInFunction, retrieveUserByObjectId, updateUser } = require('app/modules/user');
+const { toast } = require('app/impacto-design-system/toast/notify');
 const Reset = require('pages/account/reset/index').default;
 
-describe('Phase 8 — Reset page redesign', () => {
-  it('renders data-testid="auth-brand" (brand column)', () => {
+const STORED = {
+  firstname: 'Ada', lastname: 'Example', organization: 'Puente', phonenumber: '8095550100', email: 'ada@example.org',
+};
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  retrieveUserByObjectId.mockResolvedValue({ attributes: STORED });
+  updateUser.mockResolvedValue({ username: 'ada@example.org', password: 'new-secret' });
+});
+
+const fieldsReady = () => screen.findByDisplayValue('Ada');
+
+describe('Reset — page structure', () => {
+  it('uses the shared signed-out frame: brand column, <main>, skip link, title', async () => {
     render(<Reset />);
+    await fieldsReady();
     expect(screen.getByTestId('auth-brand')).toBeInTheDocument();
+    expect(screen.getByTestId('auth-form')).toBe(screen.getByRole('main'));
+    expect(screen.getByRole('link', { name: 'Skip to main content' })).toHaveAttribute('href', '#main');
+    expect(screen.getByTestId('head')).toHaveTextContent('Account Details · Puente');
   });
 
-  it('renders data-testid="auth-form" (form column)', () => {
+  it('names the page with an h1 that says what it is for, not "PUENTE"', async () => {
     render(<Reset />);
-    expect(screen.getByTestId('auth-form')).toBeInTheDocument();
+    await fieldsReady();
+    expect(within(screen.getByRole('main')).getByRole('heading', { level: 1, name: 'Account Details' })).toBeInTheDocument();
   });
 
-  it('does NOT call window.localStorage.clear on mount', () => {
+  it('does not clear localStorage on mount', async () => {
     const clearSpy = jest.spyOn(window.localStorage.__proto__, 'clear');
     render(<Reset />);
+    await fieldsReady();
     expect(clearSpy).not.toHaveBeenCalled();
     clearSpy.mockRestore();
   });
 });
 
-// Every account form submits like a form, so Enter works (see login tests).
-describe('form semantics', () => {
-  it('Continue is the submit button of the form, and the fields have their labels', async () => {
-    const { container } = render(<Reset />);
-    const button = await screen.findByRole('button', { name: 'continue' });
+describe('Reset — fields', () => {
+  it('labels every field from the catalog and prefills it from the stored account', async () => {
+    render(<Reset />);
+    await fieldsReady();
+    expect(screen.getByLabelText(/First Name/)).toHaveValue('Ada');
+    expect(screen.getByLabelText(/Last Name/)).toHaveValue('Example');
+    expect(screen.getByLabelText(/Organization/)).toHaveValue('Puente');
+    expect(screen.getByLabelText(/Phone Number/)).toHaveValue('8095550100');
+    expect(screen.getByLabelText(/Email Address/)).toHaveValue('ada@example.org');
+  });
+
+  it('masks the new password and tells password managers what each field is', async () => {
+    render(<Reset />);
+    await fieldsReady();
+    const password = screen.getByLabelText(/^Password/);
+    expect(password).toHaveAttribute('type', 'password');
+    expect(password).toHaveAttribute('autocomplete', 'new-password');
+    expect(screen.getByLabelText(/Email Address/)).toHaveAttribute('autocomplete', 'email');
+    expect(screen.getByLabelText(/Phone Number/)).toHaveAttribute('type', 'tel');
+    expect(screen.getByLabelText(/First Name/)).toHaveAttribute('autocomplete', 'given-name');
+  });
+
+  it('makes Continue the submit button of a real form', async () => {
+    render(<Reset />);
+    await fieldsReady();
+    const button = screen.getByRole('button', { name: 'Continue' });
     expect(button).toHaveAttribute('type', 'submit');
     expect(button.closest('form')).not.toBeNull();
-    container.querySelectorAll('label[for]').forEach((label) => {
-      expect(container.querySelector(`#${CSS.escape(label.htmlFor)}`)).not.toBeNull();
-    });
+  });
+});
+
+describe('Reset — validation in the reader\'s language', () => {
+  it('explains a missing password from the catalog, linked to the field, and does not submit', async () => {
+    render(<Reset />);
+    await fieldsReady();
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    const password = screen.getByLabelText(/^Password/);
+    await waitFor(() => expect(password).toHaveAttribute('aria-invalid', 'true'));
+    expect(password).toHaveAccessibleDescription('Password is required');
+    expect(updateUser).not.toHaveBeenCalled();
+  });
+});
+
+describe('Reset — submitting (the updateUser contract)', () => {
+  it('sends the account fields under their model names, signs in, and goes to the dashboard', async () => {
+    render(<Reset />);
+    await fieldsReady();
+    await userEvent.type(screen.getByLabelText(/^Password/), 'new-secret');
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    await waitFor(() => expect(updateUser).toHaveBeenCalledWith('USR1', {
+      ...STORED, password: 'new-secret',
+    }));
+    await waitFor(() => expect(retrieveSignInFunction).toHaveBeenCalledWith('ada@example.org', 'new-secret'));
+    expect(mockPush).toHaveBeenCalledWith('/quick-start');
+  });
+
+  it('says what went wrong, in the reader\'s language, when the update fails', async () => {
+    updateUser.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+    render(<Reset />);
+    await fieldsReady();
+    await userEvent.type(screen.getByLabelText(/^Password/), 'new-secret');
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    await waitFor(() => expect(toast).toHaveBeenCalledWith({
+      text: "Couldn't reach Puente. Check your connection and try again.",
+      isError: true,
+    }));
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+});
+
+describe('Reset — accessibility', () => {
+  it('has no axe violations', async () => {
+    const { container } = render(<Reset />);
+    await fieldsReady();
+    expect(await axe(container)).toHaveNoViolations();
   });
 });

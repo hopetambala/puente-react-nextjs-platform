@@ -87,6 +87,8 @@ common,login_collect_hint,Collecting in the field? Open Puente Collect on your p
 common,login_email,Email,Correo electrónico,Imel,,Collect uses signUp.email
 common,login_field_email,Email or phone number,Correo electrónico o número de teléfono,Imel oswa nimewo telefòn,,Collect uses signIn.username
 common,login_field_password,Password,Contraseña,Modpas,,Collect uses signUp.password
+common,login_error_username_required,Enter your email or phone number.,Escribe tu correo o número de teléfono.,Antre imèl oswa nimewo telefòn ou.,,"Sign-in validation, previously hard-coded English. Spanish and Creole written by Claude: needs native review."
+common,login_error_password_required,Enter your password.,Escribe tu contraseña.,Antre modpas ou.,,"Sign-in validation, previously hard-coded English. Spanish and Creole written by Claude: needs native review."
 common,login_forgot,Forgot Password,¿Olvidaste tu contraseña?,Ou bliye modpas ou?,,Collect uses signIn.forgotPassword.label
 common,login_or,Or login with email,O inicia sesión con tu correo,Oswa konekte ak imel,,
 common,login_password,Password,Contraseña,Modpas,,Collect uses signUp.password
@@ -155,6 +157,14 @@ common,register_error_email_required,Email address is required,El correo electr�
 common,register_error_organization,Organization is required,La organización es obligatoria,Òganizasyon an obligatwa,,
 common,register_error_password,Password is required,La contraseña es obligatoria,Modpas la obligatwa,,
 common,register_error_password_match,Passwords must match,Las contraseñas deben coincidir,Modpas yo dwe menm,,
+common,auth_error_invalid_credentials,"That email, phone number or password isn't right. Check them and try again.","Ese correo, número de teléfono o contraseña no es correcto. Revísalos e inténtalo de nuevo.","Imèl, nimewo telefòn oswa modpas sa a pa bon. Verifye yo epi eseye ankò.",,Replaces Parse's raw English error on sign-in/sign-up/reset (app/modules/user/authErrors.js). Spanish and Creole written by Claude: needs native review.
+common,auth_error_offline,Couldn't reach Puente. Check your connection and try again.,No se pudo conectar con Puente. Revisa tu conexión e inténtalo de nuevo.,Nou pa ka jwenn Puente. Verifye koneksyon ou epi eseye ankò.,,Replaces Parse's raw English error on sign-in/sign-up/reset (app/modules/user/authErrors.js). Spanish and Creole written by Claude: needs native review.
+common,auth_error_invalid_email,Enter a valid email address.,Escribe un correo electrónico válido.,Antre yon adrès imèl ki valab.,,Replaces Parse's raw English error on sign-in/sign-up/reset (app/modules/user/authErrors.js). Spanish and Creole written by Claude: needs native review.
+common,auth_error_username_taken,"An account already uses that email or phone number. Sign in instead, or reset your password.",Ya existe una cuenta con ese correo o número de teléfono. Inicia sesión o restablece tu contraseña.,"Gen yon kont ki deja sèvi ak imèl oswa nimewo sa a. Konekte pito, oswa reyinisyalize modpas ou.",,Replaces Parse's raw English error on sign-in/sign-up/reset (app/modules/user/authErrors.js). Spanish and Creole written by Claude: needs native review.
+common,auth_error_email_taken,"An account already uses that email address. Sign in instead, or reset your password.",Ya existe una cuenta con ese correo electrónico. Inicia sesión o restablece tu contraseña.,"Gen yon kont ki deja sèvi ak adrès imèl sa a. Konekte pito, oswa reyinisyalize modpas ou.",,Replaces Parse's raw English error on sign-in/sign-up/reset (app/modules/user/authErrors.js). Spanish and Creole written by Claude: needs native review.
+common,auth_error_email_not_found,"No account uses that email address. Check it, or create an account.",Ninguna cuenta usa ese correo electrónico. Revísalo o crea una cuenta.,"Pa gen okenn kont ki sèvi ak adrès imèl sa a. Verifye l, oswa kreye yon kont.",,Replaces Parse's raw English error on sign-in/sign-up/reset (app/modules/user/authErrors.js). Spanish and Creole written by Claude: needs native review.
+common,auth_error_session,You were signed out. Sign in again to continue.,Se cerró tu sesión. Inicia sesión de nuevo para continuar.,Ou te dekonekte. Konekte ankò pou kontinye.,,Replaces Parse's raw English error on sign-in/sign-up/reset (app/modules/user/authErrors.js). Spanish and Creole written by Claude: needs native review.
+common,auth_error_generic,Something went wrong on our side. Try again in a moment.,Algo salió mal de nuestro lado. Inténtalo de nuevo en un momento.,Yon bagay pa mache bò kote pa nou. Eseye ankò nan yon ti moman.,,Replaces Parse's raw English error on sign-in/sign-up/reset (app/modules/user/authErrors.js). Spanish and Creole written by Claude: needs native review.
 common,register_error_phone,Enter a valid phone number,Ingrese un número de teléfono válido,Antre yon nimewo telefòn ki valab,,
 common,register_field_email,Email Address,Correo electrónico,Adrès imèl,,
 common,register_field_first_name,First Name,Nombre,Prenon,,
@@ -408,13 +418,23 @@ common,account_settings_title,Account Settings,Configuración de la cuenta,Param
 common,account_settings_sub,"Manage your profile, credentials, and account preferences.","Gestiona tu perfil, tus credenciales y las preferencias de tu cuenta.","Jere pwofil ou, idantifyan ou yo ak preferans kont ou.",,
 common,account_update_user,Update user,Actualizar usuario,Mete itilizatè a ajou,,
 common,account_delete_user,Delete user,Eliminar usuario,Efase itilizatè a,,
+common,account_org_change_note,Your organization determines which records you can see. Email info@puente-dr.org to change it.,Tu organización determina qué registros puedes ver. Escribe a info@puente-dr.org para cambiarla.,Òganizasyon ou detèmine ki dosye ou ka wè. Ekri info@puente-dr.org pou chanje l.,,Account settings (organization note was hard-coded English; the deactivation confirmation is new). Spanish and Creole written by Claude: needs native review.
+common,account_delete_confirm,Deactivate your account? You will be signed out and can no longer sign in.,¿Desactivar tu cuenta? Se cerrará tu sesión y ya no podrás iniciar sesión.,Dezaktive kont ou? W ap dekonekte epi ou p ap ka konekte ankò.,,Account settings (organization note was hard-coded English; the deactivation confirmation is new). Spanish and Creole written by Claude: needs native review.
+common,account_delete_confirm_action,Deactivate account,Desactivar cuenta,Dezaktive kont lan,,Account settings (organization note was hard-coded English; the deactivation confirmation is new). Spanish and Creole written by Claude: needs native review.
 common,account_reset_title,Reset your account,Restablece tu cuenta,Reinisyalize kont ou,,
 common,account_reset_field,Phone Number or Email Address,Número de teléfono o correo electrónico,Nimewo telefòn oswa adrès imèl,,
+common,account_reset_channel_legend,Send the reset by,Enviar el restablecimiento por,Voye reyinisyalizasyon an pa,,Reset channel radios (were colour-only buttons). Spanish and Creole written by Claude: needs native review.
+common,account_reset_channel_email,Email,Correo electrónico,Imèl,,Reset channel radios (were colour-only buttons). Spanish and Creole written by Claude: needs native review.
+common,account_reset_channel_text,Text message,Mensaje de texto,Mesaj tèks,,Reset channel radios (were colour-only buttons). Spanish and Creole written by Claude: needs native review.
 common,account_reset_send_email,Send account reset email?,¿Enviar el correo de restablecimiento?,Voye imèl reinisyalizasyon an?,,
 common,account_reset_send_text,Send account reset text?,¿Enviar el mensaje de texto de restablecimiento?,Voye mesaj tèks reinisyalizasyon an?,,
 common,account_reset_sent,Request Sent!,¡Solicitud enviada!,Demann nan pati!,,
 common,account_details_title,Account Details,Datos de la cuenta,Detay kont lan,,
 common,account_hold_on,Hold On,Un momento,Tann yon ti moman,,
+common,account_verified_title,Account verified,Cuenta verificada,Kont lan verifye,,"Account verification outcome (was hard-coded ""Verified""/""Error""). Spanish and Creole written by Claude: needs native review."
+common,account_verify_missing_title,This verification link is incomplete,Este enlace de verificación está incompleto,Lyen verifikasyon sa a pa konplè,,"Account verification outcome (was hard-coded ""Verified""/""Error""). Spanish and Creole written by Claude: needs native review."
+common,account_verify_missing_body,"Open the link from your email again. If it still does not work, ask your organization admin to send a new one.","Abre de nuevo el enlace de tu correo. Si sigue sin funcionar, pide a la persona administradora de tu organización que envíe uno nuevo.","Louvri lyen ki nan imèl ou a ankò. Si li toujou pa mache, mande administratè òganizasyon ou a voye yon lòt.",,"Account verification outcome (was hard-coded ""Verified""/""Error""). Spanish and Creole written by Claude: needs native review."
+common,account_back_to_sign_in,Back to sign in,Volver a iniciar sesión,Retounen pou konekte,,"Account verification outcome (was hard-coded ""Verified""/""Error""). Spanish and Creole written by Claude: needs native review."
 common,login_license,Source available · BSL 1.1,Código disponible · BSL 1.1,Kòd sous disponib · BSL 1.1,,
 common,form_manager_no_custom_forms,No custom forms yet.,Todavía no hay formularios personalizados.,Poko gen fòm pèsonalize.,,
 common,form_manager_custom_forms_error,Your custom forms did not load.,Sus formularios personalizados no se cargaron.,Fòm pèsonalize ou yo pa t chaje.,,

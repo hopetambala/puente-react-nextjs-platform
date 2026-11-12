@@ -319,3 +319,31 @@ Fix each primitive once, to the systemic patterns, so routes inherit the fixes:
    - Add and reorder a FormCreator question without dragging.
    - Check 400% zoom (1280 → 320).
    - A VoiceOver pass on the shell, Dialog and Sheet is for Hope. I can't drive a screen reader.
+
+## Earmarked: integration and e2e tests (finish at the end, on this branch)
+
+Everything below was built test-first with unit tests (jsdom, mocked services). These are the seams that unit tests can't reach and that need real services or a real browser. Each line says what to prove. Add to this list while working; tick items off in the PR description.
+
+### Integration (real modules together; Parse/cloud code against a stub or the test harness)
+- [ ] **`authErrorKey` against real Parse errors**: drive `Parse.User.logIn` (wrong password → 101), `signUp` (duplicate → 202/203), `requestPasswordReset` (unknown email → 205) and a dropped connection through the real SDK against a stub server, and check the mapped catalog keys (`app/modules/user/authErrors.js`).
+- [ ] **`signup` cloud function contract**: the register payload (organization as the name string from the native `FormSelect`) against `puente-node-cloudcode`'s test harness.
+- [ ] **`updateUser` cloud function contract**: field names from reset, account settings (no organization edit; password only when typed; `active: false` on deactivate) and verify/redirect (`adminVerified: true`).
+- [ ] **`queryUser` → `sendMessage` for both channels**: and settle whether **SMS reset still works**. Register says SMS is no longer supported, but reset-login still offers "Text message". That's a product question for Hope; the page change kept the behavior.
+- [ ] **Toasts end to end**: a page's `toast()` reaching the `ToastRegion` mounted in `pages/_app.js` (the right live region, Dismiss, auto-dismiss), not just each piece alone.
+- [ ] **Organization picker**: `loadOrganizations` → `FormSelect` options → submitted name, with a real Parse query response shape.
+- [ ] **Data curation source picker**: the native `SourceSelector` select driving the real records query (form-results vs fixed classes).
+- [ ] **dlite 0.4.0 on the real package**: once hopetambala/style-dictionary-dlite#13 publishes, bump `package.json` and rerun every gate without the `node_modules` overlay (`rm -rf .next` first; webpack caches `node_modules` by version).
+
+### E2E (Playwright, the synthetic world, 320/375/768/1024/1440 × eng/spa)
+- [ ] **Sign-in**: Enter submits; a wrong password and an offline failure each show the translated alert (announced in the alert region); the skip link is the first stop.
+- [ ] **Register**: native organization picker on a phone; errors announced and linked; success redirects.
+- [ ] **Reset-login**: channel radios by keyboard (arrow keys switch); the success toast is announced.
+- [ ] **Account details (reset)**: prefilled from the link's account; the new password is masked; submit signs in.
+- [ ] **Verify / verify-redirect**: the verified status and the incomplete-link alert; a failed admin verification shows the alert instead of hanging.
+- [ ] **Account settings deactivation**: Delete opens the confirmation; Esc and Cancel change nothing and return focus to Delete; confirm deactivates.
+- [ ] **AppShell drawer at 375 and 768**: open from the menu button by keyboard, Esc closes, focus returns, navigating closes it, the background is inert while open, and widening to 1024 closes it.
+- [ ] **Modal and Sheet in a real browser**: Tab stays inside (native inert background), the backdrop click closes, `@starting-style` motion is off under `prefers-reduced-motion`.
+- [ ] **Tooltip (WCAG 1.4.13)**: hover-then-move onto the tooltip keeps it open; Esc dismisses; keyboard focus shows it.
+- [ ] **Toast timing**: pauses while hovered and focused; errors never time out.
+- [ ] **Table stacked mode**: data analysis at 375 shows per-cell column labels; the scroll region is focusable at wide widths.
+- [ ] **Screenshot matrix + design critique** for each route group (the review loop), compared against the baseline in `.e2e-artifacts/design-baseline/`.

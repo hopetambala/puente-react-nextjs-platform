@@ -1,31 +1,44 @@
 import { yupResolver } from '@hookform/resolvers';
 import {
-    Button,
-    FormInput,
-    LanguageSwitcher,
+  AuthLayout,
+  Button,
+  FormInput,
+  LanguageSwitcher,
 } from 'app/impacto-design-system';
 import { toast } from 'app/impacto-design-system/toast/notify';
 import { retrieveSignInFunction } from 'app/modules/user';
+import { authErrorKey } from 'app/modules/user/authErrors';
 import parseService from 'app/services/parse';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import styles from './index.module.scss';
 
-const validationSchema = yup.object().shape({
-  usernameV: yup.string().required('Username or Phone Number is Required'),
-  passwordV: yup.string().required('Password is Required'),
+// Built from the catalog, so an empty field is explained in the reader's
+// language (these were English for everyone).
+const buildSchema = (t) => yup.object().shape({
+  usernameV: yup.string().required(t('login_error_username_required')),
+  passwordV: yup.string().required(t('login_error_password_required')),
 });
+
+// A real field testimonial, quoted as said. Its own language is marked so a
+// screen reader pronounces it as English on a Spanish or Creole page.
+const QUOTE = {
+  text: 'The clinic ran in a school courtyard. By the time we packed up, the records were already in San Juan.',
+  attribution: 'Yolanda M., program manager, jornada médica, Las Matas',
+  lang: 'en',
+};
 
 function Login() {
   const { t } = useTranslation('common');
   const router = useRouter();
-  const methods = useForm({ resolver: yupResolver(validationSchema) });
+  const schema = useMemo(() => buildSchema(t), [t]);
+  const methods = useForm({ resolver: yupResolver(schema) });
   const { handleSubmit, errors } = methods;
   const [loading, setLoading] = useState(false);
 
@@ -41,99 +54,77 @@ function Login() {
         const returnUrl = router.query.returnUrl || '/quick-start';
         router.push(returnUrl);
       })
-      .catch((e) => toast({ text: `${e.message}`, isError: true }))
+      // Parse's own message is English and can't tell a wrong password from no
+      // connection: show what the person can act on, in their language.
+      .catch((e) => toast({ text: t(authErrorKey(e)), isError: true }))
       .finally(() => setLoading(false));
   };
 
   return (
-    <div className={styles.login}>
-      {/* ── left column: dark brand + quote ── */}
-      <div className={styles.left}>
-        <div className={styles.leftBrand}>
-          {/* Brand mark and product name — not copy, never translated. */}
-          <div className={styles.leftBrandMark}>P</div>
-          <span className={styles.leftBrandName}>Puente</span>
-        </div>
-
-        <div className={styles.quote}>
-          <div className={styles.quoteMark}>&ldquo;</div>
-          <p className={styles.quoteBody}>
-            The clinic ran in a school courtyard. By the time we packed up,
-            the records were already in San Juan.
-          </p>
-          <div className={styles.quoteAttr}>
-            Yolanda M., program manager, jornada médica, Las Matas
-          </div>
-        </div>
-
-        <div className={styles.leftFooter}>
+    <AuthLayout
+      title={t('sign_in')}
+      quote={QUOTE}
+      footer={(
+        <>
           <span>v0.1.2</span>
-          <span>·</span>
+          <span aria-hidden="true">·</span>
           <span>{t('login_license')}</span>
-        </div>
-      </div>
+        </>
+      )}
+    >
+      <p className={styles.eyebrow}>{t('sign_in_to')}</p>
+      <h1 className={styles.title}>Puente Manage</h1>
+      <p className={styles.sub}>{t('login_sub')}</p>
 
-      {/* ── right column: sign-in form ── */}
-      <div className={styles.right}>
-        <div className={styles.card}>
-          <div className={styles.eyebrow}>{t('sign_in_to')}</div>
-          <h1 className={styles.title}>Puente Manage</h1>
-          <p className={styles.sub}>{t('login_sub')}</p>
-
-          {/* A real form, so Enter signs in and password managers recognise
-              it. Without one, Enter did nothing: no error, no request. */}
-          <form onSubmit={handleSubmit(onSubmit)} noValidate>
-            <FormProvider {...methods}>
-              <div className={styles.fields}>
-                <FormInput
-                  name="usernameV"
-                  label={t('login_field_email')}
-                  autoComplete="username"
-                  required
-                  errorobj={errors}
-                />
-                <FormInput
-                  name="passwordV"
-                  label={t('login_field_password')}
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  errorobj={errors}
-                />
-              </div>
-            </FormProvider>
-
-            <Button
-              type="submit"
-              text={t('sign_in')}
-              intent="primary"
-              isFullWidth
-              isLoading={loading}
+      {/* A real form, so Enter signs in and password managers recognise it. */}
+      <form onSubmit={handleSubmit(onSubmit)} noValidate>
+        <FormProvider {...methods}>
+          <div className={styles.fields}>
+            <FormInput
+              name="usernameV"
+              label={t('login_field_email')}
+              autoComplete="username"
+              required
+              errorobj={errors}
             />
-          </form>
-
-          <div className={styles.divider}>{t('divider_or')}</div>
-
-          <div className={styles.altLinks}>
-            <Link href="/account/login/reset-login" passHref>
-              <a className={styles.altLink}>{t('forgot_password')}</a>
-            </Link>
-            <span className={styles.altSep}>·</span>
-            <Link href="/account/register" passHref>
-              <a className={styles.altLink}>{t('create_account')}</a>
-            </Link>
+            <FormInput
+              name="passwordV"
+              label={t('login_field_password')}
+              type="password"
+              autoComplete="current-password"
+              required
+              errorobj={errors}
+            />
           </div>
+        </FormProvider>
 
-          <div className={styles.hint}>{t('login_collect_hint')}</div>
+        <Button
+          type="submit"
+          text={t('sign_in')}
+          intent="primary"
+          isFullWidth
+          isLoading={loading}
+        />
+      </form>
 
-          {/* Inside the card, not a sibling of it: `.right` is a ROW flexbox,
-              so a sibling lands beside the card rather than beneath it.
-              Settings is behind both auth and English, so this is the only
-              place someone who cannot read the current language can change it. */}
-          <LanguageSwitcher className={styles.languageSwitcher} />
-        </div>
+      <div className={styles.divider}>{t('divider_or')}</div>
+
+      <div className={styles.altLinks}>
+        <Link href="/account/login/reset-login" passHref>
+          <a className={styles.altLink}>{t('forgot_password')}</a>
+        </Link>
+        <span className={styles.altSep} aria-hidden="true">·</span>
+        <Link href="/account/register" passHref>
+          <a className={styles.altLink}>{t('create_account')}</a>
+        </Link>
       </div>
-    </div>
+
+      <p className={styles.hint}>{t('login_collect_hint')}</p>
+
+      {/* Settings is behind both sign-in and the current language, so this is
+          the only place someone who can't read it can change it. */}
+      <LanguageSwitcher className={styles.languageSwitcher} />
+    </AuthLayout>
   );
 }
 

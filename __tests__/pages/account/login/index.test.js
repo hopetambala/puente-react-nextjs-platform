@@ -11,6 +11,14 @@ jest.mock('app/modules/user', () => ({
   retrieveSignInFunction: jest.fn(),
 }));
 
+jest.mock('app/impacto-design-system/toast/notify', () => ({ toast: jest.fn() }));
+
+// next/head only renders through Next's head manager; inline its children so
+// the document title can be asserted.
+jest.mock('next/head', () => function MockHead({ children }) {
+  return <div data-testid="head">{children}</div>;
+});
+
 jest.mock('next/router', () => ({
   useRouter: () => ({
     push: jest.fn(), query: {}, asPath: '/account/login', locale: 'eng',
@@ -32,6 +40,7 @@ jest.mock('next-i18next', () => ({
 }));
 
 const parseService = require('app/services/parse').default;
+const { toast } = require('app/impacto-design-system/toast/notify');
 const { retrieveSignInFunction } = require('app/modules/user');
 const Login = require('pages/account/login/index').default;
 
@@ -167,5 +176,48 @@ describe('Keyboard and assistive technology', () => {
   it('makes Sign in the form\'s submit button', () => {
     render(<Login />);
     expect(screen.getByRole('button', { name: /sign in/i })).toHaveAttribute('type', 'submit');
+  });
+});
+
+
+// ─── The frame every signed-out page shares (overhaul PR 4) ─────────────────
+describe('Page structure', () => {
+  it('puts the sign-in card in a <main> with a skip link and a document title', () => {
+    render(<Login />);
+    expect(screen.getByRole('main')).toContainElement(screen.getByRole('heading', { level: 1 }));
+    expect(screen.getByRole('link', { name: 'skip_to_content' })).toHaveAttribute('href', '#main');
+    expect(screen.getByTestId('head')).toHaveTextContent('Sign in · Puente');
+  });
+
+  it('marks the English testimonial as English, whatever the page language (WCAG 3.1.2)', () => {
+    render(<Login />);
+    expect(screen.getByText(/records were already in San Juan/).closest('figure')).toHaveAttribute('lang', 'en');
+  });
+});
+
+// ─── No English that the reader didn't choose ───────────────────────────────
+describe('Errors in the reader\'s language', () => {
+  it('shows the empty-field messages from the catalog, not hardcoded English', async () => {
+    render(<Login />);
+    await userEvent.click(screen.getByRole('button', { name: /sign in/i }));
+    expect(await screen.findByText('login_error_username_required')).toBeInTheDocument();
+    expect(screen.getByText('login_error_password_required')).toBeInTheDocument();
+    expect(screen.queryByText(/is required/i)).not.toBeInTheDocument();
+  });
+
+  it('turns a wrong password into the translated message, not Parse\'s English', async () => {
+    retrieveSignInFunction.mockRejectedValue(Object.assign(new Error('Invalid username/password.'), { code: 101 }));
+    render(<Login />);
+    await userEvent.type(screen.getByLabelText(/email or phone number/i), 'TestUser');
+    await userEvent.type(screen.getByLabelText(/^password/i), 'wrong{enter}');
+    await waitFor(() => expect(toast).toHaveBeenCalledWith({ text: 'auth_error_invalid_credentials', isError: true }));
+  });
+
+  it('tells an offline coordinator it is the connection, not their password', async () => {
+    retrieveSignInFunction.mockRejectedValue(new TypeError('Failed to fetch'));
+    render(<Login />);
+    await userEvent.type(screen.getByLabelText(/email or phone number/i), 'TestUser');
+    await userEvent.type(screen.getByLabelText(/^password/i), 'secret{enter}');
+    await waitFor(() => expect(toast).toHaveBeenCalledWith({ text: 'auth_error_offline', isError: true }));
   });
 });

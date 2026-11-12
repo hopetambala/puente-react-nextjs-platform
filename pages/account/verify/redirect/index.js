@@ -1,49 +1,48 @@
-import { Card, Page, Text } from 'app/impacto-design-system';
+import { AuthLayout, Spinner } from 'app/impacto-design-system';
 import { updateUser } from 'app/modules/user';
+import { authErrorKey } from 'app/modules/user/authErrors';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
-function Verify() {
+import styles from '../index.module.scss';
+
+/**
+ * /account/verify/redirect?objectId=…: the link an admin follows to verify an
+ * account. Marks it admin-verified, then moves on to /account/verify. A failed
+ * update is said, in the reader's language, instead of leaving "Hold On" up
+ * forever with nothing announced.
+ */
+function VerifyRedirect() {
   const { t } = useTranslation('common');
   const router = useRouter();
-
   const { objectId: userId } = router.query;
-
-  const updateVerificationStatus = async () => {
-    const updatedUser = {
-      adminVerified: true,
-    };
-    await updateUser(userId, updatedUser);
-  };
-
-  const redirect = async () => {
-    await updateVerificationStatus();
-    router.push(`/account/verify?objectId=${userId}`);
-  };
+  const [errorKey, setErrorKey] = useState(null);
 
   useEffect(() => {
-    const verify = async () => {
-      if (userId) redirect();
-    };
-    verify();
-    if (!userId) router.push('/account/login');
+    if (!userId) {
+      router.push('/account/login');
+      return;
+    }
+    updateUser(userId, { adminVerified: true })
+      .then(() => router.push(`/account/verify?objectId=${userId}`))
+      .catch((e) => setErrorKey(authErrorKey(e)));
   }, [userId]);
 
   return (
-    <Page>
-      <Card padding="extraLarge">
-        <Text text={t('account_hold_on')} element="h1" />
-      </Card>
-    </Page>
+    <AuthLayout title={t('account_hold_on')}>
+      <h1 className={styles.heading}>{t('account_hold_on')}</h1>
+      {errorKey
+        ? <p role="alert" className={styles.body}>{t(errorKey)}</p>
+        : <Spinner />}
+    </AuthLayout>
   );
 }
 
-export default Verify;
+export default VerifyRedirect;
 
-// Without this the page ships no catalog, so every `t()` under it — the shell's
-// navigation included — renders its own key instead of a word.
+// Without this the page ships no catalog, so every `t()` renders its own key.
 export async function getStaticProps({ locale }) {
   return { props: { ...(await serverSideTranslations(locale ?? 'eng', ['common'])) } };
 }

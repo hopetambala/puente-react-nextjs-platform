@@ -14,7 +14,7 @@
     "pages/data/": "PR 6 (data routes)",
     "pages/index.module.scss": "PR 7 (landing page)"
   },
-  "total": 206,
+  "total": 173,
   "files": {
     "app/epics/DataAnalyticsManager/index.module.scss": {
       "no-empty-source": 1
@@ -95,28 +95,6 @@
     },
     "app/impacto-design-system/stack/css/stack.module.css": {
       "declaration-no-important": 1
-    },
-    "pages/account/login/index.module.scss": {
-      "color-named": 3,
-      "declaration-property-unit-disallowed-list": 13,
-      "declaration-property-value-allowed-list": 3,
-      "declaration-property-value-disallowed-list": 1,
-      "function-disallowed-list": 3
-    },
-    "pages/account/login/reset-login/index.module.scss": {
-      "declaration-property-value-disallowed-list": 1
-    },
-    "pages/account/register/index.module.scss": {
-      "declaration-property-unit-disallowed-list": 2,
-      "declaration-property-value-disallowed-list": 1
-    },
-    "pages/account/reset/index.module.scss": {
-      "declaration-property-unit-disallowed-list": 2,
-      "declaration-property-value-disallowed-list": 1
-    },
-    "pages/account/verify/index.module.scss": {
-      "declaration-property-unit-disallowed-list": 2,
-      "declaration-property-value-disallowed-list": 1
     },
     "pages/data/data-visualization/css/dashboard.module.css": {
       "block-no-empty": 1

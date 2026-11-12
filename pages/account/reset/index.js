@@ -1,138 +1,98 @@
-/* eslint-disable react/prop-types */ // TODO: upgrade to latest eslint tooling
-
-import { yupResolver } from '@hookform/resolvers'
-import { Button, Stack, Text } from 'app/impacto-design-system'
+import { yupResolver } from '@hookform/resolvers';
 import {
-    retrieveSignInFunction,
-    retrieveUserByObjectId,
-    updateUser,
-} from 'app/modules/user'
-import { useRouter } from 'next/router'
+  AuthLayout, Button, FormInput,
+} from 'app/impacto-design-system';
+import { toast } from 'app/impacto-design-system/toast/notify';
+import {
+  retrieveSignInFunction,
+  retrieveUserByObjectId,
+  updateUser,
+} from 'app/modules/user';
+import { authErrorKey } from 'app/modules/user/authErrors';
+import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useEffect, useState } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
-import * as yup from 'yup'
+import { useEffect, useMemo, useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
+import * as yup from 'yup';
 
-import styles from './index.module.scss'
+import styles from './index.module.scss';
 
-const validationSchema = yup
-  .object()
-  .shape({
-    'First Name': yup.string().required('First Name is Required'),
-    'Last Name': yup.string().required('Last Name is Required'),
-    'Email Address': yup.string().required('Email is Required'),
-    Organization: yup.string().required('Username or Phone Number is Required'),
-    Password: yup.string().required('Password is Required'),
-  })
-  .required()
+/** The account fields this page edits, under the names the _User model uses. */
+const ACCOUNT_FIELDS = ['firstname', 'lastname', 'organization', 'phonenumber', 'email'];
 
-function Reset(props) {
+/** Built from `t`, so validation speaks the reader's language. */
+export function buildResetSchema(t) {
+  return yup.object().shape({
+    firstname: yup.string(),
+    lastname: yup.string(),
+    organization: yup.string().required(t('register_error_organization')),
+    phonenumber: yup.string(),
+    email: yup.string()
+      .email(t('register_error_email_invalid'))
+      .required(t('register_error_email_required')),
+    password: yup.string().required(t('register_error_password')),
+  });
+}
+
+/**
+ * /account/reset?objectId=…: where someone finishes their account after a
+ * reset link. Their stored details, prefilled, and a new password.
+ */
+function Reset() {
   const { t } = useTranslation('common');
-  const { user, userId, router } = props
-  const methods = useForm({
-    resolver: yupResolver(validationSchema),
-  })
-
-  const { register, reset, handleSubmit, errors } = methods
+  const router = useRouter();
+  const { objectId: userId } = router.query;
+  const schema = useMemo(() => buildResetSchema(t), [t]);
+  const methods = useForm({ resolver: yupResolver(schema) });
+  const { reset, handleSubmit, errors } = methods;
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    reset(user)
-  }, [user])
+    if (!userId) return;
+    retrieveUserByObjectId(userId).then(({ attributes }) => {
+      const stored = Object.fromEntries(ACCOUNT_FIELDS.map((f) => [f, attributes?.[f] ?? '']));
+      reset({ ...stored, password: '' });
+    });
+  }, [userId, reset]);
 
   const onSubmit = async (data) => {
-    const updatedUser = {
-      firstname: data['First Name'],
-      lastname: data['Last Name'],
-      organization: data.Organization,
-      phonenumber: data['Phone Number'],
-      email: data['Email Address'],
-      password: data.Password,
+    setSubmitting(true);
+    const updated = Object.fromEntries([...ACCOUNT_FIELDS, 'password'].map((f) => [f, data[f]]));
+    try {
+      const { username, password } = await updateUser(userId, updated);
+      await retrieveSignInFunction(username, password);
+      router.push('/quick-start');
+    } catch (e) {
+      toast({ text: t(authErrorKey(e)), isError: true });
+    } finally {
+      setSubmitting(false);
     }
-    await updateUser(userId, updatedUser).then(async (userResp) => {
-      const { username, password } = userResp
-      await retrieveSignInFunction(username, password)
-      const returnUrl = '/quick-start'
-      router.push(returnUrl)
-    })
-  }
+  };
 
   return (
-    <div className={styles.auth}>
-      <div className={styles.left} data-testid="auth-brand">
-        <div className={styles.leftBrand}>
-          {/* Brand mark and product name — not copy, never translated. */}
-          <div className={styles.leftBrandMark}>P</div>
-          <span className={styles.leftBrandName}>Puente</span>
-        </div>
-      </div>
-      <div className={styles.right} data-testid="auth-form">
-        <div className={styles.paper}>
-          <Text text="PUENTE" element="h1" className={styles.stack} />
-          <Stack isVertical className={styles.stack}>
-            <Text text={t('account_details_title')} element="h2" />
-          </Stack>
-          <FormProvider {...methods}>
-            <form onSubmit={handleSubmit(onSubmit)} noValidate>
-              <Stack isVertical spacing="large" className={styles.stack} fill>
-                {user &&
-                  Object.keys(user).map((attr) => (
-                    <Stack isVertical fill key={attr}>
-                      <label htmlFor={attr}>{attr}</label>
-                      <input id={attr} name={attr} ref={register} />
-                      {errors[`${attr}`]?.message && (
-                        <p className={styles.errorText}>
-                          {errors[`${attr}`]?.message}
-                        </p>
-                      )}
-                    </Stack>
-                  ))}
-              </Stack>
-              <Stack isVertical spacing="large">
-                <Button
-                  type="submit"
-                  text={t('continue')}
-                  isFullWidth
-                />
-              </Stack>
-            </form>
-          </FormProvider>
-        </div>
-      </div>
-    </div>
-  )
+    <AuthLayout title={t('account_details_title')}>
+      <h1 className={styles.heading}>{t('account_details_title')}</h1>
+      <FormProvider {...methods}>
+        <form onSubmit={handleSubmit(onSubmit)} noValidate>
+          <div className={styles.fields}>
+            <FormInput name="firstname" label={t('register_field_first_name')} autoComplete="given-name" errorobj={errors} />
+            <FormInput name="lastname" label={t('register_field_last_name')} autoComplete="family-name" errorobj={errors} />
+            <FormInput name="organization" label={t('register_field_organization')} autoComplete="organization" required errorobj={errors} />
+            <FormInput name="phonenumber" label={t('register_field_phone')} type="tel" autoComplete="tel" errorobj={errors} />
+            <FormInput name="email" label={t('register_field_email')} type="email" autoComplete="email" required errorobj={errors} />
+            <FormInput name="password" label={t('register_field_password')} type="password" autoComplete="new-password" required errorobj={errors} />
+          </div>
+          <Button type="submit" intent="primary" text={t('continue')} isFullWidth isLoading={submitting} />
+        </form>
+      </FormProvider>
+    </AuthLayout>
+  );
 }
 
-function ResetWrapper() {
-  const router = useRouter()
-  const { objectId: userId } = router.query
-  const [user, setUser] = useState()
-  useEffect(() => {
-    // http://localhost:3000/account/reset?objectId=AyplFWVebA
-    const retrieveAccountDetails = async () => {
-      const { attributes: retrievedUser } = await retrieveUserByObjectId(userId)
-      setUser(retrievedUser)
-      setUser({
-        'First Name': retrievedUser.firstname,
-        'Last Name': retrievedUser.lastname,
-        // Username: retrievedUser.username,
-        Organization: retrievedUser.organization,
-        'Phone Number': retrievedUser.phonenumber,
-        'Email Address': retrievedUser.email,
-        Password: '',
-      })
-    }
-    if (!userId) return
-    retrieveAccountDetails()
-  }, [userId])
+export default Reset;
 
-  return <Reset user={user} userId={userId} router={router} />
-}
-
-export default ResetWrapper
-
-// Without this the page ships no catalog, so every `t()` under it — the shell's
-// navigation included — renders its own key instead of a word.
+// Without this the page ships no catalog, so every `t()` renders its own key.
 export async function getStaticProps({ locale }) {
   return { props: { ...(await serverSideTranslations(locale ?? 'eng', ['common'])) } };
 }

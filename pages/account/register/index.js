@@ -1,14 +1,15 @@
 import { yupResolver } from '@hookform/resolvers';
 import {
-    Button,
-    FormInput,
-    Stack,
-    Text,
+  AuthLayout,
+  Button,
+  FormInput,
+  Stack,
 } from 'app/impacto-design-system';
 import FormSelect from 'app/impacto-design-system/form-controls/select';
 import { toast } from 'app/impacto-design-system/toast/notify';
 import { loadOrganizations, selectedOrganizationName } from 'app/modules/organization';
 import { retrieveSignUpFunction } from 'app/modules/user';
+import { authErrorKey } from 'app/modules/user/authErrors';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -86,27 +87,13 @@ function Register() {
     };
     await retrieveSignUpFunction(payload, notificationType).then(() => {
       router.push('/quick-start');
-    }).catch((e) => toast({ text: `${e.message}`, isError: true }));
+    }).catch((e) => toast({ text: t(authErrorKey(e)), isError: true }));
   };
 
   return (
-    <div className={styles.auth}>
-      {/* ── left column: brand ── */}
-      <div className={styles.left} data-testid="auth-brand">
-        <div className={styles.leftBrand}>
-          {/* Brand mark and product name — not copy, never translated. */}
-          <div className={styles.leftBrandMark}>P</div>
-          <span className={styles.leftBrandName}>Puente</span>
-        </div>
-      </div>
-
-      {/* ── right column: form ── */}
-      <div className={styles.right} data-testid="auth-form">
-        <div className={styles.card}>
-          <Stack isVertical spacing="medium">
-            <Text text={t('register_heading')} element="h2" />
-            <Text text={t('register_required_note')} element="p" />
-          </Stack>
+    <AuthLayout title={t('register_heading')}>
+          <h1 className={styles.heading}>{t('register_heading')}</h1>
+          <p className={styles.requiredNote}>{t('register_required_note')}</p>
           <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <FormProvider {...methods}>
             <Stack isVertical className={styles.stack}>
@@ -125,13 +112,11 @@ function Register() {
               {organizations.unavailable ? (
                 // Text takes a fixed prop list and does not forward data-* or
                 // arbitrary attributes, so the test hook lives on the wrapper.
-                <div data-testid="organization-unavailable">
-                  <Text
-                    element="p"
-                    color="red"
-                    text={t('register_org_unavailable')}
-                  />
-                </div>
+                // An alert, so it is announced when it replaces the picker
+                // (WCAG 4.1.3), not only seen.
+                <p data-testid="organization-unavailable" role="alert" className={styles.unavailable}>
+                  {t('register_org_unavailable')}
+                </p>
               ) : (
                 <>
                   <FormSelect
@@ -230,9 +215,7 @@ function Register() {
             />
           </Stack>
           </form>
-        </div>
-      </div>
-    </div>
+    </AuthLayout>
   );
 }
 

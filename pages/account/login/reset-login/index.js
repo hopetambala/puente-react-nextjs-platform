@@ -1,105 +1,92 @@
 import { yupResolver } from '@hookform/resolvers';
-import {
-  Button,
-  Card,
-  FormInput,
-  Page, Stack,
-  Text,
-} from 'app/impacto-design-system';
+import { AuthLayout, Button, FormInput } from 'app/impacto-design-system';
 import { toast } from 'app/impacto-design-system/toast/notify';
 import { sendMessage } from 'app/modules/cloud-code';
 import { queryUser, retrieveSignOutFunction } from 'app/modules/user';
+import { authErrorKey } from 'app/modules/user/authErrors';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import styles from './index.module.scss';
 
-const validationSchema = yup.object().shape({
-  usernameV: yup.string().required('Username or Phone Number is Required'),
+// The stored channel codes sendMessage understands.
+const CHANNELS = [
+  { value: 'email', labelKey: 'account_reset_channel_email', submitKey: 'account_reset_submit_email' },
+  { value: 'text', labelKey: 'account_reset_channel_text', submitKey: 'account_reset_submit_text' },
+];
+
+const buildSchema = (t) => yup.object().shape({
+  usernameV: yup.string().required(t('login_error_username_required')),
 });
 
+/**
+ * /account/login/reset-login: "I can't sign in." The person names their
+ * account and picks how the reset reaches them.
+ */
 function ResetLogin() {
   const { t } = useTranslation('common');
-  const [notificationType, setNotificationType] = useState('email');
-  const methods = useForm({
-    resolver: yupResolver(validationSchema),
-  });
+  const [channel, setChannel] = useState('email');
+  const schema = useMemo(() => buildSchema(t), [t]);
+  const methods = useForm({ resolver: yupResolver(schema) });
   const { handleSubmit, errors } = methods;
 
-  const retrieveUser = (username) => queryUser(username)
-    .then((user) => sendMessage(user, notificationType));
-
-  const onSubmit = (data) => {
-    const { usernameV } = data;
-    return retrieveUser(usernameV).then(() => toast({ text: t('account_reset_sent') })).catch(async (e) => {
+  const onSubmit = ({ usernameV }) => queryUser(usernameV)
+    .then((user) => sendMessage(user, channel))
+    .then(() => toast({ text: t('account_reset_sent') }))
+    .catch(async (e) => {
       await retrieveSignOutFunction();
-      return toast({ text: `${e.message}`, isError: true });
+      // What the person can act on, in their language, not Parse's English.
+      toast({ text: t(authErrorKey(e)), isError: true });
     });
-  };
+
+  const { submitKey } = CHANNELS.find((c) => c.value === channel);
 
   return (
-    <Page>
-      <div className={styles.paper}>
-        <Card padding="extraLarge">
-          <Stack isVertical className={styles.stack}>
-            <Text text={t('account_reset_title')} element="h2" />
-          </Stack>
-          <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          <FormProvider {...methods}>
-            <Stack
-              isVertical
-              spacing="large"
-              className={styles.stack}
-            >
-              <FormInput
-                name="usernameV"
-                label={t('account_reset_field')}
-                autoComplete="username"
-                required
-                errorobj={errors}
-              />
-            </Stack>
-          </FormProvider>
-          <Stack spacing="medium" fill>
-            <Button
-              intent={notificationType === 'email' ? 'primary' : ''}
-              onClick={() => setNotificationType('email')}
-              text={t('account_reset_send_email')}
-              isFullWidth
-            />
-            <Button
-              intent={notificationType === 'text' ? 'primary' : ''}
-              onClick={() => setNotificationType('text')}
-              text={t('account_reset_send_text')}
-              isFullWidth
-            />
-          </Stack>
-          <Stack isVertical spacing="medium">
-            <Button
-              // A whole key per channel, not `Send reset ${type}`: "email" and
-              // "text" are stored codes, and the two sentences do not share a
-              // shape across languages.
-              type="submit"
-              text={notificationType === 'text'
-                ? t('account_reset_submit_text')
-                : t('account_reset_submit_email')}
-              isFullWidth
-            />
-          </Stack>
-          </form>
-        </Card>
-      </div>
-    </Page>
+    <AuthLayout title={t('account_reset_title')}>
+      <h1 className={styles.heading}>{t('account_reset_title')}</h1>
+      <FormProvider {...methods}>
+        <form onSubmit={handleSubmit(onSubmit)} noValidate className={styles.form}>
+          <FormInput
+            name="usernameV"
+            label={t('account_reset_field')}
+            autoComplete="username"
+            required
+            errorobj={errors}
+          />
+          {/* Real radios in a named group: the choice and which one is picked
+              are announced. They were two buttons that showed the choice by
+              colour alone (WCAG 1.4.1, 4.1.2). */}
+          <fieldset className={styles.channels}>
+            <legend className={styles.legend}>{t('account_reset_channel_legend')}</legend>
+            {CHANNELS.map((c) => (
+              <label key={c.value} htmlFor={`reset-channel-${c.value}`} className={styles.channel}>
+                <input
+                  id={`reset-channel-${c.value}`}
+                  type="radio"
+                  name="channel"
+                  value={c.value}
+                  checked={channel === c.value}
+                  onChange={() => setChannel(c.value)}
+                />
+                {t(c.labelKey)}
+              </label>
+            ))}
+          </fieldset>
+          {/* A whole key per channel: "email" and "text" are stored codes, and
+              the two sentences don't share a shape across languages. */}
+          <Button type="submit" intent="primary" text={t(submitKey)} isFullWidth />
+        </form>
+      </FormProvider>
+    </AuthLayout>
   );
 }
 
 export default ResetLogin;
 
-// Without this the page ships no catalog, so every `t()` under it — the shell's
-// navigation included — renders its own key instead of a word.
+// Without this the page ships no catalog, so every `t()` renders its own key.
 export async function getStaticProps({ locale }) {
   return { props: { ...(await serverSideTranslations(locale ?? 'eng', ['common'])) } };
 }

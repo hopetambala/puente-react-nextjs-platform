@@ -1,59 +1,16 @@
-.auth {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  min-height: 100vh;
+/* The account-details card. The page frame is AuthLayout's. */
+.heading {
+  margin: 0 0 var(--tk-dlite-semantic-spacing-lg);
+  font-family: var(--font-family-heading);
+  font-size: clamp(var(--tk-dlite-semantic-typography-size-700), 1.25rem + 2vw, var(--tk-dlite-semantic-typography-size-800));
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
 }
 
-.left {
-  background: var(--tk-dlite-semantic-color-text-primary);
+.fields {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: var(--tk-dlite-semantic-spacing-xl);
-}
-
-.leftBrand {
-  display: flex;
-  align-items: center;
-  gap: var(--tk-dlite-semantic-spacing-sm);
-}
-
-.leftBrandMark {
-  width: 28px;
-  height: 28px;
-  background: var(--tk-dlite-primitive-color-yellow-200);
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 14px;
-}
-
-.leftBrandName {
-  color: var(--tk-dlite-primitive-color-white);
-  font-weight: 600;
-  font-size: 15px;
-}
-
-.right {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--tk-dlite-semantic-spacing-xl);
-  background: var(--tk-dlite-semantic-color-background);
-}
-
-.paper {
-  width: 100%;
-  max-width: 480px;
-}
-
-.stack {
-  padding-bottom: var(--spacer-l);
-}
-
-.errorText {
-  color: var(--tk-dlite-semantic-color-feedback-danger);
-  font-size: var(--font-size-small);
+  gap: var(--tk-dlite-semantic-spacing-md);
+  margin-bottom: var(--tk-dlite-semantic-spacing-500);
 }

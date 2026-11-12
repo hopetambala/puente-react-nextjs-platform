@@ -1,14 +1,8 @@
 {
   "_readme": "Known failures of the responsive a11y sweep (e2e/suites/responsive-a11y.mjs): \"<route> @ <width>\" → rule ids failing there in either language. Rule ids are axe-core's, plus the sweep's own (see CUSTOM_RULES in e2e/lib/a11y-gate-lib.mjs). The sweep fails on anything not listed. Regenerate with `node e2e/suites/responsive-a11y.mjs --update`, which refuses to add entries. Each PR of docs/responsive-a11y-overhaul.md shrinks it; PR 7 empties it.",
-  "total": 76,
+  "total": 43,
   "byRoute": {
     "/": 15,
-    "/account/login": 5,
-    "/account/login/reset-login": 5,
-    "/account/register": 5,
-    "/account/reset": 7,
-    "/account/verify": 6,
-    "/account/verify/redirect": 5,
     "/data/data-curation": 10,
     "/data/data-visualization": 10,
     "/forms/form-creator": 7,
@@ -39,99 +33,6 @@
       "color-contrast",
       "skip-link",
       "text-spacing"
-    ],
-    "/account/login @ 320": [
-      "skip-link"
-    ],
-    "/account/login @ 375": [
-      "skip-link"
-    ],
-    "/account/login @ 768": [
-      "skip-link"
-    ],
-    "/account/login @ 1024": [
-      "skip-link"
-    ],
-    "/account/login @ 1440": [
-      "skip-link"
-    ],
-    "/account/login/reset-login @ 320": [
-      "skip-link"
-    ],
-    "/account/login/reset-login @ 375": [
-      "skip-link"
-    ],
-    "/account/login/reset-login @ 768": [
-      "skip-link"
-    ],
-    "/account/login/reset-login @ 1024": [
-      "skip-link"
-    ],
-    "/account/login/reset-login @ 1440": [
-      "skip-link"
-    ],
-    "/account/register @ 320": [
-      "skip-link"
-    ],
-    "/account/register @ 375": [
-      "skip-link"
-    ],
-    "/account/register @ 768": [
-      "skip-link"
-    ],
-    "/account/register @ 1024": [
-      "skip-link"
-    ],
-    "/account/register @ 1440": [
-      "skip-link"
-    ],
-    "/account/reset @ 320": [
-      "reflow",
-      "skip-link"
-    ],
-    "/account/reset @ 375": [
-      "reflow",
-      "skip-link"
-    ],
-    "/account/reset @ 768": [
-      "skip-link"
-    ],
-    "/account/reset @ 1024": [
-      "skip-link"
-    ],
-    "/account/reset @ 1440": [
-      "skip-link"
-    ],
-    "/account/verify @ 320": [
-      "focus-unreachable",
-      "reflow"
-    ],
-    "/account/verify @ 375": [
-      "focus-unreachable"
-    ],
-    "/account/verify @ 768": [
-      "focus-unreachable"
-    ],
-    "/account/verify @ 1024": [
-      "focus-unreachable"
-    ],
-    "/account/verify @ 1440": [
-      "focus-unreachable"
-    ],
-    "/account/verify/redirect @ 320": [
-      "skip-link"
-    ],
-    "/account/verify/redirect @ 375": [
-      "skip-link"
-    ],
-    "/account/verify/redirect @ 768": [
-      "skip-link"
-    ],
-    "/account/verify/redirect @ 1024": [
-      "skip-link"
-    ],
-    "/account/verify/redirect @ 1440": [
-      "skip-link"
     ],
     "/data/data-curation @ 320": [
       "aria-prohibited-attr",

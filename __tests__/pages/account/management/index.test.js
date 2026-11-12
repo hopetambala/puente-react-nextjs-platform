@@ -30,11 +30,7 @@ jest.mock('app/modules/user', () => ({
   updateUser: jest.fn().mockResolvedValue({ username: 'hope', password: 'pass' }),
 }));
 
-jest.mock('@hookform/resolvers', () => ({ yupResolver: () => () => ({}) }));
-jest.mock('yup', () => ({
-  object: () => ({ shape: () => ({ required: () => ({}) }) }),
-  string: () => ({ required: () => ({}) }),
-}));
+jest.mock('app/impacto-design-system/toast/notify', () => ({ toast: jest.fn() }));
 
 jest.mock('app/impacto-design-system', () => ({
   AppShell: ({ children, breadcrumb }) => (
@@ -48,6 +44,9 @@ jest.mock('app/impacto-design-system', () => ({
   ),
   Button: ({ text, onClick, type = 'button' }) => <button type={type} onClick={onClick}>{text}</button>,
   Card: ({ children }) => <div>{children}</div>,
+  // The real field: labelling is what 'form semantics' below checks.
+  FormInput: jest.requireActual('app/impacto-design-system/form-controls/input').default,
+  Modal: () => null,
   LanguageSwitcher: () => <div data-testid="language-switcher" />,
   Spinner: () => <div data-testid="spinner" />,
   Stack: ({ children }) => <div>{children}</div>,
@@ -118,9 +117,9 @@ describe('Organization is not self-service', () => {
   // tenant-hopping easier by listing the destinations.
   it('does not render an editable organization field', async () => {
     const { container } = render(<ManagementWrapper />);
-    await waitFor(() => expect(container.querySelector('input[name="First Name"]')).toBeTruthy());
+    await waitFor(() => expect(container.querySelector('input[name="firstname"]')).toBeTruthy());
 
-    expect(container.querySelector('input[name="Organization"]')).toBeNull();
+    expect(container.querySelector('input[name="organization"]')).toBeNull();
   });
 
   it('still shows which organization the account belongs to', async () => {
@@ -164,7 +163,7 @@ describe('form semantics', () => {
     expect(labels.length).toBeGreaterThan(0);
     labels.forEach((label) => {
       const target = container.querySelector(`#${CSS.escape(label.htmlFor)}`);
-      if (label.htmlFor !== 'Organization') expect(target).not.toBeNull();
+      expect(target).not.toBeNull();
     });
   });
 });

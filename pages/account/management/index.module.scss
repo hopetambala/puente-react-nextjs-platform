@@ -1,34 +1,34 @@
 .paper {
-    max-width: 640px;
-    margin: var(--spacer-xxl) auto;
-    padding: 0 var(--spacer-m);
+  display: grid;
+  gap: var(--tk-dlite-semantic-spacing-lg);
+  max-width: 40rem;
+  margin-inline: auto;
 }
 
 .loadingState {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 300px;
-    width: 100%;
+  display: grid;
+  place-items: center;
+  min-height: 18rem;
 }
 
-.loadingState svg {
-    left: 0;
-    top: 0;
+.form {
+  display: grid;
+  gap: var(--tk-dlite-semantic-spacing-md);
 }
 
-.stack {
-    padding-bottom: var(--spacer-l);
+/* Organization is shown, not edited: it is the tenancy principal, not a
+   preference. A stated fact rather than a disabled input, because a greyed-out
+   box reads as "temporarily unavailable" rather than "not yours to change". */
+.readOnly {
+  display: grid;
+  gap: var(--tk-dlite-semantic-spacing-xs);
 }
 
-.errorText{
-    color: var(--tk-dlite-semantic-color-feedback-danger);
-    font-size: var(--font-size-small);
+.readOnlyLabel {
+  font-size: var(--tk-dlite-semantic-typography-size-300);
+  font-weight: 600;
 }
-/* Organization is shown, not edited — it is the tenancy principal, not a
-   preference. Styled as a stated fact rather than a disabled input, because a
-   greyed-out box reads as "temporarily unavailable" rather than "not yours to
-   change". */
+
 .readOnlyValue {
   margin: 0;
   color: var(--tk-dlite-semantic-color-text-primary);
@@ -36,8 +36,14 @@
 }
 
 .readOnlyNote {
-  margin-top: var(--tk-dlite-semantic-spacing-xs);
+  margin: 0;
   color: var(--tk-dlite-semantic-color-text-secondary);
   font-size: var(--tk-dlite-semantic-typography-size-300);
   line-height: 1.5;
+}
+
+.actions {
+  display: grid;
+  gap: var(--tk-dlite-semantic-spacing-sm);
+  margin-top: var(--tk-dlite-semantic-spacing-sm);
 }

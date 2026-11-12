@@ -1,0 +1,150 @@
+/* One column on phones (brand bar, then the form at full width); the dark
+   brand column beside the form from dlite's md breakpoint up. */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  min-height: 100dvh;
+  background: var(--tk-dlite-semantic-color-surface-base);
+}
+
+@media (--tk-dlite-bp-md-up) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: 1fr;
+  }
+}
+
+.skipLink {
+  position: absolute;
+  inset-block-start: var(--tk-dlite-semantic-spacing-sm);
+  inset-inline-start: var(--tk-dlite-semantic-spacing-sm);
+  z-index: var(--tk-dlite-semantic-z-index-overlay);
+  padding: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-md);
+  border-radius: var(--tk-dlite-semantic-border-radius-md);
+  background: var(--tk-dlite-semantic-color-surface-base);
+  color: var(--tk-dlite-semantic-color-text-link);
+  font-weight: 600;
+  translate: 0 -200%;
+}
+
+.skipLink:focus-visible {
+  translate: 0 0;
+}
+
+/* ── brand ── */
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tk-dlite-semantic-spacing-lg);
+  padding: var(--tk-dlite-semantic-spacing-md);
+  background: var(--tk-dlite-semantic-color-text-primary);
+  color: var(--tk-dlite-semantic-color-text-on-dark);
+}
+
+@media (--tk-dlite-bp-md-up) {
+  .brand {
+    justify-content: space-between;
+    padding: var(--tk-dlite-semantic-spacing-xl);
+  }
+}
+
+.brandRow {
+  display: flex;
+  align-items: center;
+  gap: var(--tk-dlite-semantic-spacing-sm);
+}
+
+.brandMark {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--tk-dlite-semantic-border-radius-md);
+  background: var(--tk-dlite-semantic-color-action-primary);
+  color: var(--tk-dlite-semantic-color-text-on-primary);
+  font-weight: 800;
+  font-size: var(--tk-dlite-semantic-typography-size-400);
+}
+
+.brandName {
+  font-family: var(--font-family-heading);
+  font-size: var(--tk-dlite-semantic-typography-size-500);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* The quote and the small print are decoration a phone doesn't have room
+   for: they show only beside the form. */
+.quote,
+.brandFooter {
+  display: none;
+}
+
+@media (--tk-dlite-bp-md-up) {
+  .quote {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0;
+  }
+
+  .brandFooter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--tk-dlite-semantic-spacing-sm);
+    color: var(--tk-dlite-semantic-color-text-on-dark-muted);
+    font-family: var(--font-family-mono);
+    font-size: var(--tk-dlite-semantic-typography-size-200);
+  }
+}
+
+.quoteBody {
+  margin: 0 0 var(--tk-dlite-semantic-spacing-500);
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: var(--tk-dlite-semantic-typography-size-600);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.quoteBody p {
+  margin: 0;
+}
+
+.quoteBody p::before {
+  content: "\201C" / "";
+  display: block;
+  margin-block-end: var(--tk-dlite-semantic-spacing-md);
+  color: var(--tk-dlite-primitive-color-yellow-200);
+  font-size: var(--tk-dlite-semantic-typography-size-1100);
+  font-style: normal;
+  line-height: 0.8;
+}
+
+.quoteAttr {
+  color: var(--tk-dlite-semantic-color-text-on-dark-muted);
+  font-family: var(--font-family-heading);
+  font-size: var(--tk-dlite-semantic-typography-size-300);
+}
+
+/* ── form ── */
+.main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--tk-dlite-semantic-spacing-xl) var(--tk-dlite-semantic-spacing-md) var(--tk-dlite-semantic-spacing-xxl);
+}
+
+@media (--tk-dlite-bp-md-up) {
+  .main {
+    align-items: center;
+    padding: var(--tk-dlite-semantic-spacing-xxl) var(--tk-dlite-semantic-spacing-xl);
+  }
+}
+
+.card {
+  width: 100%;
+  max-width: 26rem;
+}
