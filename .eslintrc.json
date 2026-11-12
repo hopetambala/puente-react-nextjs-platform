@@ -47,6 +47,20 @@
       "error",
       { "tags": [], "roles": ["tabpanel", "region"], "allowExpressionValues": true }
     ],
+    // Explicit roles on table elements are deliberate in a table that can be
+    // restyled into stacked cards: changing `display` on table elements drops
+    // their native semantics in some browsers (WebKit with VoiceOver).
+    "jsx-a11y/no-redundant-roles": [
+      "error",
+      { "nav": ["navigation"], "table": ["table"], "tr": ["row"], "th": ["columnheader"], "td": ["cell"] }
+    ],
+    // Same reason as no-redundant-roles above: jsx-a11y maps <td> to an
+    // interactive grid cell, so the explicit role="cell" a stackable table
+    // needs reads as a downgrade. airbnb's own allowance (tr) is kept.
+    "jsx-a11y/no-interactive-element-to-noninteractive-role": [
+      "error",
+      { "tr": ["none", "presentation"], "td": ["cell"], "canvas": ["img"] }
+    ],
     "jsx-a11y/anchor-is-valid": [
       "error",
       {

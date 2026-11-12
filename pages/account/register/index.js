@@ -5,7 +5,7 @@ import {
     Stack,
     Text,
 } from 'app/impacto-design-system';
-import FormSelectAutoComplete from 'app/impacto-design-system/form-controls/select-autocomplete';
+import FormSelect from 'app/impacto-design-system/form-controls/select';
 import { toast } from 'app/impacto-design-system/toast/notify';
 import { loadOrganizations, selectedOrganizationName } from 'app/modules/organization';
 import { retrieveSignUpFunction } from 'app/modules/user';
@@ -77,8 +77,9 @@ function Register() {
   const { handleSubmit, errors } = methods;
 
   const onSubmit = async (user) => {
-    // The picker yields a react-select option object; signup stores
-    // String(organization), so an object lands as "[object Object]".
+    // The picker (a native select) submits the organization's name. Normalized
+    // anyway: signup stores String(organization), so an option object would
+    // land as "[object Object]".
     const payload = {
       ...user,
       organization: selectedOrganizationName(user.organization),
@@ -133,7 +134,7 @@ function Register() {
                 </div>
               ) : (
                 <>
-                  <FormSelectAutoComplete
+                  <FormSelect
                     name="organization"
                     label={t('register_field_organization')}
                     required

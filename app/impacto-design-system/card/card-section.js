@@ -3,15 +3,15 @@ import React from 'react';
 import CardHeader from './card-header';
 import styles from './css/card.module.css';
 
-const CardSection = ({
+function CardSection({
   children,
   title,
   subtitle,
   link,
   headerActions,
   avatar,
-}) => (
-  <div className={styles.cardSection}>
+}) {
+  return <div className={styles.cardSection}>
     <CardHeader
       title={title}
       subtitle={subtitle}
@@ -22,6 +22,6 @@ const CardSection = ({
     />
     {children}
   </div>
-);
+}
 
 export default CardSection;

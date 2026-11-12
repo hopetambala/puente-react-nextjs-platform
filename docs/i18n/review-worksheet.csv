@@ -396,6 +396,9 @@ common,select_none,None,Ninguno,Okenn,,
 common,select_placeholder,Please Select,Selecciona una opción,Tanpri chwazi youn,,
 common,analytics_retrieve,Retrieve,Consultar,Chèche,,
 common,analytics_answer_to_question,Answer to Question,Respuesta a la pregunta,Repons kesyon an,,
+common,analytics_organization,Organization,Organización,Òganizasyon,,"Added by the responsive/a11y overhaul (table caption, header, empty state). Spanish and Creole written by Claude: needs native review."
+common,analytics_table_caption,Answers collected,Respuestas recolectadas,Repons yo ranmase,,"Added by the responsive/a11y overhaul (table caption, header, empty state). Spanish and Creole written by Claude: needs native review."
+common,table_empty,Nothing to show yet.,Todavía no hay nada que mostrar.,Pa gen anyen pou montre ankò.,,"Added by the responsive/a11y overhaul (table caption, header, empty state). Spanish and Creole written by Claude: needs native review."
 common,form_marketplace_empty,No forms available yet.,Todavía no hay formularios disponibles.,Poko gen fòm disponib.,,
 common,form_manager_forms_collected,"Forms collected: {{count, number}}","Formularios recolectados: {{count, number}}","Fòm ki ranmase: {{count, number}}",,
 common,form_manager_expand_row,Expand row,Expandir la fila,Louvri liy nan,,

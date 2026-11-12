@@ -1,24 +1,38 @@
+import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import React from 'react';
 
 import Link from '../Link';
 import Text from '../text';
 import styles from './css/card.module.css';
 
-const CardHeader = ({
+function CardHeader({
   headerActions,
+  headingLevel,
   isSmallTitle,
   link,
   subtitle,
   title,
   className,
-}) => {
+}) {
   if (!title && !headerActions) return null;
 
   let titleEl = title ? (
-    <Text text={title} element={isSmallTitle ? 'h5' : 'h4'} className={link ? '' : styles.title} />
+    <Text
+      text={title}
+      element={`h${headingLevel}`}
+      className={classNames(styles.title, { [styles.smallTitle]: isSmallTitle })}
+    />
   ) : null;
-  titleEl = link ? <Link to={link}>{titleEl}</Link> : titleEl;
+  // The link goes inside the heading, so it is named by the title and the
+  // heading stays a heading. (It was `to=`, which Link never read: a dead link.)
+  if (title && link) {
+    const Heading = `h${headingLevel}`;
+    titleEl = (
+      <Heading className={classNames(styles.title, { [styles.smallTitle]: isSmallTitle })}>
+        <Link href={link}>{title}</Link>
+      </Heading>
+    );
+  }
 
   return (
     <div className={`${styles.header} ${className}`}>
@@ -29,11 +43,14 @@ const CardHeader = ({
       {headerActions}
     </div>
   );
-};
+}
 
 CardHeader.propTypes = {
-  /** A menu or button to display in the top right of the card. */
-  headerActions: PropTypes.func.isRequired,
+  /** A menu or button to display at the end of the header. */
+  headerActions: PropTypes.node,
+
+  /** The title's heading level. */
+  headingLevel: PropTypes.oneOf([2, 3, 4, 5, 6]),
 
   /** Use a smaller title size. */
   isSmallTitle: PropTypes.bool,
@@ -49,6 +66,8 @@ CardHeader.propTypes = {
 };
 
 CardHeader.defaultProps = {
+  headerActions: null,
+  headingLevel: 3,
   isSmallTitle: false,
   link: null,
   subtitle: null,

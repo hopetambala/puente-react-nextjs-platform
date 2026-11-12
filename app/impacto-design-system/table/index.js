@@ -1,353 +1,106 @@
 import {
-  // ColumnDef,
-  // ColumnSort,
-  // OnChangeFn,
-  // RowData,
-  // SortingState,
-  // VisibilityState,
   flexRender,
   getCoreRowModel,
-  getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
 import classNames from 'classnames';
-// import { map } from 'lodash';
-import React from 'react';
+import { useTranslation } from 'next-i18next';
+import PropTypes from 'prop-types';
 
-import Cell from './cell';
-// import { Checkbox, Empty, Icon, MenuOption, Popover } from '../../';
-// import { StrictReactNode } from '../../types';
 import styles from './css/table.module.css';
-// import { ITableActionsProps, TableActions } from './table-actions/table-actions';
-import Row from './row';
-// import { cell, headerFooterGroup } from './types';
 
-// interface ITableProps<Data extends IdentifiedRowData> {
-//   /** An optional classname string to apply to the outer level rendered DOM node. */
-//   className?: string;
-
-//   /** An array prop for column headers and accessors for the table */
-//   columns: ColumnDef<Data, any>[];
-
-//   /** A string prop for the desired name for rows used in table */
-//   units: string;
-
-//   /** An array of data to pass into the table */
-//   data: readonly Data[];
-
-//   /**
-//    * An optional column visibility state
-//    */
-//   columnVisibility?: VisibilityState;
-
-//   /** An optional prop to manage the state of the header checked cell */
-//   isGloballySelected?: boolean;
-
-//   /** A boolean prop to apply resizabilityto columns in the table */
-//   isResizable?: boolean;
-
-/** An optional setting controlling the sticky property on the first column. When
-   * set to `true` the first column will be set to position sticky to the left of the table. When
-   * the width of the table is smaller than the width of its content, it will scroll horizontally
-   * and the first column will remain sticky to the left. When set to false, the first column will
-   * scroll horizontally along with the rest of the columns.
-   * @default true
-   */
-//   isFirstColumnSticky?: boolean;
+/** A column's header as plain text, for the stacked layout's per-cell labels:
+ *  `meta.label`, else `meta.labelKey` through t(), else a string header. */
+const headerLabel = (column, t) => {
+  const { meta, header } = column.columnDef;
+  if (meta?.label) return meta.label;
+  if (meta?.labelKey) return t(meta.labelKey);
+  return typeof header === 'string' ? header : '';
+};
 
 /**
-   * An optional sorting state prop to manage the
-   * asc/desc order of rows in a table based on a column id
-   */
-//   sorting?: ColumnSort[];
-
-//   /**
-//    * Setter for columnVisibility
-//    */
-//   setColumnVisibility?: OnChangeFn<VisibilityState>;
-
-//   /**
-//    * An optional hook prop to set the sorting state of the table.
-//    */
-//   onSortingChange?: OnChangeFn<SortingState>;
-
-//   /**
-//    * An optional boolean prop to toggle if the table has header actions
-//    */
-//   hasTableActions?: boolean;
-
-//   /**
-//    * A optional string array that holds the ids of selected rows
-//    */
-//   selectedRows?: string[];
-
-//   /**
-//    * An optional hook prop to set the selected rows of the table.
-//    */
-//   onSelectedRowsChanged?: (rows: string[]) => void;
-
-//   /**
-//    * An optional prop for empty state content
-//    */
-//   emptyContent?: StrictReactNode;
-
-//   /**An optional prop for footer content like pagination */
-//   footer?: React.ReactNode;
-
-//   /**An optional column that will appear when the users mouse is over the row. */
-//   hoverActions?: ColumnDef<Data, any>;
-// }
-
-const renderHeaderCells = (header) => (header.isPlaceholder
-  ? null
-  : flexRender(header.column.columnDef.header, header.getContext()));
-
-// type SortIconDirection = {
-//   isUp: boolean | (() => number);
-//   isDown: boolean | (() => number);
-// };
-
-// const RenderSortIcon = (
-//   header: cell,
-//   shouldSort: boolean,
-//   isDesc: boolean | null,
-//   setIsDesc: React.Dispatch<React.SetStateAction<boolean | null>>,
-//   previousSorting: ColumnSort[],
-// ) => {
-//   const { getCanSort, toggleSorting, getSortIndex, clearSorting } = header.column;
-
-//   const toggleSort = (descSort: boolean) => {
-//     const previousSortingColumn = previousSorting[0]?.id;
-
-//     if (descSort === isDesc && previousSortingColumn === header.id) {
-//       setIsDesc(null);
-//       return clearSorting();
-//     }
-//     setIsDesc(descSort);
-//     return toggleSorting(descSort);
-//   };
-
-//   if (!getCanSort() || !shouldSort) {
-//     return null;
-//   }
-
-//   type SortArrowProps = {
-//     direction: SortIconDirection;
-//   };
-
-//   const SortArrow = ({ direction }: SortArrowProps) => {
-//     const classes = classNames(buttonStyles.iconButton, styles.sortIcon);
-
-//     const { isUp, isDown } = direction;
-//     return (
-//       <div className={classes}>
-//         <Icon name="arrowDropUp" color={isUp ? 'darkGray' : 'lightGray'} size="small" />
-//         <Icon name="arrowDropDown" color={isDown ? 'darkGray' : 'lightGray'} size="small" />
-//       </div>
-//     );
-//   };
-
-//   const sortIndex = getSortIndex();
-//   const isDescending = isDesc === true;
-
-//   const direction: SortIconDirection = {
-//     isUp: sortIndex || !isDescending,
-//     isDown: sortIndex || isDescending,
-//   };
-
-//   return (
-//     <Popover shouldOpenOnHover trigger={<SortArrow direction={direction} />}>
-//       <MenuOption text="Sort Ascending" icon="arrowUpward" onClick={() => toggleSort(false)} />
-//       <MenuOption text="Sort Descending" icon="arrowDownward" onClick={() => toggleSort(true)} />
-//     </Popover>
-//   );
-// };
-
-// const renderResizeHandler = (header: cell) =>
-//   header.column.getCanResize() && (
-//     <div
-//       role="slider"
-//       tabIndex={0}
-//       aria-valuenow={undefined}
-//       onMouseDown={header.getResizeHandler()}
-//       onTouchStart={header.getResizeHandler()}
-// className={[styles.resizer, header.column.getIsResizing()
-//   ? styles.isResizing
-//   : ''].join(' ')}
-//     ></div>
-//   );
-
-// const renderDefaultEmptyState = (units: string) => <Empty title={`No ${units} found`} />;
-const renderDefaultEmptyState = (units) => (
-  <p title={`No ${units} found`} />
-);
-
-// /** Adds a default ID to a column definition if one is not present. */
-const withGuaranteedId = (
-  column,
-  id,
-) => ({
-  ...column,
-  id: column.id ?? id,
-});
-
+ * A data table that stays a table: a caption that names it, column headers
+ * scoped to their columns, and plain cells (WCAG 1.3.1).
+ *
+ * Wide tables scroll inside a focusable region named by the caption, so a
+ * keyboard user can scroll them (WCAG 2.1.1). When its container is narrow (a
+ * phone, a side panel) each row becomes a stacked card, with every value
+ * labelled by its column, instead of scrolling sideways (WCAG 1.4.10). That
+ * switch is a container query, so it follows the space the table has, not the
+ * window.
+ *
+ * Columns are @tanstack/react-table column definitions. Give each a string
+ * `header`, or `meta: { labelKey }` (a catalog key) when the header is a
+ * component, so the stacked layout can label its cells.
+ */
 const Table = ({
-  // allRowsLength,
-  className,
-  columns,
-  data,
-  // titleText,
-  units,
-  emptyContent = renderDefaultEmptyState(units),
-  footer,
-  columnVisibility,
-  isResizable,
-  // isGloballySelected,
-  hasTableActions = false,
-  // selectedRows,
-  // onSelectedRowsChanged,
-  sorting,
-  onSortingChange,
-  // primarySlotActions,
-  // primarySlotBulkActions,
-  // secondarySlotActions,
-  // selectedRowsLength,
-  setColumnVisibility,
-  // bannerContent,
-  // subTitle,
-  // isTitleVertical,
-  hoverActions: hoverActionsInput,
+  caption, className, columns, data, emptyContent, isCaptionVisible,
 }) => {
-  const wrapperClasses = classNames(styles.wrapper, className);
-  const tableClasses = classNames(styles.tableWrapper, styles.stickyFirstColumn, {
-    [styles.hasTableActions]: !!hasTableActions,
-    [styles.hasHoverActions]: !!hoverActionsInput,
-  });
-
-  // const [isDesc, setIsDesc] = useState(null);
-
-  // const shouldSort = sorting ? true : false;
-
-  // this needs an ID so we can attach CSS to the associated cell
-  const hoverActions = hoverActionsInput && withGuaranteedId(hoverActionsInput, 'hoverColumn');
-
-  // const isHeaderCellChecked =
-  //   isGloballySelected ||
-  //   (selectedRows && selectedRows.length > 0 && selectedRows.length === data.length) ||
-  //   false;
-
-  // const isIndeterminateChecked = selectedRows
-  //   ? selectedRows?.length > 0 && selectedRows.length < data.length
-  //   : undefined;
-
+  const { t } = useTranslation('common');
   const table = useReactTable({
-    data, // ignore readonly restriction as we pass into third party code we cannot change
-    columns: [...columns, ...(hoverActions ? [hoverActions] : [])],
-    enableColumnResizing: isResizable || false,
-    columnResizeMode: isResizable === true ? 'onChange' : undefined,
-    state: {
-      sorting,
-      columnVisibility,
-    },
-    manualSorting: true,
-    onSortingChange,
+    data,
+    columns,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
   });
-
-  // const handleSelect = (rowId) => {
-  //   if (!selectedRows) return;
-  //   const newValues = [...selectedRows];
-  //   const targetIdx = newValues.findIndex((it) => it === rowId);
-
-  //   if (targetIdx > -1) {
-  //     newValues.splice(targetIdx, 1);
-  //   } else {
-  //     newValues.push(rowId);
-  //   }
-  //   if (onSelectedRowsChanged) onSelectedRowsChanged(newValues);
-  // };
-
-  // const handleSelectAll = (e) => {
-  //   const checkedRows = e.target.checked ? map(data, 'id') || [] : [];
-  //   if (!onSelectedRowsChanged) return;
-  //   if (checkedRows.length) {
-  //     onSelectedRowsChanged(checkedRows);
-  //   } else {
-  //     onSelectedRowsChanged([]);
-  //   }
-  // };
+  const { rows } = table.getRowModel();
 
   return (
-    <div className={wrapperClasses}>
-      {/* <TableActions
-        titleText={titleText}
-        subTitle={subTitle}
-        isTitleVertical={isTitleVertical}
-        units={units}
-        allRowsLength={allRowsLength ?? data.length}
-        selectedRowsLength={selectedRowsLength ?? selectedRows?.length}
-        primarySlotActions={primarySlotActions}
-        primarySlotBulkActions={primarySlotBulkActions}
-        secondarySlotActions={secondarySlotActions}
-        bannerContent={bannerContent}
-      /> */}
-      <div className={tableClasses}>
-        <table>
+    <div className={classNames(styles.wrapper, className)}>
+      {/* The scroll region is named by the caption and takes focus so it can
+          be scrolled from the keyboard. */}
+      <div className={styles.scroller} role="region" aria-label={caption} tabIndex={0}>
+        {/* Explicit table roles: the stacked layout changes `display` on these
+            elements, which in some browsers (WebKit with VoiceOver) drops their
+            native table semantics. The roles keep them in every layout. */}
+        <table className={styles.table} role="table">
+          <caption className={isCaptionVisible ? styles.caption : 'sr-only'}>{caption}</caption>
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
-              <Row
-                key={headerGroup.id}
-                // hasTableActions={hasTableActions}
-                // selectedRows={selectedRows}
-              >
-                {hasTableActions && (
-                  <Cell isHeaderCell>
-                    <p>header header</p>
-                    {/* <Checkbox
-                      id="table-checkbox"
-                      isChecked={isHeaderCellChecked}
-                      isIndeterminate={isIndeterminateChecked}
-                      onChange={handleSelectAll}
-                    /> */}
-                  </Cell>
-                )}
+              <tr key={headerGroup.id} role="row">
                 {headerGroup.headers.map((header) => (
-                  <Cell key={header.id} isHeaderCell>
-                    {renderHeaderCells(header)}
-                    {/* {RenderSortIcon(header, shouldSort, isDesc, setIsDesc, sorting || [])}
-                    {isResizable && renderResizeHandler(header)} */}
-                  </Cell>
+                  <th key={header.id} scope="col" role="columnheader">
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  </th>
                 ))}
-              </Row>
+              </tr>
             ))}
           </thead>
           <tbody>
-            {table.getRowModel().rows.map((row) => (
-              <Row>
+            {rows.map((row) => (
+              <tr key={row.id} role="row">
                 {row.getVisibleCells().map((cell) => (
-                  <Cell
-                    key={cell.id}
-                    style={{ width: cell.column.getSize() }}
-                    // containerClassName={
-                    //   cell.column.id === hoverActions?.id ? styles.hoverActions : undefined
-                    // }
-                  >
+                  <td key={cell.id} role="cell" data-label={headerLabel(cell.column, t)}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </Cell>
+                  </td>
                 ))}
-              </Row>
+              </tr>
             ))}
           </tbody>
         </table>
-        {table.getRowModel().rows.length === 0 && (
-          <div className={styles.emptyContainer}>{emptyContent}</div>
-        )}
       </div>
-      {table.getRowModel().rows.length !== 0 && footer}
+      {rows.length === 0 && (
+        <div className={styles.empty}>{emptyContent ?? <p>{t('table_empty')}</p>}</div>
+      )}
     </div>
   );
+};
+
+Table.propTypes = {
+  /** Names the table and its scroll region. Required: a table needs a name. */
+  caption: PropTypes.string.isRequired,
+  className: PropTypes.string,
+  columns: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  data: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  /** Shown instead of rows when there are none. */
+  emptyContent: PropTypes.node,
+  /** Show the caption, not only announce it. */
+  isCaptionVisible: PropTypes.bool,
+};
+
+Table.defaultProps = {
+  className: undefined,
+  emptyContent: null,
+  isCaptionVisible: false,
 };
 
 export default Table;

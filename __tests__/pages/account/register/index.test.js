@@ -28,9 +28,10 @@ jest.mock('app/modules/user', () => ({
   retrieveSignUpFunction: jest.fn().mockResolvedValue({}),
 }));
 
-// Holds what the form would hand onSubmit. react-select gives react-hook-form
-// the whole selected OPTION OBJECT, not a bare value, so tests can set that
-// shape here to exercise the real submit boundary.
+// Holds what the form would hand onSubmit. The picker was react-select, which
+// handed react-hook-form the whole OPTION OBJECT; it is a native select now
+// (the name string), and selectedOrganizationName accepts both, so tests can
+// set either shape here to exercise the real submit boundary.
 let mockFormValues = {};
 jest.mock('react-hook-form', () => ({
   FormProvider: ({ children }) => <>{children}</>,
@@ -56,7 +57,7 @@ jest.mock('app/modules/organization', () => ({
   loadOrganizations: (...a) => mockLoad(...a),
 }));
 
-jest.mock('app/impacto-design-system/form-controls/select-autocomplete', () => ({
+jest.mock('app/impacto-design-system/form-controls/select', () => ({
   __esModule: true,
   default: ({ name, label, options }) => (
     <div data-testid={`picker-${name}`} aria-label={label}>

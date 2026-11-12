@@ -177,9 +177,10 @@ export async function loadOrganizations(Parse) {
 }
 
 /**
- * react-select hands react-hook-form the whole selected OPTION OBJECT
- * (`{ label, value }`), not a bare value. Everything downstream wants the
- * canonical name STRING:
+ * The canonical organization name STRING from whatever a picker submitted:
+ * the native FormSelect submits the name itself, and the react-select it
+ * replaced handed over the whole OPTION OBJECT (`{ label, value }`); both are
+ * accepted. Everything downstream wants the string:
  *
  *   - cloudcode's `signup` does `user.set('organization', String(organization))`,
  *     so an object is stored as the literal "[object Object]";

@@ -8,6 +8,11 @@ const columns = [
   {
     accessorKey: 'surveying_organization',
     cell: (info) => info.getValue(),
+    header: function OrganizationHeader() {
+      const { t } = useTranslation('common');
+      return <span>{t('analytics_organization')}</span>;
+    },
+    meta: { labelKey: 'analytics_organization' },
   },
   {
     accessorFn: (row) => row.question_answer,
@@ -19,6 +24,7 @@ const columns = [
       const { t } = useTranslation('common');
       return <span>{t('analytics_answer_to_question')}</span>;
     },
+    meta: { labelKey: 'analytics_answer_to_question' },
   },
 ];
 const DataAnalyticsManager = () => {
@@ -57,7 +63,7 @@ const DataAnalyticsManager = () => {
   return (
     <Stack isVertical spacing="medium">
       <Button text={t('analytics_retrieve')} onClick={fetchData} />
-      <Table data={data} columns={columns} />
+      <Table data={data} columns={columns} caption={t('analytics_table_caption')} />
     </Stack>
   );
 };

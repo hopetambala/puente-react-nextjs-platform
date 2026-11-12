@@ -1,58 +1,58 @@
+import Button from '../button';
 import styles from './index.module.scss';
-/**
- * Card Component that has
- *  title
- *  description
- *  Link (if it's clicked)
- *  Actions
- *
- * @example
- * Card(
- *  "Healthy Behaviors",
- *  "A form about health behavior",
- *  "www.healthy.com",
- *  [{text: "Click Me!", action: clickAction },{text:"Navigate", action: navigateAction}]
- * )
- *
- * @param {String} title First number
- * @param {String} description Max limit of results
- * @param {String} nextLink Name of Backend Model
- * @param {Array} actions Name of Column in Backend Model
- * @returns Card Component
- */
 
+type CardAction = {
+  text: string;
+  action: () => void;
+};
 
 type CardProps = {
-  title:string;
-  description:string
-  nextLink: string;
-  shouldOpenTab?: boolean
-  actions?: any[]
-}
+  title: string;
+  description?: string;
+  /** Where the title links to, if anywhere. */
+  nextLink?: string;
+  shouldOpenTab?: boolean;
+  actions?: CardAction[];
+  /** The title's heading level in the page's outline. */
+  headingLevel?: 2 | 3 | 4;
+};
 
-const Card = ({
-  title, description, nextLink, shouldOpenTab, actions,
-}: CardProps) => (
-  <a
-    href={nextLink}
-    className={styles.card}
-    target={shouldOpenTab ? '_blank' : '_self'}
-    // Only the new-tab branch needs the opener/referrer guard; leaving `rel`
-    // off the same-tab branch keeps the Referer header these links send today.
-    rel={shouldOpenTab ? 'noreferrer' : undefined}
-  >
-    <h3>{title}</h3>
-    <p>{description}</p>
-    {actions && (
-      <div>
-        {actions.map((action) => (
-          <button type="button" onClick={action.action}>
-            {action.text}
-          </button>
-        ))}
-      </div>
-    )}
-  </a>
-);
+/**
+ * A card for a list of things (Form Marketplace): a heading, a description,
+ * and its own actions.
+ *
+ * An <article>, not an <a>: the whole card used to be one link with buttons
+ * nested inside it (invalid, and the buttons couldn't be reached reliably),
+ * and with no `nextLink` it was an <a> with no href. Now only the title is a
+ * link, when there is somewhere to go, and the actions are separate buttons.
+ */
+const CardAlt = ({
+  title, description = '', nextLink, shouldOpenTab = false, actions = [], headingLevel = 3,
+}: CardProps) => {
+  const Heading = `h${headingLevel}` as 'h2' | 'h3' | 'h4';
+  return (
+    <article className={styles.card}>
+      <Heading className={styles.title}>
+        {nextLink ? (
+          <a
+            href={nextLink}
+            className={styles.titleLink}
+            {...(shouldOpenTab ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+          >
+            {title}
+          </a>
+        ) : title}
+      </Heading>
+      {description && <p className={styles.description}>{description}</p>}
+      {actions.length > 0 && (
+        <div className={styles.actions}>
+          {actions.map((action) => (
+            <Button key={action.text} isSmall text={action.text} onClick={action.action} />
+          ))}
+        </div>
+      )}
+    </article>
+  );
+};
 
-export default Card;
+export default CardAlt;

@@ -1,25 +1,22 @@
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import React from 'react';
 
-import Link from '../Link';
 import CardHeader from './card-header';
 import styles from './css/card.module.css';
 
-const Card = ({
+function Card({
   children,
   className,
   headerActions,
-  href,
+  headingLevel,
   id,
   isElevated,
   isSmallTitle,
   isSubtle,
-  onClick,
   padding,
   subtitle,
   title,
-}) => {
+}) {
   const classname = classNames(
     styles.card,
     {
@@ -30,7 +27,6 @@ const Card = ({
       [styles.noPadding]: padding === 'none',
       [styles.elevated]: isElevated,
       [styles.subtle]: isSubtle,
-      [styles.clickable]: onClick || href,
     },
     className,
   );
@@ -41,48 +37,30 @@ const Card = ({
         title={title}
         subtitle={subtitle}
         headerActions={headerActions}
+        headingLevel={headingLevel}
         isSmallTitle={isSmallTitle}
       />
       {children}
     </>
   );
 
-  const sharedCardProps = {
-    className: classname,
-    id,
-  };
-
-  if (onClick) {
-    return (
-      <button {...sharedCardProps} onClick={onClick} type="button">
-        {contents}
-      </button>
-    );
-  } if (href) {
-    return (
-      <Link
-        to={href}
-        {...{ ...sharedCardProps }}
-        onClick={onClick}
-      >
-        {contents}
-      </Link>
-    );
-  }
-
+  // A card is a container, never a control. It used to become a <button>
+  // (onClick) or a link (href) wrapped around its whole content, which flattened
+  // the heading and anything interactive inside into one control. No caller
+  // used either; put a link or button inside the card instead.
   return (
-    <div {...sharedCardProps}>
+    <div className={classname} id={id || undefined}>
       {contents}
     </div>
   );
-};
+}
 
 Card.propTypes = {
   /** Contents to put within the card. */
   children: PropTypes.element.isRequired,
 
-  /** Link somewhere. */
-  href: PropTypes.string,
+  /** The title's heading level, so it fits the page's outline (default 3). */
+  headingLevel: PropTypes.oneOf([2, 3, 4, 5, 6]),
 
   /** Provide an id, for example to be used as an anchor in URLs. */
   id: PropTypes.string,
@@ -93,19 +71,16 @@ Card.propTypes = {
   /** Removes the white BG from the card, rendering on light gray app BG */
   isSubtle: PropTypes.bool,
 
-  /** Optionally make the card clickable */
-  onClick: PropTypes.func,
 
   /** Card padding */
   padding: PropTypes.oneOf(['small', 'medium', 'large', 'extraLarge', 'none']),
 };
 
 Card.defaultProps = {
-  href: null,
+  headingLevel: 3,
   id: '',
   isElevated: false,
   isSubtle: false,
-  onClick: null,
   padding: 'medium',
 };
 
