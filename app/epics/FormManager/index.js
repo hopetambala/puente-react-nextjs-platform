@@ -1,6 +1,8 @@
 import { Button, EmptyState, Panel, Skeleton } from 'app/impacto-design-system';
+import Icon from 'app/impacto-design-system/icon';
 import { retrieveCustomData } from 'app/modules/cloud-code';
 import { loadOrganizationIdentity } from 'app/modules/organization';
+import Link from 'next/link';
 import { useTranslation } from 'next-i18next';
 import { Parse } from 'parse';
 import { useEffect, useMemo, useState } from 'react';
@@ -11,9 +13,21 @@ import styles from './index.module.scss';
 import RecordsTable from './RecordsTable';
 import Table from './Table';
 
+// The translated name each Puente class goes by, the same one data curation
+// shows (design review X14): coordinators saw "SurveyData" here and "People
+// Records" there for the same records.
+const PUENTE_FORM_LABEL_KEYS = {
+  SurveyData: 'data_curation_source_survey_data',
+  HistoryEnvironmentalHealth: 'data_curation_source_env_health',
+  Vitals: 'data_curation_source_vitals',
+  EvaluationMedical: 'data_curation_source_eval_medical',
+};
+
 // Built from the classes the record query reads, so a card can never name a
 // class its count and record list do not know how to scope.
-const puenteConfig = PUENTE_FORM_CLASSES.map((name) => ({ name, description: '' }));
+const puenteConfig = PUENTE_FORM_CLASSES.map((name) => ({
+  name, labelKey: PUENTE_FORM_LABEL_KEYS[name], description: '',
+}));
 
 function FormManager({ context, router, user }) {
   const { t } = useTranslation('common');
@@ -40,6 +54,8 @@ function FormManager({ context, router, user }) {
   // fell to <body> and their next Tab restarted at the top of the page, seconds
   // later, on the slow connection that caused the failure. Measured, not guessed.
   const [isRetrying, setIsRetrying] = useState(false);
+  // The name of the form just removed, announced politely.
+  const [removedName, setRemovedName] = useState('');
 
   // The CSV exporter keys on shortCode so an export covers every string the
   // organization's records carry. Null until resolved, and null for an
@@ -119,6 +135,13 @@ function FormManager({ context, router, user }) {
   // Named, not an inline arrow: react/jsx-no-bind is on in this repo.
   const handleRetry = () => refreshWorkflowData({ isRetry: true });
 
+  // After the server has removed a form: refetch without the skeleton (which
+  // would unmount the list and drop focus), then say what happened.
+  const handleFormRemoved = (form) => {
+    setRemovedName(form.name);
+    refreshWorkflowData({ isRetry: true });
+  };
+
   useEffect(() => {
     if (!organization) return;
     refreshWorkflowData();
@@ -138,15 +161,18 @@ function FormManager({ context, router, user }) {
 
   return (
     <div className={styles.formManager}>
+      <p className="sr-only" role="status">
+        {removedName ? t('form_manager_removed', { name: removedName }) : ''}
+      </p>
       {/* ── Drill-in view: records for a selected form ── */}
       {selectedForm ? (
         <div>
           <div className={styles.filterStrip}>
+            {/* Named by its visible words (design review X10). */}
             <button
               type="button"
               className={styles.backBtn}
               onClick={() => setSelectedForm(null)}
-              aria-label={t('form_manager_back_aria')}
             >
               {t('form_manager_back')}
             </button>
@@ -158,33 +184,38 @@ function FormManager({ context, router, user }) {
           {/* ── Catalog view ── */}
           <div className={styles.filterStrip}>
             <div className={styles.filterLeft}>
-              <button
-                type="button"
-                className={styles.createFormBtn}
-                onClick={() => router.push('/forms/form-creator')}
-              >
-                {t('form_manager_create')}
-              </button>
-              <div className={styles.search}>
-                <span className={styles.searchIcon}>⌕</span>
-                <input
-                  type="text"
-                  placeholder={t('form_manager_search_placeholder')}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className={styles.searchInput}
-                />
+              {/* A link: it goes somewhere. */}
+              <Link href="/forms/form-creator">
+                <a className={styles.createFormBtn}>
+                  <Icon name="add" size="small" />
+                  {t('form_manager_create')}
+                </a>
+              </Link>
+              <div className={styles.searchField}>
+                <label className={styles.searchLabel} htmlFor="form-manager-search">
+                  {t('form_manager_search_label')}
+                </label>
+                <div className={styles.search}>
+                  <Icon name="search" size="small" className={styles.searchIcon} />
+                  <input
+                    id="form-manager-search"
+                    type="search"
+                    placeholder={t('form_manager_search_placeholder')}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className={styles.searchInput}
+                  />
+                </div>
               </div>
             </div>
           </div>
           {loading && (
             <div className={styles.section}>
               <div className={styles.skeletonList}>
-                {[55, 70, 40, 60].map((w, i) => (
-                  // eslint-disable-next-line react/no-array-index-key
-                  <div key={i} className={styles.skeletonRow}>
-                    <Skeleton width={`${w}%`} height={14} />
-                    <Skeleton width={60} height={22} style={{ borderRadius: 'var(--tk-dlite-semantic-border-radius-sm)' }} />
+                {[55, 70, 40, 60].map((w) => (
+                  <div key={w} className={styles.skeletonRow}>
+                    <Skeleton width={`${w}%`} height="1em" />
+                    <Skeleton width="4rem" height="1.5em" />
                   </div>
                 ))}
               </div>
@@ -196,7 +227,7 @@ function FormManager({ context, router, user }) {
             <Panel title={t('form_manager_puente_forms')} noPadding>
               <Table
                 data={puenteConfig}
-                retrieveCustomData={retrieveCustomData}
+                onFormRemoved={handleFormRemoved}
                 passDataToFormCreator={passDataToFormCreator}
                 organization={organization}
                 shortCode={shortCode}
@@ -231,7 +262,7 @@ function FormManager({ context, router, user }) {
                   <Panel key={key} title={key} noPadding>
                     <Table
                       data={filteredWorkflowData[key]}
-                      retrieveCustomData={retrieveCustomData}
+                      onFormRemoved={handleFormRemoved}
                       passDataToFormCreator={passDataToFormCreator}
                       organization={organization}
                       shortCode={shortCode}
@@ -248,7 +279,7 @@ function FormManager({ context, router, user }) {
                   >
                     <Table
                       data={filteredNoWorkflowData}
-                      retrieveCustomData={retrieveCustomData}
+                      onFormRemoved={handleFormRemoved}
                       passDataToFormCreator={passDataToFormCreator}
                       organization={organization}
                       shortCode={shortCode}

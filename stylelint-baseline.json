@@ -14,7 +14,7 @@
     "pages/data/": "PR 6 (data routes)",
     "pages/index.module.scss": "PR 7 (landing page)"
   },
-  "total": 153,
+  "total": 138,
   "files": {
     "app/epics/DataAnalyticsManager/index.module.scss": {
       "no-empty-source": 1
@@ -50,20 +50,6 @@
     "app/epics/FormCreator/index.module.scss": {
       "declaration-property-unit-disallowed-list": 5,
       "declaration-property-value-disallowed-list": 1
-    },
-    "app/epics/FormManager/RecordsTable/index.module.css": {
-      "declaration-property-unit-disallowed-list": 1
-    },
-    "app/epics/FormManager/Table/ExpandableTableRow/index.module.scss": {
-      "declaration-property-unit-disallowed-list": 1
-    },
-    "app/epics/FormManager/Table/index.module.scss": {
-      "color-no-hex": 2,
-      "declaration-block-single-line-max-declarations": 3,
-      "declaration-property-unit-disallowed-list": 3
-    },
-    "app/epics/FormManager/index.module.scss": {
-      "declaration-property-unit-disallowed-list": 5
     },
     "app/epics/NativeApplcationDrawer/index.module.css": {
       "declaration-property-value-allowed-list": 1

@@ -46,7 +46,7 @@ function renderRow() {
   return render(
     <table>
       <tbody>
-        <ExpandableTableRow row={{ objectId: 'f1' }} surveyingOrganization="TestOrg">
+        <ExpandableTableRow row={{ objectId: 'f1' }} name="WaSH Survey" surveyingOrganization="TestOrg">
           <td>WaSH Survey</td>
         </ExpandableTableRow>
       </tbody>
@@ -54,25 +54,53 @@ function renderRow() {
   );
 }
 
-describe('ExpandableTableRow — copy', () => {
-  it('routes both states of the expand toggle through t()', () => {
+const toggleName = (name) => `form_manager_row_details(name=${name})`;
+
+// The toggle was "Expand row" on every row, its state only in its label, and
+// its ▼ glyph read aloud. It now names its form and states its state.
+describe('ExpandableTableRow — the toggle', () => {
+  it('names the form whose details it shows, and says whether they are open', () => {
     renderRow();
-    const toggle = screen.getByRole('button', { name: 'form_manager_expand_row' });
+    const toggle = screen.getByRole('button', { name: toggleName('WaSH Survey') });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
     fireEvent.click(toggle);
-    expect(screen.getByRole('button', { name: 'form_manager_collapse_row' })).toBeInTheDocument();
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    const details = document.getElementById(toggle.getAttribute('aria-controls'));
+    expect(details).not.toBeNull();
+    expect(details).toHaveTextContent(/form_manager_records_collected|form_manager_counting/);
   });
 
-  it('interpolates the collected count rather than concatenating it', async () => {
+  it('hides the arrow glyph from assistive tech', () => {
     renderRow();
-    fireEvent.click(screen.getByRole('button', { name: 'form_manager_expand_row' }));
+    const toggle = screen.getByRole('button', { name: toggleName('WaSH Survey') });
+    expect(toggle.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+    expect(toggle).not.toHaveTextContent(/[▲▼]/);
+  });
+
+  it('spans the detail row across every column', () => {
+    renderRow();
+    fireEvent.click(screen.getByRole('button', { name: toggleName('WaSH Survey') }));
+    const cells = document.querySelectorAll('tr:last-child td');
+    const span = Array.from(cells).reduce((n, td) => n + (td.colSpan || 1), 0);
+    expect(span).toBe(4);
+  });
+});
+
+describe('ExpandableTableRow — copy', () => {
+  // X15: "Forms collected: N" counted records.
+  it('counts records, not forms, as soon as the details open', async () => {
+    renderRow();
+    fireEvent.click(screen.getByRole('button', { name: toggleName('WaSH Survey') }));
     await waitFor(() => {
-      expect(screen.getByText('form_manager_forms_collected(count=0)')).toBeInTheDocument();
+      // The custom form's FormResults count, not the 0 it used to show
+      // before anything was counted.
+      expect(screen.getByText('form_manager_records_collected(count=561)')).toBeInTheDocument();
     });
   });
 
   it('routes the refresh control through t()', () => {
     renderRow();
-    fireEvent.click(screen.getByRole('button', { name: 'form_manager_expand_row' }));
+    fireEvent.click(screen.getByRole('button', { name: toggleName('WaSH Survey') }));
     expect(screen.getByRole('button', { name: 'action_refresh' })).toBeInTheDocument();
   });
 });
@@ -84,13 +112,13 @@ describe('ExpandableTableRow — research export', () => {
     render(
       <table>
         <tbody>
-          <ExpandableTableRow row={row} surveyingOrganization="McMaster" offersResearch={offersResearch}>
+          <ExpandableTableRow row={row} name="Vision exam" surveyingOrganization="McMaster" offersResearch={offersResearch}>
             <td>Vision exam</td>
           </ExpandableTableRow>
         </tbody>
       </table>,
     );
-    fireEvent.click(screen.getByRole('button', { name: 'form_manager_expand_row' }));
+    fireEvent.click(screen.getByRole('button', { name: toggleName('Vision exam') }));
   };
 
   it('says what each file contains on a research-enabled form', () => {
@@ -110,23 +138,24 @@ describe('ExpandableTableRow — research export', () => {
 // Field report, 2026-11-06: an HOF coordinator expanded Vitals and read
 // "0 collected" — the count asked FormResults, where no vital has ever lived.
 describe('ExpandableTableRow — collected count', () => {
+  // The count used to show a false "0" until Refresh was pressed. It now
+  // loads when the details open.
   const expandAndRefresh = (row, org = 'WOF') => {
     render(
       <table>
         <tbody>
-          <ExpandableTableRow row={row} surveyingOrganization={org}>
+          <ExpandableTableRow row={row} name={row.name} surveyingOrganization={org}>
             <td>{row.name}</td>
           </ExpandableTableRow>
         </tbody>
       </table>,
     );
-    fireEvent.click(screen.getByRole('button', { name: 'form_manager_expand_row' }));
-    fireEvent.click(screen.getByRole('button', { name: 'action_refresh' }));
+    fireEvent.click(screen.getByRole('button', { name: toggleName(row.name) }));
   };
 
   it('counts the Vitals card in the Vitals class, across every name of the organization', async () => {
     expandAndRefresh({ name: 'Vitals', description: '' });
-    await waitFor(() => expect(screen.getByText('form_manager_forms_collected(count=14799)')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('form_manager_records_collected(count=14799)')).toBeInTheDocument());
     expect(mockQueries.map((q) => q.className)).toEqual(['Vitals']);
     expect(mockQueries[0].calls).toContainEqual(['containedIn', 'surveyingOrganization', ['WOF', 'HOF']]);
   });
@@ -134,7 +163,7 @@ describe('ExpandableTableRow — collected count', () => {
   it('counts a custom form in FormResults by its id, across every name of the organization', async () => {
     mockScope.mockResolvedValue(['Constanza Medical Mission', 'CMM']);
     expandAndRefresh({ objectId: 'MYt04Zp4ok', name: 'Seguimiento', customForm: true }, 'Constanza Medical Mission');
-    await waitFor(() => expect(screen.getByText('form_manager_forms_collected(count=561)')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('form_manager_records_collected(count=561)')).toBeInTheDocument());
     expect(mockQueries[0].className).toBe('FormResults');
     expect(mockQueries[0].calls).toContainEqual(['equalTo', 'formSpecificationsId', 'MYt04Zp4ok']);
     expect(mockQueries[0].calls).toContainEqual(['containedIn', 'surveyingOrganization', ['Constanza Medical Mission', 'CMM']]);
@@ -145,7 +174,21 @@ describe('ExpandableTableRow — collected count', () => {
     expandAndRefresh({ name: 'Vitals' });
     await waitFor(() => expect(mockScope).toHaveBeenCalled());
     expect(mockQueries).toHaveLength(0);
-    expect(screen.getByText('form_manager_forms_collected(count=0)')).toBeInTheDocument();
+    expect(await screen.findByText('form_manager_records_collected(count=0)')).toBeInTheDocument();
+  });
+
+  it('never shows a count before one has loaded', () => {
+    mockScope.mockReturnValue(new Promise(() => {}));
+    expandAndRefresh({ name: 'Vitals' });
+    expect(screen.queryByText(/form_manager_records_collected/)).not.toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('form_manager_counting');
+  });
+
+  it('counts again from Refresh', async () => {
+    expandAndRefresh({ name: 'Vitals' });
+    await screen.findByText('form_manager_records_collected(count=14799)');
+    fireEvent.click(screen.getByRole('button', { name: 'action_refresh' }));
+    await waitFor(() => expect(mockQueries).toHaveLength(2));
   });
 });
 
@@ -157,15 +200,14 @@ describe('ExpandableTableRow — failed count', () => {
     render(
       <table>
         <tbody>
-          <ExpandableTableRow row={{ name: 'Vitals' }} surveyingOrganization="WOF">
+          <ExpandableTableRow row={{ name: 'Vitals' }} name="Vitals" surveyingOrganization="WOF">
             <td>Vitals</td>
           </ExpandableTableRow>
         </tbody>
       </table>,
     );
-    fireEvent.click(screen.getByRole('button', { name: 'form_manager_expand_row' }));
-    fireEvent.click(screen.getByRole('button', { name: 'action_refresh' }));
+    fireEvent.click(screen.getByRole('button', { name: toggleName('Vitals') }));
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('form_manager_records_error'));
-    expect(screen.queryByText('form_manager_forms_collected(count=0)')).not.toBeInTheDocument();
+    expect(screen.queryByText('form_manager_records_collected(count=0)')).not.toBeInTheDocument();
   });
 });

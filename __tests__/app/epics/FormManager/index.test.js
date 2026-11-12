@@ -4,7 +4,9 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import userEvent from '@testing-library/user-event';
 
 // ─── Mocks ───────────────────────────────────────────────────────────────────
-jest.mock('next-i18next', () => ({ useTranslation: () => ({ t: (k) => k }) }));
+jest.mock('next-i18next', () => ({
+  useTranslation: () => ({ t: (k, v) => (v ? `${k} ${JSON.stringify(v)}` : k) }),
+}));
 
 jest.mock('app/modules/cloud-code', () => ({
   retrieveCustomData: jest.fn(),
@@ -14,7 +16,7 @@ jest.mock('app/modules/cloud-code', () => ({
 // Mock sub-components — only the business logic lives in the epic/Table layer
 jest.mock('app/epics/FormManager/Table', () =>
   jest.fn(({
-    data, passDataToFormCreator, organization, retrieveCustomData: refresh, onSelectForm,
+    data, passDataToFormCreator, onFormRemoved, onSelectForm,
   }) => (
     <div data-testid="table" data-count={data.length}>
       {data.map((f) => (
@@ -30,13 +32,13 @@ jest.mock('app/epics/FormManager/Table', () =>
           <button
             type="button"
             data-testid={`delete-${f.objectId}`}
-            onClick={() => {
-              require('app/modules/cloud-code').updateObject({
+            onClick={async () => {
+              await require('app/modules/cloud-code').updateObject({
                 parseClass: 'FormSpecificationsV2',
                 parseClassID: f.objectId,
                 localObject: { active: 'false' },
               });
-              refresh(organization);
+              onFormRemoved(f);
             }}
           >
             Delete
@@ -197,12 +199,19 @@ describe('Delete behavior', () => {
     );
   });
 
-  it('calls retrieveCustomData again after delete (list refresh)', async () => {
-    renderManager([makeForm({ objectId: 'f4', workflows: ['WaSH'] })]);
+  it('refetches after a delete, and the removed form leaves the list', async () => {
+    renderManager([makeForm({ objectId: 'f4', name: 'Old Survey', workflows: ['WaSH'] })]);
     await waitFor(() => screen.getByTestId('delete-f4'));
+    retrieveCustomData.mockResolvedValue([makeForm({ objectId: 'f4', name: 'Old Survey', workflows: ['WaSH'], active: 'false' })]);
     await userEvent.click(screen.getByTestId('delete-f4'));
-    // retrieveCustomData: once on mount + once after delete = 2
-    expect(retrieveCustomData).toHaveBeenCalledTimes(2);
+    await waitFor(() => expect(retrieveCustomData).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(screen.queryByText('Old Survey')).not.toBeInTheDocument());
+  });
+
+  it('announces the removal, and that collected records are kept', async () => {
+    renderManager([makeForm({ objectId: 'f5', name: 'Old Survey', workflows: ['WaSH'] })]);
+    await userEvent.click(await screen.findByTestId('delete-f5'));
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('form_manager_removed {"name":"Old Survey"}'));
   });
 });
 
@@ -244,6 +253,15 @@ describe('Search filter', () => {
     renderManager([makeForm({ workflows: ['WaSH'] })]);
     await waitFor(() => expect(retrieveCustomData).toHaveBeenCalled());
     expect(screen.getByPlaceholderText('form_manager_search_placeholder')).toBeInTheDocument();
+  });
+
+  // Design review X8: labelled only by its placeholder, which goes as soon as
+  // someone types. X7: the ⌕ glyph was read aloud.
+  it('labels the search and hides its glyph', async () => {
+    renderManager([makeForm({ workflows: ['WaSH'] })]);
+    const search = await screen.findByRole('searchbox', { name: 'form_manager_search_label' });
+    expect(search).toBeInTheDocument();
+    expect(screen.queryByText('⌕')).not.toBeInTheDocument();
   });
 
   it('hides forms not matching the search term', async () => {
@@ -315,7 +333,10 @@ describe('Drill-in — records view', () => {
     await waitFor(() => screen.getByTestId('view-records-f9'));
     fireEvent.click(screen.getByTestId('view-records-f9'));
     await waitFor(() => screen.getByTestId('records-table'));
-    fireEvent.click(screen.getByRole('button', { name: /back/i }));
+    // Named by its visible words (X10), not an aria-label that differs.
+    const back = screen.getByRole('button', { name: 'form_manager_back' });
+    expect(back).not.toHaveAttribute('aria-label');
+    fireEvent.click(back);
     await waitFor(() =>
       expect(screen.queryByTestId('records-table')).not.toBeInTheDocument(),
     );
@@ -396,17 +417,14 @@ describe('Phase 1 — Create form CTA', () => {
   // The label is asserted as its KEY: the `t` mock returns keys, so this also
   // holds the button to going through translation. It shipped hardcoded as
   // "+ Create form" and rendered English on the Spanish page.
-  it('renders a translated Create form button in the catalog view', async () => {
+  // It goes somewhere, so it is a link (open in a new tab works; a screen
+  // reader says "link"). The "+" was read aloud as "plus"; it is an icon now.
+  it('renders a translated Create form link in the catalog view', async () => {
     renderManager([]);
     await waitFor(() => expect(retrieveCustomData).toHaveBeenCalled());
-    expect(screen.getByRole('button', { name: 'form_manager_create' })).toBeInTheDocument();
-  });
-
-  it('clicking Create form navigates to /forms/form-creator', async () => {
-    renderManager([]);
-    await waitFor(() => expect(retrieveCustomData).toHaveBeenCalled());
-    fireEvent.click(screen.getByRole('button', { name: 'form_manager_create' }));
-    expect(mockRouter.push).toHaveBeenCalledWith('/forms/form-creator');
+    const link = screen.getByRole('link', { name: 'form_manager_create' });
+    expect(link).toHaveAttribute('href', '/forms/form-creator');
+    expect(link.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
   });
 });
 
@@ -584,6 +602,13 @@ describe('Puente cards', () => {
     const puenteCall = Table.mock.calls.find(([props]) => props.puenteForm);
     const cards = puenteCall[0].data;
     expect(cards.map((c) => c.name)).toEqual(PUENTE_FORM_CLASSES);
+    // Shown by curation's translated names, not class names (X14).
+    expect(cards.map((c) => c.labelKey)).toEqual([
+      'data_curation_source_survey_data',
+      'data_curation_source_env_health',
+      'data_curation_source_vitals',
+      'data_curation_source_eval_medical',
+    ]);
     function Query(cls) { this.cls = cls; }
     Query.prototype.containedIn = function chain() { return this; };
     Query.prototype.descending = function chain() { return this; };

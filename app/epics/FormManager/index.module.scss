@@ -1,170 +1,133 @@
+// Form Manager page. The tables style themselves (Table/, RecordsTable/).
+
 .formManager {
   display: flex;
   flex-direction: column;
-  gap: var(--spacer-xl);
+  gap: var(--tk-dlite-semantic-spacing-xl);
 }
 
+// Create, then search: they wrap onto two rows rather than pushing the search
+// past the edge at 768 (design review C6).
 .filterStrip {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: var(--spacer-m);
-  padding: var(--spacer-s) var(--spacer-m);
-  background: var(--tk-dlite-semantic-color-surface-base);
+  gap: var(--tk-dlite-semantic-spacing-md);
+  padding: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-md);
   border: 1px solid var(--tk-dlite-semantic-color-border);
-  border-radius: var(--border-radius-m);
+  border-radius: var(--tk-dlite-semantic-border-radius-md);
+  background: var(--tk-dlite-semantic-color-surface-base);
 }
 
 .filterLeft {
   display: flex;
-  align-items: center;
-  gap: var(--spacer-s);
   flex: 1;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-md);
   min-width: 0;
 }
 
+.searchField {
+  display: grid;
+  flex: 1 1 16rem;
+  gap: var(--tk-dlite-semantic-spacing-xs);
+  min-width: 0;
+  max-width: 28rem;
+}
+
+.searchLabel {
+  font-size: var(--tk-dlite-semantic-typography-size-200);
+  font-weight: 600;
+  color: var(--tk-dlite-semantic-color-text-secondary);
+}
+
+// The input is the field and takes the global focus ring; the glyph sits over
+// its start padding.
 .search {
-  display: flex;
-  align-items: center;
-  gap: var(--spacer-xs);
-  background: var(--tk-dlite-semantic-color-background);
-  border: 1px solid var(--tk-dlite-semantic-color-border);
-  border-radius: var(--border-radius-s);
-  padding: 0 var(--spacer-s);
-  min-width: 280px;
-  height: 32px;
+  position: relative;
 }
 
 .searchIcon {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: var(--tk-dlite-semantic-spacing-sm);
+  margin-block: auto;
   color: var(--tk-dlite-semantic-color-text-secondary);
-  font-size: 14px;
-  flex-shrink: 0;
+  pointer-events: none;
 }
 
 .searchInput {
-  border: none;
-  background: transparent;
-  font-family: var(--font-family);
-  font-size: 13px;
-  color: var(--tk-dlite-semantic-color-text-primary);
   width: 100%;
+  min-height: var(--tk-dlite-semantic-sizing-target-comfortable);
+  padding: 0 var(--tk-dlite-semantic-spacing-sm);
+  padding-inline-start: calc(var(--tk-dlite-semantic-spacing-sm) * 2 + var(--tk-dlite-semantic-sizing-icon-md));
+  border: 1px solid var(--tk-dlite-semantic-color-border-control);
+  border-radius: var(--tk-dlite-semantic-border-radius-sm);
+  background: var(--tk-dlite-semantic-color-background);
+  font-family: var(--font-family);
+  color: var(--tk-dlite-semantic-color-text-primary);
 
   &::placeholder {
-    color: var(--tk-dlite-semantic-color-text-secondary);
+    color: var(--tk-dlite-semantic-color-text-tertiary);
   }
 }
 
 .section {
+  padding: var(--tk-dlite-semantic-spacing-lg);
+  border: 1px solid var(--tk-dlite-semantic-color-border);
+  border-radius: var(--tk-dlite-semantic-border-radius-md);
   background: var(--tk-dlite-semantic-color-surface-base);
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-m);
-  padding: var(--spacer-l);
-  box-shadow: var(--shadow-lv1);
 }
 
-.sectionLabel {
-  font-family: var(--font-family-heading);
-  font-size: 11px;
-  font-weight: var(--font-weight-bold);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--tk-dlite-semantic-color-text-secondary);
-  margin-bottom: var(--spacer-m);
-}
-
-.backBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacer-xs);
-  background: none;
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-s);
-  padding: var(--spacer-xs) var(--spacer-s);
-  font-family: var(--font-family);
-  font-size: 13px;
-  color: var(--color-text);
-  cursor: pointer;
-
-  &:hover {
-    background: var(--color-bg);
-  }
-}
-
+.backBtn,
 .createFormBtn {
   display: inline-flex;
   align-items: center;
-  gap: var(--spacer-xs);
-  background: var(--tk-dlite-semantic-color-action-primary);
-  border: none;
-  border-radius: var(--border-radius-s);
-  padding: var(--spacer-xs) var(--spacer-m);
+  gap: var(--tk-dlite-semantic-spacing-xs);
+  min-height: var(--tk-dlite-semantic-sizing-target-comfortable);
+  padding: 0 var(--tk-dlite-semantic-spacing-md);
+  border-radius: var(--tk-dlite-semantic-border-radius-sm);
   font-family: var(--font-family);
-  font-size: 13px;
-  font-weight: var(--font-weight-emphasis);
-  color: var(--tk-dlite-primitive-color-white);
-  cursor: pointer;
+  font-weight: 600;
   white-space: nowrap;
+  cursor: pointer;
+}
+
+.backBtn {
+  border: 1px solid var(--tk-dlite-semantic-color-border-control);
+  background: none;
+  color: var(--tk-dlite-semantic-color-text-primary);
 
   &:hover {
-    filter: brightness(1.08);
+    background: var(--tk-dlite-semantic-color-background);
   }
 }
 
-.tableWrap {
-  overflow-x: auto;
-  margin: 0 calc(var(--spacer-l) * -1);
-  padding: 0 var(--spacer-l);
-}
+// A link that looks like the primary action.
+.createFormBtn {
+  border: none;
+  background: var(--tk-dlite-semantic-color-action-primary);
+  color: var(--tk-dlite-semantic-color-text-on-primary);
+  text-decoration: none;
 
-.tableWrap table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.tableWrap th {
-  text-align: left;
-  font-family: var(--font-family-heading);
-  font-size: var(--font-size-small);
-  font-weight: var(--font-weight-medium);
-  color: var(--tk-dlite-semantic-color-text-secondary);
-  letter-spacing: var(--letter-spacing-label);
-  text-transform: uppercase;
-  padding: var(--spacer-s) var(--spacer-m);
-  border-bottom: 2px solid var(--color-border);
-  white-space: nowrap;
-}
-
-.tableWrap td {
-  padding: var(--spacer-s) var(--spacer-m);
-  border-bottom: 1px solid var(--color-border);
-  font-size: var(--font-size-body);
-  color: var(--color-text);
-  vertical-align: middle;
-}
-
-.tableWrap tbody tr:hover {
-  background: var(--tk-dlite-semantic-color-background);
-}
-
-.emptyState {
-  text-align: center;
-  padding: var(--spacer-xl) var(--spacer-m);
-  color: var(--tk-dlite-semantic-color-text-secondary);
-  font-size: var(--font-size-body);
+  &:hover {
+    background: var(--tk-dlite-semantic-color-action-primary-hover);
+  }
 }
 
 /* This block occupies the SAME slot as the shared <EmptyState>, so it is scaled
    to match it — otherwise the panel visibly resizes when a load fails, which
    reads as the page breaking rather than as one state replacing another.
    The reference is app/impacto-design-system/empty-state/empty-state.module.css
-   (13px/500 message, 11px sub, xxl/lg padding), NOT the `.emptyState` rule below
-   in this file — that rule is dead and paints nothing.
+   (13px/500 message, 11px sub, xxl/lg padding).
    Padding and layout live on the element as cl-dlite-* utilities. */
 .errorStateTitle {
   /* Colour is the ONLY thing that distinguishes this from the empty state.
      That is deliberate: same weight, same slot, same rhythm — one is not an
      error because it is louder, it is an error because it says so. */
-  color: var(--tk-dlite-semantic-color-feedback-danger);
+  color: var(--tk-dlite-semantic-color-feedback-danger-active);
   font-size: var(--tk-dlite-semantic-typography-size-300);
   font-weight: var(--tk-dlite-primitive-fontWeight-medium);
   margin-bottom: var(--tk-dlite-semantic-spacing-xs);
@@ -175,22 +138,15 @@
   font-size: var(--tk-dlite-semantic-typography-size-200);
 }
 
-.formButtons {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: var(--spacer-s);
-}
-
 .skeletonList {
   display: flex;
   flex-direction: column;
-  gap: var(--spacer-sm);
-  padding: var(--spacer-m);
+  gap: var(--tk-dlite-semantic-spacing-sm);
+  padding: var(--tk-dlite-semantic-spacing-md);
 }
 
 .skeletonRow {
   display: flex;
   align-items: center;
-  gap: var(--spacer-sm);
+  gap: var(--tk-dlite-semantic-spacing-sm);
 }

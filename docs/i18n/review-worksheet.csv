@@ -241,7 +241,7 @@ common,export_empty,This form has no records to export yet.,Este formulario toda
 common,export_failed,The export could not be completed. Please try again.,"No se pudo completar la descarga. Por favor, inténtelo de nuevo.",Nou pa t kapab fini ekspòtasyon an. Tanpri eseye ankò.,,
 common,export_button,Export,Exportar,Ekspòte,,
 common,export_loading,Loading…,Cargando…,Ap chaje…,,
-common,form_manager_create,+ Create form,+ Crear formulario,+ Kreye fòm,,
+common,form_manager_create,Create form,Crear formulario,Kreye fòm,,"""+"" removed; it is an icon now."
 common,data_curation_search_placeholder,Search records…,Buscar registros…,Chèche dosye…,,
 common,data_curation_all_surveyors,All surveyors,Todos los encuestadores,Tout ankètè,,
 common,data_curation_all_communities,All communities,Todas las comunidades,Tout kominote,,
@@ -386,29 +386,31 @@ common,form_creator_inspector,Inspector,Inspector,Enspektè,,
 common,form_creator_select_block,Select a block to edit.,Selecciona un bloque para editarlo.,Chwazi yon blòk pou modifye l.,,
 common,field_status,Status,Estado,Estati,,
 common,form_manager_col_expand,Expand,Expandir,Elaji,,
+common,form_manager_row_details,Details for {{name}},Detalles de {{name}},Detay pou {{name}},,Needs native review.
+common,form_manager_counting,Counting records…,Contando registros…,N ap konte dosye yo…,,Needs native review.
+common,form_manager_records_collected_one,"{{count, number}} record collected","{{count, number}} registro recopilado","{{count, number}} dosye ranmase",,"Counts records, not forms (X15). Needs native review."
+common,form_manager_records_collected_other,"{{count, number}} records collected","{{count, number}} registros recopilados","{{count, number}} dosye ranmase",,Needs native review.
 common,form_manager_col_name,Name,Nombre,Non,,
-common,form_manager_col_description,Description,Descripción,Deskripsyon,,
 common,form_manager_col_updated,Updated,Actualizado,Mizajou,,
 common,form_manager_col_actions,Actions,Acciones,Aksyon,,
-common,form_manager_status_active,Active,Activo,Aktif,,
 common,form_manager_edit,Edit,Editar,Modifye,,
 common,form_manager_duplicate,Duplicate,Duplicar,Fè yon kopi,,
 common,form_manager_delete,Delete,Eliminar,Efase,,
-common,form_manager_delete_confirm,Do you want to remove this form?,¿Quieres eliminar este formulario?,Èske ou vle retire fòm sa a?,,
+common,form_manager_delete_confirm,Remove “{{name}}” from your forms? Records already collected with it are kept.,¿Quitar «{{name}}» de tus formularios? Los registros ya recopilados con él se conservan.,Retire «{{name}}» nan fòm ou yo? Dosye ki deja ranmase avè l rete.,,Names the form and says its records are kept (design review X12). Needs native review.
 common,form_manager_delete_action,Delete form,Eliminar formulario,Efase fòm nan,,
+common,form_manager_removed,“{{name}}” removed. Records already collected with it are kept.,Se quitó «{{name}}». Los registros ya recopilados con él se conservan.,Nou retire «{{name}}». Dosye ki deja ranmase avè l rete.,,Needs native review.
+common,form_manager_delete_failed,“{{name}}” wasn't removed. Check your connection and try again.,No se quitó «{{name}}». Revisa tu conexión e inténtalo de nuevo.,Nou pa t retire «{{name}}». Verifye koneksyon ou epi eseye ankò.,,Needs native review.
 common,form_manager_empty,No data available.,No hay datos disponibles.,Pa gen done disponib.,,
 common,form_manager_col_record,Record,Registro,Dosye,,
 common,form_manager_records_empty,No records found for this form.,No se encontraron registros para este formulario.,Nou pa jwenn okenn dosye pou fòm sa a.,,
+common,form_manager_records_caption,Records collected with {{name}},Registros recopilados con {{name}},Dosye ki ranmase avèk {{name}},,Needs native review.
 common,form_manager_records_error,These records did not load.,Estos registros no se cargaron.,Dosye sa yo pa t chaje.,,
 common,form_manager_status_conflict,Conflict,Conflicto,Konfli,,
-common,form_manager_select_record,Select record {{id}},Seleccionar el registro {{id}},Chwazi dosye {{id}},,
-common,form_manager_prev,‹ Prev,‹ Anterior,‹ Anvan,,
-common,form_manager_next,Next ›,Siguiente ›,Apre ›,,
-common,pagination_prev_page,Previous page,Página anterior,Paj anvan an,,
-common,pagination_next_page,Next page,Página siguiente,Paj apre a,,
-common,form_manager_back,← Back,← Volver,← Tounen,,
-common,form_manager_back_aria,Back to form catalog,Volver al catálogo de formularios,Tounen nan katalòg fòm yo,,
+common,form_manager_prev,Previous,Anterior,Anvan,,Arrows removed: screen readers read them aloud (X10).
+common,form_manager_next,Next,Siguiente,Apre,,Needs native review.
+common,form_manager_back,Back to forms,Volver a los formularios,Tounen nan fòm yo,,Needs native review.
 common,form_manager_search_placeholder,Search forms…,Buscar formularios…,Chèche fòm…,,
+common,form_manager_search_label,Search forms,Buscar formularios,Chèche fòm,,Needs native review.
 common,form_manager_puente_forms,Puente Forms,Formularios de Puente,Fòm Puente yo,,
 common,form_manager_other_forms,Other forms,Otros formularios,Lòt fòm,,
 common,form_manager_custom_forms,Custom forms,Formularios personalizados,Fòm pèsonalize,,
@@ -436,9 +438,6 @@ common,analytics_organization,Organization,Organización,Òganizasyon,,"Added by
 common,analytics_table_caption,Answers collected,Respuestas recolectadas,Repons yo ranmase,,"Added by the responsive/a11y overhaul (table caption, header, empty state). Spanish and Creole written by Claude: needs native review."
 common,table_empty,Nothing to show yet.,Todavía no hay nada que mostrar.,Pa gen anyen pou montre ankò.,,"Added by the responsive/a11y overhaul (table caption, header, empty state). Spanish and Creole written by Claude: needs native review."
 common,form_marketplace_empty,No forms available yet.,Todavía no hay formularios disponibles.,Poko gen fòm disponib.,,
-common,form_manager_forms_collected,"Forms collected: {{count, number}}","Formularios recolectados: {{count, number}}","Fòm ki ranmase: {{count, number}}",,
-common,form_manager_expand_row,Expand row,Expandir la fila,Louvri liy nan,,
-common,form_manager_collapse_row,Collapse row,Contraer la fila,Fèmen liy nan,,
 common,breadcrumb_settings,Settings,Configuración,Paramèt,,
 common,account_settings_title,Account Settings,Configuración de la cuenta,Paramèt kont lan,,
 common,account_settings_sub,"Manage your profile, credentials, and account preferences.","Gestiona tu perfil, tus credenciales y las preferencias de tu cuenta.","Jere pwofil ou, idantifyan ou yo ak preferans kont ou.",,

@@ -1,35 +1,48 @@
 .rowDetail {
-  padding: var(--spacer-m) 0;
+  padding: var(--tk-dlite-semantic-spacing-md) 0;
 }
 
-.rowDetail h3 {
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text);
+.countLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-lg);
+}
+
+.countLine p {
+  margin: 0;
+}
+
+.count {
+  font-weight: 600;
+  color: var(--tk-dlite-semantic-color-text-primary);
+}
+
+.count:empty {
+  display: none;
 }
 
 .exportNotes {
-  margin-top: var(--spacer-s);
   max-width: 70ch;
+  margin-top: var(--tk-dlite-semantic-spacing-sm);
 }
 
-.expandableRow {
-  cursor: pointer;
+.toggleCell {
+  width: calc(var(--tk-dlite-semantic-sizing-target-comfortable) + var(--tk-dlite-semantic-spacing-sm));
 }
 
 .expandBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: var(--tk-dlite-semantic-sizing-target-comfortable);
+  height: var(--tk-dlite-semantic-sizing-target-comfortable);
   border: none;
-  border-radius: var(--border-radius-m);
+  border-radius: var(--tk-dlite-semantic-border-radius-sm);
   background: transparent;
   color: var(--tk-dlite-semantic-color-text-secondary);
-  font-size: 10px;
   cursor: pointer;
-  transition: background var(--duration-fast) ease-out;
+  transition: background var(--tk-dlite-semantic-motion-duration-quick) ease-out;
 }
 
 .expandBtn:hover {
@@ -41,5 +54,17 @@
 }
 
 .detailRow td {
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--tk-dlite-semantic-color-border);
+}
+
+// Narrow (the forms table's stacked layout): the details span the card.
+@container (max-width: 40rem) {
+  // Two classes, to outrank the table's own `.table td { display: block }`.
+  .detailRow .spacer {
+    display: none;
+  }
+
+  .detailRow td[colspan] {
+    grid-column: 1 / -1;
+  }
 }

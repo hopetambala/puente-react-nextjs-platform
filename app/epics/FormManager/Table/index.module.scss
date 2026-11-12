@@ -1,4 +1,8 @@
+// The table's own size container: the stacked layout follows the space the
+// table has (a phone, a narrow panel), not the window.
 .tableWrap {
+  container-type: inline-size;
+  min-width: 0;
   overflow-x: auto;
 }
 
@@ -7,44 +11,89 @@
   border-collapse: collapse;
 }
 
-/* Column sizing — keep dates/status/actions compact so name & description
-   get the room. width:1% + nowrap shrinks the actions column to its content. */
-.colCaret { width: 40px; }
-.colStatus { width: 80px; white-space: nowrap; }
-.colDate { width: 96px; white-space: nowrap; }
-.colActions { width: 1%; text-align: right; white-space: nowrap; }
+.table th {
+  padding: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-md);
+  border-bottom: 1px solid var(--tk-dlite-semantic-color-border);
+  background: var(--tk-dlite-semantic-color-background);
+  font-family: var(--font-family-heading);
+  font-size: var(--tk-dlite-semantic-typography-size-200);
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-align: start;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--tk-dlite-semantic-color-text-secondary);
+}
 
-// Below 1440px the table is wider than its card and the actions (the one
-// column a coordinator came to use) start off-screen. Description is already
-// truncated to a few words and is the column to give up; the full text is one
-// Edit away. Measured, not a token: CSS variables can't be used in @media, and
-// --breakpoint-xl (1280px) would miss 1366px laptops. With Description shown,
-// the table overflowed by 22px (eng) and 59px (spa) at 1366, and first fit at
-// 1400 (eng) and 1430 (spa); hidden below 1440, it fits at every width in
-// eng, spa and hat.
-@media (max-width: 1439px) {
-  .colDescription { display: none; }
+.table td {
+  padding: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-md);
+  border-bottom: 1px solid var(--tk-dlite-semantic-color-border);
+  font-size: var(--tk-dlite-semantic-typography-size-300);
+  vertical-align: middle;
+  color: var(--tk-dlite-semantic-color-text-primary);
+}
+
+.table tbody tr:hover {
+  background: var(--tk-dlite-primitive-color-neutral-100);
+}
+
+// Dates and actions stay compact so the name and its description get the room.
+// width:1% + nowrap shrinks the actions column to its content.
+.colCaret {
+  width: 1%;
+}
+
+.colDate {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.colActions {
+  width: 1%;
+  text-align: end;
+  white-space: nowrap;
+}
+
+.nameCell {
+  min-width: 12rem;
+  font-weight: 600;
+}
+
+.nameLink {
+  min-height: var(--tk-dlite-semantic-sizing-target-min);
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  text-align: start;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  color: var(--tk-dlite-semantic-color-text-link);
+  cursor: pointer;
+}
+
+// Under the name, wrapping: never truncated, never hover-only (WCAG 1.4.12,
+// 1.4.13).
+.description {
+  display: block;
+  max-width: 60ch;
+  margin-top: var(--tk-dlite-semantic-spacing-xxs);
+  font-weight: 400;
+  color: var(--tk-dlite-semantic-color-text-secondary);
 }
 
 .nameBadge {
   display: block;
-  margin-top: var(--spacer-xs);
-  font-weight: var(--font-weight-regular);
+  margin-top: var(--tk-dlite-semantic-spacing-xs);
+  font-weight: 400;
 }
 
-.nameCell {
-  min-width: 200px;
-  font-weight: var(--font-weight-emphasis);
-}
-
-/* Long descriptions truncate with an ellipsis instead of wrapping to 4 lines;
-   the full text stays available via the cell's title attribute. */
-.descCell {
-  max-width: 190px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--tk-dlite-semantic-color-text-secondary);
+.actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--tk-dlite-semantic-spacing-xs);
 }
 
 .actionsStacked {
@@ -53,8 +102,7 @@
 }
 
 // The two exports stack too: side by side, their Spanish labels are wider than
-// the four buttons on every other row, and the column would grow past the
-// table edge for the whole table.
+// the four buttons on every other row.
 .actionsStacked .actionGroup:last-child {
   flex-direction: column;
   align-items: stretch;
@@ -62,60 +110,77 @@
 
 .actionGroup {
   display: inline-flex;
-  gap: var(--spacer-xs);
+  flex-wrap: wrap;
+  gap: var(--tk-dlite-semantic-spacing-xs);
 }
 
-.actions {
-  display: inline-flex;
-  gap: var(--spacer-xs);
-  justify-content: flex-end;
-  white-space: nowrap;
+.error {
+  margin: 0;
+  padding: var(--tk-dlite-semantic-spacing-sm) var(--tk-dlite-semantic-spacing-md);
+  background: var(--tk-dlite-semantic-color-feedback-danger-bg);
+  color: var(--tk-dlite-semantic-color-feedback-danger-active);
 }
 
 .empty {
+  padding: var(--tk-dlite-semantic-spacing-lg);
   text-align: center;
-  padding: var(--spacer-l);
   color: var(--tk-dlite-semantic-color-text-secondary);
 }
 
-.table th {
-  text-align: left;
-  font-family: var(--font-family-heading);
-  font-size: 11px;
-  font-weight: var(--font-weight-bold);
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--tk-dlite-semantic-color-text-secondary);
-  padding: var(--spacer-s) var(--spacer-m);
-  border-bottom: 1px solid var(--color-border);
-  white-space: nowrap;
-  background: var(--tk-dlite-semantic-color-background, #f7f7f7);
-}
+// Narrow: each form is a card. The header row stays for screen readers, so
+// cells still announce their column; sighted users get data-label.
+@container (max-width: 40rem) {
+  .table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
 
-.table td {
-  padding: var(--spacer-s) var(--spacer-m);
-  border-bottom: 1px solid var(--color-border);
-  font-size: 13px;
-  color: var(--color-text);
-  vertical-align: middle;
-}
+  .table,
+  .table tbody {
+    display: block;
+  }
 
-.table tbody tr:hover {
-  background: var(--tk-dlite-primitive-color-neutral-100, #f0f0f0);
-}
+  .table tr {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    border-bottom: 1px solid var(--tk-dlite-semantic-color-border);
+  }
 
-.nameLink {
-  background: none;
-  border: none;
-  padding: 0;
-  font-family: var(--font-family);
-  font-size: 13px;
-  font-weight: var(--font-weight-emphasis);
-  color: var(--tk-dlite-semantic-color-action-primary);
-  cursor: pointer;
-  text-align: left;
+  .table td {
+    display: block;
+    border-bottom: 0;
+    width: auto;
+    text-align: start;
+    white-space: normal;
+  }
 
-  &:hover {
-    text-decoration: underline;
+  // The toggle beside the name; date and actions span the card below them.
+  .table td[data-label]:not(.nameCell) {
+    grid-column: 1 / -1;
+    padding-block: var(--tk-dlite-semantic-spacing-xxs);
+  }
+
+  .table td[data-label]:not(.nameCell)::before {
+    content: attr(data-label);
+    display: block;
+    font-size: var(--tk-dlite-semantic-typography-size-200);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--tk-dlite-semantic-color-text-secondary);
+  }
+
+  .nameCell {
+    min-width: 0;
+  }
+
+  .actions,
+  .actionsStacked {
+    justify-content: flex-start;
+    align-items: flex-start;
   }
 }

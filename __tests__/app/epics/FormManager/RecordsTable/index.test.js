@@ -1,9 +1,7 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
-// ─── RED: RecordsTable not yet implemented ────────────────────────────────────
-// These tests will fail until app/epics/FormManager/RecordsTable/index.js exists
-// and FormManager wires the drill-in view.
+import { axe } from '../../../../../__test-utils__/axe';
 
 jest.mock('next-i18next', () => ({
   useTranslation: () => ({
@@ -104,7 +102,8 @@ describe('RecordsTable — loading', () => {
 
 describe('RecordsTable — column headers', () => {
   beforeEach(() => {
-    Parse.Query._mockFind.mockResolvedValue([]);
+    // One record: with none, the empty state stands in for the table.
+    Parse.Query._mockFind.mockResolvedValue([makeRecord()]);
     Parse.Query.mockImplementation(() => ({
       equalTo: jest.fn().mockReturnThis(),
       containedIn: jest.fn().mockReturnThis(),
@@ -393,12 +392,13 @@ describe('FormManager RecordsTable — copy', () => {
     await waitFor(() => expect(screen.getAllByText('sync_ribbon_synced').length).toBeGreaterThan(0));
   });
 
-  it('interpolates the record id into the row checkbox label', async () => {
+  // A checkbox per row that no action used, and a "⋯" that opened nothing.
+  it('has no selection checkboxes and no dead menu', async () => {
     mockQuery(records, 1);
     renderTable();
-    await waitFor(() => {
-      expect(screen.getByLabelText('form_manager_select_record(id=EH-218)')).toBeInTheDocument();
-    });
+    await screen.findByText('EH-218');
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+    expect(screen.queryByText('⋯')).not.toBeInTheDocument();
   });
 
   it('interpolates all three pagination numbers rather than concatenating them', async () => {
@@ -409,13 +409,15 @@ describe('FormManager RecordsTable — copy', () => {
     });
   });
 
-  it('routes both page controls through t()', async () => {
+  // Design review X10 (WCAG 2.5.3): "‹ Prev" was named "Previous page", so a
+  // voice-control user saying what they saw matched nothing.
+  it('names the page controls by their visible words', async () => {
     mockQuery(records, 1);
     renderTable();
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'pagination_prev_page' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'pagination_next_page' })).toBeInTheDocument();
-    });
+    const prev = await screen.findByRole('button', { name: 'form_manager_prev' });
+    const next = screen.getByRole('button', { name: 'form_manager_next' });
+    expect(prev).not.toHaveAttribute('aria-label');
+    expect(next).not.toHaveAttribute('aria-label');
   });
 });
 
@@ -484,5 +486,61 @@ describe('RecordsTable — failed load', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'form_manager_retry' }));
     await waitFor(() => expect(screen.getByTestId('empty-state')).toBeInTheDocument());
     expect(find).toHaveBeenCalledTimes(2);
+  });
+});
+
+// It was a grid of divs: no table, no headers a screen reader could tie to a
+// value, and no name for which form's records these are.
+describe('RecordsTable — a real table', () => {
+  function mockQuery(rows, total, find = Parse.Query._mockFind) {
+    find.mockResolvedValue(rows);
+    Parse.Query.mockImplementation(() => ({
+      equalTo: jest.fn().mockReturnThis(),
+      containedIn: jest.fn().mockReturnThis(),
+      descending: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockReturnThis(),
+      skip: jest.fn().mockReturnThis(),
+      count: jest.fn().mockResolvedValue(total),
+      find,
+    }));
+  }
+
+  it("is a table named for the form's records, with column headers", async () => {
+    mockQuery([makeRecord({ id: 'EH-218' })], 1);
+    renderTable();
+    const table = await screen.findByRole('table', { name: 'form_manager_records_caption(name=Environmental Health)' });
+    expect(table).toBeInTheDocument();
+    expect(screen.getAllByRole('columnheader').map((h) => h.textContent))
+      .toEqual(['form_manager_col_record', 'field_surveyor', 'field_submitted', 'field_status']);
+    expect(screen.getAllByRole('cell')[0]).toHaveAttribute('data-label', 'form_manager_col_record');
+  });
+
+  it('names a Puente form by its translated name', async () => {
+    mockQuery([], 0);
+    renderTable({ form: { name: 'Vitals', labelKey: 'data_curation_source_vitals' } });
+    await screen.findByTestId('empty-state');
+    expect(screen.getByRole('heading', { name: 'data_curation_source_vitals' })).toBeInTheDocument();
+  });
+
+  // Swapping the table for a spinner unmounted Next while it had focus, so
+  // focus fell to <body> on every page turn.
+  it('keeps the table and focus in place while the next page loads', async () => {
+    const twenty = Array.from({ length: 20 }, (_, i) => makeRecord({ id: `EH-${100 + i}` }));
+    mockQuery(twenty, 100);
+    renderTable();
+    const next = await screen.findByRole('button', { name: 'form_manager_next' });
+    next.focus();
+    Parse.Query._mockFind.mockReturnValue(new Promise(() => {}));
+    fireEvent.click(next);
+    expect(screen.getByRole('table')).toHaveAttribute('aria-busy', 'true');
+    expect(screen.queryByTestId('spinner')).not.toBeInTheDocument();
+    expect(next).toHaveFocus();
+  });
+
+  it('has no axe violations', async () => {
+    mockQuery([makeRecord({ id: 'EH-218' })], 1);
+    const { container } = renderTable();
+    await screen.findByText('EH-218');
+    expect(await axe(container)).toHaveNoViolations();
   });
 });

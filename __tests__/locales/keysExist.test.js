@@ -60,8 +60,13 @@ describe('Every key the code asks for exists in the source catalog', () => {
   );
 
   it('resolves every t() key referenced in app/ and pages/', () => {
+    // A counted string (`t('key', { count })`) resolves the way i18next does:
+    // to `key_one` / `key_other`. Both must ship; `_other` is the fallback
+    // every language uses, `_one` is English's and Spanish's singular.
+    const resolves = (key) => key in catalog
+      || (`${key}_one` in catalog && `${key}_other` in catalog);
     const missing = [...referencedKeys().entries()]
-      .filter(([key]) => !(key in catalog))
+      .filter(([key]) => !resolves(key))
       .map(([key, file]) => `${key}  (${file})`);
 
     expect(missing).toEqual([]);

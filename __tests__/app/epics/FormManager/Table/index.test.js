@@ -1,12 +1,12 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-// ─── RED: Status badge missing ────────────────────────────────────────────────
-// If the Status column is removed from the Table, the green "Active" badge
-// disappears from every form row — caught before users see a bare table.
-
-jest.mock('next-i18next', () => ({ useTranslation: () => ({ t: (k) => k }) }));
+// `t` echoes the key, plus its interpolation values when it has any, so a test
+// can tell which form a sentence names.
+jest.mock('next-i18next', () => ({
+  useTranslation: () => ({ t: (k, v) => (v ? `${k} ${JSON.stringify(v)}` : k) }),
+}));
 
 jest.mock('app/impacto-design-system', () => ({
   Button: ({ text, onClick, intent }) => (
@@ -39,7 +39,7 @@ const { updateObject } = require('app/modules/cloud-code');
 const FormManagerTable = require('app/epics/FormManager/Table').default;
 
 const mockFns = {
-  retrieveCustomData: jest.fn(),
+  onFormRemoved: jest.fn(),
   passDataToFormCreator: jest.fn(),
 };
 
@@ -57,7 +57,7 @@ function renderTable(rows, puenteForm = false) {
   return render(
     <FormManagerTable
       data={rows}
-      retrieveCustomData={mockFns.retrieveCustomData}
+      onFormRemoved={mockFns.onFormRemoved}
       passDataToFormCreator={mockFns.passDataToFormCreator}
       organization="test-org"
       puenteForm={puenteForm}
@@ -74,27 +74,54 @@ describe('Rendering', () => {
     expect(screen.getByText('Form B')).toBeInTheDocument();
   });
 
-  it('shows "—" when description is absent', () => {
-    renderTable([makeRow({ description: undefined })]);
-    expect(screen.getByText('—')).toBeInTheDocument();
+  // The description column was hidden below 1440px, so most screens never
+  // showed it. It now sits under the form's name, at every width.
+  it("shows the description under the form's name", () => {
+    renderTable([makeRow({ description: 'Water survey' })]);
+    const nameCell = screen.getByText('WaSH Survey').closest('td');
+    expect(nameCell).toHaveTextContent('Water survey');
   });
 
-  it('renders a Status column header', () => {
+  it('shows no description line when there is none', () => {
+    renderTable([makeRow({ description: undefined })]);
+    expect(screen.queryByText('—')).not.toBeInTheDocument();
+  });
+
+  // Below 40rem of container the rows become cards (CSS); these are what keep
+  // that layout readable and announced as a table.
+  it('keeps table semantics and labels each cell for the stacked layout', () => {
     renderTable([makeRow()]);
-    expect(screen.getByText('field_status')).toBeInTheDocument();
+    expect(screen.getByRole('table')).toBeInTheDocument();
+    const cells = screen.getAllByRole('cell');
+    const labels = cells.map((c) => c.getAttribute('data-label'));
+    expect(labels).toEqual(expect.arrayContaining(['form_manager_col_updated', 'form_manager_col_actions']));
+  });
+
+});
+
+// Design review X14: every row's badge read "Active", because removed forms
+// are never listed. A column that never varies says nothing and cost the
+// table the width its Actions column needed at 768 (C6).
+describe('No status column', () => {
+  it('has no Status column and no Active badge', () => {
+    renderTable([makeRow(), makeRow({ objectId: 'r2', name: 'Form B' })]);
+    expect(screen.queryByText('field_status')).not.toBeInTheDocument();
+    expect(screen.queryByText('form_manager_status_active')).not.toBeInTheDocument();
   });
 });
 
-describe('Status badge', () => {
-  it('renders a green Active badge for each form row', () => {
-    renderTable([makeRow()]);
-    expect(screen.getByTestId('badge-green')).toBeInTheDocument();
-    expect(screen.getByText('form_manager_status_active')).toBeInTheDocument();
+// Design review X14: the Puente cards showed Parse class names ("SurveyData",
+// "HistoryEnvironmentalHealth") where curation shows the same forms by name.
+describe('Puente form names', () => {
+  it('shows a Puente form by its translated name, not its class', () => {
+    renderTable([{ name: 'SurveyData', labelKey: 'data_curation_source_survey_data', description: '' }], true);
+    expect(screen.getByText('data_curation_source_survey_data')).toBeInTheDocument();
+    expect(screen.queryByText('SurveyData')).not.toBeInTheDocument();
   });
 
-  it('renders one badge per row', () => {
-    renderTable([makeRow(), makeRow({ objectId: 'r2', name: 'Form B' })]);
-    expect(screen.getAllByTestId('badge-green')).toHaveLength(2);
+  it("shows a custom form's own name as written", () => {
+    renderTable([makeRow({ name: 'Lecturas 2026' })]);
+    expect(screen.getByText('Lecturas 2026')).toBeInTheDocument();
   });
 });
 
@@ -150,20 +177,50 @@ describe('Delete modal', () => {
       expect.objectContaining({ parseClassID: 'form-99', localObject: { active: 'false' } }),
     );
   });
+
+  // X12: "Do you want to remove this form?" named no form and didn't say what
+  // happens to the records collected with it.
+  it('names the form in the confirmation', async () => {
+    renderTable([makeRow({ name: 'WaSH Survey' })]);
+    await userEvent.click(screen.getByText('form_manager_delete'));
+    expect(screen.getByText('form_manager_delete_confirm {"name":"WaSH Survey"}')).toBeInTheDocument();
+  });
+
+  // The list used to call retrieveCustomData and drop the answer, without
+  // waiting for the delete: the removed form stayed on screen.
+  it('tells the page once the server has removed the form', async () => {
+    let finish;
+    updateObject.mockReturnValueOnce(new Promise((resolve) => { finish = resolve; }));
+    const row = makeRow({ objectId: 'form-7' });
+    renderTable([row]);
+    await userEvent.click(screen.getByText('form_manager_delete'));
+    await userEvent.click(screen.getByText('form_manager_delete_action'));
+    expect(mockFns.onFormRemoved).not.toHaveBeenCalled();
+    await act(async () => finish({}));
+    expect(mockFns.onFormRemoved).toHaveBeenCalledWith(row);
+  });
+
+  it('says so when the delete fails, and keeps the form', async () => {
+    updateObject.mockRejectedValueOnce(new Error('offline'));
+    renderTable([makeRow({ name: 'WaSH Survey' })]);
+    await userEvent.click(screen.getByText('form_manager_delete'));
+    await userEvent.click(screen.getByText('form_manager_delete_action'));
+    expect(await screen.findByRole('alert')).toHaveTextContent('form_manager_delete_failed {"name":"WaSH Survey"}');
+    expect(mockFns.onFormRemoved).not.toHaveBeenCalled();
+  });
 });
 
 describe('FormManagerTable — copy', () => {
   it('routes every column header through t()', () => {
     renderTable([makeRow()]);
-    ['form_manager_col_name', 'form_manager_col_description', 'field_status',
-      'form_manager_col_updated', 'form_manager_col_actions'].forEach((key) => {
+    ['form_manager_col_name', 'form_manager_col_updated', 'form_manager_col_actions'].forEach((key) => {
       expect(screen.getByText(key)).toBeInTheDocument();
     });
   });
 
   it('routes the caret column label through t()', () => {
     renderTable([makeRow()]);
-    expect(screen.getByLabelText('form_manager_col_expand')).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'form_manager_col_expand' })).toBeInTheDocument();
   });
 
   // The two empty states are different: no data at all reaches this component
@@ -176,7 +233,7 @@ describe('FormManagerTable — copy', () => {
   it('routes the delete confirmation body through t()', async () => {
     renderTable([makeRow()]);
     await userEvent.click(screen.getAllByText('form_manager_delete')[0]);
-    expect(screen.getByText('form_manager_delete_confirm')).toBeInTheDocument();
+    expect(screen.getByText(/^form_manager_delete_confirm/)).toBeInTheDocument();
   });
 });
 
