@@ -10,7 +10,7 @@
 .label {
   color: var(--tk-dlite-semantic-color-text-tertiary);
   font-family: var(--tk-dlite-semantic-typography-font-body);
-  font-size: var(--tk-dlite-semantic-typography-size-100);
+  font-size: var(--tk-dlite-semantic-typography-size-200);
 }
 
 .options {
@@ -27,7 +27,7 @@
   background: none;
   color: var(--tk-dlite-semantic-color-text-secondary);
   font-family: var(--tk-dlite-semantic-typography-font-body);
-  font-size: var(--tk-dlite-semantic-typography-size-100);
+  font-size: var(--tk-dlite-semantic-typography-size-200);
   cursor: pointer;
   transition: color var(--tk-dlite-semantic-motion-duration-quick),
     background-color var(--tk-dlite-semantic-motion-duration-quick);

@@ -36,7 +36,12 @@ export default function Sheet({
             </svg>
           </button>
         </header>
-        <div className={styles.body}>{open ? children : null}</div>
+        {/* The body scrolls on its own, so it takes focus and is named, for a
+            keyboard user to scroll content with nothing focusable in it (WCAG
+            2.1.1; axe scrollable-region-focusable). */}
+        <div className={styles.body} role="region" aria-label={title} tabIndex={0}>
+          {open ? children : null}
+        </div>
         {footer && <footer className={styles.footer}>{footer}</footer>}
       </div>
     </dialog>

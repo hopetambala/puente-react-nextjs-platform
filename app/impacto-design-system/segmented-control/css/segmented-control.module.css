@@ -1,31 +1,38 @@
+/* Wraps onto more lines rather than overflowing a narrow screen, and every
+   option is at least the 24px minimum target (WCAG 2.5.8). */
 .root {
   display: inline-flex;
-  background: var(--tk-dlite-semantic-color-background);
-  border-radius: var(--border-radius-m);
-  padding: 3px;
+  flex-wrap: wrap;
+  max-width: 100%;
+  gap: var(--tk-dlite-semantic-spacing-xxs);
+  padding: var(--tk-dlite-semantic-spacing-xxs);
   border: 1px solid var(--tk-dlite-semantic-color-border);
-  gap: 2px;
+  border-radius: var(--border-radius-m);
+  background: var(--tk-dlite-semantic-color-background);
 }
 
 .btn {
-  padding: 4px 12px;
-  font-size: 12px;
-  font-weight: 600;
-  font-family: var(--font-family-heading);
-  color: var(--tk-dlite-semantic-color-text-secondary);
-  border-radius: calc(var(--border-radius-m) - 3px);
-  cursor: pointer;
+  min-height: var(--tk-dlite-semantic-sizing-target-min);
+  padding: var(--tk-dlite-semantic-spacing-xs) var(--tk-dlite-semantic-spacing-300);
   border: none;
+  border-radius: var(--tk-dlite-semantic-border-radius-sm);
   background: transparent;
-  transition: background 0.1s ease, color 0.1s ease;
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  font-family: var(--font-family-heading);
+  font-size: var(--tk-dlite-semantic-typography-size-200);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--tk-dlite-semantic-motion-duration-quick) ease, color var(--tk-dlite-semantic-motion-duration-quick) ease;
 }
 
 .btn:hover {
   color: var(--tk-dlite-semantic-color-text-primary);
 }
 
+/* Selected is also announced (aria-pressed), and drawn with weight and a raised
+   surface, not colour alone. */
 .active {
   background: var(--tk-dlite-semantic-color-surface-base);
   color: var(--tk-dlite-semantic-color-text-primary);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--tk-dlite-semantic-elevation-low);
 }

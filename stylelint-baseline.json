@@ -14,7 +14,7 @@
     "pages/data/": "PR 6 (data routes)",
     "pages/index.module.scss": "PR 7 (landing page)"
   },
-  "total": 211,
+  "total": 206,
   "files": {
     "app/epics/DataAnalyticsManager/index.module.scss": {
       "no-empty-source": 1
@@ -92,16 +92,6 @@
     },
     "app/impacto-design-system/_css/variables.css": {
       "declaration-block-no-duplicate-custom-properties": 4
-    },
-    "app/impacto-design-system/badge/css/badge.module.css": {
-      "declaration-property-unit-disallowed-list": 1
-    },
-    "app/impacto-design-system/empty-state/empty-state.module.css": {
-      "declaration-property-unit-disallowed-list": 2
-    },
-    "app/impacto-design-system/segmented-control/css/segmented-control.module.css": {
-      "declaration-property-unit-disallowed-list": 1,
-      "function-disallowed-list": 1
     },
     "app/impacto-design-system/stack/css/stack.module.css": {
       "declaration-no-important": 1

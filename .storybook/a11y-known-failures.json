@@ -1,18 +1,4 @@
 {
-  "_readme": "Storybook axe failures that existed when the gate went in (PR 1a), keyed \"<story id> @ <width>\" → axe rule ids. yarn test-storybook fails on anything not listed and prints listed entries that are fixed. Only ever shrinks; PR 3 empties it.",
-  "failures": {
-    "components-actions-button--default @ 640": [
-      "color-contrast"
-    ],
-    "components-actions-button--default @ 768": [
-      "color-contrast"
-    ],
-    "components-actions-button--default @ 1024": [
-      "color-contrast"
-    ],
-    "components-actions-button--default @ 1280": [
-      "color-contrast"
-    ]
-  },
-  "_todo": "TODO(PR 1b): Button primary text on action-primary is 3.69:1 until the dlite 0.4.0 bump (action-primary → blue-600)."
+  "_readme": "Storybook axe failures that existed when the gate went in (PR 1a), keyed \"<story id> @ <width>\" \u2192 axe rule ids. yarn test-storybook fails on anything not listed and prints listed entries that are fixed. Empty since PR 3: keep it empty.",
+  "failures": {}
 }

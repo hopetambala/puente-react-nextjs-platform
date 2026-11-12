@@ -8,14 +8,14 @@
 }
 
 .message {
-  font-size: 13px;
+  font-size: var(--tk-dlite-semantic-typography-size-300);
   font-weight: 500;
   color: var(--tk-dlite-semantic-color-text-secondary);
   text-align: center;
 }
 
 .sub {
-  font-size: 11px;
+  font-size: var(--tk-dlite-semantic-typography-size-200);
   color: var(--tk-dlite-semantic-color-text-secondary);
   text-align: center;
 }

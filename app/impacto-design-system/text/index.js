@@ -1,8 +1,6 @@
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import React from 'react';
 
-import Tooltip from '../tooltip';
 import styles from './css/text.module.css';
 
 const Color = ['gray', 'white', 'red', 'green', 'blue', 'orange', 'yellow', 'lightGray'];
@@ -15,7 +13,6 @@ const Text = ({
   shouldTruncate,
   text,
   title,
-  withTooltip,
 }) => {
   if (!text) return null;
 
@@ -37,37 +34,12 @@ const Text = ({
   );
 
   const Tag = element || 'span';
-  const hoverText = title;
-  const isTextString = typeof text === 'string';
-
-  const tagElement = (
-    <Tag className={classname} title={hoverText}>
-      {text}
-    </Tag>
-  );
-
-  // This branch once rendered react-intl's <FormattedMessage>, which took a
-  // `defaultMessage` prop. react-intl is no longer a dependency of this project
-  // and the wrapper is a plain <div>, so `defaultMessage` was an invalid DOM
-  // attribute that nothing read; it has been dropped.
-  const formattedMessage = (
-    <div {...text}>
-      {(...content) => (
-        <Tag className={classname} title={hoverText}>
-          {content}
-        </Tag>
-      )}
-    </div>
-  );
-
-  if (withTooltip) {
-    return (
-      <Tooltip position="top" shouldEllipsis trigger={text}>
-        {isTextString ? tagElement : formattedMessage}
-      </Tooltip>
-    );
-  }
-  return isTextString ? tagElement : formattedMessage;
+  // Plain text only. The non-string branch (react-intl's leftover) passed a
+  // function as a child and rendered nothing useful; withTooltip had no
+  // callers. Both are gone. `title` is kept for callers that set it, but it is
+  // not an accessible name or a tooltip for keyboard users: put anything a
+  // reader needs in the text itself.
+  return <Tag className={classname} title={title || undefined}>{text}</Tag>;
 };
 
 Text.propTypes = {
@@ -86,11 +58,8 @@ Text.propTypes = {
    */
   text: PropTypes.string,
 
-  /** Use the HTML title attribute to display text in a native tooltip on hover. */
+  /** The HTML title attribute. Mouse-only: never the only place information lives. */
   title: PropTypes.string,
-
-  /** Determine if we should wrap the text given in a tooptip. */
-  withTooltip: PropTypes.bool,
 };
 
 export default Text;

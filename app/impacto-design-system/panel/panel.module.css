@@ -20,6 +20,7 @@
 }
 
 .panelTitle {
+  margin: 0;
   font-size: var(--tk-dlite-semantic-typography-size-300);
   font-weight: 700;
   color: var(--tk-dlite-semantic-color-text-primary);

@@ -84,3 +84,34 @@ describe('Table', () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 });
+
+describe('SegmentedControl', () => {
+  const SegmentedControl = require('app/impacto-design-system/segmented-control').default;
+  const options = [{ label: 'Records', value: 'records' }, { label: 'Community audit', value: 'audit' }];
+
+  it('says which option is pressed, not by colour alone (WCAG 4.1.2)', () => {
+    render(<SegmentedControl label="View" options={options} value="audit" onChange={() => {}} />);
+    expect(screen.getByRole('group', { name: 'View' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Community audit' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'Records' })).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  it('has no axe violations', async () => {
+    const { container } = render(<SegmentedControl label="View" options={options} value="records" />);
+    expect(await axe(container)).toHaveNoViolations();
+  });
+});
+
+describe('Panel', () => {
+  const Panel = require('app/impacto-design-system/panel').default;
+
+  it('is a section whose title is a real heading (level 2 by default)', () => {
+    render(<Panel title="Registry"><p>Body</p></Panel>);
+    expect(screen.getByRole('heading', { level: 2, name: 'Registry' })).toBeInTheDocument();
+  });
+
+  it('takes another heading level when nested', () => {
+    render(<Panel title="Registry" headingLevel={3}><p>Body</p></Panel>);
+    expect(screen.getByRole('heading', { level: 3, name: 'Registry' })).toBeInTheDocument();
+  });
+});
