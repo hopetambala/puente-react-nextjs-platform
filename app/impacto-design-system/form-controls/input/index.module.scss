@@ -1,6 +1,8 @@
+/* 8px between label and field: the 2px focus ring sits 2px outside the
+   field, so a 4px gap drew it through the label (design review T4). */
 .field {
   display: grid;
-  gap: var(--tk-dlite-semantic-spacing-xs);
+  gap: var(--tk-dlite-semantic-spacing-sm);
   min-width: 0;
 }
 

@@ -17873,10 +17873,10 @@ stubs@^3.0.0:
   resolved "https://registry.yarnpkg.com/stubs/-/stubs-3.0.0.tgz#e8d2ba1fa9c90570303c030b6900f7d5f89abe5b"
   integrity sha512-PdHt7hHUJKxvTCgbKX9C1V/ftOcjJQgz8BZwNfV5c4B6dcGqlpelTbJ999jBGZ2jYiPAwcX5dP6oBwVlBlUbxw==
 
-style-dictionary-dlite-tokens@^0.2.7:
-  version "0.2.7"
-  resolved "https://registry.yarnpkg.com/style-dictionary-dlite-tokens/-/style-dictionary-dlite-tokens-0.2.7.tgz#2ef569f93c269afb54f20fd62cd85bc0df319ed7"
-  integrity sha512-Z3LEwsQqUvReH/i8T9F6NIw4hzpr6/nAVfIo7y0Ep0jaGL8+ph2Q18WGBjfuLEQCDc6Yf/6njCaEeTOVwWz8Ow==
+style-dictionary-dlite-tokens@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/style-dictionary-dlite-tokens/-/style-dictionary-dlite-tokens-0.4.0.tgz#b974c8afbf3456f6711e73a52c183432aec69d85"
+  integrity sha512-lfUUymf6Ly9PgccObvgrORlyQ+1xjIQ24yQik4XmRAx8HRzYIAgcQJ/QszTNX5MJrH2gNmM7RY5rRbdw9buHwQ==
 
 style-loader@^3.3.1:
   version "3.3.4"

@@ -156,3 +156,23 @@ describe('Account settings — every string it shows is in every catalog', () =>
     KEYS.forEach((k) => expect(catalog[k]).toEqual(expect.any(String)));
   });
 });
+
+
+// Design review C7: a failed account lookup left a spinner up forever.
+describe('Account settings — when the account does not load', () => {
+  it('says why, in the reader\'s language, and offers to try again', async () => {
+    retrieveUserByObjectId.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+    render(<Management />);
+    expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't reach Puente. Check your connection and try again.");
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    retrieveUserByObjectId.mockResolvedValueOnce({ attributes: STORED });
+    await userEvent.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(await screen.findByDisplayValue('Ada')).toBeInTheDocument();
+  });
+
+  it('sends someone whose session expired to sign in', async () => {
+    retrieveUserByObjectId.mockRejectedValueOnce(Object.assign(new Error('Invalid session token'), { code: 209 }));
+    render(<Management />);
+    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/account/login'));
+  });
+});

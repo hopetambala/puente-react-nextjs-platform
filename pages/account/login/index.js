@@ -26,14 +26,6 @@ const buildSchema = (t) => yup.object().shape({
   passwordV: yup.string().required(t('login_error_password_required')),
 });
 
-// A real field testimonial, quoted as said. Its own language is marked so a
-// screen reader pronounces it as English on a Spanish or Creole page.
-const QUOTE = {
-  text: 'The clinic ran in a school courtyard. By the time we packed up, the records were already in San Juan.',
-  attribution: 'Yolanda M., program manager, jornada médica, Las Matas',
-  lang: 'en',
-};
-
 function Login() {
   const { t } = useTranslation('common');
   const router = useRouter();
@@ -63,7 +55,7 @@ function Login() {
   return (
     <AuthLayout
       title={t('sign_in')}
-      quote={QUOTE}
+      tagline={t('login_tagline')}
       footer={(
         <>
           <span>v0.1.2</span>

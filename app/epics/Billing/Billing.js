@@ -1,18 +1,13 @@
 import { Badge, Button, EmptyState, Panel } from 'app/impacto-design-system';
 import { summarizeOutstanding } from 'app/modules/billing/whoOwesWhat';
+// Stripe amounts are integer minor units; formatMoney divides by 100 for
+// display only, in the interface's language (design review X18).
+import { formatMoney } from 'app/modules/i18n/format';
 import { useTranslation } from 'next-i18next';
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 
 import styles from './Billing.module.css';
-
-/**
- * Stripe amounts are integer minor units. Dividing by 100 for display is the
- * only place that conversion happens; the value itself never becomes a float.
- */
-const formatMoney = (minorUnits, currency) => new Intl.NumberFormat(undefined, {
-  style: 'currency', currency: (currency || 'usd').toUpperCase(),
-}).format((minorUnits || 0) / 100);
 
 /**
  * The billing surface — who owes what, and what each organization is on.
@@ -27,7 +22,7 @@ const formatMoney = (minorUnits, currency) => new Intl.NumberFormat(undefined, {
 export default function Billing({
   organizations, invoices, now, onSaveOrg, stripeConfigured,
 }) {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   // Deliberately NOT persisted. Age is re-asserted as the default on every
   // load, so the screen cannot quietly come up amount-sorted one morning and
   // change which invoice someone chases. Sorting is an act, not a setting.
@@ -61,7 +56,7 @@ export default function Billing({
           <>
             <div className={styles.totals}>
               <span className={styles.total}>
-                {formatMoney(outstanding.total, outstanding.currency)}
+                {formatMoney(outstanding.total, outstanding.currency, i18n?.language)}
               </span>
               <span className="cl-dlite-flex-1" />
               {/* Two controls rather than a toggle: the current order must be
@@ -93,7 +88,7 @@ export default function Billing({
                   </span>
                 </div>
                 <span className={styles.amount}>
-                  {formatMoney(invoice.amountDue, invoice.currency)}
+                  {formatMoney(invoice.amountDue, invoice.currency, i18n?.language)}
                 </span>
                 {invoice.daysOverdue > 0 && (
                   <span className={styles.overdue}>

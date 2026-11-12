@@ -609,7 +609,7 @@
   --color-input-bg-focus: var(--hex-neutral-800);
   --color-input-bg-disabled: var(255, 255, 255, 0.08);
   --color-input-border: rgba(255, 255, 255, 0.2);
-  --color-input-border-focus: rgba(26, 96, 232, 1);
+  --color-input-border-focus: var(--tk-dlite-semantic-color-focus-ring);
   --color-input-border-error: var(--hex-red-600);
 
   /* Focus */
@@ -620,7 +620,7 @@
   --color-button-default-active: var(--hex-neutral-800);
   --color-button-default-border: rgba(255, 255, 255, 0.2);
   --color-button-default-hover-border: rgba(255, 255, 255, 0.2);
-  --color-button-default-active-border: rgba(26, 96, 232, 1);
+  --color-button-default-active-border: var(--tk-dlite-semantic-color-focus-ring);
   --color-button-default-disabled: rgba(255, 255, 255, 0.08);
 
   /* Buttons: Primary */
@@ -647,7 +647,7 @@
   /* Checkbox and Radio Controls */
   --color-checkbox-bg: var(--hex-neutral-800);
   --color-checkbox-border: rgba(255, 255, 255, 0.2);
-  --color-checkbox-border-focus: rgba(26, 96, 232, 1);
+  --color-checkbox-border-focus: var(--tk-dlite-semantic-color-focus-ring);
 
   /* Popover */
   --color-popover-bg: var(--hex-neutral-750);

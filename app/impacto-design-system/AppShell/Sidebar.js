@@ -6,23 +6,26 @@ import PropTypes from 'prop-types';
 
 import styles from './AppShell.module.css';
 
+// Each item is labelled with its destination page's own title key, so the nav,
+// the breadcrumb and the page's h1 always say the same thing (design review X6:
+// "Review" led to "Dashboard", "Clean" to "Data Curation"...).
 const NAV_GROUPS = [
   {
     key: 'workspace',
     labelKey: 'nav_group_workspace',
     items: [
-      { id: 'forms', labelKey: 'nav_form_manager', icon: '⊟', href: '/forms/form-manager' },
-      { id: 'form-creator', labelKey: 'nav_form_creator', icon: '✦', href: '/forms/form-creator' },
-      { id: 'data', labelKey: 'nav_data', icon: '⊞', href: '/data/data-curation' },
-      { id: 'marketplace', labelKey: 'nav_marketplace', icon: '◇', href: '/forms/form-marketplace' },
+      { id: 'forms', labelKey: 'page_form_manager_title', icon: '⊟', href: '/forms/form-manager' },
+      { id: 'form-creator', labelKey: 'form_creator_title', icon: '✦', href: '/forms/form-creator' },
+      { id: 'data', labelKey: 'nav_data_curation', icon: '⊞', href: '/data/data-curation' },
+      { id: 'marketplace', labelKey: 'page_form_marketplace_title', icon: '◇', href: '/forms/form-marketplace' },
     ],
   },
   {
     key: 'org',
     labelKey: 'nav_group_org',
     items: [
-      { id: 'dashboard', labelKey: 'nav_dashboard', icon: '◧', href: '/quick-start' },
-      { id: 'settings', labelKey: 'nav_settings', icon: '◌', href: '/account/management' },
+      { id: 'dashboard', labelKey: 'breadcrumb_dashboard', icon: '◧', href: '/quick-start' },
+      { id: 'settings', labelKey: 'account_settings_title', icon: '◌', href: '/account/management' },
     ],
   },
 ];
@@ -94,13 +97,9 @@ export default function Sidebar({ activeRoute, orgName, onClose }) {
         })}
       </nav>
 
+      {/* Only sign-out down here. An "Account" link used to sit beside it and
+          open the same page as Account Settings above. */}
       <div className={styles.navBottom}>
-        <Link href="/account/management" passHref>
-          <a className={styles.navItem}>
-            <span className={styles.navIcon} aria-hidden="true">◉</span>
-            <span>{t('nav_account')}</span>
-          </a>
-        </Link>
         <button
           type="button"
           className={`${styles.navItem} ${styles.navDanger}`}
@@ -115,12 +114,13 @@ export default function Sidebar({ activeRoute, orgName, onClose }) {
 }
 
 Sidebar.defaultProps = {
+  activeRoute: null,
   onClose: null,
   orgName: null,
 };
 
 Sidebar.propTypes = {
-  activeRoute: PropTypes.string.isRequired,
+  activeRoute: PropTypes.string,
   /** Set when the sidebar is shown in the drawer: renders a close button. */
   onClose: PropTypes.func,
   orgName: PropTypes.string,

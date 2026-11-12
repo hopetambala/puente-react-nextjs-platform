@@ -14,3 +14,16 @@
   gap: var(--tk-dlite-semantic-spacing-md);
   margin-bottom: var(--tk-dlite-semantic-spacing-500);
 }
+
+.body {
+  margin: 0 0 var(--tk-dlite-semantic-spacing-lg);
+  color: var(--tk-dlite-semantic-color-text-secondary);
+  line-height: 1.5;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tk-dlite-semantic-sizing-target-min);
+  color: var(--tk-dlite-semantic-color-text-link);
+}

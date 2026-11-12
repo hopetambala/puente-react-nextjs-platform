@@ -6,10 +6,10 @@ import { toast } from 'app/impacto-design-system/toast/notify';
 import {
   retrieveCurrentUserAsyncFunction,
   retrieveSignInFunction,
-  retrieveUserByObjectId,
   updateUser,
 } from 'app/modules/user';
 import { authErrorKey } from 'app/modules/user/authErrors';
+import { useAccount } from 'app/modules/user/useAccount';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -44,34 +44,25 @@ function Management() {
   const { t } = useTranslation('common');
   const router = useRouter();
   const { objectId } = router.query;
-  const [userId, setUserId] = useState();
-  const [stored, setStored] = useState(null);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const schema = useMemo(() => buildManagementSchema(t), [t]);
   const methods = useForm({ resolver: yupResolver(schema) });
   const { reset, handleSubmit, getValues, errors } = methods;
 
+  // The URL's objectId if present, otherwise the signed-in user. With neither
+  // (it is a public route), go to sign-in instead of spinning forever.
+  const userId = objectId || retrieveCurrentUserAsyncFunction()?.id;
+  const {
+    account: stored, errorKey, retry,
+  } = useAccount(userId, [...EDITABLE, 'organization']);
+
   useEffect(() => {
-    // The URL's objectId if present, otherwise the signed-in user. With neither
-    // (it is a public route), go to sign-in instead of spinning forever.
-    let targetId = objectId;
-    if (!targetId) {
-      const currentUser = retrieveCurrentUserAsyncFunction();
-      if (!currentUser) {
-        router.push('/account/login');
-        return;
-      }
-      targetId = currentUser.id;
-    }
-    retrieveUserByObjectId(targetId).then(({ attributes }) => {
-      const account = Object.fromEntries(
-        [...EDITABLE, 'organization'].map((f) => [f, attributes?.[f] ?? '']),
-      );
-      setUserId(targetId);
-      setStored(account);
-      reset({ ...account, password: '' });
-    });
-  }, [objectId]);
+    if (!userId || errorKey === 'auth_error_session') router.push('/account/login');
+  }, [userId, errorKey]);
+
+  useEffect(() => {
+    if (stored) reset({ ...stored, password: '' });
+  }, [stored, reset]);
 
   // Organization comes from the loaded account, never the form: it isn't
   // editable here, and reading it from the form would submit undefined and
@@ -107,9 +98,15 @@ function Management() {
     <AppShell breadcrumb={[t('breadcrumb_settings')]}>
       <PageHeader title={t('account_settings_title')} sub={t('account_settings_sub')} />
       <div className={styles.paper}>
-        {!stored ? (
-          <div className={styles.loadingState}><Spinner /></div>
-        ) : (
+        {errorKey && (
+          <div className={styles.loadingState}>
+            {/* Design review C7: a failed lookup used to spin forever. */}
+            <p role="alert">{t(errorKey)}</p>
+            <Button text={t('action_try_again')} onClick={retry} />
+          </div>
+        )}
+        {!errorKey && !stored && <div className={styles.loadingState}><Spinner /></div>}
+        {stored && (
           <Card padding="extraLarge">
             <FormProvider {...methods}>
               {/* Enter saves the details. Delete is a plain button that asks

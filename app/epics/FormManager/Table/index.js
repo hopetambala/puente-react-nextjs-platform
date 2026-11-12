@@ -1,6 +1,7 @@
 import { Badge, Button, Modal } from 'app/impacto-design-system';
 import { updateObject } from 'app/modules/cloud-code';
 import offersResearchExport from 'app/modules/data-export/offersResearchExport';
+import { formatDate } from 'app/modules/i18n/format';
 import { useTranslation } from 'next-i18next';
 import { useState } from 'react';
 
@@ -17,7 +18,7 @@ function FormManagerTable({
   puenteForm,
   onSelectForm,
 }) {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const [open, setOpen] = useState(false);
   const [selectedForm, setSelectedForm] = useState();
 
@@ -120,7 +121,7 @@ function FormManagerTable({
                   </div>
                 </td>
                 <td><Badge variant="green">{t('form_manager_status_active')}</Badge></td>
-                <td className={styles.colDate}>{row.updatedAt ? new Date(row.updatedAt).toLocaleDateString() : '—'}</td>
+                <td className={styles.colDate}>{formatDate(row.updatedAt, i18n?.language)}</td>
                 <td className={styles.colActions}>
                   {/* A research-enabled row carries two export buttons; stacking the
                       groups keeps them on screen instead of past the table edge. */}

@@ -55,15 +55,13 @@ describe('AuthLayout', () => {
     expect(within(screen.getByRole('main')).getByRole('heading', { level: 1, name: 'Puente Manage' })).toBeInTheDocument();
   });
 
-  it('shows an optional quote in the brand column, marked with its own language', () => {
-    renderLayout({ quote: { text: 'The records were already in San Juan.', attribution: 'Yolanda M.', lang: 'en' } });
-    const quote = screen.getByText('The records were already in San Juan.').closest('figure');
-    expect(quote).toHaveAttribute('lang', 'en');
-    expect(within(quote).getByText('Yolanda M.')).toBeInTheDocument();
+  it('shows an optional tagline in the brand column', () => {
+    renderLayout({ tagline: 'Records reach the clinic before you pack up.' });
+    expect(within(screen.getByTestId('auth-brand')).getByText('Records reach the clinic before you pack up.')).toBeInTheDocument();
   });
 
   it('has no axe violations', async () => {
-    const { container } = renderLayout({ quote: { text: 'Quote', attribution: 'Someone', lang: 'en' } });
+    const { container } = renderLayout({ tagline: 'A tagline' });
     expect(await axe(container)).toHaveNoViolations();
   });
 });

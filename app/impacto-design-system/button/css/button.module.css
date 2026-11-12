@@ -72,6 +72,15 @@
   min-height: 2rem;
 }
 
+/* On touch screens a full-size button is the comfortable 44px target, not
+   just the 24px minimum: coordinators tap these in the field (design review
+   C20). Small and icon buttons keep their size: they sit in dense rows. */
+@media (pointer: coarse) {
+  .button:not(.small) {
+    min-height: var(--tk-dlite-semantic-sizing-target-comfortable);
+  }
+}
+
 .fullWidth {
   width: 100%;
 }

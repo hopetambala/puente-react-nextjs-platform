@@ -189,9 +189,13 @@ describe('Page structure', () => {
     expect(screen.getByTestId('head')).toHaveTextContent('Sign in · Puente');
   });
 
-  it('marks the English testimonial as English, whatever the page language (WCAG 3.1.2)', () => {
+  // Design review X20: "Yolanda M." is a mock persona, not a sourced quote. The
+  // line stays as the product's tagline, translated, with no attribution.
+  it('shows the brand line as a translated tagline, not a quote attributed to a placeholder person', () => {
     render(<Login />);
-    expect(screen.getByText(/records were already in San Juan/).closest('figure')).toHaveAttribute('lang', 'en');
+    expect(screen.getByText('login_tagline')).toBeInTheDocument();
+    expect(screen.queryByText(/Yolanda/)).not.toBeInTheDocument();
+    expect(document.querySelector('blockquote, figure')).toBeNull();
   });
 });
 

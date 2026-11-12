@@ -1,4 +1,5 @@
 import { Button, Modal } from 'app/impacto-design-system';
+import { formatDateTime } from 'app/modules/i18n/format';
 import { useTranslation } from 'next-i18next';
 import { useState } from 'react';
 
@@ -17,7 +18,7 @@ const COMPARE_FIELDS = [
 ];
 
 function RecordCard({ record, other, label }) {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   return (
     <article className={styles.card}>
       <div className={styles.cardHeader}>{t('data_curation_dup_record', { label })}</div>
@@ -34,7 +35,7 @@ function RecordCard({ record, other, label }) {
         })}
         <div className={styles.fieldRow}>
           <dt className={styles.fieldKey}>{t('field_submitted')}</dt>
-          <dd className={styles.fieldVal}>{record.createdAt ? record.createdAt.toLocaleString() : '—'}</dd>
+          <dd className={styles.fieldVal}>{formatDateTime(record.createdAt, i18n?.language)}</dd>
         </div>
       </dl>
     </article>

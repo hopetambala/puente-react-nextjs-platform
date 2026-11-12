@@ -75,7 +75,7 @@ describe('AppShell structure', () => {
   it('marks the current page in the nav and in the breadcrumb', () => {
     renderShell();
     const nav = screen.getByRole('navigation', { name: 'nav_main_label' });
-    expect(within(nav).getByRole('link', { name: 'nav_form_manager' })).toHaveAttribute('aria-current', 'page');
+    expect(within(nav).getByRole('link', { name: 'page_form_manager_title' })).toHaveAttribute('aria-current', 'page');
     const crumbs = screen.getByRole('navigation', { name: 'breadcrumb_label' });
     expect(within(crumbs).getByText('Form Manager')).toHaveAttribute('aria-current', 'page');
     expect(within(crumbs).getByText('Forms')).not.toHaveAttribute('aria-current');
@@ -136,5 +136,45 @@ describe('AppShell nav drawer', () => {
     const { container } = renderShell();
     await userEvent.click(menuButton());
     expect(await axe(container)).toHaveNoViolations();
+  });
+});
+
+// ─── Design review C11 / X6: the nav says where you are, in the page's words ──
+describe('AppShell nav labels and current page', () => {
+  const { useRouter } = require('next/router');
+  const navLinks = () => within(screen.getByRole('navigation', { name: 'nav_main_label' })).getAllByRole('link');
+
+  it('labels each item with its destination page\'s title, so the nav and the h1 agree', () => {
+    renderShell();
+    const { computeAccessibleName } = require('dom-accessibility-api');
+    expect(navLinks().map((a) => [computeAccessibleName(a), a.getAttribute('href')])).toEqual([
+      ['page_form_manager_title', '/forms/form-manager'],
+      ['form_creator_title', '/forms/form-creator'],
+      ['nav_data_curation', '/data/data-curation'],
+      ['page_form_marketplace_title', '/forms/form-marketplace'],
+      ['breadcrumb_dashboard', '/quick-start'],
+      ['account_settings_title', '/account/management'],
+    ]);
+  });
+
+  it('has no two links to the same page', () => {
+    renderShell();
+    const hrefs = [...document.querySelectorAll('aside a[href]')].map((a) => a.getAttribute('href'));
+    expect(new Set(hrefs).size).toBe(hrefs.length);
+  });
+
+  it.each(['/billing', '/organization-admin', '/data/data-analysis'])(
+    'marks nothing current on %s, which is not in the nav',
+    (pathname) => {
+      useRouter.mockReturnValue({ pathname, push: jest.fn() });
+      renderShell();
+      expect(document.querySelector('[aria-current="page"]:not(li)')).toBeNull();
+    },
+  );
+
+  it('marks Data Curation current only on its own page', () => {
+    useRouter.mockReturnValue({ pathname: '/data/data-curation', push: jest.fn() });
+    renderShell();
+    expect(screen.getByRole('link', { name: 'nav_data_curation' })).toHaveAttribute('aria-current', 'page');
   });
 });

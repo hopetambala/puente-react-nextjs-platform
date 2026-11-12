@@ -7,10 +7,10 @@ export default {
   parameters: { layout: 'fullscreen' },
 };
 
-export const WithQuote = {
+export const WithTagline = {
   args: {
     title: 'Sign in',
-    quote: { text: 'The records were already in San Juan.', attribution: 'Yolanda M., program manager', lang: 'en' },
+    tagline: 'The clinic ran in a school courtyard. By the time we packed up, the records were already in San Juan.',
     footer: <span>v0.1.2</span>,
     children: (
       <>

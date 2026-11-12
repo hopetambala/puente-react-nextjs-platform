@@ -94,6 +94,7 @@ common,login_or,Or login with email,O inicia sesión con tu correo,Oswa konekte 
 common,login_password,Password,Contraseña,Modpas,,Collect uses signUp.password
 common,login_remember,Remember,Recordarme,Sonje m,,
 common,login_sub,"Build forms, monitor the field, and analyze responses.","Crea formularios, supervisa el campo y analiza las respuestas.","Kreye fòm, siveye teren an epi analize repons yo.",,
+common,login_tagline,"The clinic ran in a school courtyard. By the time we packed up, the records were already in San Juan.","La clínica funcionó en el patio de una escuela. Cuando terminamos de recoger, los registros ya estaban en San Juan.","Klinik la te fèt nan lakou yon lekòl. Lè nou fin ranmase bagay nou yo, dosye yo te deja rive San Juan.",,Sign-in brand line. Was an English quote attributed to a placeholder persona (design review X20). Spanish and Creole written by Claude: needs native review.
 common,login_subtitle,Please login to continue,Inicia sesión para continuar,Tanpri konekte pou w kontinye,,
 common,login_title,Welcome back,Bienvenido de nuevo,Byenveni ankò,,
 common,nav_account,Account,Cuenta,Kont,,
@@ -289,6 +290,7 @@ common,data_curation_sex_prefer_not_to_say,Prefer not to say,Prefiere no decirlo
 common,data_curation_cancel,Cancel,Cancelar,Anile,,
 common,action_close,Close,Cerrar,Fèmen,,
 common,action_cancel,Cancel,Cancelar,Anile,,Design-system string added by the responsive/a11y overhaul. Spanish and Creole written by Claude: needs native review.
+common,action_try_again,Try again,Intentar de nuevo,Eseye ankò,,Retry after a failed load (design review C7). Spanish and Creole written by Claude: needs native review.
 common,status_loading,Loading,Cargando,Ap chaje,,Design-system string added by the responsive/a11y overhaul. Spanish and Creole written by Claude: needs native review.
 common,notifications_label,Notifications,Notificaciones,Notifikasyon,,Design-system string added by the responsive/a11y overhaul. Spanish and Creole written by Claude: needs native review.
 common,data_curation_inspector_close_overlay,Close inspector overlay,Cerrar la capa del inspector,Fèmen kouch enspektè a,,
@@ -433,6 +435,7 @@ common,account_details_title,Account Details,Datos de la cuenta,Detay kont lan,,
 common,account_hold_on,Hold On,Un momento,Tann yon ti moman,,
 common,account_verified_title,Account verified,Cuenta verificada,Kont lan verifye,,"Account verification outcome (was hard-coded ""Verified""/""Error""). Spanish and Creole written by Claude: needs native review."
 common,account_verify_missing_title,This verification link is incomplete,Este enlace de verificación está incompleto,Lyen verifikasyon sa a pa konplè,,"Account verification outcome (was hard-coded ""Verified""/""Error""). Spanish and Creole written by Claude: needs native review."
+common,account_reset_missing_title,This reset link is incomplete,Este enlace de restablecimiento está incompleto,Lyen reyinisyalizasyon sa a pa konplè,,Reset link with no account (design review C9). Spanish and Creole written by Claude: needs native review.
 common,account_verify_missing_body,"Open the link from your email again. If it still does not work, ask your organization admin to send a new one.","Abre de nuevo el enlace de tu correo. Si sigue sin funcionar, pide a la persona administradora de tu organización que envíe uno nuevo.","Louvri lyen ki nan imèl ou a ankò. Si li toujou pa mache, mande administratè òganizasyon ou a voye yon lòt.",,"Account verification outcome (was hard-coded ""Verified""/""Error""). Spanish and Creole written by Claude: needs native review."
 common,account_back_to_sign_in,Back to sign in,Volver a iniciar sesión,Retounen pou konekte,,"Account verification outcome (was hard-coded ""Verified""/""Error""). Spanish and Creole written by Claude: needs native review."
 common,login_license,Source available · BSL 1.1,Código disponible · BSL 1.1,Kòd sous disponib · BSL 1.1,,

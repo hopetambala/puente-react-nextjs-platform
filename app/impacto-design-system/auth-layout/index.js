@@ -15,7 +15,7 @@ import styles from './auth-layout.module.css';
  * has a skip link, a <main> and the page's own <title> (WCAG 2.4.1, 2.4.2).
  */
 export default function AuthLayout({
-  title, quote, footer, children,
+  title, tagline, footer, children,
 }) {
   const { t } = useTranslation('common');
 
@@ -33,14 +33,7 @@ export default function AuthLayout({
           <div className={styles.brandMark} aria-hidden="true">P</div>
           <span className={styles.brandName}>Puente</span>
         </div>
-        {quote && (
-          <figure className={styles.quote} lang={quote.lang}>
-            <blockquote className={styles.quoteBody}>
-              <p>{quote.text}</p>
-            </blockquote>
-            <figcaption className={styles.quoteAttr}>{quote.attribution}</figcaption>
-          </figure>
-        )}
+        {tagline && <p className={styles.tagline}>{tagline}</p>}
         {footer && <div className={styles.brandFooter}>{footer}</div>}
       </aside>
 
@@ -56,18 +49,13 @@ AuthLayout.propTypes = {
   children: PropTypes.node.isRequired,
   /** Small print at the foot of the brand column (version, licence). */
   footer: PropTypes.node,
-  /** A testimonial for the brand column. `lang` is the quote's own language,
-   *  which can differ from the page's (WCAG 3.1.2). */
-  quote: PropTypes.shape({
-    attribution: PropTypes.string.isRequired,
-    lang: PropTypes.string.isRequired,
-    text: PropTypes.string.isRequired,
-  }),
+  /** One line of product copy for the brand column, already translated. */
+  tagline: PropTypes.string,
   /** The document title, before " · Puente". */
   title: PropTypes.string.isRequired,
 };
 
 AuthLayout.defaultProps = {
   footer: null,
-  quote: null,
+  tagline: null,
 };

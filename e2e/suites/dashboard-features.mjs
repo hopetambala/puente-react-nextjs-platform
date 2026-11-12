@@ -103,7 +103,8 @@ const ON_CURATION = { text: /record|curation|filter|search/i };
       .filter((t) => /^[\d.,]+( of [\d.,]+)?\s/.test(t)));
   const before = await queueRows();
 
-  await s.click({ role: 'link', name: /^.?\s*Manage$/i }, { text: /form|record|name/i }, 'click Manage in the sidebar');
+  // The nav item carries its page's title ("Form Manager"), not "Manage".
+  await s.click({ role: 'link', name: /^Form Manager$/i }, { text: /form|record|name/i }, 'click Form Manager in the sidebar');
   await s.check('sidebar navigation works from this view',
     !s.page.url().includes('/quick-start'), s.page.url());
 

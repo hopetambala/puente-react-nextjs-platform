@@ -2,6 +2,7 @@ import { Badge, Button, Skeleton } from 'app/impacto-design-system';
 // Straight from the shared module, not from the parent epic: the epic imports
 // this table, so reaching back into it for these would be an import cycle.
 import { computeFormResultsCompleteness, scoreRecord, sourceHasClientPointer } from 'app/modules/data-quality';
+import { formatDate } from 'app/modules/i18n/format';
 import { useTranslation } from 'next-i18next';
 
 import styles from './index.module.css';
@@ -71,7 +72,7 @@ export default function RecordsTable({
   source, records, total, page, dups, anomalies,
   onSelectRecord, onPageChange, onDuplicateGroup, loading, formDefinition,
 }) {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const isFormResults = source.startsWith('form-results:');
   const from = total === 0 ? 0 : page * PAGE_SIZE + 1;
   const to = Math.min((page + 1) * PAGE_SIZE, total);
@@ -118,7 +119,7 @@ export default function RecordsTable({
               <td className={styles.nameCell}>{personName(r, source)}</td>
               {!isFormResults && <td>{community(r, source)}</td>}
               <td>{r.get('surveyingUser') || '—'}</td>
-              <td>{r.createdAt ? r.createdAt.toLocaleDateString() : '—'}</td>
+              <td>{formatDate(r.createdAt, i18n?.language)}</td>
               {isFormResults ? (
                 <FormResultsCompleteness record={r} formDefinition={formDefinition} />
               ) : (

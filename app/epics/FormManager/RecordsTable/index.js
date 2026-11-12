@@ -1,4 +1,5 @@
 import { Badge, EmptyState, Spinner } from 'app/impacto-design-system';
+import { formatDate } from 'app/modules/i18n/format';
 import { loadOrganizationScope } from 'app/modules/organization';
 import { useTranslation } from 'next-i18next';
 import Parse from 'parse';
@@ -21,7 +22,7 @@ function getInitials(name) {
 }
 
 function RecordsTable({ form, organization }) {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const [records, setRecords] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
@@ -116,9 +117,7 @@ function RecordsTable({ form, organization }) {
         records.map((record) => {
           const recordId = record.id;
           const surveyor = record.get('surveyingUser') || '—';
-          const submitted = record.createdAt
-            ? record.createdAt.toLocaleDateString()
-            : '—';
+          const submitted = formatDate(record.createdAt, i18n?.language);
           const syncStatus = record.get('syncStatus') || 'synced';
 
           return (

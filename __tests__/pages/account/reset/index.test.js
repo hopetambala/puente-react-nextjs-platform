@@ -16,8 +16,9 @@ import { axe } from '../../../../__test-utils__/axe';
 // keys, which also made ids with spaces in them), or that the h1 said "PUENTE".
 
 const mockPush = jest.fn();
+const mockQuery = { current: { objectId: 'USR1' } };
 jest.mock('next/router', () => ({
-  useRouter: jest.fn(() => ({ push: mockPush, query: { objectId: 'USR1' } })),
+  useRouter: jest.fn(() => ({ push: mockPush, query: mockQuery.current })),
 }));
 
 // The real English catalog, so missing keys fail visibly.
@@ -49,6 +50,7 @@ const STORED = {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockQuery.current = { objectId: 'USR1' };
   retrieveUserByObjectId.mockResolvedValue({ attributes: STORED });
   updateUser.mockResolvedValue({ username: 'ada@example.org', password: 'new-secret' });
 });
@@ -155,5 +157,28 @@ describe('Reset — accessibility', () => {
     const { container } = render(<Reset />);
     await fieldsReady();
     expect(await axe(container)).toHaveNoViolations();
+  });
+});
+
+
+// Design review C9: with no account in the link the page was a blank form.
+describe('Reset — a link with no account in it', () => {
+  it('says the link is incomplete and how to fix it, instead of an empty form', () => {
+    mockQuery.current = {};
+    render(<Reset />);
+    expect(screen.getByRole('heading', { level: 1, name: 'This reset link is incomplete' })).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent('Open the link from your email again');
+    expect(screen.getByRole('link', { name: 'Back to sign in' })).toHaveAttribute('href', '/account/login');
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    expect(retrieveUserByObjectId).not.toHaveBeenCalled();
+  });
+
+  it('says the account could not be loaded, with a way to retry, instead of an empty form', async () => {
+    retrieveUserByObjectId.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+    render(<Reset />);
+    expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't reach Puente. Check your connection and try again.");
+    retrieveUserByObjectId.mockResolvedValueOnce({ attributes: STORED });
+    await userEvent.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(await screen.findByDisplayValue('Ada')).toBeInTheDocument();
   });
 });

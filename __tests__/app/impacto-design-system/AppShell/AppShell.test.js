@@ -15,18 +15,18 @@ jest.mock('next/link', () => {
 jest.mock('next-i18next', () => ({
   useTranslation: () => ({
     t: (key) => ({
-      nav_dashboard: 'Dashboard',
-      nav_form_manager: 'Form Manager',
-      nav_form_creator: 'Form Creator',
+      // Nav items use their destination page's title key (design review X6).
+      breadcrumb_dashboard: 'Dashboard',
+      page_form_manager_title: 'Form Manager',
+      form_creator_title: 'Form Creator',
       nav_forms: 'Forms',
-      nav_data: 'Data',
-      nav_marketplace: 'Marketplace',
+      nav_data_curation: 'Data Curation',
+      page_form_marketplace_title: 'Marketplace',
       nav_surveyors: 'Surveyors',
       nav_households: 'Households',
       nav_consent: 'Consent & GDPR',
       nav_members: 'Members',
-      nav_settings: 'Settings',
-      nav_account: 'Account',
+      account_settings_title: 'Account Settings',
       nav_logout: 'Log out',
     }[key] ?? key),
   }),
@@ -85,27 +85,27 @@ describe('Route → active nav item', () => {
 
   it('/data/data-curation highlights Data', () => {
     renderShell('/data/data-curation');
-    const btn = screen.getByText('Data').closest('a');
+    const btn = screen.getByText('Data Curation').closest('a');
     expect(btn.className).toMatch('navItemActive');
   });
 
   it('/account/management highlights Settings', () => {
     renderShell('/account/management');
-    const btn = screen.getByText('Settings').closest('a');
+    const btn = screen.getByText('Account Settings').closest('a');
     expect(btn.className).toMatch('navItemActive');
   });
 
-  it('unknown path defaults to Dashboard active', () => {
+  it('marks nothing current on a page that is not in the nav (design review C11)', () => {
     renderShell('/some/unknown/path');
-    const btn = screen.getByText('Dashboard').closest('a');
-    expect(btn.className).toMatch('navItemActive');
+    expect(document.querySelector('a[aria-current="page"]')).toBeNull();
+    expect(screen.getByText('Dashboard').closest('a').className).not.toMatch('navItemActive');
   });
 });
 
 describe('Nav click routing', () => {
   it('clicking Data navigates to /data/data-curation', () => {
     render(<AppShell breadcrumb={['Test']}><div /></AppShell>);
-    const link = screen.getByText('Data').closest('a');
+    const link = screen.getByText('Data Curation').closest('a');
     expect(link).toHaveAttribute('href', '/data/data-curation');
   });
 });

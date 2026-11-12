@@ -1,5 +1,7 @@
 import '@testing-library/jest-dom';
-import { render, screen, waitFor } from '@testing-library/react';
+import {
+  render, screen, waitFor, within,
+} from '@testing-library/react';
 
 // Resolve t() against the REAL eng locale and shout when a key is absent, so a
 // single assertion below proves every key the page uses actually ships.
@@ -95,7 +97,8 @@ describe('Shell', () => {
     render(<Dashboard />);
     await waitFor(() => expect(mockLoad).toHaveBeenCalled());
 
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
+    // In the breadcrumb, where it names the page (the nav says it too).
+    expect(within(document.querySelector('header')).getByText('Dashboard')).toBeInTheDocument();
   });
 });
 
@@ -243,7 +246,8 @@ describe('Empty and failure states', () => {
     render(<Dashboard />);
 
     await waitFor(() => expect(mockLoad).toHaveBeenCalled());
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
+    // In the breadcrumb, where it names the page (the nav says it too).
+    expect(within(document.querySelector('header')).getByText('Dashboard')).toBeInTheDocument();
   });
 
   it('tells a brand-new organization where records come from, instead of an all-clear', async () => {
@@ -313,7 +317,8 @@ describe('Empty and failure states', () => {
 
     expect(screen.queryByTestId('triage-clear')).not.toBeInTheDocument();
     // A failed load must still leave the page standing, not blank the screen.
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
+    // In the breadcrumb, where it names the page (the nav says it too).
+    expect(within(document.querySelector('header')).getByText('Dashboard')).toBeInTheDocument();
   });
 
   it('shows a placeholder where the 24-hour count could not be read', async () => {

@@ -16,23 +16,23 @@ const groupOf = (labelKey) => {
 };
 
 describe('Sidebar grouping', () => {
-  it('puts Review under Org, not Workspace', () => {
+  it('puts the Dashboard under Organization, not Workspace', () => {
     render(<Sidebar activeRoute="dashboard" orgName="testORG" />);
 
-    expect(groupOf('nav_dashboard')).toEqual('nav_group_org');
+    expect(groupOf('breadcrumb_dashboard')).toEqual('nav_group_org');
   });
 
   it('leaves the other workspace items where they are', () => {
     render(<Sidebar activeRoute="dashboard" orgName="testORG" />);
 
-    expect(groupOf('nav_form_manager')).toEqual('nav_group_workspace');
-    expect(groupOf('nav_data')).toEqual('nav_group_workspace');
+    expect(groupOf('page_form_manager_title')).toEqual('nav_group_workspace');
+    expect(groupOf('nav_data_curation')).toEqual('nav_group_workspace');
   });
 
   it('keeps Settings under Org', () => {
     render(<Sidebar activeRoute="dashboard" orgName="testORG" />);
 
-    expect(groupOf('nav_settings')).toEqual('nav_group_org');
+    expect(groupOf('account_settings_title')).toEqual('nav_group_org');
   });
 });
 

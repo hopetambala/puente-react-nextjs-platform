@@ -13,14 +13,19 @@ import styles from './AppShell.module.css';
 import Sidebar from './Sidebar';
 import TopBar, { NAV_DRAWER_ID } from './TopBar';
 
+/**
+ * The nav item for the current page, or null when the page isn't in the nav
+ * (billing, organization admin, data analysis). Those used to fall through to
+ * the dashboard or to Data Curation, marking the wrong place as current.
+ */
 function deriveActiveRoute(pathname) {
   if (pathname === '/quick-start') return 'dashboard';
   if (pathname.startsWith('/forms/form-marketplace')) return 'marketplace';
   if (pathname.startsWith('/forms/form-creator')) return 'form-creator';
-  if (pathname.startsWith('/forms')) return 'forms';
-  if (pathname.startsWith('/data')) return 'data';
+  if (pathname.startsWith('/forms/form-manager')) return 'forms';
+  if (pathname.startsWith('/data/data-curation')) return 'data';
   if (pathname.startsWith('/account/management')) return 'settings';
-  return 'dashboard';
+  return null;
 }
 
 /**
