@@ -78,8 +78,8 @@ function FormResultsCompleteness({ record, formDefinition }) {
   // states the same quantity, and one figure rendered two ways reads as two.
   return (
     <>
-      <td>{t('data_curation_percent', { pct: s.meta })}</td>
-      <td>{t('data_curation_percent', { pct: s.fields })}</td>
+      <td role="cell" data-label={t('data_curation_col_metadata_pct')}>{t('data_curation_percent', { pct: s.meta })}</td>
+      <td role="cell" data-label={t('data_curation_col_fields_pct')}>{t('data_curation_percent', { pct: s.fields })}</td>
     </>
   );
 }
@@ -95,37 +95,40 @@ export default function RecordsTable({
   const to = Math.min((page + 1) * PAGE_SIZE, total);
   const hasNext = (page + 1) * PAGE_SIZE < total;
   const hasPrev = page > 0;
+  const nameHeader = isFormResults ? t('data_curation_col_person') : t('data_curation_col_name');
 
   return (
     <div className={styles.tableWrap} role="region" aria-label={t('data_curation_records_table')} tabIndex={0}>
-      <table className={styles.table} aria-busy={loading || undefined}>
+      {/* Explicit roles: below 40rem of container each row is a card
+          (display: block), which drops table semantics in Safari. */}
+      <table className={styles.table} role="table" aria-busy={loading || undefined}>
         <thead>
-          <tr>
-            <th>{isFormResults ? t('data_curation_col_person') : t('data_curation_col_name')}</th>
-            {!isFormResults && <th>{t('field_community')}</th>}
-            <th>{t('field_surveyor')}</th>
-            <th>{t('field_submitted')}</th>
+          <tr role="row">
+            <th role="columnheader">{nameHeader}</th>
+            {!isFormResults && <th role="columnheader">{t('field_community')}</th>}
+            <th role="columnheader">{t('field_surveyor')}</th>
+            <th role="columnheader">{t('field_submitted')}</th>
             {isFormResults ? (
               <>
-                <th>{t('data_curation_col_metadata_pct')}</th>
-                <th>{t('data_curation_col_fields_pct')}</th>
+                <th role="columnheader">{t('data_curation_col_metadata_pct')}</th>
+                <th role="columnheader">{t('data_curation_col_fields_pct')}</th>
               </>
             ) : (
-              <th>{t('data_curation_col_completeness')}</th>
+              <th role="columnheader">{t('data_curation_col_completeness')}</th>
             )}
-            <th>{t('data_curation_col_flags')}</th>
+            <th role="columnheader">{t('data_curation_col_flags')}</th>
           </tr>
         </thead>
         <tbody>
           {loading && (
             // eslint-disable-next-line react/no-array-index-key
             [0, 1, 2, 3, 4].map((i) => (
-              <tr key={i}>
+              <tr key={i} role="row">
                 {/* A `td` is labelled by its column header, which the rule cannot
                     resolve statically; it also treats every `td` as interactive.
                     The cell holds a loading placeholder, so there is no label to
                     add. */}
-                <td colSpan={isFormResults ? 6 : 6}>
+                <td role="cell" colSpan={6}>
                   <Skeleton width="100%" height={16} />
                 </td>
               </tr>
@@ -134,8 +137,8 @@ export default function RecordsTable({
           {!loading && records.map((r) => (
             // The row click is a mouse convenience; the name button is how
             // everyone else opens a record (it was the only way in).
-            <tr key={r.id} className={styles.row} onClick={() => onSelectRecord(r)}>
-              <td className={styles.nameCell}>
+            <tr key={r.id} role="row" className={styles.row} onClick={() => onSelectRecord(r)}>
+              <td role="cell" className={styles.nameCell} data-label={nameHeader}>
                 <button
                   type="button"
                   className={styles.nameButton}
@@ -144,21 +147,21 @@ export default function RecordsTable({
                   {personName(r, source)}
                 </button>
               </td>
-              {!isFormResults && <td>{community(r, source)}</td>}
-              <td>{r.get('surveyingUser') || '—'}</td>
-              <td>{formatDate(r.createdAt, i18n?.language)}</td>
+              {!isFormResults && <td role="cell" data-label={t('field_community')}>{community(r, source)}</td>}
+              <td role="cell" data-label={t('field_surveyor')}>{r.get('surveyingUser') || '—'}</td>
+              <td role="cell" data-label={t('field_submitted')}>{formatDate(r.createdAt, i18n?.language)}</td>
               {isFormResults ? (
                 <FormResultsCompleteness record={r} formDefinition={formDefinition} />
               ) : (
                 // The score is announced by CompletenessBar's own aria-label,
                 // which the rule cannot see across the component boundary.
-                <td className={styles.completenessCell}>
+                <td role="cell" className={styles.completenessCell} data-label={t('data_curation_col_completeness')}>
                   <CompletenessBar pct={scoreRecord(r, source, formDefinition)} />
                 </td>
               )}
               {/* Flags are announced by the chips themselves; the rule cannot
                   see labels across the component boundary. */}
-              <td onClick={(e) => e.stopPropagation()}>
+              <td role="cell" data-label={t('data_curation_col_flags')} onClick={(e) => e.stopPropagation()}>
                 <FlagChips
                   isDup={dups.has(r.id)}
                   isAnomaly={anomalies.has(r.id)}

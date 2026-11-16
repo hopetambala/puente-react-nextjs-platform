@@ -74,11 +74,12 @@
   }
 }
 
+// No frame of its own: each Panel inside already has one. The two together
+// were the "double frame" that cost ~50px at tablet width (design review C6).
 .section {
-  padding: var(--tk-dlite-semantic-spacing-lg);
-  border: 1px solid var(--tk-dlite-semantic-color-border);
-  border-radius: var(--tk-dlite-semantic-border-radius-md);
-  background: var(--tk-dlite-semantic-color-surface-base);
+  display: flex;
+  flex-direction: column;
+  gap: var(--tk-dlite-semantic-spacing-lg);
 }
 
 .backBtn,

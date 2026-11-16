@@ -332,3 +332,19 @@ describe('RecordsTable — pagination labels (design review X10)', () => {
     expect(eng.data_curation_next).not.toMatch(/[←→‹›]/);
   });
 });
+
+// At 375 the table scrolled sideways inside its region. Below 40rem of
+// container each record is now a card (CSS); these attributes are what keep
+// that layout labelled and announced as a table.
+describe('RecordsTable — stacked layout', () => {
+  it.each([
+    ['survey-data'],
+    ['form-results:abc'],
+  ])('labels every cell with its column for %s', (source) => {
+    render(<RecordsTable {...defaultProps} source={source} records={[makeRecord()]} />);
+    expect(screen.getByRole('table')).toBeInTheDocument();
+    const headers = screen.getAllByRole('columnheader').map((h) => h.textContent);
+    const labels = screen.getAllByRole('cell').map((c) => c.getAttribute('data-label'));
+    expect(labels).toEqual(headers);
+  });
+});

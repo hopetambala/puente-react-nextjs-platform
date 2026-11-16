@@ -334,6 +334,9 @@ Everything below was built test-first with unit tests (jsdom, mocked services). 
 - [ ] **Data curation source picker**: the native `SourceSelector` select driving the real records query (form-results vs fixed classes).
 - [x] **dlite 0.4.0 on the real package**: #13 merged and 0.4.0 published 2026-11-12; Manage is on `^0.4.0` with every gate rerun without the overlay.
 
+- [ ] **Community audit rename against real Parse**: a save that fails partway leaves the group listed with the "not every record" alert, and running it again finishes the job (renamed records drop out of the variant query).
+- [ ] **Form Manager delete**: `updateObject` (cloud code) then `retrieveCustomData` no longer lists the form, and the status line is announced.
+- [ ] **Curation summary total**: `count()` on a real class matches the dashboard's figure for the same organization and filters (design review C13 was "50" vs "357").
 - [ ] **Dates and money in the interface language** (design review X18): each table that now calls `formatDate`/`formatDateTime`/`formatMoney` renders day-first dates in `spa`/`hat` on an English browser (`app/modules/i18n/format.js` is unit-tested; the wiring in curation, duplicates, Form Manager and Billing isn't).
 
 ### E2E (Playwright, the synthetic world, 320/375/768/1024/1440 × eng/spa)
@@ -348,6 +351,10 @@ Everything below was built test-first with unit tests (jsdom, mocked services). 
 - [ ] **Tooltip (WCAG 1.4.13)**: hover-then-move onto the tooltip keeps it open; Esc dismisses; keyboard focus shows it.
 - [ ] **Toast timing**: pauses while hovered and focused; errors never time out.
 - [ ] **Table stacked mode**: data analysis at 375 shows per-cell column labels; the scroll region is focusable at wide widths.
+- [ ] **Curation at 375 and 768**: filters wrap with visible labels; Clear filters empties the fields and the query; the summary's polite status reads the new counts; a never-answering load (throttled to offline) ends in the alert with Try again.
+- [ ] **Record inspector sheet**: opens from the name button; Esc with edits asks to discard and stays open; Chrome's forced close on a second Esc doesn't lose the edits silently; focus returns to the name button.
+- [ ] **Duplicate resolver**: "Keep A, delete B" → confirmation names B → B is gone; a failed delete shows the alert.
+- [ ] **Form Manager at 375**: forms and records stack as cards; the details disclosure announces expanded/collapsed; Next keeps focus while the page loads in a real browser (disabled-button focus fixup is why it isn't disabled).
 - [ ] **Screenshot matrix + design critique** for each route group (the review loop), compared against the baseline in `.e2e-artifacts/design-baseline/`.
 
 
@@ -362,6 +369,6 @@ The design review ("Manage design review", https://claude.ai/artifact/Sd4XgFGg9b
 | PR 2 AppShell | C1, C10 (structure), C11 + X6 (nav labels = page titles, exact current item, duplicate Account link removed), X7 (nav glyphs) | **R6** validate the nav vocabulary with coordinators; h1s on dashboard/billing/org admin (PR 5/6) |
 | PR 3 primitives | X9 (dialog/spinner names), C20 (24px minimum everywhere, 44px buttons on touch), T4 (label/ring gap), X18 (dates and money in the interface language) | C15 search/filter inputs (PR 5), C21 remaining axe rules (PR 5/6), X8 (PR 5/6) |
 | PR 4 auth | C3, C4, C9 (verify and reset dead ends), C14 (one brand mark), X1, X2, X3, X4, X11, X12 (account deactivation confirmed), X20 (placeholder testimonial → translated tagline, no attribution), C7 (account settings load failure → alert + Try again) | **R3/R8/X19** native review of Spanish/Creole and the tú/usted register (Hope); SMS reset question |
-| PR 5 | | C6, C7 (curation + dashboard skeleton timeouts), C12, C13, C18, C21, X7, X8, X10, X12, X13, X14, X15 |
+| PR 5 | C6 (curation filters and Form Manager wrap; tables stack below 40rem of container), C7 (dashboard and curation loads settle within 25s → alert + Try again; no session → sign in), C12 (labels on the T1 tokens, uppercase and tracked), C13 (summary = data set total; averages labelled "On this page"), C18 + X13 (curation, Form Manager and community audit empty, loading and failed states), C21 (curation axe: meter, select-name, label), X7 (search and toggle glyphs hidden), X8 (curation and Form Manager search, filters, segmented groups, audit radios), X10 (Prev/Next and Back named by their words), X12 (duplicate "delete", not "dismiss"; Form Manager delete names the form and keeps its records), X14 (translated Puente form names; constant "Active" column removed), X15 ("records collected"; no "0%" average for zero records) | **Record search does nothing**: `filters.search` is set but never applied to the curation query (found in PR 5; needs a decision on what search matches: name only, or IDs and household too); C21 on data visualization (redirects to curation, so it shares curation's fixes) |
 | PR 6 | | C8, C16, C17, C18, C21, X5, X12, X13, X15, X21 |
 | PR 7 | | C5, T5, X17 |

@@ -91,7 +91,6 @@
 
 .actions {
   display: inline-flex;
-  flex-wrap: wrap;
   justify-content: flex-end;
   gap: var(--tk-dlite-semantic-spacing-xs);
 }
@@ -108,9 +107,10 @@
   align-items: stretch;
 }
 
+// One line per group at table widths: the actions column is width:1%, so a
+// group allowed to wrap shrank to one button per line.
 .actionGroup {
   display: inline-flex;
-  flex-wrap: wrap;
   gap: var(--tk-dlite-semantic-spacing-xs);
 }
 
@@ -178,8 +178,11 @@
     min-width: 0;
   }
 
+  // A card has the width the table didn't: the buttons wrap here instead.
   .actions,
-  .actionsStacked {
+  .actionsStacked,
+  .actionGroup {
+    flex-wrap: wrap;
     justify-content: flex-start;
     align-items: flex-start;
   }

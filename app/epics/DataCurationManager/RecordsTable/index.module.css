@@ -1,4 +1,5 @@
 .tableWrap {
+  container-type: inline-size;
   background: var(--tk-dlite-semantic-color-surface-base);
   border: 1px solid var(--tk-dlite-semantic-color-border);
   border-radius: var(--tk-dlite-semantic-border-radius-md);
@@ -87,6 +88,8 @@
 
 .barValue {
   font-variant-numeric: tabular-nums;
+  /* Spanish writes "50 %": the space must not break the figure in two. */
+  white-space: nowrap;
   color: var(--tk-dlite-semantic-color-text-secondary);
 }
 
@@ -152,4 +155,51 @@
 .pageButtons {
   display: flex;
   gap: var(--tk-dlite-semantic-spacing-sm);
+}
+
+/* Narrow: each record is a card, each value labelled by its column. The
+   header row stays for screen readers (visually hidden), so cells still
+   announce their column. */
+@container (max-width: 40rem) {
+  .table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .table,
+  .table tbody,
+  .table tr {
+    display: block;
+  }
+
+  .table tr {
+    padding-block: var(--tk-dlite-semantic-spacing-sm);
+    border-bottom: 1px solid var(--tk-dlite-semantic-color-border);
+  }
+
+  .table td {
+    display: grid;
+    grid-template-columns: minmax(6rem, 35%) minmax(0, 1fr);
+    align-items: center;
+    gap: var(--tk-dlite-semantic-spacing-sm);
+    padding-block: var(--tk-dlite-semantic-spacing-xxs);
+    border-bottom: 0;
+  }
+
+  .table td[data-label]::before {
+    content: attr(data-label);
+    font-size: var(--tk-dlite-semantic-typography-size-200);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--tk-dlite-semantic-color-text-secondary);
+  }
+
+  .completenessCell {
+    min-width: 0;
+  }
 }
