@@ -127,6 +127,16 @@
   color: var(--tk-dlite-semantic-color-text-secondary);
 }
 
+// Tablet: four buttons on one line ran past the table edge at 768 (design
+// review C6). Export drops under Edit / Duplicate / Delete, as it already does
+// on research rows.
+@container (max-width: 56rem) {
+  .actions {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+}
+
 // Narrow: each form is a card. The header row stays for screen readers, so
 // cells still announce their column; sighted users get data-label.
 @container (max-width: 40rem) {

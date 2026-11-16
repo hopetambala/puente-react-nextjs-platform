@@ -1,12 +1,9 @@
 {
   "_readme": "Known failures of the responsive a11y sweep (e2e/suites/responsive-a11y.mjs): \"<route> @ <width>\" → rule ids failing there in either language. Rule ids are axe-core's, plus the sweep's own (see CUSTOM_RULES in e2e/lib/a11y-gate-lib.mjs). The sweep fails on anything not listed. Regenerate with `node e2e/suites/responsive-a11y.mjs --update`, which refuses to add entries. Each PR of docs/responsive-a11y-overhaul.md shrinks it; PR 7 empties it.",
-  "total": 43,
+  "total": 22,
   "byRoute": {
     "/": 15,
-    "/data/data-curation": 10,
-    "/data/data-visualization": 10,
-    "/forms/form-creator": 7,
-    "/forms/form-manager": 1
+    "/forms/form-creator": 7
   },
   "failures": {
     "/ @ 320": [
@@ -34,46 +31,6 @@
       "skip-link",
       "text-spacing"
     ],
-    "/data/data-curation @ 320": [
-      "aria-prohibited-attr",
-      "select-name"
-    ],
-    "/data/data-curation @ 375": [
-      "aria-prohibited-attr",
-      "select-name"
-    ],
-    "/data/data-curation @ 768": [
-      "aria-prohibited-attr",
-      "select-name"
-    ],
-    "/data/data-curation @ 1024": [
-      "aria-prohibited-attr",
-      "select-name"
-    ],
-    "/data/data-curation @ 1440": [
-      "aria-prohibited-attr",
-      "select-name"
-    ],
-    "/data/data-visualization @ 320": [
-      "aria-prohibited-attr",
-      "select-name"
-    ],
-    "/data/data-visualization @ 375": [
-      "aria-prohibited-attr",
-      "select-name"
-    ],
-    "/data/data-visualization @ 768": [
-      "aria-prohibited-attr",
-      "select-name"
-    ],
-    "/data/data-visualization @ 1024": [
-      "aria-prohibited-attr",
-      "select-name"
-    ],
-    "/data/data-visualization @ 1440": [
-      "aria-prohibited-attr",
-      "select-name"
-    ],
     "/forms/form-creator @ 320": [
       "nested-interactive",
       "target-min-24"
@@ -90,9 +47,6 @@
     ],
     "/forms/form-creator @ 1440": [
       "nested-interactive"
-    ],
-    "/forms/form-manager @ 1440": [
-      "text-spacing"
     ]
   }
 }
