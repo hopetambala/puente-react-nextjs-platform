@@ -121,9 +121,19 @@ const NON_SELECTABLE_SHORT_CODES = new Set(['internal-test']);
  * Inactive organizations are omitted: a retired partner must not be offerable
  * to a new account.
  */
+/**
+ * A name someone could recognise and join. Signup once stored
+ * String(react-select option) as an organization, so "[object Object]" exists
+ * as data and showed at the top of the registration picker.
+ */
+function isUsableOrganizationName(name) {
+  return typeof name === 'string' && name.trim() !== '' && name !== '[object Object]';
+}
+
 export function toOrganizationOptions(records = []) {
   return (records || [])
     .filter((r) => r.get('active') !== false)
+    .filter((r) => isUsableOrganizationName(r.get('name')))
     .filter((r) => !NON_SELECTABLE_SHORT_CODES.has(r.get('shortCode')))
     .map((r) => ({ id: r.id, label: r.get('name'), shortCode: r.get('shortCode') }))
     .sort((a, b) => normalizeOrganizationName(a.label)
