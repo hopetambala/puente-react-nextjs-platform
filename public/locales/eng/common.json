@@ -146,6 +146,7 @@
   "org_admin_alias_implicit": "always matches",
   "org_admin_aliases_label": "Spellings, separated by commas",
   "org_admin_aliases_save": "Save spellings",
+  "org_admin_aliases_ask_staff": "To add a spelling, email it to Puente staff at info@puente-dr.org.",
   "org_admin_unresolved_title": "Accounts that do not match an organization",
   "org_admin_unresolved_count": "Not matching",
   "org_admin_unresolved_empty": "Every account matches an organization.",

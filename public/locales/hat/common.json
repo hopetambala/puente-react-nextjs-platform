@@ -146,6 +146,7 @@
   "org_admin_alias_implicit": "toujou koresponn",
   "org_admin_aliases_label": "Fason yo ekri li, separe ak vigil",
   "org_admin_aliases_save": "Anrejistre fason yo ekri li",
+  "org_admin_aliases_ask_staff": "Pou ajoute yon fason pou ekri l, voye l bay ekip Puente nan info@puente-dr.org.",
   "org_admin_unresolved_title": "Kont ki pa koresponn ak okenn òganizasyon",
   "org_admin_unresolved_count": "Ki pa koresponn",
   "org_admin_unresolved_empty": "Tout kont yo koresponn ak yon òganizasyon.",

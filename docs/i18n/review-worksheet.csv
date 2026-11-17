@@ -110,6 +110,7 @@ common,nav_surveyors,Surveyors,Encuestadores,Ankètè,,
 common,org_admin_alias_implicit,always matches,siempre coincide,toujou koresponn,,
 common,org_admin_aliases_label,"Spellings, separated by commas","Formas de escribirlo, separadas por comas","Fason yo ekri li, separe ak vigil",,
 common,org_admin_aliases_save,Save spellings,Guardar formas de escribirlo,Anrejistre fason yo ekri li,,
+common,org_admin_aliases_ask_staff,"To add a spelling, email it to Puente staff at info@puente-dr.org.","Para agregar una forma de escribirlo, envíela al equipo de Puente a info@puente-dr.org.","Pou ajoute yon fason pou ekri l, voye l bay ekip Puente nan info@puente-dr.org.",,"Org admins cannot edit spellings (server allows puente_staff only), so they see this instead of the editor. Spanish and Creole written by Claude: needs native review."
 common,org_admin_breadcrumb,Organizations,Organizaciones,Òganizasyon,,
 common,org_admin_create_aliases,"Other spellings, separated by commas","Otras formas de escribirlo, separadas por comas","Lòt fason yo ekri li, separe ak vigil",,
 common,org_admin_create_aliases_hint,"Every spelling seen in the field. The organization name always matches, so it does not need to be listed.","Todas las formas vistas en el campo. El nombre de la organización siempre coincide, así que no hace falta incluirlo.","Tout fason ou te wè nan teren an. Non òganizasyon an toujou koresponn, kidonk ou pa bezwen mete l.",,

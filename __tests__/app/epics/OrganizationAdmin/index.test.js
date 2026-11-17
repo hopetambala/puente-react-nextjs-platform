@@ -178,6 +178,38 @@ describe('OrganizationAdmin — what each viewer may see', () => {
     expect(screen.getAllByText('Rayjon').length).toBeGreaterThan(0);
   });
 
+  // Saving spellings is a Puente staff action. An org admin's own row showed
+  // the editor anyway, so every save they tried failed.
+  it('shows an org admin their spellings read-only, with how to add one', () => {
+    render(
+      <OrganizationAdmin
+        data={twoOrgs}
+        access={{ isStaff: false, orgAdminOf: ['wof'] }}
+        onCreate={jest.fn()}
+        onEditAliases={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByText('WOF')).toBeInTheDocument();
+    expect(screen.queryByTestId('aliases-wof')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('aliases-save-wof')).not.toBeInTheDocument();
+    expect(screen.getByText('org_admin_aliases_ask_staff')).toBeInTheDocument();
+  });
+
+  it('gives staff the spellings editor', () => {
+    render(
+      <OrganizationAdmin
+        data={twoOrgs}
+        access={{ isStaff: true, orgAdminOf: [] }}
+        onCreate={jest.fn()}
+        onEditAliases={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByTestId('aliases-wof')).toBeInTheDocument();
+    expect(screen.queryByText('org_admin_aliases_ask_staff')).not.toBeInTheDocument();
+  });
+
   it('hides the unresolved queue from an org admin — it is cross-tenant data', () => {
     // The queue lists accounts from every organization that failed to resolve.
     // That is Puente staff's worklist, not a partner's.
