@@ -387,6 +387,7 @@ common,account_settings_title,Account Settings,Configuración de la cuenta,Param
 common,account_settings_sub,"Manage your profile, credentials, and account preferences.","Gestiona tu perfil, tus credenciales y las preferencias de tu cuenta.","Jere pwofil ou, idantifyan ou yo ak preferans kont ou.",,
 common,account_update_user,Update user,Actualizar usuario,Mete itilizatè a ajou,,
 common,account_delete_user,Delete user,Eliminar usuario,Efase itilizatè a,,
+common,account_org_change_note,Your organization determines which records you can see. Email info@puente-dr.org to change it.,Tu organización determina qué registros puedes ver. Escribe a info@puente-dr.org para cambiarla.,Òganizasyon ou detèmine ki dosye ou ka wè. Ekri info@puente-dr.org pou chanje l.,,"Account settings organization note, previously hard-coded English. Same key and strings as feat/responsive-a11y. Spanish and Creole written by Claude: needs native review."
 common,account_reset_title,Reset your account,Restablece tu cuenta,Reinisyalize kont ou,,
 common,account_reset_field,Phone Number or Email Address,Número de teléfono o correo electrónico,Nimewo telefòn oswa adrès imèl,,
 common,account_reset_send_email,Send account reset email?,¿Enviar el correo de restablecimiento?,Voye imèl reinisyalizasyon an?,,

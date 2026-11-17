@@ -113,8 +113,7 @@ function Management(props) {
                           className={styles.readOnlyNote}
                           data-testid="organization-change-note"
                         >
-                          Your organization determines which records you can see.
-                          Email info@puente-dr.org to change it.
+                          {t('account_org_change_note')}
                         </p>
                       </Stack>
                     ) : (

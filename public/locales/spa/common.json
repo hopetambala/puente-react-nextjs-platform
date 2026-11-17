@@ -387,6 +387,7 @@
   "account_settings_sub": "Gestiona tu perfil, tus credenciales y las preferencias de tu cuenta.",
   "account_update_user": "Actualizar usuario",
   "account_delete_user": "Eliminar usuario",
+  "account_org_change_note": "Tu organización determina qué registros puedes ver. Escribe a info@puente-dr.org para cambiarla.",
   "account_reset_title": "Restablece tu cuenta",
   "account_reset_field": "Número de teléfono o correo electrónico",
   "account_reset_send_email": "¿Enviar el correo de restablecimiento?",

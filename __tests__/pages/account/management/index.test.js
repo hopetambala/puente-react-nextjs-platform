@@ -155,6 +155,11 @@ describe('Organization is not self-service', () => {
 
     expect(await screen.findByTestId('organization-change-note')).toBeInTheDocument();
   });
+
+  it('says it in the reader\'s language, not hard-coded English', async () => {
+    render(<ManagementWrapper />);
+    expect(await screen.findByTestId('organization-change-note')).toHaveTextContent('account_org_change_note');
+  });
 });
 
 describe('Account Settings page — copy', () => {
