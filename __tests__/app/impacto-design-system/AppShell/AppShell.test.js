@@ -28,6 +28,7 @@ jest.mock('next-i18next', () => ({
       nav_settings: 'Settings',
       nav_account: 'Account',
       nav_logout: 'Log out',
+      org_admin_breadcrumb: 'Organizations',
     }[key] ?? key),
   }),
 }));
@@ -35,6 +36,10 @@ jest.mock('next-i18next', () => ({
 jest.mock('app/modules/user', () => ({
   retrieveCurrentUserAsyncFunction: jest.fn(() => null),
   retrieveSignOutFunction: jest.fn(() => Promise.resolve()),
+}));
+
+jest.mock('app/modules/cloud-code', () => ({
+  myOrganizationAccess: jest.fn(() => Promise.resolve({ isStaff: true, orgAdminOf: [] })),
 }));
 
 jest.mock('app/services/parse', () => ({
@@ -93,6 +98,13 @@ describe('Route → active nav item', () => {
     renderShell('/account/management');
     const btn = screen.getByText('Settings').closest('a');
     expect(btn.className).toMatch('navItemActive');
+  });
+
+  it('/organization-admin highlights Organizations, not Dashboard', async () => {
+    renderShell('/organization-admin');
+    const orgs = (await screen.findByText('Organizations')).closest('a');
+    expect(orgs.className).toMatch('navItemActive');
+    expect(screen.getByText('Dashboard').closest('a').className).not.toMatch('navItemActive');
   });
 
   it('unknown path defaults to Dashboard active', () => {
