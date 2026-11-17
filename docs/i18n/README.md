@@ -43,7 +43,8 @@ unforgettable, and this section is what explains the test.
 ## What shipped
 
 Manage now ships **English (`eng`), Spanish (`spa`), and Haitian Creole
-(`hat`)** — 166 keys each, at enforced parity.
+(`hat`)** — every key in all three, at enforced parity
+(`__tests__/locales/translations.test.js`).
 
 The previous locale set (`ara`, `deu`, `ind`, `prt`, `zho`) was retired on
 2026-08-28. It came from a Next.js template, had no Dominican Republic

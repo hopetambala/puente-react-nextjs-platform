@@ -25,7 +25,7 @@ Puente Manage is built for:
 
 - **Form Creator** — Build custom forms from seven blocks: number, text, side label, single and multi select, header, geolocation
 - **Form Manager** — View, filter, and drill into submitted records with pagination
-- **Operational Dashboard** — Real-time stats: records today, active surveyors, household count
+- **Operational Dashboard** — A sync ribbon (when records last arrived), a needs-attention queue (missing key fields, duplicate households, renamed form fields, unresolved household links) that links into curation, and community coverage that surfaces quiet communities
 - **Data Curation** — Quality metrics (completeness %), duplicate detection, anomaly flags, inline editing
 - **Account Management** — User roles, organization setup, profile settings
 
@@ -116,9 +116,8 @@ See [app/impacto-design-system/index.js](app/impacto-design-system/index.js) for
 - `SurveyDataActivity` — Audit log of changes
 
 **Key queries:**
-- Active surveyors (last 7 days): `.distinct('surveyingUser')` filtered by org & date
-- Household count: `SurveyData.count()` by org
-- Record completeness: % of 5 required fields filled (`fname`, `lname`, `householdId`, `surveyingUser`, `communityname`)
+- Every query is scoped to the organization's alias set (`containedIn('surveyingOrganization', …)`), not one name
+- Record completeness: % of the 8 key fields filled (`fname`, `lname`, `dob`, `sex`, `householdId`, `communityname`, `surveyingUser`, `telephoneNumber`), defined once in `app/modules/data-quality/index.js`
 
 ## i18n (Internationalization)
 

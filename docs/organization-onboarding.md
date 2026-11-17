@@ -50,13 +50,14 @@ an ops problem, a person who cannot make an account is a field problem.
 
 **Required before anyone from that partner registers**, and since the picker
 went live it is the ONLY way — a person can no longer create an organization by
-typing a new name. There is still no UI for this step; `app/epics/OrganizationAdmin/`
-has its data loader but no screen (see
-[billing-and-invoicing.md](billing-and-invoicing.md) §8).
+typing a new name.
 
-`createOrganization` requires the **master key**, so it cannot be called from
-Manage, Collect, or a browser. Use the Back4App dashboard's API console, or a
-local script:
+**Update 2026-11-16:** this step now has a screen. Puente staff (members of the
+`puente_staff` role) create organizations from **Organizations**
+(`/organization-admin`) in Manage. `createOrganization` accepts the master key
+**or** a signed-in member of `puente_staff` (cloudcode
+`cloud/src/definer/organization.definer.js`, which refuses anyone else). The
+script below still works with the master key:
 
 ```js
 // Same call the cloudcode integration tests make.

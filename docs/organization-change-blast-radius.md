@@ -76,7 +76,7 @@ Ordered by who is affected, not by how interesting it is.
 | Assets | Collect | Degraded — see §3 |
 | Registration | Collect | Free text still; no longer self-grants admin |
 | Registration | Manage | Picker over 37 organizations, live |
-| **Account settings** | Manage | **Still free text — open hole, see §4** |
+| **Account settings** | Manage | **Fixed** — read-only since Manage #93 (the §4 hole is closed in the UI) |
 | Dashboard, curation, community audit | Manage | **Fixed** — alias-set scoping |
 | CSV export | Manage + aggregator | **Fixed** — short-code paths |
 | Form Creator | Manage | Unchanged; tags new forms with the creator's string |
@@ -131,7 +131,9 @@ own; it disappears when #613 ships.
 
 ---
 
-## 4. Open hole: account settings is still free text
+## 4. Open hole (closed in Manage #93): account settings was free text
+
+> **Update 2026-11-16:** the field has been read-only since Manage #93.
 
 `pages/account/management/index.js:46` writes `organization: data.Organization`
 from a free-text field, straight through `updateUser` — which takes **no auth**
