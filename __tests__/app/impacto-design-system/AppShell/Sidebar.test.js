@@ -19,24 +19,34 @@ describe('Sidebar grouping', () => {
   it('puts Review under Org, not Workspace', () => {
     render(<Sidebar activeRoute="dashboard" orgName="testORG" />);
 
-    expect(groupOf('nav_dashboard')).toEqual('Org');
+    expect(groupOf('nav_dashboard')).toEqual('nav_group_org');
   });
 
   it('leaves the other workspace items where they are', () => {
     render(<Sidebar activeRoute="dashboard" orgName="testORG" />);
 
-    expect(groupOf('nav_form_manager')).toEqual('Workspace');
-    expect(groupOf('nav_data')).toEqual('Workspace');
+    expect(groupOf('nav_form_manager')).toEqual('nav_group_workspace');
+    expect(groupOf('nav_data')).toEqual('nav_group_workspace');
   });
 
   it('keeps Settings under Org', () => {
     render(<Sidebar activeRoute="dashboard" orgName="testORG" />);
 
-    expect(groupOf('nav_settings')).toEqual('Org');
+    expect(groupOf('nav_settings')).toEqual('nav_group_org');
   });
 });
 
 describe('Sidebar — copy', () => {
+  // The group headings used to be the raw strings 'Workspace' and 'Org', so
+  // Spanish and Creole readers saw English. They are catalog keys now.
+  it('routes the group headings through t()', () => {
+    render(<Sidebar activeRoute="dashboard" orgName="testORG" />);
+    expect(screen.getByText('nav_group_workspace')).toBeInTheDocument();
+    expect(screen.getByText('nav_group_org')).toBeInTheDocument();
+    expect(screen.queryByText('Workspace')).not.toBeInTheDocument();
+    expect(screen.queryByText('Org')).not.toBeInTheDocument();
+  });
+
   it('leaves the brand name untranslated', () => {
     render(<Sidebar activeRoute="dashboard" orgName="testORG" />);
     // "Puente" is the product's name, not copy.

@@ -28,6 +28,8 @@
   "nav_settings": "Settings",
   "nav_account": "Account",
   "nav_logout": "Log out",
+  "nav_group_workspace": "Workspace",
+  "nav_group_org": "Organization",
   "dashboard_eyebrow_today": "Today",
   "dashboard_good_morning": "Good morning, {{name}}.",
   "dashboard_sub": "Here's what's moving.",

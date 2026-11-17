@@ -9,7 +9,7 @@ import styles from './AppShell.module.css';
 const NAV_GROUPS = [
   {
     key: 'workspace',
-    labelKey: 'Workspace',
+    labelKey: 'nav_group_workspace',
     items: [
       { id: 'forms', labelKey: 'nav_form_manager', icon: '⊟', href: '/forms/form-manager' },
       { id: 'form-creator', labelKey: 'nav_form_creator', icon: '✦', href: '/forms/form-creator' },
@@ -19,7 +19,7 @@ const NAV_GROUPS = [
   },
   {
     key: 'org',
-    labelKey: 'Org',
+    labelKey: 'nav_group_org',
     items: [
       { id: 'dashboard', labelKey: 'nav_dashboard', icon: '◧', href: '/quick-start' },
       { id: 'settings', labelKey: 'nav_settings', icon: '◌', href: '/account/management' },
@@ -49,7 +49,7 @@ export default function Sidebar({ activeRoute, orgName }) {
       <nav className={styles.nav}>
         {NAV_GROUPS.map((group) => (
           <div key={group.key} className={styles.navGroup}>
-            <div className={styles.navGroupTitle}>{group.labelKey}</div>
+            <div className={styles.navGroupTitle}>{t(group.labelKey)}</div>
             {group.items.map((item) => (
               <Link key={item.id} href={item.href} passHref>
                 <a

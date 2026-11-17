@@ -28,6 +28,8 @@
   "nav_settings": "Paramèt",
   "nav_account": "Kont",
   "nav_logout": "Dekonekte",
+  "nav_group_workspace": "Espas travay",
+  "nav_group_org": "Òganizasyon",
   "dashboard_eyebrow_today": "Jodi a",
   "dashboard_good_morning": "Bonjou, {{name}}.",
   "dashboard_sub": "Men sa k ap pase.",

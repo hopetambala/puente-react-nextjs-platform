@@ -28,6 +28,8 @@
   "nav_settings": "Configuración",
   "nav_account": "Cuenta",
   "nav_logout": "Cerrar sesión",
+  "nav_group_workspace": "Espacio de trabajo",
+  "nav_group_org": "Organización",
   "dashboard_eyebrow_today": "Hoy",
   "dashboard_good_morning": "Buenos días, {{name}}.",
   "dashboard_sub": "Esto es lo que está pasando.",

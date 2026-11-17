@@ -101,6 +101,8 @@ common,nav_form_manager,Manage,Gestionar,Jere,,
 common,nav_forms,Forms,Formularios,Fòm,,Collect uses findResident.residentPage.household.forms
 common,nav_households,Households,Hogares,Kay,,
 common,nav_logout,Log out,Cerrar sesión,Dekonekte,,Collect uses home.logOut
+common,nav_group_workspace,Workspace,Espacio de trabajo,Espas travay,,"Sidebar group title, previously hard-coded English. Spanish and Creole written by Claude: needs native review."
+common,nav_group_org,Organization,Organización,Òganizasyon,,"Sidebar group title, previously hard-coded English. Spanish and Creole written by Claude: needs native review."
 common,nav_marketplace,Market,Mercado,Mache,,
 common,nav_members,Members,Miembros,Manm,,
 common,nav_settings,Settings,Configuración,Paramèt,,Collect uses global.settings
