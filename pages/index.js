@@ -1,6 +1,11 @@
 import Link from 'next/link';
+import PropTypes from 'prop-types';
 
+import packageJson from '../package.json';
 import styles from './index.module.scss';
+
+// The customer onboarding guides (EN/ES), published from puente-dr.github.io.
+const DOCS_URL = 'https://puente-dr.github.io/guides/';
 
 const CHART_BARS = [40, 65, 30, 80, 55, 90, 45, 70, 35, 60];
 
@@ -9,11 +14,11 @@ const PILLAR_COLLECT_FEATURES = ['Offline-first data collection', 'Household geo
 const PILLAR_CURATE_FEATURES = ['Duplicate detection & merge', 'Completeness scoring', 'Community-name auditing', 'Inline record editing & CSV export'];
 
 const MODULES = [
-  { platform: 'Manage · Web', mobile: false, title: 'Form Creator', desc: 'Drag & drop blocks like headers, inputs, selects, geolocation and loops into surveys field workers can run on Collect.', link: '/forms/form-creator', linkLabel: 'Open Form Creator →' },
+  { platform: 'Manage · Web', mobile: false, title: 'Form Creator', desc: 'Drag & drop blocks like headers, text and number inputs, selects and geolocation into surveys field workers can run on Collect.', link: '/forms/form-creator', linkLabel: 'Open Form Creator →' },
   { platform: 'Manage · Web', mobile: false, title: 'Form Manager', desc: 'Browse submitted records as cards or tables. Drill in, expand rows, export to CSV.', link: '/forms/form-manager', linkLabel: 'Open Form Manager →' },
   { platform: 'Manage · Web', mobile: false, title: 'Marketplace', desc: 'Community-published form templates for medical evaluation, vitals and environmental health. Install in one click.', link: '/forms/form-marketplace', linkLabel: 'Browse marketplace →' },
-  { platform: 'Collect · Mobile', mobile: true, title: 'Data Collection', desc: 'Identification forms, supplementary configs and GDPR consent, all queued locally and synced when online.', link: '#', linkLabel: 'Get the app →' },
-  { platform: 'Collect · Mobile', mobile: true, title: 'Find Records', desc: 'Search and edit existing household records in the field, on the same data model as the web side.', link: '#', linkLabel: 'See how it works →' },
+  { platform: 'Collect · Mobile', mobile: true, title: 'Data Collection', desc: 'Identification forms, supplementary configs and GDPR consent, all queued locally and synced when online.', link: '#collect', linkLabel: 'Get the app →' },
+  { platform: 'Collect · Mobile', mobile: true, title: 'Find Records', desc: 'Search and edit existing household records in the field, on the same data model as the web side.', link: DOCS_URL, linkLabel: 'See how it works →' },
   { platform: 'Manage · Web', mobile: false, title: 'Data Curation', desc: 'Find duplicates, score completeness, audit community names and fix records inline before the data is used, then export it clean.', link: '/data/data-curation', linkLabel: 'Open Data Curation →' },
 ];
 
@@ -32,10 +37,13 @@ const USE_CASES = [
 ];
 
 export async function getStaticProps() {
-  return { props: {} };
+  // Read at build time so the hero's version line follows package.json
+  // instead of a number someone has to remember to edit. Used only here, so
+  // Next strips the import from the client bundle.
+  return { props: { appVersion: packageJson.version } };
 }
 
-export default function Homepage() {
+export default function Homepage({ appVersion }) {
   return (
     <div className={styles.page}>
       {/* ── top nav ── */}
@@ -80,7 +88,7 @@ export default function Homepage() {
               </div>
               <div className={styles.heroMeta}>
                 <span className={styles.heroMetaItem}>Service operational</span>
-                <span className={styles.heroMetaMono}>v0.1.2 · Mobile 12.7.1</span>
+                {appVersion && <span className={styles.heroMetaMono}>{`v${appVersion}`}</span>}
               </div>
             </div>
 
@@ -230,7 +238,7 @@ export default function Homepage() {
       </section>
 
       {/* ── companion ── */}
-      <section className={styles.companion}>
+      <section id="collect" className={styles.companion}>
         <div className={styles.container}>
           <div className={styles.companionGrid}>
             <div>
@@ -346,8 +354,7 @@ export default function Homepage() {
               {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
               <a className={`${styles.btn} ${styles.btnPrimary}`}>Sign in to Manage</a>
             </Link>
-            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-            <a href="#" className={`${styles.btn} ${styles.btnGhost} ${styles.ctaBtnGhost}`}>
+            <a href={DOCS_URL} className={`${styles.btn} ${styles.btnGhost} ${styles.ctaBtnGhost}`}>
               Read the docs
             </a>
           </div>
@@ -373,7 +380,7 @@ export default function Homepage() {
               <ul className={styles.footerLinks}>
                 {[
                   { label: 'Collect', href: 'https://apps.apple.com/us/app/puente-collect/id1362371696' },
-                  { label: 'dlite tokens', href: 'https://github.com/nicholasgalante1997/style-dictionary-dlite-tokens' },
+                  { label: 'dlite tokens', href: 'https://github.com/hopetambala/style-dictionary-dlite' },
                 ].map((link) => (
                   <li key={link.label}>
                     <a
@@ -392,7 +399,7 @@ export default function Homepage() {
               <h5 className={styles.footerColTitle}>Resources</h5>
               <ul className={styles.footerLinks}>
                 {[
-                  { label: 'Documentation', href: 'https://github.com/hopetambala/puente-react-nextjs-platform' },
+                  { label: 'Documentation', href: DOCS_URL },
                   { label: 'Changelog', href: 'https://github.com/hopetambala/puente-react-nextjs-platform/blob/master/CHANGELOG.md' },
                   { label: 'Contributing', href: 'https://github.com/hopetambala/puente-react-nextjs-platform/blob/master/CONTRIBUTING.md' },
                 ].map((link) => (
@@ -443,3 +450,11 @@ export default function Homepage() {
     </div>
   );
 }
+
+Homepage.defaultProps = {
+  appVersion: null,
+};
+
+Homepage.propTypes = {
+  appVersion: PropTypes.string,
+};
