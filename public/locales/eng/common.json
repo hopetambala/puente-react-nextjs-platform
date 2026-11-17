@@ -388,6 +388,7 @@
   "account_update_user": "Update user",
   "account_delete_user": "Delete user",
   "account_org_change_note": "Your organization determines which records you can see. Email info@puente-dr.org to change it.",
+  "privacy_policy": "Privacy Policy",
   "account_reset_title": "Reset your account",
   "account_reset_field": "Phone Number or Email Address",
   "account_reset_send_email": "Send account reset email?",

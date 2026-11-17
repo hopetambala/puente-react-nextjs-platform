@@ -289,3 +289,12 @@ describe('form semantics', () => {
     expect(button.closest('form')).not.toBeNull();
   });
 });
+
+describe('Legal', () => {
+  it('links the privacy policy', () => {
+    render(<Register />);
+    expect(screen.getByRole('link', { name: 'Privacy Policy' }))
+      .toHaveAttribute('href', 'https://www.puente-dr.org/privacy-policy/');
+  });
+});
+

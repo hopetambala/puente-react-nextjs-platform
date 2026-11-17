@@ -388,6 +388,7 @@ common,account_settings_sub,"Manage your profile, credentials, and account prefe
 common,account_update_user,Update user,Actualizar usuario,Mete itilizatè a ajou,,
 common,account_delete_user,Delete user,Eliminar usuario,Efase itilizatè a,,
 common,account_org_change_note,Your organization determines which records you can see. Email info@puente-dr.org to change it.,Tu organización determina qué registros puedes ver. Escribe a info@puente-dr.org para cambiarla.,Òganizasyon ou detèmine ki dosye ou ka wè. Ekri info@puente-dr.org pou chanje l.,,"Account settings organization note, previously hard-coded English. Same key and strings as feat/responsive-a11y. Spanish and Creole written by Claude: needs native review."
+common,privacy_policy,Privacy Policy,Política de privacidad,Règleman sou enfòmasyon prive,,Link to puente-dr.org/privacy-policy on sign-in and register. Spanish and Creole match Collect's termsService strings.
 common,account_reset_title,Reset your account,Restablece tu cuenta,Reinisyalize kont ou,,
 common,account_reset_field,Phone Number or Email Address,Número de teléfono o correo electrónico,Nimewo telefòn oswa adrès imèl,,
 common,account_reset_send_email,Send account reset email?,¿Enviar el correo de restablecimiento?,Voye imèl reinisyalizasyon an?,,

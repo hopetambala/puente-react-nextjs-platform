@@ -169,3 +169,29 @@ describe('Keyboard and assistive technology', () => {
     expect(screen.getByRole('button', { name: /sign in/i })).toHaveAttribute('type', 'submit');
   });
 });
+
+// Manage linked to no privacy policy anywhere. Collect links Puente's canonical
+// one (modules/legal), and so does every signed-out account page now.
+describe('Legal and version footer', () => {
+  it('links the privacy policy', () => {
+    render(<Login />);
+    expect(screen.getByRole('link', { name: 'privacy_policy' }))
+      .toHaveAttribute('href', 'https://www.puente-dr.org/privacy-policy/');
+  });
+
+  it('shows the version it is given, read from package.json at build time', async () => {
+    render(<Login appVersion="9.9.9" />);
+    expect(screen.getByText('v9.9.9')).toBeInTheDocument();
+    expect(screen.queryByText('v0.1.2')).not.toBeInTheDocument();
+
+    jest.doMock('next-i18next/serverSideTranslations', () => ({
+      serverSideTranslations: jest.fn().mockResolvedValue({}),
+    }));
+    // eslint-disable-next-line global-require
+    const { getStaticProps } = require('pages/account/login/index');
+    const { props } = await getStaticProps({ locale: 'eng' });
+    // eslint-disable-next-line global-require
+    expect(props.appVersion).toBe(require('../../../../package.json').version);
+  });
+});
+

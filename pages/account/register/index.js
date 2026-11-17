@@ -7,6 +7,7 @@ import {
     Toast,
 } from 'app/impacto-design-system';
 import FormSelectAutoComplete from 'app/impacto-design-system/form-controls/select-autocomplete';
+import { PRIVACY_POLICY_URL } from 'app/modules/legal';
 import { loadOrganizations, selectedOrganizationName } from 'app/modules/organization';
 import { retrieveSignUpFunction } from 'app/modules/user';
 import { useRouter } from 'next/router';
@@ -232,6 +233,11 @@ function Register() {
             />
           </Stack>
           </form>
+          <p className={styles.legal}>
+            <a href={PRIVACY_POLICY_URL} target="_blank" rel="noreferrer">
+              {t('privacy_policy')}
+            </a>
+          </p>
         </div>
       </div>
     </div>
