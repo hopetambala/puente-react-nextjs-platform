@@ -84,6 +84,13 @@ function FormCreator({ context, user }) {
   const [previewOpen, setPreviewOpen] = useState();
   const [submissionType, setSubmissionType] = useState('');
   const [submission, setSubmission] = useState(false);
+  // A failed publish must be visible: logging it alone let authors believe a
+  // form was live while surveyors never received it.
+  const [publishError, setPublishError] = useState(false);
+  const showPublishError = (err) => {
+    console.log(err); //eslint-disable-line
+    setPublishError(true);
+  };
 
   useEffect(() => {
     if (context.store['/forms/form-creator']) {
@@ -133,6 +140,7 @@ function FormCreator({ context, user }) {
   };
 
   const submitCustomForm = () => {
+    setPublishError(false);
     const formObject = {};
     formObject.fields = formItems;
     formObject.organizations = [user.organization];
@@ -168,9 +176,7 @@ function FormCreator({ context, user }) {
           setTimeout(() => setSubmission(false), 3000);
           clearForm();
         })
-        .catch((err) => {
-          console.log(err); //eslint-disable-line
-        });
+        .catch(showPublishError);
     } else if (submissionType === 'edit puente form') {
       postParams.parseClass = 'PuenteFormModifications';
       postParams.parseClassID = formId;
@@ -194,9 +200,7 @@ function FormCreator({ context, user }) {
               setTimeout(() => setSubmission(false), 3000);
               console.log(postParams); //eslint-disable-line
             })
-            .catch((error) => {
-              console.log(error); //eslint-disable-line
-            });
+            .catch(showPublishError);
           console.log(err); //eslint-disable-line
         });
     } else {
@@ -207,9 +211,7 @@ function FormCreator({ context, user }) {
           console.log(postParams); //eslint-disable-line
           clearForm();
         })
-        .catch((err) => {
-          console.log(err); //eslint-disable-line
-        });
+        .catch(showPublishError);
     }
   };
 
@@ -252,6 +254,15 @@ function FormCreator({ context, user }) {
   return (
     <div>
       {submission && <Toast text={t('form_creator_success')} />}
+      {publishError && (
+        <div role="alert">
+          <Toast
+            isError
+            text={t('form_creator_publish_error')}
+            closeToast={() => setPublishError(false)}
+          />
+        </div>
+      )}
       <NativeApplicationDrawer
         isOpen={previewOpen}
         onClose={() => setPreviewOpen(false)}

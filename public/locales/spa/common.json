@@ -316,6 +316,7 @@
   "inspector_close": "Cerrar el inspector",
   "inspector_other_with_text": "Otro (con texto)",
   "form_creator_success": "¡Listo!",
+  "form_creator_publish_error": "Su formulario no se publicó. Revise su conexión e inténtelo de nuevo.",
   "form_creator_reset": "Restablecer el formulario",
   "form_creator_preview": "Vista previa del formulario",
   "form_creator_type_of_form": "Tipo de formulario",

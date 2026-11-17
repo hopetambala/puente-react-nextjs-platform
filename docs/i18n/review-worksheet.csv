@@ -316,6 +316,7 @@ common,form_creator_drag_to_reorder,Drag to reorder,Arrastra para reordenar,Tren
 common,inspector_close,Close inspector,Cerrar el inspector,Fèmen enspektè a,,
 common,inspector_other_with_text,Other (with text),Otro (con texto),Lòt (ak tèks),,
 common,form_creator_success,Success!,¡Listo!,Sa mache!,,
+common,form_creator_publish_error,Your form was not published. Check your connection and try again.,Su formulario no se publicó. Revise su conexión e inténtelo de nuevo.,Fòm ou an pa t pibliye. Tcheke koneksyon ou epi eseye ankò.,,Shown when Publish fails; it used to fail silently. Spanish and Creole written by Claude: needs native review.
 common,form_creator_reset,Reset form,Restablecer el formulario,Reinisyalize fòm nan,,
 common,form_creator_preview,Preview form,Vista previa del formulario,Gade fòm nan davans,,
 common,form_creator_type_of_form,Type of form,Tipo de formulario,Kalite fòm,,

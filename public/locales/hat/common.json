@@ -316,6 +316,7 @@
   "inspector_close": "Fèmen enspektè a",
   "inspector_other_with_text": "Lòt (ak tèks)",
   "form_creator_success": "Sa mache!",
+  "form_creator_publish_error": "Fòm ou an pa t pibliye. Tcheke koneksyon ou epi eseye ankò.",
   "form_creator_reset": "Reinisyalize fòm nan",
   "form_creator_preview": "Gade fòm nan davans",
   "form_creator_type_of_form": "Kalite fòm",

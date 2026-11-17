@@ -316,6 +316,7 @@
   "inspector_close": "Close inspector",
   "inspector_other_with_text": "Other (with text)",
   "form_creator_success": "Success!",
+  "form_creator_publish_error": "Your form was not published. Check your connection and try again.",
   "form_creator_reset": "Reset form",
   "form_creator_preview": "Preview form",
   "form_creator_type_of_form": "Type of form",
