@@ -18,7 +18,7 @@ const MODULES = [
   { platform: 'Manage · Web', mobile: false, title: 'Form Manager', desc: 'Browse submitted records as cards or tables. Drill in, expand rows, export to CSV.', link: '/forms/form-manager', linkLabel: 'Open Form Manager →' },
   { platform: 'Manage · Web', mobile: false, title: 'Marketplace', desc: 'Community-published form templates for medical evaluation, vitals and environmental health. Install in one click.', link: '/forms/form-marketplace', linkLabel: 'Browse marketplace →' },
   { platform: 'Collect · Mobile', mobile: true, title: 'Data Collection', desc: 'Identification forms, supplementary configs and GDPR consent, all queued locally and synced when online.', link: '#collect', linkLabel: 'Get the app →' },
-  { platform: 'Collect · Mobile', mobile: true, title: 'Find Records', desc: 'Search and edit existing household records in the field, on the same data model as the web side.', link: DOCS_URL, linkLabel: 'See how it works →' },
+  { platform: 'Collect · Mobile', mobile: true, title: 'Find Records', desc: 'Search and edit existing household records in the field, on the same data model as the web side.', link: `${DOCS_URL}finding-someone-you-already-surveyed/`, linkLabel: 'See how it works →' },
   { platform: 'Manage · Web', mobile: false, title: 'Data Curation', desc: 'Find duplicates, score completeness, audit community names and fix records inline before the data is used, then export it clean.', link: '/data/data-curation', linkLabel: 'Open Data Curation →' },
 ];
 

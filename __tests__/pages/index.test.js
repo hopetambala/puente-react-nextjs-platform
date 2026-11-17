@@ -70,10 +70,12 @@ describe('Landing page — every link goes somewhere real', () => {
     expect(section.querySelector('a[href^="https://play.google.com/"]')).not.toBeNull();
   });
 
-  it('points "See how it works" at the guides', () => {
+  it('points "See how it works" at the guide for that screen', () => {
     render(<Homepage />);
-    expect(screen.getByRole('link', { name: /See how it works/ }).getAttribute('href'))
-      .toMatch(/^https:\/\/puente-dr\.github\.io\/guides\//);
+    expect(screen.getByRole('link', { name: /See how it works/ })).toHaveAttribute(
+      'href',
+      'https://puente-dr.github.io/guides/finding-someone-you-already-surveyed/',
+    );
   });
 
   it('links dlite tokens to the repo npm names for the package', () => {
