@@ -8,7 +8,7 @@ import { render, screen } from '@testing-library/react';
 const { default: Homepage, getStaticProps } = require('pages/index');
 const pkg = require('../../package.json');
 
-const DOCS_URL = 'https://puente-dr.github.io/guides/';
+const DOCS_URL = 'https://puente-dr.github.io/docs/';
 
 describe('Landing page — highlights Data Curation', () => {
   it('markets Data Curation', () => {
@@ -49,12 +49,12 @@ describe('Landing page — every link goes somewhere real', () => {
     expect(dead).toEqual([]);
   });
 
-  it('points "Read the docs" at the onboarding guides', () => {
+  it('points "Read the docs" at the docs site', () => {
     render(<Homepage />);
     expect(screen.getByRole('link', { name: 'Read the docs' })).toHaveAttribute('href', DOCS_URL);
   });
 
-  it('points the footer "Documentation" link at the guides, not the source repo', () => {
+  it('points the footer "Documentation" link at the docs site, not the source repo', () => {
     render(<Homepage />);
     expect(screen.getByRole('link', { name: 'Documentation' })).toHaveAttribute('href', DOCS_URL);
   });
@@ -74,7 +74,7 @@ describe('Landing page — every link goes somewhere real', () => {
     render(<Homepage />);
     expect(screen.getByRole('link', { name: /See how it works/ })).toHaveAttribute(
       'href',
-      'https://puente-dr.github.io/guides/finding-someone-you-already-surveyed/',
+      'https://puente-dr.github.io/docs/collect/find-records/',
     );
   });
 
