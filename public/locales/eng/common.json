@@ -398,6 +398,7 @@
   "account_details_title": "Account Details",
   "account_hold_on": "Hold On",
   "login_license": "Source available · BSL 1.1",
+  "login_account_deactivated": "This account has been deactivated. Contact your organization administrator.",
   "form_manager_no_custom_forms": "No custom forms yet.",
   "form_manager_custom_forms_error": "Your custom forms did not load.",
   "form_manager_custom_forms_error_sub": "This is a loading problem — nothing was changed. Check your connection and try again.",

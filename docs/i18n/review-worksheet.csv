@@ -398,6 +398,7 @@ common,account_reset_sent,Request Sent!,¡Solicitud enviada!,Demann nan pati!,,
 common,account_details_title,Account Details,Datos de la cuenta,Detay kont lan,,
 common,account_hold_on,Hold On,Un momento,Tann yon ti moman,,
 common,login_license,Source available · BSL 1.1,Código disponible · BSL 1.1,Kòd sous disponib · BSL 1.1,,
+common,login_account_deactivated,This account has been deactivated. Contact your organization administrator.,Esta cuenta ha sido desactivada. Comuníquese con el administrador de su organización.,Kont sa a dezaktive. Kontakte administratè òganizasyon ou an.,,Sign-in refusal for an account an administrator deactivated. Spanish and Creole written by Claude: needs native review.
 common,form_manager_no_custom_forms,No custom forms yet.,Todavía no hay formularios personalizados.,Poko gen fòm pèsonalize.,,
 common,form_manager_custom_forms_error,Your custom forms did not load.,Sus formularios personalizados no se cargaron.,Fòm pèsonalize ou yo pa t chaje.,,
 common,form_manager_custom_forms_error_sub,This is a loading problem — nothing was changed. Check your connection and try again.,Es un problema de carga — no se cambió nada. Revise su conexión e inténtelo de nuevo.,Se yon pwoblèm chajman — anyen pa chanje. Tcheke koneksyon ou epi eseye ankò.,,

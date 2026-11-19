@@ -398,6 +398,7 @@
   "account_details_title": "Datos de la cuenta",
   "account_hold_on": "Un momento",
   "login_license": "Código disponible · BSL 1.1",
+  "login_account_deactivated": "Esta cuenta ha sido desactivada. Comuníquese con el administrador de su organización.",
   "form_manager_no_custom_forms": "Todavía no hay formularios personalizados.",
   "form_manager_custom_forms_error": "Sus formularios personalizados no se cargaron.",
   "form_manager_custom_forms_error_sub": "Es un problema de carga — no se cambió nada. Revise su conexión e inténtelo de nuevo.",

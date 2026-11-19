@@ -398,6 +398,7 @@
   "account_details_title": "Detay kont lan",
   "account_hold_on": "Tann yon ti moman",
   "login_license": "Kòd sous disponib · BSL 1.1",
+  "login_account_deactivated": "Kont sa a dezaktive. Kontakte administratè òganizasyon ou an.",
   "form_manager_no_custom_forms": "Poko gen fòm pèsonalize.",
   "form_manager_custom_forms_error": "Fòm pèsonalize ou yo pa t chaje.",
   "form_manager_custom_forms_error_sub": "Se yon pwoblèm chajman — anyen pa chanje. Tcheke koneksyon ou epi eseye ankò.",

@@ -11,6 +11,8 @@ jest.mock('app/modules/user', () => ({
   retrieveSignInFunction: jest.fn(),
 }));
 
+jest.mock('react-toastify', () => ({ toast: jest.fn() }));
+
 jest.mock('next/router', () => ({
   useRouter: () => ({
     push: jest.fn(), query: {}, asPath: '/account/login', locale: 'eng',
@@ -192,6 +194,25 @@ describe('Legal and version footer', () => {
     const { props } = await getStaticProps({ locale: 'eng' });
     // eslint-disable-next-line global-require
     expect(props.appVersion).toBe(require('../../../../package.json').version);
+  });
+});
+
+describe('Deactivated account', () => {
+  it('says the account is deactivated, in the reader\'s language', async () => {
+    const { toast } = require('react-toastify');
+    retrieveSignInFunction.mockRejectedValue(
+      Object.assign(new Error('deactivated'), { code: 'ACCOUNT_DEACTIVATED' }),
+    );
+    const { container } = render(<Login />);
+
+    await userEvent.type(container.querySelector('input[name="usernameV"]'), 'gone');
+    await userEvent.type(container.querySelector('input[name="passwordV"]'), 'pw');
+    await userEvent.click(screen.getByRole('button', { name: /sign in/i }));
+
+    await waitFor(() => expect(toast).toHaveBeenCalled());
+    const [element] = toast.mock.calls[0];
+    expect(element.props.text).toBe('login_account_deactivated');
+    expect(element.props.isError).toBe(true);
   });
 });
 

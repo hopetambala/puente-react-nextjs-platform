@@ -45,7 +45,12 @@ function Login({ appVersion }) {
         const returnUrl = router.query.returnUrl || '/quick-start';
         router.push(returnUrl);
       })
-      .catch((e) => toast(<Toast text={`${e.message}`} isError />))
+      .catch((e) => toast(
+        <Toast
+          text={e.code === 'ACCOUNT_DEACTIVATED' ? t('login_account_deactivated') : `${e.message}`}
+          isError
+        />,
+      ))
       .finally(() => setLoading(false));
   };
 
