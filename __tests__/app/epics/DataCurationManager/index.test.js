@@ -97,8 +97,14 @@ jest.mock('app/epics/DataCurationManager/FilterBar', () => ({ onFilterChange }) 
   <div data-testid="filter-bar">
     <button type="button" onClick={() => onFilterChange({ community: 'Nsanje' })}>set community filter</button>
     <button type="button" onClick={() => onFilterChange({ completeness: 'high' })}>filter to high completeness</button>
+    <button type="button" onClick={() => onFilterChange({ search: 'Ana' })}>search for Ana</button>
   </div>
 ));
+
+// The search itself has its own tests (search.test.js); here only the wiring.
+jest.mock('app/epics/DataCurationManager/search', () => ({
+  applySearch: jest.fn((q) => q),
+}));
 jest.mock('app/epics/DataCurationManager/RecordsTable', () => ({ records }) => (
   <div data-testid="records-table">{records.length} rows</div>
 ));
@@ -282,6 +288,22 @@ describe('Summary bar', () => {
     mockFind.mockResolvedValue([r]);
     render(<DataCurationManager />);
     await waitFor(() => expect(screen.getByText(/1.*anomalies/i)).toBeInTheDocument());
+  });
+});
+
+// The search box used to set filters.search and nothing read it.
+describe('Search', () => {
+  it('applies the search box to the fetch, and the fetch then pages', async () => {
+    const { applySearch } = require('app/epics/DataCurationManager/search');
+    render(<DataCurationManager />);
+    await waitFor(() => screen.getByTestId('filter-bar'));
+    fireEvent.click(screen.getByText('search for Ana'));
+
+    await waitFor(() => expect(applySearch).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ source: 'survey-data', search: 'Ana', orgValues: ['TestOrg'] }),
+    ));
+    expect(mockQueryChain.limit).toHaveBeenCalled();
   });
 });
 

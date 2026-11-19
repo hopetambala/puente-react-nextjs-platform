@@ -21,6 +21,7 @@ import FilterBar from './FilterBar';
 import styles from './index.module.css';
 import RecordInspector from './RecordInspector';
 import RecordsTable from './RecordsTable';
+import { applySearch } from './search';
 import SourceSelector from './SourceSelector';
 
 // ─── Data-quality definitions ────────────────────────────────────────────────
@@ -181,14 +182,9 @@ export default function DataCurationManager() {
     // too — and it adds no round trip, since find() and count() still run as the
     // one concurrent pair.
     const signalQuery = SIGNAL_QUERIES[activeSignal];
-    const q = signalQuery
+    let q = signalQuery
       ? signalQuery({ Parse, orgValues })
       : new Parse.Query(parseClass).containedIn('surveyingOrganization', orgValues);
-    // Every class except SurveyData holds no person or community fields of its
-    // own and points at the SurveyData record via `client`. include() resolves
-    // that pointer in the same round-trip; without it the pointer arrives
-    // unfetched and every read through it is undefined.
-    if (sourceHasClientPointer(source)) q.include('client');
     if (source.startsWith('form-results:')) {
       q.equalTo('formSpecificationsId', source.replace('form-results:', ''));
     }
@@ -196,6 +192,15 @@ export default function DataCurationManager() {
     if (filters.community) q.equalTo('communityname', filters.community);
     if (filters.from) q.greaterThanOrEqualTo('createdAt', filters.from);
     if (filters.to) q.lessThanOrEqualTo('createdAt', filters.to);
+    // May return a new (compound) query, so it goes before include/order/paging.
+    q = applySearch(q, {
+      Parse, source, search: filters.search, orgValues,
+    });
+    // Every class except SurveyData holds no person or community fields of its
+    // own and points at the SurveyData record via `client`. include() resolves
+    // that pointer in the same round-trip; without it the pointer arrives
+    // unfetched and every read through it is undefined.
+    if (sourceHasClientPointer(source)) q.include('client');
     q.descending('createdAt').limit(PAGE_SIZE).skip(page * PAGE_SIZE);
 
     Promise.all([q.find(), q.count()])
