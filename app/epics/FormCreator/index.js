@@ -64,6 +64,24 @@ const COLLECTION = [
   },
 ];
 
+// The types the dropdown offers, which are also what Collect downloads
+// (typeOfForm "Custom" or "Assets"). Anything else, an empty list included,
+// published fine and never reached a phone, while the dropdown showed "Custom".
+const FORM_TYPES = ['Custom', 'Assets'];
+const DEFAULT_FORM_TYPES = ['Custom'];
+
+/**
+ * The form type to start from. A Puente form edit keeps whatever it carries
+ * (it is saved as a PuenteFormModifications record, not a custom form).
+ * Everything else, including a Marketplace "Duplicate", becomes a form of the
+ * author's own: its type if the dropdown offers it, otherwise Custom.
+ */
+export function initialFormTypes(action, typeOfForm) {
+  if (action === 'edit puente form') return typeOfForm || [];
+  const [type] = typeOfForm || [];
+  return FORM_TYPES.includes(type) ? [type] : DEFAULT_FORM_TYPES;
+}
+
 function FormCreator({ context, user }) {
   const { t } = useTranslation('common');
   const [formName, setFormName] = useState('');
@@ -72,7 +90,7 @@ function FormCreator({ context, user }) {
   const [allowResearchExport, setAllowResearchExport] = useState(false);
   const [formDescription, setFormDescription] = useState('');
   const [formItems, setFormItems] = useState([]);
-  const [formTypeNames, setFormTypeNames] = useState(['Custom']);
+  const [formTypeNames, setFormTypeNames] = useState(DEFAULT_FORM_TYPES);
   const [formId, setFormId] = useState();
 
   // const [workflowTypes] = useState(["Puente", "Assets", "Marketplace"]);
@@ -112,7 +130,7 @@ function FormCreator({ context, user }) {
       setFormName(name);
       setFormDescription(description);
       setAllowResearchExport(allowed === true);
-      setFormTypeNames(typeOfForm || []);
+      setFormTypeNames(initialFormTypes(action, typeOfForm));
       console.log("Orgs Authorized", orgs); //eslint-disable-line
       setFormItems(fields);
     }
@@ -135,7 +153,7 @@ function FormCreator({ context, user }) {
     setFormName('');
     setFormDescription('');
     setAllowResearchExport(false);
-    setFormTypeNames([]);
+    setFormTypeNames(DEFAULT_FORM_TYPES);
     setFormItems([]);
   };
 

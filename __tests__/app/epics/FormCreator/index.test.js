@@ -292,6 +292,71 @@ describe('Publish feedback', () => {
   });
 });
 
+// ─── Form type survives Reset, Publish and Duplicate ─────────────────────────
+// Collect only downloads forms whose typeOfForm is "Custom" (or "Assets").
+// Reset and every successful publish set the type to [] while the dropdown
+// still showed "Custom", and Duplicate from the Marketplace carried
+// typeOfForm "Marketplace" while the dropdown showed "Custom". Either way the
+// form published fine and never reached a phone.
+
+describe('Form type', () => {
+  const lastTypeOfForm = () => {
+    const { calls } = postObjectsToClass.mock;
+    return calls[calls.length - 1][0].localObject.typeOfForm;
+  };
+
+  it('publishes a second form as Custom after the first one publishes', async () => {
+    render(<FormCreator context={makeContext()} user={mockUser} />);
+    await userEvent.click(screen.getByText('form_creator_publish'));
+    await waitFor(() => expect(postObjectsToClass).toHaveBeenCalledTimes(1));
+    await userEvent.click(screen.getByText('form_creator_publish'));
+    await waitFor(() => expect(postObjectsToClass).toHaveBeenCalledTimes(2));
+    expect(lastTypeOfForm()).toEqual(['Custom']);
+  });
+
+  it('publishes as Custom after Reset', async () => {
+    render(<FormCreator context={makeContext()} user={mockUser} />);
+    await userEvent.click(screen.getByText('form_creator_reset'));
+    await userEvent.click(screen.getByText('form_creator_publish'));
+    await waitFor(() => expect(postObjectsToClass).toHaveBeenCalled());
+    expect(lastTypeOfForm()).toEqual(['Custom']);
+  });
+
+  it('publishes a Marketplace duplicate as Custom, a new form of your own', async () => {
+    const ctx = makeContext({
+      action: 'duplicate',
+      data: {
+        name: 'WaSH template', description: '', fields: [],
+        typeOfForm: ['Marketplace'], organizations: ['other-org'], objectId: 'mkt-1',
+      },
+    });
+    render(<FormCreator context={ctx} user={mockUser} />);
+    await waitFor(() =>
+      expect(screen.getByPlaceholderText('form_creator_form_name_placeholder').value).toBe('WaSH template'),
+    );
+    await userEvent.click(screen.getByText('form_creator_publish'));
+    await waitFor(() => expect(postObjectsToClass).toHaveBeenCalled());
+    expect(lastTypeOfForm()).toEqual(['Custom']);
+  });
+
+  it('keeps an Assets form as Assets when editing', async () => {
+    const ctx = makeContext({
+      action: 'edit',
+      data: {
+        name: 'Water points', description: '', fields: [],
+        typeOfForm: ['Assets'], organizations: ['test-org'], objectId: 'a-1',
+      },
+    });
+    render(<FormCreator context={ctx} user={mockUser} />);
+    await waitFor(() =>
+      expect(screen.getByPlaceholderText('form_creator_form_name_placeholder').value).toBe('Water points'),
+    );
+    await userEvent.click(screen.getByText('form_creator_publish'));
+    await waitFor(() => expect(updateObject).toHaveBeenCalled());
+    expect(updateObject.mock.calls[0][0].localObject.typeOfForm).toEqual(['Assets']);
+  });
+});
+
 // ─── Pure utility functions ───────────────────────────────────────────────────
 // Tested directly — no component rendering needed.
 
