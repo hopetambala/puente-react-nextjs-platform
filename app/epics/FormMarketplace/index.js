@@ -55,7 +55,8 @@ const FormMarketplace = ({ context, router }) => {
             description={form.description}
             actions={[
               {
-                text: 'Duplicate',
+                // Same word and key as Form Manager's Duplicate action.
+                text: t('form_manager_duplicate'),
                 action: () => passDataToFormCreator('duplicate', form),
               },
             ]}

@@ -75,6 +75,27 @@ describe('Unauthenticated access', () => {
   });
 });
 
+// Account settings shows the signed-in person's own account, and only that.
+describe('Only your own account', () => {
+  const { retrieveUserByObjectId, updateUser } = require('app/modules/user');
+
+  it('sends a signed-out visitor to sign in and loads nothing', async () => {
+    mockQuery = { objectId: 'someone-else' };
+    retrieveCurrentUserAsyncFunction.mockReturnValue(null);
+    render(<ManagementWrapper />);
+    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/account/login'));
+    expect(retrieveUserByObjectId).not.toHaveBeenCalled();
+  });
+
+  it('loads the signed-in account, whatever the URL says', async () => {
+    mockQuery = { objectId: 'someone-else' };
+    render(<ManagementWrapper />);
+    await waitFor(() => expect(retrieveUserByObjectId).toHaveBeenCalledWith('user-123'));
+    expect(retrieveUserByObjectId).not.toHaveBeenCalledWith('someone-else');
+    expect(updateUser).not.toHaveBeenCalled();
+  });
+});
+
 describe('PageHeader', () => {
   it('renders via PageHeader component (not raw h1 "PUENTE")', async () => {
     render(<ManagementWrapper />);
@@ -133,6 +154,11 @@ describe('Organization is not self-service', () => {
     render(<ManagementWrapper />);
 
     expect(await screen.findByTestId('organization-change-note')).toBeInTheDocument();
+  });
+
+  it('says it in the reader\'s language, not hard-coded English', async () => {
+    render(<ManagementWrapper />);
+    expect(await screen.findByTestId('organization-change-note')).toHaveTextContent('account_org_change_note');
   });
 });
 

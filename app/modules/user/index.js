@@ -29,7 +29,16 @@ const retrieveSignInFunction = async (username, password) => {
 
   return new Promise((resolve, reject) => {
   // sign in with either phonenumber (username) or email handled with logIn
-    Parse.User.logIn(String(username), String(password)).then((user) => {
+    Parse.User.logIn(String(username), String(password)).then(async (user) => {
+      // An account an administrator has deactivated may not sign in to
+      // Manage: sign it straight back out and store nothing.
+      if (user.get('deactivated') === true) {
+        await Parse.User.logOut().catch(() => {});
+        const error = new Error('This account has been deactivated.');
+        error.code = 'ACCOUNT_DEACTIVATED';
+        reject(error);
+        return;
+      }
     console.log(`User logged in successful with username: ${user.get('username')}`); // eslint-disable-line
       const userJSON = user.toJSON();
       userSubject.next(userJSON);

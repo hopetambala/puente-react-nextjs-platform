@@ -25,7 +25,10 @@ jest.mock('app/impacto-design-system', () => ({
   ),
   EmptyState: ({ message }) => <p data-testid="empty-state">{message}</p>,
   PageHeader: ({ title, actions }) => <div data-testid="page-header"><h1>{title}</h1>{actions}</div>,
-  Toast: ({ message }) => message ? <div data-testid="toast">{message}</div> : null,
+  // The real Toast takes `text` and an `isError` flag.
+  Toast: ({ text, isError }) => (text
+    ? <div data-testid={isError ? 'toast-error' : 'toast'}>{text}</div>
+    : null),
 }));
 
 // Heavy sub-components — render nothing; only the epic's own logic is under test
@@ -229,6 +232,128 @@ describe('Submit routing — Puente edit', () => {
     await waitFor(() => {
       expect(postObjectsToClass).toHaveBeenCalled();
     });
+  });
+});
+
+// ─── Publish failures are visible ───────────────────────────────────────────
+// A failed publish used to go only to console.log, so the author believed the
+// form was live while surveyors never received it.
+
+describe('Publish feedback', () => {
+  const editCtx = (action, objectId) => makeContext({
+    action,
+    data: {
+      name: 'Existing Form',
+      description: '',
+      fields: [],
+      typeOfForm: ['Custom'],
+      organizations: ['test-org'],
+      objectId,
+    },
+  });
+
+  it('shows the success toast when a new form publishes', async () => {
+    render(<FormCreator context={makeContext()} user={mockUser} />);
+    await userEvent.click(screen.getByText('form_creator_publish'));
+    expect(await screen.findByTestId('toast')).toHaveTextContent('form_creator_success');
+    expect(screen.queryByTestId('toast-error')).not.toBeInTheDocument();
+  });
+
+  it('shows an error, and keeps the form, when a new form fails to publish', async () => {
+    postObjectsToClass.mockRejectedValueOnce(new Error('network'));
+    render(<FormCreator context={makeContext()} user={mockUser} />);
+    await userEvent.type(screen.getByPlaceholderText('form_creator_form_name_placeholder'), 'Vitals');
+    await userEvent.click(screen.getByText('form_creator_publish'));
+    expect(await screen.findByTestId('toast-error')).toHaveTextContent('form_creator_publish_error');
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(screen.queryByTestId('toast')).not.toBeInTheDocument();
+    expect(screen.getByPlaceholderText('form_creator_form_name_placeholder').value).toBe('Vitals');
+  });
+
+  it('shows an error when saving an edit fails', async () => {
+    updateObject.mockRejectedValueOnce(new Error('network'));
+    render(<FormCreator context={editCtx('edit', 'form-xyz')} user={mockUser} />);
+    await waitFor(() =>
+      expect(screen.getByPlaceholderText('form_creator_form_name_placeholder').value).toBe('Existing Form'),
+    );
+    await userEvent.click(screen.getByText('form_creator_publish'));
+    expect(await screen.findByTestId('toast-error')).toHaveTextContent('form_creator_publish_error');
+  });
+
+  it('shows an error when a Puente form edit fails both ways', async () => {
+    updateObject.mockRejectedValueOnce(new Error('not found'));
+    postObjectsToClass.mockRejectedValueOnce(new Error('network'));
+    render(<FormCreator context={editCtx('edit puente form', 'puente-003')} user={mockUser} />);
+    await waitFor(() =>
+      expect(screen.getByPlaceholderText('form_creator_form_name_placeholder').value).toBe('Existing Form'),
+    );
+    await userEvent.click(screen.getByText('form_creator_publish'));
+    expect(await screen.findByTestId('toast-error')).toHaveTextContent('form_creator_publish_error');
+  });
+});
+
+// ─── Form type survives Reset, Publish and Duplicate ─────────────────────────
+// Collect only downloads forms whose typeOfForm is "Custom" (or "Assets").
+// Reset and every successful publish set the type to [] while the dropdown
+// still showed "Custom", and Duplicate from the Marketplace carried
+// typeOfForm "Marketplace" while the dropdown showed "Custom". Either way the
+// form published fine and never reached a phone.
+
+describe('Form type', () => {
+  const lastTypeOfForm = () => {
+    const { calls } = postObjectsToClass.mock;
+    return calls[calls.length - 1][0].localObject.typeOfForm;
+  };
+
+  it('publishes a second form as Custom after the first one publishes', async () => {
+    render(<FormCreator context={makeContext()} user={mockUser} />);
+    await userEvent.click(screen.getByText('form_creator_publish'));
+    await waitFor(() => expect(postObjectsToClass).toHaveBeenCalledTimes(1));
+    await userEvent.click(screen.getByText('form_creator_publish'));
+    await waitFor(() => expect(postObjectsToClass).toHaveBeenCalledTimes(2));
+    expect(lastTypeOfForm()).toEqual(['Custom']);
+  });
+
+  it('publishes as Custom after Reset', async () => {
+    render(<FormCreator context={makeContext()} user={mockUser} />);
+    await userEvent.click(screen.getByText('form_creator_reset'));
+    await userEvent.click(screen.getByText('form_creator_publish'));
+    await waitFor(() => expect(postObjectsToClass).toHaveBeenCalled());
+    expect(lastTypeOfForm()).toEqual(['Custom']);
+  });
+
+  it('publishes a Marketplace duplicate as Custom, a new form of your own', async () => {
+    const ctx = makeContext({
+      action: 'duplicate',
+      data: {
+        name: 'WaSH template', description: '', fields: [],
+        typeOfForm: ['Marketplace'], organizations: ['other-org'], objectId: 'mkt-1',
+      },
+    });
+    render(<FormCreator context={ctx} user={mockUser} />);
+    await waitFor(() =>
+      expect(screen.getByPlaceholderText('form_creator_form_name_placeholder').value).toBe('WaSH template'),
+    );
+    await userEvent.click(screen.getByText('form_creator_publish'));
+    await waitFor(() => expect(postObjectsToClass).toHaveBeenCalled());
+    expect(lastTypeOfForm()).toEqual(['Custom']);
+  });
+
+  it('keeps an Assets form as Assets when editing', async () => {
+    const ctx = makeContext({
+      action: 'edit',
+      data: {
+        name: 'Water points', description: '', fields: [],
+        typeOfForm: ['Assets'], organizations: ['test-org'], objectId: 'a-1',
+      },
+    });
+    render(<FormCreator context={ctx} user={mockUser} />);
+    await waitFor(() =>
+      expect(screen.getByPlaceholderText('form_creator_form_name_placeholder').value).toBe('Water points'),
+    );
+    await userEvent.click(screen.getByText('form_creator_publish'));
+    await waitFor(() => expect(updateObject).toHaveBeenCalled());
+    expect(updateObject.mock.calls[0][0].localObject.typeOfForm).toEqual(['Assets']);
   });
 });
 

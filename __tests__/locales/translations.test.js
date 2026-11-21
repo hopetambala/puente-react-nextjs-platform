@@ -65,6 +65,8 @@ const NAV_KEYS = [
   'nav_marketplace',
   'nav_settings',
   'nav_logout',
+  'nav_group_workspace',
+  'nav_group_org',
 ];
 
 describe('Navigation is genuinely translated, not copied from English', () => {

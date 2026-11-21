@@ -1,6 +1,8 @@
 # Self-service organizations, org admins, and Puente super-admins
 
-**Status: specified 2026-08-30, not yet built.** Decisions below were taken by
+**Status: specified 2026-08-30; since built.** What shipped, and where, is in
+[organization-delivery-status.md](organization-delivery-status.md) ("the second
+wave"); this file keeps the decisions and their reasoning. Decisions below were taken by
 Hope in a scoping session; each is recorded with the reasoning so nobody has to
 re-litigate it. This supersedes two things it contradicts — see §1.
 

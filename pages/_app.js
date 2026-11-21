@@ -19,9 +19,10 @@ import 'styles/landing-page/top-loading-bar.css'
 
 import CssBaseline from '@material-ui/core/CssBaseline'
 import { ThemeProvider } from '@material-ui/core/styles'
-import { stripLocalePrefix, syncDocumentLanguage } from 'app/modules/i18n/languages'
+import { syncDocumentLanguage } from 'app/modules/i18n/languages'
 import theme from 'app/modules/theme'
 import { parseUserValue } from 'app/modules/user'
+import { isPublicPath } from 'app/modules/user/publicPaths'
 import parseService from 'app/services/parse'
 import { AppWrapper } from 'app/store'
 import Head from 'next/head'
@@ -46,21 +47,7 @@ function App(props) {
   const authCheck = (url) => {
     // redirect to login page if accessing a private page and not logged in
     const parseUser = parseUserValue()
-    const publicPaths = [
-      '/',
-      '/account/login',
-      '/account/login/reset-login',
-      '/account/verify',
-      '/account/verify/redirect',
-      '/account/register',
-      '/account/reset',
-      '/account/management',
-    ]
-    // Strip the locale prefix before comparing: publicPaths is written without
-    // one, and routeChangeComplete hands over the full URL. Without this, every
-    // /spa/* and /hat/* public route fails the guard and renders blank.
-    const path = stripLocalePrefix(url)
-    if (!parseUser && !publicPaths.includes(path)) {
+    if (!parseUser && !isPublicPath(url)) {
       setAuthorized(false)
       router.push({
         pathname: '/account/login',

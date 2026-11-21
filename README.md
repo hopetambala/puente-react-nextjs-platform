@@ -19,13 +19,13 @@ Puente Manage is built for:
 - **Organizations** collecting humanitarian data (surveys, household data, community info)
 - **Field staff** submitting data on mobile and web
 - **Data managers** reviewing, editing, and exporting results
-- **Multi-language** operations (6 locales: English, Arabic, German, Indonesian, Portuguese, Chinese)
+- **Multi-language** operations (3 languages: English, Spanish, Haitian Creole)
 
 ### Core Features
 
-- **Form Creator** — Build custom forms with conditional logic, loops, and data validation
+- **Form Creator** — Build custom forms from seven blocks: number, text, side label, single and multi select, header, geolocation
 - **Form Manager** — View, filter, and drill into submitted records with pagination
-- **Operational Dashboard** — Real-time stats: records today, active surveyors, household count
+- **Operational Dashboard** — A sync ribbon (when records last arrived), a needs-attention queue (missing key fields, duplicate households, renamed form fields, unresolved household links) that links into curation, and community coverage that surfaces quiet communities
 - **Data Curation** — Quality metrics (completeness %), duplicate detection, anomaly flags, inline editing
 - **Account Management** — User roles, organization setup, profile settings
 
@@ -39,7 +39,7 @@ Puente Manage is built for:
 | **Data** | Parse SDK, Apollo Client (GraphQL) |
 | **Forms** | react-hook-form, yup |
 | **State** | React Context |
-| **i18n** | next-i18next (6 languages) |
+| **i18n** | next-i18next (English, Spanish, Haitian Creole) |
 | **Testing** | Jest, React Testing Library (230+ tests, 26 suites) |
 
 ## Project Structure
@@ -79,7 +79,7 @@ app/
     flask-api/                      # Backend integration
 
 __tests__/                          # Jest tests (mirrors source tree)
-public/locales/                     # i18n translations (6 languages)
+public/locales/                     # i18n translations (eng, spa, hat)
 ```
 
 ## Design System (dlite)
@@ -116,9 +116,8 @@ See [app/impacto-design-system/index.js](app/impacto-design-system/index.js) for
 - `SurveyDataActivity` — Audit log of changes
 
 **Key queries:**
-- Active surveyors (last 7 days): `.distinct('surveyingUser')` filtered by org & date
-- Household count: `SurveyData.count()` by org
-- Record completeness: % of 5 required fields filled (`fname`, `lname`, `householdId`, `surveyingUser`, `communityname`)
+- Every query is scoped to the organization's alias set (`containedIn('surveyingOrganization', …)`), not one name
+- Record completeness: % of the 8 key fields filled (`fname`, `lname`, `dob`, `sex`, `householdId`, `communityname`, `surveyingUser`, `telephoneNumber`), defined once in `app/modules/data-quality/index.js`
 
 ## i18n (Internationalization)
 

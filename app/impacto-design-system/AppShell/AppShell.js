@@ -14,6 +14,7 @@ function deriveActiveRoute(pathname) {
   if (pathname.startsWith('/forms')) return 'forms';
   if (pathname.startsWith('/data')) return 'data';
   if (pathname.startsWith('/account/management')) return 'settings';
+  if (pathname.startsWith('/organization-admin')) return 'organization-admin';
   return 'dashboard';
 }
 

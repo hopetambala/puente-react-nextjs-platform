@@ -58,3 +58,25 @@ describe('toOrganizationOptions', () => {
     expect(toOrganizationOptions(undefined)).toEqual([]);
   });
 });
+
+// The registration picker showed an entry called "[object Object]" at the top,
+// in production and test (documented in the onboarding guide). Signup once
+// stored String(option object) as an organization; the register page no longer
+// does, but a record named that way, or with a non-string name, must not be
+// offered as an organization someone can join.
+describe('toOrganizationOptions: corrupt names', () => {
+  const named = (id, name) => ({ id, get: (k) => ({ name, shortCode: id, active: true }[k]) });
+
+  it('drops a record literally named "[object Object]"', () => {
+    const options = toOrganizationOptions([named('bad', '[object Object]'), named('ok', 'Puente')]);
+    expect(options.map((o) => o.label)).toEqual(['Puente']);
+  });
+
+  it('drops a record whose name is not a non-empty string', () => {
+    const options = toOrganizationOptions([
+      named('obj', { label: 'Puente' }), named('blank', '  '), named('ok', 'Puente'),
+    ]);
+    expect(options.map((o) => o.label)).toEqual(['Puente']);
+  });
+});
+

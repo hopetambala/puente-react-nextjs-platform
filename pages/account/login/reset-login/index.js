@@ -11,7 +11,6 @@ import { sendMessage } from 'app/modules/cloud-code';
 import { queryUser, retrieveSignOutFunction } from 'app/modules/user';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import * as yup from 'yup';
@@ -24,14 +23,16 @@ const validationSchema = yup.object().shape({
 
 function ResetLogin() {
   const { t } = useTranslation('common');
-  const [notificationType, setNotificationType] = useState('email');
+  // Email only. Reset by text went to Puente's SMS functions, retired in
+  // October 2026 (serverless/README.md): it sent nothing while the page said
+  // the message was on its way.
   const methods = useForm({
     resolver: yupResolver(validationSchema),
   });
   const { handleSubmit, errors } = methods;
 
   const retrieveUser = (username) => queryUser(username)
-    .then((user) => sendMessage(user, notificationType));
+    .then((user) => sendMessage(user, 'email'));
 
   const onSubmit = (data) => {
     const { usernameV } = data;
@@ -68,29 +69,11 @@ function ResetLogin() {
               />
             </Stack>
           </FormProvider>
-          <Stack spacing="medium" fill>
-            <Button
-              intent={notificationType === 'email' ? 'primary' : ''}
-              onClick={() => setNotificationType('email')}
-              text={t('account_reset_send_email')}
-              isFullWidth
-            />
-            <Button
-              intent={notificationType === 'text' ? 'primary' : ''}
-              onClick={() => setNotificationType('text')}
-              text={t('account_reset_send_text')}
-              isFullWidth
-            />
-          </Stack>
           <Stack isVertical spacing="medium">
             <Button
-              // A whole key per channel, not `Send reset ${type}`: "email" and
-              // "text" are stored codes, and the two sentences do not share a
-              // shape across languages.
               type="submit"
-              text={notificationType === 'text'
-                ? t('account_reset_submit_text')
-                : t('account_reset_submit_email')}
+              intent="primary"
+              text={t('account_reset_submit_email')}
               isFullWidth
             />
           </Stack>

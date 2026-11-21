@@ -113,8 +113,7 @@ function Management(props) {
                           className={styles.readOnlyNote}
                           data-testid="organization-change-note"
                         >
-                          Your organization determines which records you can see.
-                          Email info@puente-dr.org to change it.
+                          {t('account_org_change_note')}
                         </p>
                       </Stack>
                     ) : (
@@ -165,22 +164,16 @@ function ManagementWrapper() {
   const router = useRouter()
   const [user, setUser] = useState()
   const [userId, setUserID] = useState()
-  const { objectId } = router.query
 
   useEffect(() => {
     const retrieveAccountDetails = async () => {
-      // Use URL param objectId if present, otherwise fall back to current user
-      let targetId = objectId
-      if (!targetId) {
-        const currentUser = retrieveCurrentUserAsyncFunction()
-        if (!currentUser) {
-          // Public route opened with no objectId and no signed-in user — send to
-          // login instead of spinning forever.
-          router.push('/account/login')
-          return
-        }
-        targetId = currentUser.id
+      // Always the signed-in person's own account.
+      const currentUser = retrieveCurrentUserAsyncFunction()
+      if (!currentUser) {
+        router.push('/account/login')
+        return
       }
+      const targetId = currentUser.id
       const { attributes: retrievedUser } = await retrieveUserByObjectId(targetId)
       setUserID(targetId)
       setUser({
@@ -193,7 +186,7 @@ function ManagementWrapper() {
       })
     }
     retrieveAccountDetails()
-  }, [objectId])
+  }, [])
 
   return <Management user={user} userId={userId} router={router} loading={!user} />
 }

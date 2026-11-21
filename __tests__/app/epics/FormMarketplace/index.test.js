@@ -20,10 +20,11 @@ jest.mock('app/epics/FormMarketplace/_data', () => ({
 }));
 
 jest.mock('app/impacto-design-system', () => ({
-  CardAlt: ({ title, description }) => (
+  CardAlt: ({ title, description, actions = [] }) => (
     <div data-testid="card">
       <span>{title}</span>
       <span>{description}</span>
+      {actions.map((a) => <button type="button" key={a.text} onClick={a.action}>{a.text}</button>)}
     </div>
   ),
   Spinner: () => <div data-testid="spinner" />,
@@ -87,5 +88,11 @@ describe('FormMarketplace — copy', () => {
     await waitFor(() => {
       expect(screen.getByTestId('empty-state')).toHaveTextContent('form_marketplace_empty');
     });
+  });
+
+  it('labels the Duplicate action through t(), not hard-coded English', async () => {
+    renderMarketplace([{ objectId: '1', name: 'WaSH Survey', description: '' }]);
+    expect(await screen.findByRole('button', { name: 'form_manager_duplicate' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Duplicate' })).not.toBeInTheDocument();
   });
 });

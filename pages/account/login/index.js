@@ -5,17 +5,20 @@ import {
     LanguageSwitcher,
     Toast,
 } from 'app/impacto-design-system';
+import { PRIVACY_POLICY_URL } from 'app/modules/legal';
 import { retrieveSignInFunction } from 'app/modules/user';
 import parseService from 'app/services/parse';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import * as yup from 'yup';
 
+import packageJson from '../../../package.json';
 import styles from './index.module.scss';
 
 const validationSchema = yup.object().shape({
@@ -23,7 +26,7 @@ const validationSchema = yup.object().shape({
   passwordV: yup.string().required('Password is Required'),
 });
 
-function Login() {
+function Login({ appVersion }) {
   const { t } = useTranslation('common');
   const router = useRouter();
   const methods = useForm({ resolver: yupResolver(validationSchema) });
@@ -42,7 +45,12 @@ function Login() {
         const returnUrl = router.query.returnUrl || '/quick-start';
         router.push(returnUrl);
       })
-      .catch((e) => toast(<Toast text={`${e.message}`} isError />))
+      .catch((e) => toast(
+        <Toast
+          text={e.code === 'ACCOUNT_DEACTIVATED' ? t('login_account_deactivated') : `${e.message}`}
+          isError
+        />,
+      ))
       .finally(() => setLoading(false));
   };
 
@@ -68,9 +76,13 @@ function Login() {
         </div>
 
         <div className={styles.leftFooter}>
-          <span>v0.1.2</span>
-          <span>·</span>
+          {appVersion && <span>{`v${appVersion}`}</span>}
+          {appVersion && <span>·</span>}
           <span>{t('login_license')}</span>
+          <span>·</span>
+          <a href={PRIVACY_POLICY_URL} target="_blank" rel="noreferrer" className={styles.leftFooterLink}>
+            {t('privacy_policy')}
+          </a>
         </div>
       </div>
 
@@ -143,9 +155,19 @@ function Login() {
 export async function getStaticProps({ locale }) {
   return {
     props: {
+      // Read at build time, like the landing page, instead of a typed number.
+      appVersion: packageJson.version,
       ...(await serverSideTranslations(locale, ['common'])),
     },
   };
 }
+
+Login.defaultProps = {
+  appVersion: null,
+};
+
+Login.propTypes = {
+  appVersion: PropTypes.string,
+};
 
 export default Login;

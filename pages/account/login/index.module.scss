@@ -100,6 +100,12 @@
   z-index: 1;
 }
 
+.leftFooterLink {
+  color: inherit;
+  text-decoration: underline;
+}
+
+
 /* ── right column ── */
 .right {
   background: var(--tk-dlite-semantic-color-surface-base);

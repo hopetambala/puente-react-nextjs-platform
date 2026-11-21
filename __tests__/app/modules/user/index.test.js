@@ -50,6 +50,39 @@ describe('retrieveSignInFunction — user normalization', () => {
   });
 });
 
+// An account an administrator has deactivated is refused at sign-in, with no
+// session left behind and nothing stored.
+describe('retrieveSignInFunction — deactivated accounts', () => {
+  const deactivatedUser = {
+    get: (key) => ({ organization: 'TestOrg', deactivated: true }[key]),
+    toJSON: () => ({ objectId: 'u2', username: 'gone', deactivated: true }),
+  };
+
+  it('refuses a deactivated account and signs it straight back out', async () => {
+    const { Parse } = require('parse');
+    Parse.User.logIn.mockResolvedValue(deactivatedUser);
+    Parse.User.logOut.mockResolvedValue();
+
+    const { retrieveSignInFunction, parseUserValue } = require('app/modules/user');
+    await expect(retrieveSignInFunction('gone', 'pw')).rejects.toMatchObject({
+      code: 'ACCOUNT_DEACTIVATED',
+    });
+
+    expect(Parse.User.logOut).toHaveBeenCalled();
+    expect(parseUserValue()).toBeFalsy();
+    expect(localStorage.getItem('user')).toBeNull();
+  });
+
+  it('lets an active account in', async () => {
+    const { Parse } = require('parse');
+    Parse.User.logIn.mockResolvedValue(fakeParseUser);
+
+    const { retrieveSignInFunction } = require('app/modules/user');
+    await expect(retrieveSignInFunction('TestCMM', 'pw')).resolves.toBe(fakeParseUser);
+    expect(Parse.User.logOut).not.toHaveBeenCalled();
+  });
+});
+
 describe('retrieveSignUpFunction — user normalization', () => {
   it('stores a plain object in the subject so .organization is accessible directly', async () => {
     const { Parse } = require('parse');

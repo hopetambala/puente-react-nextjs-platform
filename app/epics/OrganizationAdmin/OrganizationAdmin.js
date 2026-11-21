@@ -24,7 +24,7 @@ const parseAliases = (value) => value
  */
 function OrganizationRow({
   organization, onEditAliases, members, membersUnavailable, onSetOrgAdmin, onSetUserActive,
-  onLoadMembers,
+  onLoadMembers, canEditAliases,
 }) {
   const { t } = useTranslation('common');
   const [draft, setDraft] = useState((organization.aliases || []).join(', '));
@@ -67,6 +67,13 @@ function OrganizationRow({
         ))}
       </div>
 
+      {/* Staff only: saving spellings is a Puente staff action, so an org
+          admin's editor failed on every save. They see the set above and how
+          to ask. */}
+      {!canEditAliases && (
+        <p className={styles.implicitNote}>{t('org_admin_aliases_ask_staff')}</p>
+      )}
+      {canEditAliases && (
       <div className={styles.aliasEditor}>
         <label className={styles.fieldLabel} htmlFor={`aliases-${organization.shortCode}`}>
           {t('org_admin_aliases_label')}
@@ -85,6 +92,7 @@ function OrganizationRow({
           data-testid={`aliases-save-${organization.shortCode}`}
         />
       </div>
+      )}
 
       {error && (
         <p className={styles.error} data-testid={`aliases-error-${organization.shortCode}`}>
@@ -118,6 +126,7 @@ function OrganizationRow({
 }
 
 OrganizationRow.defaultProps = {
+  canEditAliases: false,
   members: null,
   membersUnavailable: false,
   onSetOrgAdmin: () => {},
@@ -126,6 +135,7 @@ OrganizationRow.defaultProps = {
 };
 
 OrganizationRow.propTypes = {
+  canEditAliases: PropTypes.bool,
   members: PropTypes.arrayOf(PropTypes.shape({})),
   membersUnavailable: PropTypes.bool,
   onSetOrgAdmin: PropTypes.func,
@@ -329,6 +339,7 @@ export default function OrganizationAdmin({
               key={organization.shortCode}
               organization={organization}
               onEditAliases={onEditAliases}
+              canEditAliases={isStaff}
               members={(membersByShortCode || {})[organization.shortCode]}
               membersUnavailable={Boolean((membersByShortCode || {}).unavailable)}
               onSetOrgAdmin={onSetOrgAdmin}

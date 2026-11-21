@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 jest.mock('next-i18next', () => ({ useTranslation: () => ({ t: (k) => k }) }));
 
@@ -10,6 +10,9 @@ jest.mock('next-i18next/serverSideTranslations', () => ({
   serverSideTranslations: jest.fn().mockResolvedValue({ _nextI18Next: {} }),
 }));
 jest.mock('next/router', () => ({ useRouter: () => ({ push: jest.fn(), query: {} }) }));
+jest.mock('app/modules/cloud-code', () => ({
+  sendMessage: jest.fn().mockResolvedValue({}),
+}));
 jest.mock('app/modules/user', () => ({
   queryUser: jest.fn().mockResolvedValue({}),
   sendMessage: jest.fn().mockResolvedValue({}),
@@ -25,12 +28,6 @@ describe('Reset login page — copy', () => {
     expect(screen.getByText('account_reset_field')).toBeInTheDocument();
   });
 
-  it('routes both delivery-channel buttons through t()', () => {
-    render(<ResetLogin />);
-    expect(screen.getByText('account_reset_send_email')).toBeInTheDocument();
-    expect(screen.getByText('account_reset_send_text')).toBeInTheDocument();
-  });
-
   // The submit button read `Send reset ${notificationType}` — an English word
   // concatenated with a stored code. It rendered "Send reset email" in Spanish,
   // beneath two correctly translated buttons. The channel picks a whole key,
@@ -39,13 +36,6 @@ describe('Reset login page — copy', () => {
   it('routes the submit button through t(), defaulting to the email channel', () => {
     render(<ResetLogin />);
     expect(screen.getByText('account_reset_submit_email')).toBeInTheDocument();
-  });
-
-  it('switches the submit key when the text channel is chosen', () => {
-    render(<ResetLogin />);
-    fireEvent.click(screen.getByText('account_reset_send_text'));
-    expect(screen.getByText('account_reset_submit_text')).toBeInTheDocument();
-    expect(screen.queryByText('account_reset_submit_email')).not.toBeInTheDocument();
   });
 
   it('loads the common catalog server-side', async () => {
@@ -64,5 +54,26 @@ describe('form semantics', () => {
     const button = await screen.findByRole('button', { name: 'account_reset_submit_email' });
     expect(button).toHaveAttribute('type', 'submit');
     expect(button.closest('form')).not.toBeNull();
+  });
+});
+
+// Reset by text message went to Puente's SMS functions, which were retired in
+// October 2026 (serverless/README.md), so choosing it sent nothing while the
+// page said the message was on its way. Email is the only channel offered.
+describe('Reset channel', () => {
+  it('offers no text-message option', () => {
+    render(<ResetLogin />);
+    expect(screen.queryByText('account_reset_send_text')).not.toBeInTheDocument();
+    expect(screen.queryByText('account_reset_submit_text')).not.toBeInTheDocument();
+  });
+
+  it('sends the reset by email', async () => {
+    const { sendMessage } = require('app/modules/cloud-code');
+    const { queryUser } = require('app/modules/user');
+    queryUser.mockResolvedValue({ objectId: 'u1' });
+    render(<ResetLogin />);
+    fireEvent.change(screen.getByLabelText(/account_reset_field/), { target: { value: 'ana@example.org' } });
+    fireEvent.click(screen.getByRole('button', { name: 'account_reset_submit_email' }));
+    await waitFor(() => expect(sendMessage).toHaveBeenCalledWith({ objectId: 'u1' }, 'email'));
   });
 });
